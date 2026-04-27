@@ -1,0 +1,67 @@
+# Deploy the docs site to Cloudflare Pages on every push to main.
+#
+# Secrets are read from the `production` environment so they're
+# scoped to deploys from the protected branch:
+#   CLOUDFLARE_API_TOKEN  — token with Pages:Edit + User Details:Read
+#   CLOUDFLARE_ACCOUNT_ID — Cloudflare account ID
+#
+# The build runs `npm run build:cf`, which:
+#   1. generates public/_redirects from next.config.mjs
+#   2. produces a static export at out/ with NEXT_OUTPUT_EXPORT=1
+#   3. mirrors out/ipa → out/api and writes index.html / api.html
+#      so the rewrite-style URLs (`/`, `/api`, `/api/<splat>`) all
+#      resolve to physical files (Cloudflare Pages doesn't reliably
+#      proxy splat rewrites declared in `_redirects`).
+#
+# Pull requests build but don't deploy — they get a preview URL
+# from Cloudflare via the wrangler action's `branch: <pr branch>`.
+
+name: Deploy docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+  deployments: write
+
+concurrency:
+  group: deploy-docs-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: ${{ github.event_name == 'push' && 'production' || 'preview' }}
+      url: ${{ steps.publish.outputs.deployment-url }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build for Cloudflare
+        run: npm run build:cf
+
+      - name: Publish to Cloudflare Pages
+        id: publish
+        uses: cloudflare/wrangler-action@v3
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          command: >-
+            pages deploy out
+            --project-name openzro-docs
+            --branch ${{ github.head_ref || github.ref_name }}
+            --commit-dirty=true

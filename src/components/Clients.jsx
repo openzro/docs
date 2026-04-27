@@ -99,7 +99,7 @@ function ClientPattern({ mouseX, mouseY, ...gridProps }) {
         />
       </div>
       <motion.div
-        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#FFAC1C] to-[#F28C28] opacity-0 transition duration-300 group-hover:opacity-30 dark:group-hover:opacity-60 dark:from-[#F28C28]/30 dark:to-[#FF7518]/30"
+        className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#8b5cf6] to-[#5b21b6] opacity-0 transition duration-300 group-hover:opacity-30 dark:group-hover:opacity-60 dark:from-[#a78bfa]/30 dark:to-[#7c3aed]/30"
         style={style}
       />
       <motion.div
