@@ -69,7 +69,15 @@ After creating your setup key, the next step is to provision your VM and install
 * [Install openZro](https://docs.openzro.io/get-started/install) by running:
 
 ```bash
-curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
+# Install via the openZro APT repo (Debian / Ubuntu).
+# For other distros — RHEL / Fedora / openSUSE / macOS / Windows / Docker —
+# see the platform-specific guides at /get-started/install.
+curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg \
+  | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] \
+https://pkg.openzro.io/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null
+sudo apt-get update && sudo apt-get install -y openzro
 ```
 
 Once installation completes, connect to the openZro network using your setup key:

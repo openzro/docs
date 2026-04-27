@@ -56,7 +56,8 @@ Launch an EC2 instance in your VPC with openZro installed. Use the following use
 
 ```bash
 #!/bin/bash
-curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
+# See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
+curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
 openzro up --setup-key YOUR_AWS_SETUP_KEY
 ```
 
@@ -66,7 +67,8 @@ Launch a Compute Engine instance in your VPC:
 
 ```bash
 #!/bin/bash
-curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
+# See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
+curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
 openzro up --setup-key YOUR_GCP_SETUP_KEY
 ```
 

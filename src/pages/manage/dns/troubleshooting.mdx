@@ -415,7 +415,8 @@ sudo systemctl disable openzro
 # Restore DNS manually (see above)
 
 # Reinstall openZro
-curl -sSL https://github.com/openzro/openzro/releases/latest | sh
+# See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
+curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
 ```
 
 ### Issue 6: DNS Rebinding Protection

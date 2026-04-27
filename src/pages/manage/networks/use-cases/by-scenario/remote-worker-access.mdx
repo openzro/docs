@@ -116,7 +116,8 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 
 ```bash
 # Linux
-curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
+# See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
+curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
 sudo openzro up --setup-key YOUR_SETUP_KEY
 
 # Windows (PowerShell as Administrator)

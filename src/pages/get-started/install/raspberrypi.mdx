@@ -32,24 +32,36 @@ sudo apt update && sudo apt upgrade -y
 
 ```
 
-### Install openZro with One Command
+### Install openZro
 
-openZro provides a simple one-line installation script that detects your system architecture, adds the openZro repository, installs the latest stable version, and configures the service to start on boot:
+Raspberry Pi OS is Debian-based, so the standard APT repository
+works. For other distros (Alpine, Arch, etc.) see the
+[Linux install guide](/get-started/install/linux):
 
 ```bash
-curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
-
+curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg \
+  | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null
+echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] \
+https://pkg.openzro.io/apt stable main" \
+  | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null
+sudo apt-get update
+sudo apt-get install -y openzro
 ```
+
+The package installs the openZro binary, registers a systemd
+service, and starts it.
 
 ### Connect to Your openZro Network
 
-Run the following to authenticate and join your network:
+Authenticate and join your network:
 
 ```bash
 sudo openzro up
-
 ```
 
-This will present you with an Authentication URL. Open it in your browser, log in with your openZro deployment, and approve the device. Alternatively, you can authenticate with a **setup key**. Learn more about generating setup key, learn more about that [here](https://docs.openzro.io/how-to/setup-keys-add-servers-to-network#creating-a-setup-key-in-your-net-bird-account).
+This presents an Authentication URL — open it in a browser, sign in
+through your IdP, and approve the device. Alternatively, use a
+[setup key](/manage/peers/register-machines-using-setup-keys) for
+headless authentication.
 
 Once the device is connected it should show up under the **Peers** page on the openZro dashboard. Here we can quickly assign the Raspberry Pi a group. Within the **Groups** column click the pencil to edit and add the peer to a new group, this can be something like “RaspberryPi”.
