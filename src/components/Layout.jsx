@@ -251,7 +251,7 @@ export function Layout({ children, title, tableOfContents }) {
                   {showJumpToTop && (
                     <button
                       onClick={scrollToTop}
-                      className="text-xs text-slate-500 hover:text-orange-500 dark:text-slate-400 dark:hover:text-orange-400 transition-colors flex items-center gap-1"
+                      className="text-xs text-slate-500 hover:text-violet-500 dark:text-slate-400 dark:hover:text-violet-400 transition-colors flex items-center gap-1"
                       aria-label="Jump to top"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -269,7 +269,7 @@ export function Layout({ children, title, tableOfContents }) {
                           href={`#${section.id}`}
                           className={clsx(
                             isActive(section)
-                              ? 'text-orange-500'
+                              ? 'text-violet-500'
                               : 'font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
                           )}
                         >
@@ -287,7 +287,7 @@ export function Layout({ children, title, tableOfContents }) {
                                 href={`#${subSection.id}`}
                                 className={
                                   isActive(subSection)
-                                    ? 'text-orange-500'
+                                    ? 'text-violet-500'
                                     : 'hover:text-slate-600 dark:hover:text-slate-300'
                                 }
                               >

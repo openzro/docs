@@ -43,14 +43,19 @@ export default function Document() {
           <GoogleTagManagerHeadScript />
           <script dangerouslySetInnerHTML={{ __html: modeScript }} />
           {/*
-            Primary favicon is the openZro brand SVG — modern browsers
-            (>=2017) pick it. A `.ico` fallback path is kept for older
-            agents but the file behind it is upstream's; it ships with
-            the clone and should be replaced when we generate a
-            multi-resolution ico from the brand SVG.
+            Favicons rendered from public/docs-static/img/openzro-icon.svg:
+              - SVG primary for modern browsers (Chrome/Firefox/Edge >=2017)
+              - .ico fallback (16x16 + 32x32 + 48x48 + 64x64) for legacy
+                user-agents and the Windows tile preview
+              - apple-touch-icon for iOS home-screen shortcuts
+            Regenerate with:
+              rsvg-convert -w 180 -h 180 public/docs-static/img/openzro-icon.svg \
+                -o public/docs-static/img/apple-touch-icon.png
+              magick /tmp/oz-{16,32,48,64}.png public/docs-static/img/favicon.ico
           */}
           <link rel="icon" type="image/svg+xml" href="/docs-static/img/openzro-icon.svg" />
-          <link rel="shortcut icon" href="/docs-static/img/favicon.ico" />
+          <link rel="icon" type="image/x-icon" href="/docs-static/img/favicon.ico" />
+          <link rel="apple-touch-icon" href="/docs-static/img/apple-touch-icon.png" />
       </Head>
       <body className="bg-white antialiased dark:bg-[#181A1D]">
         <GoogleTageManagerBodyScript />
