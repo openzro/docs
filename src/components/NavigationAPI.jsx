@@ -57,9 +57,6 @@ export const apiNavigation = [
             { title: 'EDR Intune', href: '/api/resources/edr-intune-integrations' },
             { title: 'EDR SentinelOne', href: '/api/resources/edr-sentinelone-integrations' },
             { title: 'Notifications', href: '/api/resources/notifications' },
-            { title: 'MSP', href: '/api/resources/msp' },
-            { title: 'Invoice', href: '/api/resources/invoice' },
-            { title: 'Usage', href: '/api/resources/usage' },
         ],
     },
 ]

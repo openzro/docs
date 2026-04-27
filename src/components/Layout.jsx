@@ -5,7 +5,6 @@ import clsx from 'clsx'
 
 import { Logo } from '@/components/Logo'
 import { Prose } from '@/components/Prose'
-import {HeroPattern} from "@/components/HeroPattern";
 import {NavigationDocs} from "@/components/NavigationDocs";
 import {Header} from "@/components/Header";
 import {NavigationAPI} from "@/components/NavigationAPI";
@@ -186,7 +185,6 @@ export function Layout({ children, title, tableOfContents }) {
   return (
     <>
       <AnnouncementBanner />
-      <HeroPattern/>
       <div
         className="relative mx-auto flex max-w-8xl sm:px-2 lg:px-8 xl:px-12 lg:ml-72 xl:ml-80"
         style={{ paddingTop: bannerHeight }}

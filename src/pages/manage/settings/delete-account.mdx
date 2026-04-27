@@ -1,32 +1,53 @@
 import {Note} from "@/components/mdx";
 
-# Delete your openZro account
-To delete your openZro organization account, you must be a user with the [owner role](/manage/team/add-users-to-your-network#manage-user-roles). You can ask the owner to delete the organization account if you are not the account owner.
-## Delete your account
+# Delete the account record
+
+In openZro, the **account record** is the per-tenant container in the
+management server's database that owns your peers, users, groups,
+policies, network resources, and routes. Deleting it through the
+dashboard removes that record and all of its associated data — but
+**it does not uninstall openZro itself**. The management server keeps
+running and is ready to create a fresh account on the next IdP login.
+
+To delete the account, you must be signed in as a user with the
+[owner role](/manage/team/add-users-to-your-network#manage-user-roles).
+If you aren't the owner, ask the owner to do it.
+
 <Note>
-    Before proceeding to delete your openZro account, please be aware that this action is irreversible. Once your account is deleted, you will permanently lose access to all associated data, including your peers, users, groups, policies, and routes.
+    This action is irreversible. Once the account is deleted, all
+    associated data — peers, users, groups, policies, routes, network
+    resources, audit log, flow exports, MDM/EDR integrations,
+    posture-check definitions — is permanently gone. There is no
+    recovery from this side; you'd have to restore the management
+    server's database from a backup.
 </Note>
 
-    Go to the `Settings` tab, then click on `Danger Zone`. Review the message and click on the `Delete Account` button.
-<p>
-    <img src="/docs-static/img/manage/settings/account-settings-danger-zone.png" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
-    To confirm, click on the `Delete` button.
-<p>
-    <img src="/docs-static/img/manage/settings/account-settings-delete-account-confirm.png" alt="high-level-dia" className="imagewrapper"/>
-</p>
+## Steps
 
+1. Open `Settings` → `Danger Zone`.
+2. Review the warning. Click `Delete Account`.
 
-After you delete your account, your session will end, and you will be redirected to the login page.
-<Note>
-    If you log in again, a new account will be created.
-</Note>
+   <p>
+       <img src="/docs-static/img/manage/settings/account-settings-danger-zone.png" alt="settings danger zone" className="imagewrapper-big"/>
+   </p>
+3. Confirm by clicking `Delete`.
+
+   <p>
+       <img src="/docs-static/img/manage/settings/account-settings-delete-account-confirm.png" alt="confirm delete" className="imagewrapper"/>
+   </p>
+
+After deletion, your session ends and you're redirected to the login
+page. If you log in again, a fresh account record is created
+automatically.
+
+## What about the management server itself?
+
+To uninstall the management binary and tear down the deployment
+entirely (database, configuration, certificates), see
+[Remove openZro](/selfhosted/maintenance/remove) under self-host
+maintenance.
+
 ## Get started
-<p float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
-</p>
 
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Follow us [on X](https://x.com/openzro)
-- Join our [Slack Channel](/slack-url)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub
+- Star openZro on [GitHub](https://github.com/openzro/openzro)
+- Latest [release notes](https://github.com/openzro/openzro/releases)
