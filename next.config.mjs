@@ -14,11 +14,19 @@ const withMDX = nextMDX({
 })
 
 
+// Static export mode for Cloudflare Pages. When NEXT_OUTPUT_EXPORT=1,
+// Next emits pure HTML to `out/`. The redirects/rewrites declared
+// below are converted to a Cloudflare `_redirects` file by
+// scripts/gen-redirects.mjs (committed to public/) — Next itself
+// ignores them in export mode since they require a server.
+const isStaticExport = process.env.NEXT_OUTPUT_EXPORT === '1';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
     assetPrefix: undefined,
     reactStrictMode: true,
     pageExtensions: ['js', 'jsx', 'ts', 'tsx', 'mdx'],
+    ...(isStaticExport ? { output: 'export', images: { unoptimized: true } } : {}),
     redirects: async () => {
         return [
             {
