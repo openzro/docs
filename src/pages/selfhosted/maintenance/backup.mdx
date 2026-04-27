@@ -1,6 +1,6 @@
-# Back Up Your Self-Hosted NetBird Installation
+# Back Up Your Self-Hosted openZro Installation
 
-To back up your NetBird installation, you need to copy the configuration files and the Management service databases.
+To back up your openZro installation, you need to copy the configuration files and the Management service databases.
 
 The configuration files are located in the folder where you ran [the installation script](/selfhosted/selfhosted-quickstart#installation-script). To back up, copy the files to a backup location:
 ```bash
@@ -13,9 +13,9 @@ For detailed information about each configuration file and its options, see the 
 </Note>
 To save the server databases, stop the server and copy the files from the data directory:
 ```bash
-docker compose stop netbird-server
-docker compose cp -a netbird-server:/var/lib/netbird/ backup/
-docker compose start netbird-server
+docker compose stop openzro-server
+docker compose cp -a openzro-server:/var/lib/openzro/ backup/
+docker compose start openzro-server
 ```
 
 ## Older Setup (Separate Containers)
@@ -29,7 +29,7 @@ cp docker-compose.yml Caddyfile dashboard.env management.json relay.env backup/
 To save the Management service database:
 ```bash
 docker compose stop management
-docker compose cp -a management:/var/lib/netbird/ backup/
+docker compose cp -a management:/var/lib/openzro/ backup/
 docker compose start management
 ```
 
@@ -37,6 +37,6 @@ docker compose start management
 
 Feel free to ping us on [Slack](/slack-url) if you have any questions.
 
-- NetBird managed version: [https://app.netbird.io](https://app.netbird.io)
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- openZro managed version: [https://app.openzro.io](https://app.openzro.io)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)

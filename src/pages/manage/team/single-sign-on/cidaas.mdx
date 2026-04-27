@@ -1,8 +1,8 @@
 import {Note} from "@/components/mdx";
 
-# cidaas on NetBird Cloud
+# cidaas on openZro Cloud
 
-You can use [cidaas](https://www.cidaas.com/) as your Identity Provider with NetBird, but it will require some additional configuration steps. cidaas is a cloud-native Identity and Access Management platform that provides single sign-on, multi-factor authentication, user self-service, and fine-grained authorization.
+You can use [cidaas](https://www.cidaas.com/) as your Identity Provider with openZro, but it will require some additional configuration steps. cidaas is a cloud-native Identity and Access Management platform that provides single sign-on, multi-factor authentication, user self-service, and fine-grained authorization.
 
 <Note>
     Support for OIDC-compliant IdPs is available on the Team plan and higher.
@@ -18,9 +18,9 @@ This opens the **Create App** form, which is divided into three sections: **App 
 ## Step 2: Fill in App Details
 
 Configure the App Details section with the following settings:
-- **App Name**: `NetBird`
-- **App Display Name**: `NetBird`
-- **App Logo URL**: `https://netbird.io/_next/static/media/netbird-logo.46570303.svg`
+- **App Name**: `openZro`
+- **App Display Name**: `openZro`
+- **App Logo URL**: `https://openzro.io/_next/static/media/openzro-logo.46570303.svg`
 - **App Type**: `Regular`
 
 <p>
@@ -35,8 +35,8 @@ Configure the App Settings section with the following settings:
 - **Scopes**: `openid`, `email`, `profile`
 - **Hosted Page Group**: `default`
 - **OAuth Standard**: `OAuth2.1`
-- **Redirect URLs**: `https://login.netbird.io/login/callback`
-- **Allow Logout URLs**: `https://login.netbird.io/oauth/revoke`
+- **Redirect URLs**: `https://login.openzro.io/login/callback`
+- **Allow Logout URLs**: `https://login.openzro.io/oauth/revoke`
 
 <p>
     <img src="/docs-static/img/manage/team/single-sign-on/cidaas-idp/app-settings.png" alt="cidaas-app-settings" className="imagewrapper-big"/>
@@ -47,12 +47,12 @@ Click **Next** to proceed to Company Settings.
 ## Step 4: Configure Company Settings
 
 Configure the App Settings section with the following settings:
-- **Company Name**: `NetBird GmbH`
+- **Company Name**: `openZro GmbH`
 - **Company Address**: `Brunnenstraße 196 10119 Berlin`
-- **Website URL**: `https://netbird.io`
-- **Terms and Conditions URL**: `https://netbird.io/terms`
-- **Privacy Policy URL**: `https://netbird.io/privacy`
-- **Imprint URL**: `https://netbird.io/imprint`
+- **Website URL**: `https://openzro.io`
+- **Terms and Conditions URL**: `https://openzro.io/terms`
+- **Privacy Policy URL**: `https://openzro.io/privacy`
+- **Imprint URL**: `https://openzro.io/imprint`
 
 <p>
     <img src="/docs-static/img/manage/team/single-sign-on/cidaas-idp/company-settings.png" alt="cidaas-company-settings" className="imagewrapper-big"/>
@@ -76,9 +76,9 @@ Ensure the application status is set to **Active**. If it is not active, select 
 
 From the application's **App Settings** tab, copy the **Client ID** and **Client Secret**.
 
-## Step 7: Share Configuration with NetBird
+## Step 7: Share Configuration with openZro
 
-Send the following information to the NetBird support team at support@netbird.io:
+Send the following information to the openZro support team at support@openzro.io:
 
 - **Client ID**
 - **Client Secret**

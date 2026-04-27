@@ -15,7 +15,7 @@ jobs:
         id: meta
         uses: docker/metadata-action@v3
         with:
-          images: netbirdio/docs.netbird.io
+          images: openzro/docs.openzro.io
       -
         name: Login to DockerHub
         if: github.event_name != 'pull_request'

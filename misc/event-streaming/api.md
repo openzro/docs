@@ -1,10 +1,10 @@
 # Event-Streaming Integration API Documentation
 
 ## Introduction
-This reference provides detailed information on managing event-streaming integrations via NetBird Cloud API.
+This reference provides detailed information on managing event-streaming integrations via openZro Cloud API.
 
 ## Authentication
-Authentication is required for all API requests. Please refer to the [authentication guideline](https://docs.netbird.io/how-to/access-netbird-public-api) for how to create and authenticate API calls using Personal Access Tokens (PAT).
+Authentication is required for all API requests. Please refer to the [authentication guideline](https://docs.openzro.io/how-to/access-openzro-public-api) for how to create and authenticate API calls using Personal Access Tokens (PAT).
 
 ## Event Streaming Endpoints
 
@@ -19,7 +19,7 @@ Request:
 
 ```shell
 curl --request POST \
-  --url https://api.netbird.io/api/integrations/event-streaming \
+  --url https://api.openzro.io/api/integrations/event-streaming \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>' \
   --header 'Content-Type: application/json' \
@@ -53,7 +53,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/event-streaming/<ID> \
+  --url https://api.openzro.io/api/integrations/event-streaming/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -73,7 +73,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/event-streaming \
+  --url https://api.openzro.io/api/integrations/event-streaming \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -109,7 +109,7 @@ Request:
 
 ```shell
 curl --request PUT \
-  --url https://api.netbird.io/api/integrations/event-streaming/<ID> \
+  --url https://api.openzro.io/api/integrations/event-streaming/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>' \
   --header 'Content-Type: application/json' \
@@ -143,7 +143,7 @@ Response
 Request
 ```shell
 curl --request DELETE \
-  --url https://api.netbird.io/api/integrations/event-streaming/<ID> \
+  --url https://api.openzro.io/api/integrations/event-streaming/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```

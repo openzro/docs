@@ -24,10 +24,10 @@ This migration process allows users to seamlessly transition between storage opt
     The following commands assume you use the latest docker version with the compose plugin. If you have docker-compose installed as a standalone, please use docker-compose as a command.
 </Note>
 
-1. Backup your data store (`events.db` in `datadir` - default `/var/lib/netbird/`)
+1. Backup your data store (`events.db` in `datadir` - default `/var/lib/openzro/`)
 ```bash
 mkdir backup
-docker compose cp -a management:/var/lib/netbird/. backup/
+docker compose cp -a management:/var/lib/openzro/. backup/
 ```
 
 2. Import Sqlite data to Postgres
@@ -76,7 +76,7 @@ To rollback to the Sqlite  store, follow these steps:
 
 1. Restore `events.db` backup
 ```bash
-docker compose cp backup/events.db management:/var/lib/netbird/events.db
+docker compose cp backup/events.db management:/var/lib/openzro/events.db
 ```
 
 2. Enable SQLite by setting the `NB_ACTIVITY_EVENT_STORE_ENGINE` environment variable to `sqlite`:

@@ -1,10 +1,10 @@
 import {Note, Warning, Success} from "@/components/mdx"
 
-export const description = 'Migrate a self-hosted NetBird deployment from an external identity provider to the embedded IdP introduced in v0.62.0.'
+export const description = 'Migrate a self-hosted openZro deployment from an external identity provider to the embedded IdP introduced in v0.62.0.'
 
 # Migration Guide: External IdP to Embedded IdP
 
-This guide walks through migrating a self-hosted NetBird deployment from an external identity provider to the embedded IdP introduced in v0.62.0.
+This guide walks through migrating a self-hosted openZro deployment from an external identity provider to the embedded IdP introduced in v0.62.0.
 
 <Note>
 **Who is this guide for?** This migration guide is for users who:
@@ -38,7 +38,7 @@ This guide assumes you're using Docker and everything is run in the same bash se
 
 | Requirement | Details |
 |-------------|---------|
-| NetBird version | v0.67.2 or later |
+| openZro version | v0.67.2 or later |
 | Config access | You can read and write `management.json` |
 | Server downtime | The management server **must be stopped** during migration |
 | Backups | Back up your database and config before starting |
@@ -65,7 +65,7 @@ This guide assumes you're using Docker and everything is run in the same bash se
 When to use --domain vs --dashboard-domain vs --api-domain:
 - If you have a single domain for both dashboard and API, use --domain
 - If you don't have a reverse proxy in front of dashboard and API, make sure you use the domain + port combination for each.
-  For example, `--dashboard-domain demo.netbird.io` and `--api-domain demo.netbird.io:33073`
+  For example, `--dashboard-domain demo.openzro.io` and `--api-domain demo.openzro.io:33073`
 </Note>
 ---
 
@@ -89,10 +89,10 @@ Before starting the migration, it's also a good idea to log out of the dashboard
 
 ```bash
 # Replace VERSION with the release tag, and adjust the architecture as needed
-curl -L -o netbird-idp-migrate.tar.gz \
-  https://github.com/netbirdio/netbird/releases/download/v0.67.2/netbird-idp-migrate_0.67.2_linux_amd64.tar.gz
-tar xzf netbird-idp-migrate.tar.gz
-chmod +x netbird-idp-migrate
+curl -L -o openzro-idp-migrate.tar.gz \
+  https://github.com/openzro/openzro/releases/download/v0.67.2/openzro-idp-migrate_0.67.2_linux_amd64.tar.gz
+tar xzf openzro-idp-migrate.tar.gz
+chmod +x openzro-idp-migrate
 ```
 
 Available architectures: `linux_amd64`, `linux_arm64`, `linux_arm`.
@@ -100,7 +100,7 @@ Available architectures: `linux_amd64`, `linux_arm64`, `linux_arm`.
 **Option B — Build from source** (requires Go 1.25+ and a C compiler for CGO/SQLite):
 
 ```bash
-go build -o netbird-idp-migrate ./tools/idp-migrate/
+go build -o openzro-idp-migrate ./tools/idp-migrate/
 ```
 
 Copy the binary to the management server host if you built it elsewhere.
@@ -209,7 +209,7 @@ echo $NETBIRD_IDP_SEED_INFO | base64 -d
 
 You should expect to see an output similar to this:
 ```
-/etc/netbird/management.json
+/etc/openzro/management.json
 /var/lib/docker/volumes/management_data/_data
 {
   "type": "oidc",
@@ -230,7 +230,7 @@ so that the migration tool can connect to it. You can set the env var in your sh
 
 ```bash
 # This should match the same env var content that is passed to the management server
-export NB_STORE_ENGINE_POSTGRES_DSN="host=localhost port=5432 user=postgres password=postgres dbname=netbird sslmode=disable"
+export NB_STORE_ENGINE_POSTGRES_DSN="host=localhost port=5432 user=postgres password=postgres dbname=openzro sslmode=disable"
 ```
 
 
@@ -243,7 +243,7 @@ the correct flags while running the tool.
 Assuming that you've followed the steps in this guide, you should be able to run the tool with the following command:
 
 ```bash
-./netbird-idp-migrate --domain mgmt.example.com --dry-run
+./openzro-idp-migrate --domain mgmt.example.com --dry-run
 ```
 
 <Note>
@@ -275,7 +275,7 @@ Verify before proceeding:
 Run the same command without `--dry-run`:
 
 ```bash
-./netbird-idp-migrate --domain mgmt.example.com
+./openzro-idp-migrate --domain mgmt.example.com
 ```
 
 The tool will show a summary and prompt for confirmation:
@@ -344,8 +344,8 @@ Your dashboard should also be updated to use the embedded IdP configuration, for
 
 Your env vars should have the following values:
 ```bash
-AUTH_AUDIENCE=netbird-dashboard
-AUTH_CLIENT_ID=netbird-dashboard
+AUTH_AUDIENCE=openzro-dashboard
+AUTH_CLIENT_ID=openzro-dashboard
 AUTH_AUTHORITY=https://<your-domain>/oauth2
 AUTH_SUPPORTED_SCOPES=openid profile email groups
 AUTH_REDIRECT_URI=/nb-auth

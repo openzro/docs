@@ -1,27 +1,27 @@
 import {Note} from "@/components/mdx"
 
 export const description =
-    'Configure free and custom domains for NetBird Reverse Proxy services, including CNAME verification and DNS setup.'
+    'Configure free and custom domains for openZro Reverse Proxy services, including CNAME verification and DNS setup.'
 
 # Custom Domains
 
-When you create a reverse proxy service, you need to assign it a domain. NetBird provides built-in domains that are automatically available for every account, and also supports custom domains where you bring your own domain name. This page explains how both types work and walks you through adding and verifying a custom domain.
+When you create a reverse proxy service, you need to assign it a domain. openZro provides built-in domains that are automatically available for every account, and also supports custom domains where you bring your own domain name. This page explains how both types work and walks you through adding and verifying a custom domain.
 
 ## Built-in domains
 
-Every NetBird deployment comes with built-in domains that you can use immediately - no DNS configuration required. The format and labeling of these domains differ between cloud and self-hosted deployments.
+Every openZro deployment comes with built-in domains that you can use immediately - no DNS configuration required. The format and labeling of these domains differ between cloud and self-hosted deployments.
 
 ### Cloud deployments (Free domains)
 
 Cloud accounts receive free domains in the format:
 
 ```
-{subdomain}.{nonce}.{cluster}.proxy.netbird.io
+{subdomain}.{nonce}.{cluster}.proxy.openzro.io
 ```
 
-For example: `myapp.abc123.eu.proxy.netbird.io` where `myapp` is your chosen subdomain, `abc123` is a nonce unique to your account, and `eu` is the proxy cluster region.
+For example: `myapp.abc123.eu.proxy.openzro.io` where `myapp` is your chosen subdomain, `abc123` is a nonce unique to your account, and `eu` is the proxy cluster region.
 
-NetBird operates multiple proxy clusters in different regions, and your available free domains correspond to these clusters. In the domain selector, free domains appear with a **Free** badge.
+openZro operates multiple proxy clusters in different regions, and your available free domains correspond to these clusters. In the domain selector, free domains appear with a **Free** badge.
 
 ### Self-hosted deployments (Cluster domains)
 
@@ -45,13 +45,13 @@ Built-in domains are a quick way to get started. They receive automatic TLS cert
 
 Custom domains let you use your own domain name (e.g., `app.example.com`) for reverse proxy services. Custom domains work identically in both cloud and self-hosted deployments. Before a custom domain can be used, you must verify ownership by creating a CNAME record in your DNS provider.
 
-To manage custom domains, navigate to **Reverse Proxy** > **Custom Domains** in the NetBird dashboard.
+To manage custom domains, navigate to **Reverse Proxy** > **Custom Domains** in the openZro dashboard.
 
 ## Adding a custom domain
 
 Follow these steps to add a custom domain to your account:
 
-1. Navigate to **Reverse Proxy** > **Custom Domains** in the NetBird dashboard.
+1. Navigate to **Reverse Proxy** > **Custom Domains** in the openZro dashboard.
 2. Click **Add Domain**.
 3. Enter your domain name (e.g., `proxy.example.com`).
 4. Select the target **proxy cluster** that will handle traffic for this domain.
@@ -65,20 +65,20 @@ After saving, the domain appears in your list with a **Pending Verification** st
 
 ## Verifying a custom domain
 
-To prove that you own the domain, NetBird requires you to create a specific CNAME record in your DNS provider.
+To prove that you own the domain, openZro requires you to create a specific CNAME record in your DNS provider.
 
 ### Step 1: Create the CNAME record
 
 In your DNS provider, create a wildcard CNAME record for your custom domain, pointing to the proxy cluster address. The CNAME target depends on your deployment type:
 
-- **Cloud deployments** - point to a NetBird-hosted cluster address (e.g., `eu.proxy.netbird.io`)
+- **Cloud deployments** - point to a openZro-hosted cluster address (e.g., `eu.proxy.openzro.io`)
 - **Self-hosted deployments** - point to your own proxy URL (e.g., `proxy.mycompany.com`)
 
 For example, on a cloud deployment:
 
 | Record Type | Name | Value |
 |-------------|------|-------|
-| `CNAME` | `*.proxy.example.com` | `eu.proxy.netbird.io` |
+| `CNAME` | `*.proxy.example.com` | `eu.proxy.openzro.io` |
 
 On a self-hosted deployment:
 
@@ -86,7 +86,7 @@ On a self-hosted deployment:
 |-------------|------|-------|
 | `CNAME` | `*.proxy.example.com` | `proxy.mycompany.com` |
 
-The exact target value depends on the proxy cluster you selected when adding the domain. The NetBird dashboard displays the required CNAME record and target after you save the domain.
+The exact target value depends on the proxy cluster you selected when adding the domain. The openZro dashboard displays the required CNAME record and target after you save the domain.
 
 ### Step 2: Verify in the dashboard
 
@@ -102,10 +102,10 @@ Confirm that the dialog reflects CNAME record you added to your domain provider 
     <img src="/docs-static/img/manage/reverse-proxy/custom-domains/custom-domains-start-verification.png" alt="Start Verification Dialog" className="imagewrapper"/>
 </p>
 
-NetBird performs a CNAME lookup on `*.<your-domain>` and verifies that it resolves to a known proxy cluster. Once verification succeeds, the domain status changes to **Active** and it becomes available in the domain selector when creating or editing services.
+openZro performs a CNAME lookup on `*.<your-domain>` and verifies that it resolves to a known proxy cluster. Once verification succeeds, the domain status changes to **Active** and it becomes available in the domain selector when creating or editing services.
 
 <Note>
-    DNS changes can take time to propagate. If NetBird does not find the record immediately, please wait up to 24 hours and try again.
+    DNS changes can take time to propagate. If openZro does not find the record immediately, please wait up to 24 hours and try again.
 </Note>
 
 ## Managing custom domains
@@ -149,7 +149,7 @@ All domain types receive automatic TLS certificates managed by the proxy.
 
 ### Domain shows as Pending Verification
 
-Verify that the wildcard CNAME record for `*.<your-domain>` is correctly configured and points to the right proxy cluster address. For cloud deployments, this is a NetBird-hosted address (e.g., `eu.proxy.netbird.io`). For self-hosted deployments, this is your own proxy URL (e.g., `proxy.mycompany.com`). Use a DNS lookup tool to confirm the record has propagated:
+Verify that the wildcard CNAME record for `*.<your-domain>` is correctly configured and points to the right proxy cluster address. For cloud deployments, this is a openZro-hosted address (e.g., `eu.proxy.openzro.io`). For self-hosted deployments, this is your own proxy URL (e.g., `proxy.mycompany.com`). Use a DNS lookup tool to confirm the record has propagated:
 
 ```bash
 dig CNAME *.proxy.example.com
@@ -163,7 +163,7 @@ The CNAME record must resolve to one of your available proxy clusters. If you se
 
 ### Domain already in use
 
-Each custom domain must be unique across all NetBird accounts. If you receive an error that the domain is already in use, it may be registered by another account. Verify that you are entering the correct domain name. If you believe this is an error, contact [NetBird support](/slack-url).
+Each custom domain must be unique across all openZro accounts. If you receive an error that the domain is already in use, it may be registered by another account. Verify that you are entering the correct domain name. If you believe this is an error, contact [openZro support](/slack-url).
 
 ## Related pages
 

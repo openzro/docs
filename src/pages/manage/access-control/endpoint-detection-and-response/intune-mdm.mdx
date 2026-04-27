@@ -9,17 +9,17 @@
 
 [Microsoft Intune](https://www.microsoft.com/en-us/security/business/endpoint-management/microsoft-intune) is a cloud-based endpoint management platform that enables organizations to manage devices, enforce security policies, and protect their networks. Intune agent presence on endpoints allows continuous collection and evaluation of device posture, which can then be used to enforce network access controls based on device compliance, security configuration, and enrollment status.
 
-The integration of NetBird with Microsoft Intune provides network security by ensuring only devices managed and compliant
-in Intune can access the protected network. This approach ensures only up-to-date and compliant Windows/macOS endpoints have access to critical network resources via NetBird and lets administrators enforce access restrictions based on compliance policies defined in Intune, such as device health, OS version, security baseline adherence, and more.
+The integration of openZro with Microsoft Intune provides network security by ensuring only devices managed and compliant
+in Intune can access the protected network. This approach ensures only up-to-date and compliant Windows/macOS endpoints have access to critical network resources via openZro and lets administrators enforce access restrictions based on compliance policies defined in Intune, such as device health, OS version, security baseline adherence, and more.
 
-In this guide, you'll learn how to integrate NetBird with Microsoft Intune and configure access controls to allow only Intune-managed/compliant devices onto your network.
+In this guide, you'll learn how to integrate openZro with Microsoft Intune and configure access controls to allow only Intune-managed/compliant devices onto your network.
 
-## Get Started with NetBird-Intune Integration
+## Get Started with openZro-Intune Integration
 
-- Navigate to the [Integrations &raquo; EDR](https://app.netbird.io/integrations?tab=edr) tab in the NetBird dashboard
+- Navigate to the [Integrations &raquo; EDR](https://app.openzro.io/integrations?tab=edr) tab in the openZro dashboard
 - Click `Connect Intune` to start the configuration wizard
 <p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/getting-started.png" alt="NetBird Get Started Intune MDM" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/getting-started.png" alt="openZro Get Started Intune MDM" className="imagewrapper-big"/>
 </p>
 
 ## Prerequisites
@@ -40,18 +40,18 @@ To check your permissions:
 
 ![Intune Roles](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/lDyaAeV.png)
 
-If you don't have the required permissions, contact your Azure AD administrator to grant you the appropriate role before proceeding with the NetBird integration.
+If you don't have the required permissions, contact your Azure AD administrator to grant you the appropriate role before proceeding with the openZro integration.
 
-## Create and Configure a Microsoft Entra ID Application for NetBird Integration
+## Create and Configure a Microsoft Entra ID Application for openZro Integration
 
-Now that you have the required permissions, return to the NetBird dashboard. Click on the `Get Started` button to initiate the integration process.
+Now that you have the required permissions, return to the openZro dashboard. Click on the `Get Started` button to initiate the integration process.
 
 A new wizard screen will appear, offering step-by-step instructions for creating and configuring your Microsoft Entra ID application. To simplify the process, the wizard also provides quick-copy buttons for essential information:
 
 * Name
 * Account Type
 
-![NetBird Create Application](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/create-app.png)
+![openZro Create Application](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/create-app.png)
 
 For convenience, click on [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview) (step 1). That will open the Azure dashboard. Navigate to `App registrations` in the left menu and then click `+New registration` as indicated below:
 
@@ -69,11 +69,11 @@ Upon successful registration, you'll be redirected to a confirmation screen simi
 
 Copy and securely store the generated `Application (client) ID` and `Directory (tenant) ID` as you will need them shortly.
 
-## Configure API Permissions for NetBird-Intune Integration
+## Configure API Permissions for openZro-Intune Integration
 
-On the NetBird dashboard click the `Continue →` button. A new wizard screen will appear, this time, offering step-by-step instructions for setting up API permissions.
+On the openZro dashboard click the `Continue →` button. A new wizard screen will appear, this time, offering step-by-step instructions for setting up API permissions.
 
-![NetBird Add API Permissions](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/api-permissions.png)
+![openZro Add API Permissions](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/api-permissions.png)
 
 Back to Azure, in the `App registrations` screen, click on `Manage` in the left menu to expand it and then click on `API permissions`:
 
@@ -87,7 +87,7 @@ A new pop-up window will appear, asking you to select an API. Click on `Microsof
 
 ![Intune Microsoft Graph](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/tP7WqXO.png)
 
-On the next screen, click on the `Application permissions` button, which will let you select the appropriate permissions for NetBird to function correctly with your Microsoft Intune environment.
+On the next screen, click on the `Application permissions` button, which will let you select the appropriate permissions for openZro to function correctly with your Microsoft Intune environment.
 
 ![Intune Request API Permissions](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/zSkSGAm.png)
 
@@ -99,7 +99,7 @@ To assign user permissions:
 
 ![Intune UserReadAll](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/device-permissions.png)
 
-The `DeviceManagementManagedDevices.Read.All` permission allows NetBird to read the properties of all devices managed by Microsoft Intune in your organization.
+The `DeviceManagementManagedDevices.Read.All` permission allows openZro to read the properties of all devices managed by Microsoft Intune in your organization.
 
 Once done, click the `Add permissions` button. You will see a few warnings:
 
@@ -113,11 +113,11 @@ Once finished, the status of the permissions should change to `Granted for [Your
 
 ![Intune API Permissions Granted](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/granted-permissions.png)
 
-## Create a Client Secret for Secure NetBird-Intune Authentication
+## Create a Client Secret for Secure openZro-Intune Authentication
 
-Back to the NetBird dashboard, click the `Continue →` button. A new wizard screen will appear, showing instructions for generating a client secret in Entra ID.
+Back to the openZro dashboard, click the `Continue →` button. A new wizard screen will appear, showing instructions for generating a client secret in Entra ID.
 
-![NetBird Generate Client Secret](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/client-secret.png)
+![openZro Generate Client Secret](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/client-secret.png)
 
 On Azure, click on the `Certificates & secrets` button in the left menu to open the management page. Click on `+New client secret` as shown below. Choose an expiration time that suits your security needs and click the `Add` button.
 
@@ -127,17 +127,17 @@ A new client secret will be generated and displayed on the screen. Copy and secu
 
 ![EntraID Client Secret Value](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/LimVmGI.png)
 
-## Enter Application ID and Directory ID in NetBird
+## Enter Application ID and Directory ID in openZro
 
-Paste the secret `Value` from the previous step into NetBird and click the `Continue →` button. A new wizard screen will appear, asking for the `Application (client) ID` and the `Directory (tenant) ID` credentials generated previously.
+Paste the secret `Value` from the previous step into openZro and click the `Continue →` button. A new wizard screen will appear, asking for the `Application (client) ID` and the `Directory (tenant) ID` credentials generated previously.
 
 Paste the values and click the `Continue →` button.
 
-![NetBird Application ID and Directory](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/client-id.png)
+![openZro Application ID and Directory](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/client-id.png)
 
 ## Choose Groups to require Intune Agent
 
-At this stage, specify one or more NetBird groups to which the check should apply. The check will require the peer to have a running Intune agent installed.
+At this stage, specify one or more openZro groups to which the check should apply. The check will require the peer to have a running Intune agent installed.
 
 
 ![Intune Groups](/docs-static/img/manage/access-control/endpoint-detection-and-response/intune-mdm/groups.png)
@@ -161,8 +161,8 @@ with a `Approval required` mark in the peers list and won't be able to access th
 - Only Windows and macOS devices are supported; Linux, iOS, and Android are not eligible for this integration.
 - A device must have successfully synced with Intune within the last 24 hours otherwise, it will not be treated as compliant, regardless of its last known state.
 - Devices with a Intune compliance state of `Compliant` or `InGracePeriod` are accepted; all other states are rejected.
-- New devices or those that recently achieved compliance may need to be disconnected and reconnected to NetBird to propagate updated status.
-- NetBird regularly synchronizes with Intune every few minutes, so changes in compliance can take some time to reflect on the dashboard.
+- New devices or those that recently achieved compliance may need to be disconnected and reconnected to openZro to propagate updated status.
+- openZro regularly synchronizes with Intune every few minutes, so changes in compliance can take some time to reflect on the dashboard.
 
 ## Managing Exceptions
 

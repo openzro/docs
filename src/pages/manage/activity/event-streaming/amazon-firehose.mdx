@@ -1,11 +1,11 @@
 # Stream Network Activity to Amazon Data Firehose
 
 [Amazon Data Firehose](https://docs.aws.amazon.com/firehose/) is a fully managed service for delivering real-time streaming data to destinations such as Amazon Simple Storage Service (Amazon S3), Amazon Redshift,
-an other AWS services. You can use Amazon Data Firehose as a bridge between NetBird and other third-party providers that support Data Firehose
+an other AWS services. You can use Amazon Data Firehose as a bridge between openZro and other third-party providers that support Data Firehose
 to ingest, transform and analyze your network activity events.
 
 <Note>
-    This feature is only available in the cloud version of NetBird.
+    This feature is only available in the cloud version of openZro.
 </Note>
 
 ## Prerequisites
@@ -20,7 +20,7 @@ If you don't have the required permissions, ask your AWS administrator to grant 
 - Navigate to the [Data Firehose Dashboard](https://console.aws.amazon.com/firehose/home)
 - Click `Create Firehose stream`
 - As source select `Direct PUT` and the desired destination
-- Give it a descriptive name like `netbird-activity-events` and configure the stream to your needs
+- Give it a descriptive name like `openzro-activity-events` and configure the stream to your needs
 
 ## Create an IAM User
 - Navigate to the [IAM Dashboard](https://console.aws.amazon.com/iam/home)
@@ -36,7 +36,7 @@ If you don't have the required permissions, ask your AWS administrator to grant 
                 "firehose:PutRecord",
                 "firehose:PutRecordBatch"
             ],
-            "Resource": "arn:aws:firehose:region:accountID:deliverystream/netbird-event-streaming"
+            "Resource": "arn:aws:firehose:region:accountID:deliverystream/openzro-event-streaming"
         }
     ]
 }
@@ -46,10 +46,10 @@ If you don't have the required permissions, ask your AWS administrator to grant 
 - Click `Create access key`
 - Select `Third-party service` and click `Next`
 - Give it a description
-- Store `Access key` and `Secret access key` in a secure place. You will need these when configuring an integration in NetBird.
+- Store `Access key` and `Secret access key` in a secure place. You will need these when configuring an integration in openZro.
 
-## Create an Integration in NetBird
-- Navigate to the [Integrations &raquo; Event Streaming](https://preview.netbird.io/integrations) tab in the NetBird dashboard
+## Create an Integration in openZro
+- Navigate to the [Integrations &raquo; Event Streaming](https://preview.openzro.io/integrations) tab in the openZro dashboard
 <p>
     <img src="/docs-static/img/manage/activity/event-streaming/event-streaming-integration.png" alt="event-streaming-integration" className="imagewrapper-big"/>
 </p>

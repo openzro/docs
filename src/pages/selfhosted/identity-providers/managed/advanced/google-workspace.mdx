@@ -1,6 +1,6 @@
 import {Note, Warning} from "@/components/mdx";
 
-# Google Workspace SSO with NetBird Self-Hosted (Legacy)
+# Google Workspace SSO with openZro Self-Hosted (Legacy)
 
 <Warning>
 The client secret has been removed from the authentication flow. The secret was originally included to support providers like Google Workspace that don't offer a proper PKCE flow, but this is no longer necessary with the embedded IdP.
@@ -8,24 +8,24 @@ The client secret has been removed from the authentication flow. The secret was 
 If you are using this standalone Google Workspace setup, we strongly recommend migrating to the [embedded IdP setup with Google as an external provider](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended). The embedded IdP approach is simpler, fully supported, and does not rely on the deprecated client secret.
 </Warning>
 
-Use Google accounts for authentication with NetBird. This supports both personal Google accounts and Google Workspace (formerly G Suite) organizations.
+Use Google accounts for authentication with openZro. This supports both personal Google accounts and Google Workspace (formerly G Suite) organizations.
 
 ## Standalone Setup (Advanced)
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds Google as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended) section in the main Google Workspace documentation.
+We highly recommend using the simpler setup that adds Google as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended) section in the main Google Workspace documentation.
 
 The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Google Workspace administrators who need full control over authentication and user management.
 </Note>
 
-Use Google Workspace as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Google Workspace administrators as it also requires additional setup and ongoing maintenance.
+Use Google Workspace as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Google Workspace administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 <Note>
-Beginning with NetBird version v0.23.6 and onwards, the Google Workspace IdP manager no longer requires the custom admin role called `User and Schema Management`. We now use a read-only role for user information.
+Beginning with openZro version v0.23.6 and onwards, the Google Workspace IdP manager no longer requires the custom admin role called `User and Schema Management`. We now use a read-only role for user information.
 </Note>
 
 ### Prerequisites
@@ -45,9 +45,9 @@ Beginning with NetBird version v0.23.6 and onwards, the Google Workspace IdP man
 </p>
 
 3. Fill in the form:
-   - **App name**: `Netbird`
+   - **App name**: `openZro`
    - **User support email**: `<administrator email>`
-   - **Authorized domain**: `<your netbird domain>`
+   - **Authorized domain**: `<your openzro domain>`
    - **Developer contact information**: `<developer email>`
 4. Click **SAVE AND CONTINUE**
 5. Click **ADD OR REMOVE SCOPES**
@@ -71,7 +71,7 @@ Beginning with NetBird version v0.23.6 and onwards, the Google Workspace IdP man
 2. Click **CREATE CREDENTIALS** → **OAuth client ID**
 3. Fill in:
    - **Application type**: `Web application`
-   - **Name**: `netbird`
+   - **Name**: `openzro`
    - **Authorized JavaScript origins**: `https://<your domain>` and `http://localhost`
    - **Authorized redirect URIs**: 
      - `https://<your domain>/auth`
@@ -94,8 +94,8 @@ Beginning with NetBird version v0.23.6 and onwards, the Google Workspace IdP man
 1. Navigate to [API Credentials](https://console.cloud.google.com/apis/credentials)
 2. Click **CREATE CREDENTIALS** → **Service account**
 3. Fill in:
-   - **Service account name**: `netbird`
-   - **Service account ID**: `netbird`
+   - **Service account name**: `openzro`
+   - **Service account ID**: `openzro`
 4. Note the service account email address
 5. Click **DONE**
 
@@ -106,7 +106,7 @@ Beginning with NetBird version v0.23.6 and onwards, the Google Workspace IdP man
 ### Step 4: Create Service Account Keys
 
 1. Navigate to [API Credentials](https://console.cloud.google.com/apis/credentials)
-2. Under **Service Accounts**, click **netbird** to edit
+2. Under **Service Accounts**, click **openzro** to edit
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/google-workspace/advanced/google-edit-service-account.png" alt="Edit service account" className="imagewrapper-big"/>
@@ -165,7 +165,7 @@ The key file downloads automatically. Store it securely. Read about [managing se
 base64 -i <SERVICE_ACCOUNT_KEY_PATH>
 ```
 
-### Step 7: Configure NetBird
+### Step 7: Configure openZro
 
 Set properties in the `setup.env` file:
 
@@ -189,9 +189,9 @@ NETBIRD_IDP_MGMT_EXTRA_SERVICE_ACCOUNT_KEY="<BASE64_SERVICE_ACCOUNT_KEY>"
 NETBIRD_IDP_MGMT_EXTRA_CUSTOMER_ID="<GOOGLE_WORKSPACE_CUSTOMER_ID>"
 ```
 
-### Step 8: Continue with NetBird Setup
+### Step 8: Continue with openZro Setup
 
-You've configured all required resources in Google Workspace. Continue with the [NetBird Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
+You've configured all required resources in Google Workspace. Continue with the [openZro Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
 
 ---
 
@@ -223,9 +223,9 @@ You've configured all required resources in Google Workspace. Continue with the 
 ---
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds Google as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended) section in the main Google Workspace documentation.
+We highly recommend using the simpler setup that adds Google as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended) section in the main Google Workspace documentation.
 </Note>
 
 ## Related Resources

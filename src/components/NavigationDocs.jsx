@@ -19,30 +19,30 @@ export const docsNavigation = [
   {
     title: 'ABOUT',
     links: [
-      { title: 'How NetBird Works', href: '/about-netbird/how-netbird-works' },
+      { title: 'How openZro Works', href: '/about-openzro/how-openzro-works' },
       {
-        title: 'NetBird vs. Traditional VPN',
-        href: '/about-netbird/netbird-vs-traditional-vpn',
+        title: 'openZro vs. Traditional VPN',
+        href: '/about-openzro/openzro-vs-traditional-vpn',
       },
       {
         title: 'Self-Hosted vs. Cloud',
-        href: '/about-netbird/self-hosted-vs-cloud',
+        href: '/about-openzro/self-hosted-vs-cloud',
       },
       {
         title: 'Understanding NAT and Connectivity',
-        href: '/about-netbird/understanding-nat-and-connectivity',
+        href: '/about-openzro/understanding-nat-and-connectivity',
       },
       {
-        title: 'Why WireGuard with NetBird',
-        href: '/about-netbird/why-wireguard-with-netbird',
+        title: 'Why WireGuard with openZro',
+        href: '/about-openzro/why-wireguard-with-openzro',
       },
       {
         title: 'Browser Client Architecture',
-        href: '/about-netbird/browser-client-architecture',
+        href: '/about-openzro/browser-client-architecture',
       },
-      { title: 'FAQ', href: '/about-netbird/faq' },
-      /*{ title: 'Whats new in version xx', href: '/welcome/how-netbird-works' },
-            { title: 'Release notes', href: '/about-netbird/netbird-vs-traditional-vpn' },*/
+      { title: 'FAQ', href: '/about-openzro/faq' },
+      /*{ title: 'Whats new in version xx', href: '/welcome/how-openzro-works' },
+            { title: 'Release notes', href: '/about-openzro/openzro-vs-traditional-vpn' },*/
     ],
   },
   {
@@ -50,7 +50,7 @@ export const docsNavigation = [
     links: [
       { title: 'Quickstart Guide', href: '/get-started' },
       {
-        title: 'Install NetBird',
+        title: 'Install openZro',
         isOpen: true,
         href: '/get-started/install',
         links: [
@@ -342,7 +342,7 @@ export const docsNavigation = [
           },
           { title: 'Approve Users', href: '/manage/team/approve-users' },
           {
-            title: 'Enable NetBird for Entra ID',
+            title: 'Enable openZro for Entra ID',
             href: '/manage/team/entra-id-app-enablement',
           },
           {
@@ -463,15 +463,15 @@ export const docsNavigation = [
             links: [
               {
                 title: 'Deploy with Jamf Pro',
-                href: '/manage/integrations/mdm-deployment/jamf-pro-netbird-integration',
+                href: '/manage/integrations/mdm-deployment/jamf-pro-openzro-integration',
               },
               {
                 title: 'Deploy with Kandji',
-                href: '/manage/integrations/mdm-deployment/kandji-netbird-integration',
+                href: '/manage/integrations/mdm-deployment/kandji-openzro-integration',
               },
               {
                 title: 'Deploy with Intune',
-                href: '/manage/integrations/mdm-deployment/intune-netbird-integration',
+                href: '/manage/integrations/mdm-deployment/intune-openzro-integration',
               },
             ],
           },
@@ -500,7 +500,7 @@ export const docsNavigation = [
             href: '/manage/for-partners/msp-portal',
           },
           {
-            title: 'Acronis NetBird integration',
+            title: 'Acronis openZro integration',
             href: '/manage/for-partners/acronis-integration',
           },
         ],
@@ -716,7 +716,7 @@ export const docsNavigation = [
         links: [
           { title: 'Overview', href: '/use-cases/homelab' },
           {
-            title: 'NetBird on MikroTik Router',
+            title: 'openZro on MikroTik Router',
             href: '/use-cases/homelab/client-on-mikrotik-router',
           },
         ],
@@ -727,12 +727,12 @@ export const docsNavigation = [
         links: [
           { title: 'Overview', href: '/use-cases/cloud' },
           {
-            title: 'NetBird on AWS ECS',
+            title: 'openZro on AWS ECS',
             href: '/use-cases/cloud/aws-ecs-terraform',
           },
           {
-            title: 'NetBird on Serverless (FaaS)',
-            href: '/use-cases/cloud/netbird-on-faas',
+            title: 'openZro on Serverless (FaaS)',
+            href: '/use-cases/cloud/openzro-on-faas',
           },
           {
             title: 'Routing Peers and Kubernetes',
@@ -773,13 +773,13 @@ export function NavigationDocs({ className }) {
   return (
     <nav className={className}>
       <ul role="list">
-        <TopLevelNavItem href="https://netbird.io/">Home</TopLevelNavItem>
+        <TopLevelNavItem href="https://openzro.io/">Home</TopLevelNavItem>
         <TopLevelNavItem href="/">Docs</TopLevelNavItem>
         <TopLevelNavItem href="/api">API</TopLevelNavItem>
-        <TopLevelNavItem href="https://netbird.io/knowledge-hub/">
+        <TopLevelNavItem href="https://openzro.io/knowledge-hub/">
           Learn
         </TopLevelNavItem>
-        <TopLevelNavItem href="https://github.com/netbirdio/netbird">
+        <TopLevelNavItem href="https://github.com/openzro/openzro">
           Github
         </TopLevelNavItem>
         <TopLevelNavItem href="/slack-url">Support</TopLevelNavItem>
@@ -794,7 +794,7 @@ export function NavigationDocs({ className }) {
         ))}
         <li className="sticky bottom-0 z-10 mt-6 min-[416px]:hidden">
           <Button
-            href="https://app.netbird.io/"
+            href="https://app.openzro.io/"
             variant="filled"
             className="w-full"
           >

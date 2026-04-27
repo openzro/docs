@@ -30,10 +30,11 @@ The fork is *not* a passthrough. We:
 
 ## What we do NOT do
 
-Per BSD-3-Clause clause 3, we do **not** use the names *NetBird* or
-*Wiretrustee* to endorse or promote products derived from this
-software without prior written permission. References to NetBird in
-the openZro docs appear only as historical context (fork rationale,
+Per BSD-3-Clause clause 3, we do **not** use the names of the
+upstream project or its corporate sponsor to endorse or promote
+products derived from this software without prior written
+permission. Any reference to the upstream in the openZro docs
+appears only as historical context (fork rationale,
 acknowledgements) and never as a recommendation or association.
 
 ## Re-syncing with upstream
@@ -41,5 +42,5 @@ acknowledgements) and never as a recommendation or association.
 When upstream releases new pages worth porting, we cherry-pick the
 files individually rather than running a wholesale merge — the prose
 in the rebranded fork has diverged enough that a merge would be
-mostly conflicts. The `git log --grep="Cherry-picked from netbirdio/docs"`
+mostly conflicts. The `git log --grep="Cherry-picked from upstream"`
 trail records every targeted port.

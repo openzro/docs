@@ -5,14 +5,14 @@ Setup key is a pre-authentication key that allows to register new machines in yo
 It simply associates a machine with an account on a first run.
 
 ## Related Video Content
-For a comprehensive guide, part of our "Getting started with NetBird" video specifically covers setup keys:
+For a comprehensive guide, part of our "Getting started with openZro" video specifically covers setup keys:
 <YouTube videoId="JRCZy4rLi-c" start={175} />
 
-The setup key can be provided as a parameter to the ```netbird up``` command.
+The setup key can be provided as a parameter to the ```openzro up``` command.
 This makes it possible to run automated deployments with infrastructure-as-code software like Ansible, Cloudformation or Terraform.
 
-```bash {{ title: 'Starting NetBird Client' }}
-sudo netbird up --setup-key <SETUP KEY>
+```bash {{ title: 'Starting openZro Client' }}
+sudo openzro up --setup-key <SETUP KEY>
 ```
 
 ## Types of setup keys
@@ -24,13 +24,13 @@ There are 2 types of setup keys:
 ## Ephemeral peers
 
 You can create a setup key with the ephemeral peers option enabled.
-Peers added with this key that later become offline for over 10 minutes will be removed automatically from the NetBird system.
+Peers added with this key that later become offline for over 10 minutes will be removed automatically from the openZro system.
 
 This is useful when you want to add containers or auto scaling instances to your network.
 
 ## Using setup keys
 
-Setup keys are available in the NetBird Management Dashboard under the `Setup Keys` tab [https://app.netbird.io/setup-keys](https://app.netbird.io/setup-keys).
+Setup keys are available in the openZro Management Dashboard under the `Setup Keys` tab [https://app.openzro.io/setup-keys](https://app.openzro.io/setup-keys).
  You can easily add new or revoke keys.
 
 <p>
@@ -62,11 +62,11 @@ See [Extra DNS Labels](/manage/dns/extra-dns-labels) for full details, including
 ## Peer Auto-grouping
 
 
-NetBird offers a powerful [access control feature](/manage/access-control/manage-network-access) that allows easy access management of your resources.
+openZro offers a powerful [access control feature](/manage/access-control/manage-network-access) that allows easy access management of your resources.
 In a basic scenario, you would create multiple groups of peers and create access rules to define what groups can access each other.
 Adding peers to groups might become time-consuming in large networks with dozens of machines.
 
-Starting NetBird [v0.9.2](https://github.com/netbirdio/netbird/releases), when creating or updating a setup key,
+Starting openZro [v0.9.2](https://github.com/openzro/openzro/releases), when creating or updating a setup key,
 it is possible to specify a list of auto-assign groups. Every peer registered with this key will be automatically added
 to these groups. All the access control rules enabled for these groups will apply automatically.
 
@@ -74,7 +74,7 @@ To add `Auto-assign groups`, open the `Setup Keys` tab and create or update any 
 Then use this key to enroll new machine.
 
 <p>
-    <img src="/docs-static/img/manage/peers/register-machines-using-setup-keys/netbird-peer-auto-tagging-newkey.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/peers/register-machines-using-setup-keys/openzro-peer-auto-tagging-newkey.png" alt="high-level-dia" className="imagewrapper"/>
 </p>
 
 <Note>

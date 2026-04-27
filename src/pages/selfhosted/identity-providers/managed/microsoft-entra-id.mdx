@@ -1,12 +1,12 @@
 import {Note} from "@/components/mdx";
 
-# Microsoft and Entra ID SSO with NetBird Self-Hosted
+# Microsoft and Entra ID SSO with openZro Self-Hosted
 
-Use Microsoft accounts for authentication with NetBird. This supports both personal Microsoft accounts and Microsoft Entra ID (formerly Azure AD) for work and school accounts.
+Use Microsoft accounts for authentication with openZro. This supports both personal Microsoft accounts and Microsoft Entra ID (formerly Azure AD) for work and school accounts.
 
 ## Management Setup (Recommended)
 
-Add Microsoft as an external IdP directly in the NetBird Management Dashboard. Choose the appropriate identity provider type based on your needs:
+Add Microsoft as an external IdP directly in the openZro Management Dashboard. Choose the appropriate identity provider type based on your needs:
 
 | Identity Provider Type | Use Case |
 |------------------------|----------|
@@ -15,7 +15,7 @@ Add Microsoft as an external IdP directly in the NetBird Management Dashboard. C
 
 ### Prerequisites
 
-- NetBird self-hosted with embedded IdP enabled
+- openZro self-hosted with embedded IdP enabled
 - Access the [Entra Admin Center](https://entra.microsoft.com/)
 
 ### Step 1: Start Creating App Registration
@@ -28,7 +28,7 @@ Add Microsoft as an external IdP directly in the NetBird Management Dashboard. C
 </p>
 
 3. Fill in:
-   - **Name**: `NetBird`
+   - **Name**: `openZro`
    - **Supported account types**: Choose based on your needs:
      - *Single tenant (your organization only)*: `Accounts in this organizational directory only (Default Directory only - Single tenant)`
      - *Multi-tenant (any Entra ID organization)*: `Accounts in any organizational directory (Any Microsoft Entra ID tenant - Multitenant)`
@@ -38,9 +38,9 @@ Add Microsoft as an external IdP directly in the NetBird Management Dashboard. C
 
 4. **Don't click Register yet** — keep this tab open and proceed to Step 2
 
-### Step 2: Get Redirect URL from NetBird
+### Step 2: Get Redirect URL from openZro
 
-1. Open a new tab or window and log in to your NetBird Dashboard
+1. Open a new tab or window and log in to your openZro Dashboard
 2. Navigate to **Settings** → **Identity Providers**
 3. Click **Add Identity Provider**
 4. Fill in the fields:
@@ -68,7 +68,7 @@ Add Microsoft as an external IdP directly in the NetBird Management Dashboard. C
 **Issuer URL format:** `https://login.microsoftonline.com/{tenant-id}/v2.0` where `{tenant-id}` is your Directory (tenant) ID from Azure.
 </Note>
 
-5. **Copy the Redirect URL** that NetBird displays (but don't click **Add Provider** yet)
+5. **Copy the Redirect URL** that openZro displays (but don't click **Add Provider** yet)
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/microsoft-entra-id/2_copy-url-redirect-microsoft-entra.png" alt="Copy URL redirect" className="imagewrapper-big"/>
@@ -86,7 +86,7 @@ Add Microsoft as an external IdP directly in the NetBird Management Dashboard. C
 1. Still in the Entra Admin Center tab, go to **Authentication**
 2. Click **Add a platform** → **Web**
 3. In the dropdown next to the redirect URI field, select **Web**
-4. Paste the redirect URL you copied from NetBird in the **Redirect URI** field
+4. Paste the redirect URL you copied from openZro in the **Redirect URI** field
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/microsoft-entra-id/3_select-web-paste-uri-microsoft-entra.png" alt="Select web and paste URI" className="imagewrapper-big"/>
@@ -111,30 +111,30 @@ Add Microsoft as an external IdP directly in the NetBird Management Dashboard. C
     <img src="/docs-static/img/selfhosted/identity-providers/managed/microsoft-entra-id/5_copy-secret-microsoft-entra.png" alt="Copy secret" className="imagewrapper-big"/>
 </p>
 
-### Step 6: Complete NetBird Setup
+### Step 6: Complete openZro Setup
 
-1. Return to the NetBird tab
+1. Return to the openZro tab
 2. Fill in the fields:
    - **Client ID**: Paste the **Application (client) ID** from Step 3
    - **Client Secret**: Paste the **Value** from Step 5
    - **Issuer URL**: Paste the **Issuer URL** you constructed in Step 3 (for Entra ID only)
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/microsoft-entra-id/6_netbird-config-filled-microsoft-entra.png" alt="NetBird config filled" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/managed/microsoft-entra-id/6_openzro-config-filled-microsoft-entra.png" alt="openZro config filled" className="imagewrapper-big"/>
 </p>
 
 3. Click **Add Provider**
 
 ### Step 7: Test the Connection
 
-1. Log out of NetBird Dashboard
+1. Log out of openZro Dashboard
 2. On the login page, you should see the Microsoft button
 3. Click it and sign in with your Microsoft account
-4. You should be redirected back to NetBird and logged in. Unless your user approval setting were changed you will need to log back into your local admin account to approve the user.
+4. You should be redirected back to openZro and logged in. Unless your user approval setting were changed you will need to log back into your local admin account to approve the user.
 
 ### Configuring JWT 'groups' Claim
 
-To sync Entra ID groups with NetBird, you need to configure your app registration to include group claims in the ID token.
+To sync Entra ID groups with openZro, you need to configure your app registration to include group claims in the ID token.
 
 #### Step 1: Configure Groups Claim in Azure
 
@@ -166,32 +166,32 @@ To sync Entra ID groups with NetBird, you need to configure your app registratio
 If you selected "Groups assigned to the application":
 
 1. Go to **Enterprise applications** in Entra Admin Center
-2. Find and select your NetBird application
+2. Find and select your openZro application
 3. Go to **Users and groups**
 4. Click **Add user/group**
-5. Select the groups you want to sync with NetBird
+5. Select the groups you want to sync with openZro
 6. Click **Assign**
 
-#### Step 3: Enable JWT Group Sync in NetBird
+#### Step 3: Enable JWT Group Sync in openZro
 
-1. In NetBird Dashboard, go to **Settings** → **Groups**
+1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to `groups`
 4. Optionally configure **JWT allow groups** to restrict access
 
 <Note>
-Entra ID returns group **object IDs** (GUIDs) by default, not group names. Your NetBird groups will appear as IDs like `a1b2c3d4-5678-90ab-cdef-1234567890ab`. To use display names instead, you need Azure AD Premium and cloud-only groups. [NetBird Cloud](https://netbird.io/) does not have this limitation—it syncs group names directly via the Microsoft integration.
+Entra ID returns group **object IDs** (GUIDs) by default, not group names. Your openZro groups will appear as IDs like `a1b2c3d4-5678-90ab-cdef-1234567890ab`. To use display names instead, you need Azure AD Premium and cloud-only groups. [openZro Cloud](https://openzro.io/) does not have this limitation—it syncs group names directly via the Microsoft integration.
 </Note>
 
 ---
 
 ## Standalone Setup (Advanced)
 
-Use Microsoft Entra ID as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Microsoft Entra ID administrators as it also requires additional setup and ongoing maintenance.
+Use Microsoft Entra ID as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Microsoft Entra ID administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
-For detailed instructions on the standalone setup, see the [Microsoft and Entra ID SSO with NetBird Self-Hosted (Legacy)](/selfhosted/identity-providers/managed/advanced/microsoft-entra-id) documentation.
+For detailed instructions on the standalone setup, see the [Microsoft and Entra ID SSO with openZro Self-Hosted (Legacy)](/selfhosted/identity-providers/managed/advanced/microsoft-entra-id) documentation.
 
 <Note>
 If you prefer to have full control over authentication, consider self-hosted alternatives like [PocketID](/selfhosted/identity-providers/pocketid).
@@ -203,7 +203,7 @@ If you prefer to have full control over authentication, consider self-hosted alt
 
 ### "AADSTS50011: The redirect URI specified in the request does not match"
 
-- Ensure the redirect URI in Azure exactly matches what NetBird provides
+- Ensure the redirect URI in Azure exactly matches what openZro provides
 - Check platform type (SPA vs Mobile/Desktop)
 - Verify no trailing slashes
 

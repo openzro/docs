@@ -1,16 +1,16 @@
 import {Note, Warning, Success} from "@/components/mdx"
 
-export const description = 'Migrate your self-hosted NetBird deployment from the old 5-container setup to the new combined container architecture using the migrate.sh script.'
+export const description = 'Migrate your self-hosted openZro deployment from the old 5-container setup to the new combined container architecture using the migrate.sh script.'
 
 # Migration Guide: Combined Container Setup
 
-This guide walks you through migrating a pre-v0.65.0 NetBird self-hosted deployment from the old 5-container architecture (dashboard, signal, relay, management, coturn) to the new 2-container combined setup (Traefik + `netbird-server`). The migration is handled by the `migrate.sh` script, which automates detection, backup, configuration generation, and (for Caddy-based setups) the full cutover.
+This guide walks you through migrating a pre-v0.65.0 openZro self-hosted deployment from the old 5-container architecture (dashboard, signal, relay, management, coturn) to the new 2-container combined setup (Traefik + `openzro-server`). The migration is handled by the `migrate.sh` script, which automates detection, backup, configuration generation, and (for Caddy-based setups) the full cutover.
 
 <Note>
 **Who is this guide for?** This migration guide is for users who:
 - Have an existing self-hosted deployment running the **old 5-container setup** (separate dashboard, signal, relay, management, and coturn containers)
 - Are using the **embedded IdP (Dex)** for authentication
-- Want to move to the combined `netbird-server` container for a simpler, more maintainable deployment
+- Want to move to the combined `openzro-server` container for a simpler, more maintainable deployment
 </Note>
 
 <Warning>
@@ -21,14 +21,14 @@ The migration script **exits with an error** if it detects an external identity 
 
 ### What's new
 
-- **Combined `netbird-server` container** - management, signal, relay, and the embedded STUN server all run in a single container, replacing four separate services
+- **Combined `openzro-server` container** - management, signal, relay, and the embedded STUN server all run in a single container, replacing four separate services
 - **Traefik reverse proxy** (for Caddy-based setups) - replaces the embedded Caddy with Traefik v3.6, handling TLS termination via Let's Encrypt and routing for gRPC, WebSocket, and HTTP traffic
 - **Unified `config.yaml`** - a single configuration file replaces the combination of `management.json`, `setup.env`, and multiple environment files
-- **Simplified Docker Compose** - the stack goes from 5+ services down to 2 (Traefik + `netbird-server`) or 3 (with dashboard)
+- **Simplified Docker Compose** - the stack goes from 5+ services down to 2 (Traefik + `openzro-server`) or 3 (with dashboard)
 
 ### What's removed
 
-- **Separate signal, relay, management, and coturn containers** - consolidated into `netbird-server`
+- **Separate signal, relay, management, and coturn containers** - consolidated into `openzro-server`
 - **Embedded Caddy** - replaced by Traefik (for setups that previously used Caddy)
 - **turnserver.conf** - STUN is now built into the combined server
 - **management.json** - replaced by `config.yaml` (the management container reads the new format)
@@ -40,14 +40,14 @@ Before running the migration, ensure you have:
 - **Docker** with **Docker Compose** (v2 plugin or standalone `docker-compose`)
 - **jq**, **openssl**, and **curl** installed on the host
 - **Embedded IdP (Dex)** - the script only supports embedded IdP setups. External IdP deployments are not supported.
-- **Root or sudo access** to the machine running your NetBird deployment
+- **Root or sudo access** to the machine running your openZro deployment
 - A brief **maintenance window** - peers will need to reconnect after migration
 
 ## How the script works
 
 The script runs through four phases automatically:
 
-**Phase 0 - Detection:** The script locates your installation directory (checking `$PWD`, `/opt/netbird`, and `/opt/wiretrustee`), validates the old setup by looking for `management.json` and `docker-compose.yml`, and detects your reverse proxy type (embedded Caddy, Traefik, or external), IdP type, Docker volumes, domain, store engine (SQLite/PostgreSQL/MySQL), encryption key, and relay secret. If `config.yaml` already exists, the script exits - it assumes you have already migrated.
+**Phase 0 - Detection:** The script locates your installation directory (checking `$PWD`, `/opt/openzro`), validates the old setup by looking for `management.json` and `docker-compose.yml`, and detects your reverse proxy type (embedded Caddy, Traefik, or external), IdP type, Docker volumes, domain, store engine (SQLite/PostgreSQL/MySQL), encryption key, and relay secret. If `config.yaml` already exists, the script exits - it assumes you have already migrated.
 
 **Phase 1 - Backup:** A timestamped backup directory (e.g., `backup-20260217-143000`) is created containing copies of `docker-compose.yml`, `management.json`, `setup.env`, `base.setup.env`, `turnserver.conf`, `dashboard.env`, and the `artifacts/` directory if it exists. The script also records Docker volume and container state, and generates a `rollback.sh` script for reverting.
 
@@ -71,13 +71,13 @@ The script operates in one of two modes depending on your detected reverse proxy
 ### Step 1: Download the script
 
 ```bash
-curl -fsSL https://github.com/netbirdio/netbird/raw/main/infrastructure_files/migrate.sh -o migrate.sh
+curl -fsSL https://github.com/openzro/openzro/raw/main/infrastructure_files/migrate.sh -o migrate.sh
 chmod +x migrate.sh
 ```
 
 ### Step 2: Run the migration
 
-If your NetBird installation is in the current directory:
+If your openZro installation is in the current directory:
 
 ```bash
 ./migrate.sh
@@ -86,7 +86,7 @@ If your NetBird installation is in the current directory:
 If your installation is in a different directory:
 
 ```bash
-./migrate.sh --install-dir /opt/netbird
+./migrate.sh --install-dir /opt/openzro
 ```
 
 The script will display a summary of what it detected and ask for confirmation before making changes.
@@ -94,7 +94,7 @@ The script will display a summary of what it detected and ask for confirmation b
 For automation or CI pipelines, use the `--non-interactive` flag to skip confirmation prompts:
 
 ```bash
-./migrate.sh --install-dir /opt/netbird --non-interactive
+./migrate.sh --install-dir /opt/openzro --non-interactive
 ```
 
 ### Step 3: Verify the migration (Caddy setups)
@@ -108,18 +108,18 @@ After the script completes, confirm everything is working:
 
 ```bash
 # Check running containers
-cd /opt/netbird  # or your install directory
+cd /opt/openzro  # or your install directory
 docker compose ps
 
 # Check logs
-docker compose logs -f netbird-server
+docker compose logs -f openzro-server
 
 # Open the dashboard
 # https://your-domain
 ```
 
 <Success>
-If all three verification checks pass and you can access the dashboard, the migration is complete. Your peers, networks, routes, and access policies are preserved in the database. Clients should reconnect automatically - if they do not, run `netbird down && netbird up` on the client.
+If all three verification checks pass and you can access the dashboard, the migration is complete. Your peers, networks, routes, and access policies are preserved in the database. Clients should reconnect automatically - if they do not, run `openzro down && openzro up` on the client.
 </Success>
 
 ### Step 3: Complete the cutover (external proxy setups)
@@ -129,7 +129,7 @@ For external proxy setups, the script generates the configuration files but leav
 **1. Stop the old containers:**
 
 ```bash
-cd /opt/netbird  # or your install directory
+cd /opt/openzro  # or your install directory
 docker compose down
 ```
 
@@ -170,7 +170,7 @@ curl -sk -o /dev/null -w '%{http_code}' https://your-domain/api/accounts
 
 | Flag | Description |
 |---|---|
-| `--install-dir DIR` | Path to the existing NetBird installation directory. If not specified, the script checks `$PWD`, `/opt/netbird`, and `/opt/wiretrustee`, or prompts interactively. |
+| `--install-dir DIR` | Path to the existing openZro installation directory. If not specified, the script checks `$PWD`, `/opt/openzro`, or prompts interactively. |
 | `--non-interactive` | Skip all confirmation prompts. Useful for automation and CI pipelines. |
 | `-h`, `--help` | Display usage information and exit. |
 
@@ -190,10 +190,10 @@ mv config.yaml config.yaml.bak
 
 ### Script cannot detect the installation directory
 
-If the script cannot find `management.json` in any of the default locations (`$PWD`, `/opt/netbird`, `/opt/wiretrustee`), use the `--install-dir` flag to specify the path explicitly:
+If the script cannot find `management.json` in any of the default locations (`$PWD`, `/opt/openzro`), use the `--install-dir` flag to specify the path explicitly:
 
 ```bash
-./migrate.sh --install-dir /path/to/your/netbird
+./migrate.sh --install-dir /path/to/your/openzro
 ```
 
 ### Health check times out after migration
@@ -201,7 +201,7 @@ If the script cannot find `management.json` in any of the default locations (`$P
 If the health check times out but containers are running, the services may still be starting. Check the logs for errors:
 
 ```bash
-docker compose logs netbird-server
+docker compose logs openzro-server
 docker compose logs traefik
 ```
 
@@ -216,7 +216,7 @@ Peers should reconnect automatically after the migration. If they do not:
 
 ```bash
 # On each client
-netbird down && netbird up
+openzro down && openzro up
 ```
 
 If connections still fail, verify that port `3478/udp` (STUN) is open and that your domain resolves correctly.
@@ -227,7 +227,7 @@ The script creates a complete backup before making any changes. To revert to you
 
 ```bash
 # Run the generated rollback script
-bash /opt/netbird/backup-YYYYMMDD-HHMMSS/rollback.sh
+bash /opt/openzro/backup-YYYYMMDD-HHMMSS/rollback.sh
 ```
 
 The rollback script stops the new containers, restores all backed-up configuration files (`docker-compose.yml`, `management.json`, `setup.env`, `dashboard.env`, etc.), removes the generated `config.yaml`, and restarts the old containers.
@@ -254,7 +254,7 @@ docker compose up -d
 ## Additional resources
 
 - [Self-Hosting Quickstart](/selfhosted/selfhosted-quickstart) - fresh installation guide for new deployments
-- [Enable Reverse Proxy](/selfhosted/migration/enable-reverse-proxy) - after migrating to the combined container setup with Traefik, follow this guide to add the NetBird Reverse Proxy service
+- [Enable Reverse Proxy](/selfhosted/migration/enable-reverse-proxy) - after migrating to the combined container setup with Traefik, follow this guide to add the openZro Reverse Proxy service
 - [Authentication and IdPs](/selfhosted/identity-providers) - configuring identity providers for self-hosted deployments
 - [Configuration Files](/selfhosted/configuration-files) - reference for all configuration files in a self-hosted deployment
-- [migrate.sh source](https://github.com/netbirdio/netbird/blob/main/infrastructure_files/migrate.sh) - the migration script on GitHub
+- [migrate.sh source](https://github.com/openzro/openzro/blob/main/infrastructure_files/migrate.sh) - the migration script on GitHub

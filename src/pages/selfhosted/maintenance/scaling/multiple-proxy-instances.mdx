@@ -1,11 +1,11 @@
 import {Note, Warning} from "@/components/mdx"
 
 export const description =
-    'Deploy multiple NetBird proxy instances across separate servers for high availability, redundancy, and geographic distribution.'
+    'Deploy multiple openZro proxy instances across separate servers for high availability, redundancy, and geographic distribution.'
 
 # Running Multiple Proxy Instances
 
-Running a single NetBird proxy instance works well for many deployments, but production environments often require higher availability. By deploying multiple proxy instances across separate servers, you get automatic failover - if one instance goes down, the remaining instances continue serving traffic without interruption.
+Running a single openZro proxy instance works well for many deployments, but production environments often require higher availability. By deploying multiple proxy instances across separate servers, you get automatic failover - if one instance goes down, the remaining instances continue serving traffic without interruption.
 
 This guide covers how to deploy additional proxy instances, manage tokens and TLS certificates across instances, and monitor your proxy cluster.
 
@@ -16,12 +16,12 @@ This guide covers how to deploy additional proxy instances, manage tokens and TL
       Auth Check     │  *.eu.proxy.example.com    │
   ◄─────────────────►│                            │
   │                  │  Proxy W (TLS)             │ ◄── WireGuard ──┐
-  │                  │  Proxy X (TLS)             │ ◄── WireGuard ──┤► NetBird Peer
+  │                  │  Proxy X (TLS)             │ ◄── WireGuard ──┤► openZro Peer
   │                  │  Proxy Y (TLS)             │ ◄── WireGuard ──┘   (Service)
   │                  └────────────────────────────┘
   │
 Management Service
-(netbird.example.com)
+(openzro.example.com)
 ```
 
 Proxy instances that share the same `NB_PROXY_DOMAIN` value automatically form a cluster. Each instance independently connects to the management server via gRPC and registers itself under the shared domain. The management server tracks all connected instances and distributes traffic configuration to each one.
@@ -48,39 +48,39 @@ Each proxy instance authenticates with the management server using an access tok
 
 Generate a token for each instance. The command differs depending on whether you use the combined container or the older multi-container setup.
 
-**Combined container** (`netbirdio/netbird-server`):
+**Combined container** (`openzro/openzro-server`):
 
 ```bash
-docker exec -it netbird-server /go/bin/netbird-server token create \
-  --name "proxy-server-1" --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token create \
+  --name "proxy-server-1" --config <openzro-data-dir>/config.yaml
 
-docker exec -it netbird-server /go/bin/netbird-server token create \
-  --name "proxy-server-2" --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token create \
+  --name "proxy-server-2" --config <openzro-data-dir>/config.yaml
 ```
 
-**Multi-container** (separate `netbirdio/management` image):
+**Multi-container** (separate `openzro/management` image):
 
 ```bash
-docker exec -it netbird-management /go/bin/netbird-mgmt token create --name "proxy-server-1"
-docker exec -it netbird-management /go/bin/netbird-mgmt token create --name "proxy-server-2"
+docker exec -it openzro-management /go/bin/openzro-mgmt token create --name "proxy-server-1"
+docker exec -it openzro-management /go/bin/openzro-mgmt token create --name "proxy-server-2"
 ```
 
 Use a descriptive `--name` for each token so you can identify which instance it belongs to when listing or revoking tokens:
 
 ```bash
 # List all tokens (combined container)
-docker exec -it netbird-server /go/bin/netbird-server token list \
-  --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token list \
+  --config <openzro-data-dir>/config.yaml
 
 # List all tokens (multi-container)
-docker exec -it netbird-management /go/bin/netbird-mgmt token list
+docker exec -it openzro-management /go/bin/openzro-mgmt token list
 
 # Revoke a specific instance's token (combined container)
-docker exec -it netbird-server /go/bin/netbird-server token revoke <token-id> \
-  --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token revoke <token-id> \
+  --config <openzro-data-dir>/config.yaml
 
 # Revoke a specific instance's token (multi-container)
-docker exec -it netbird-management /go/bin/netbird-mgmt token revoke <token-id>
+docker exec -it openzro-management /go/bin/openzro-mgmt token revoke <token-id>
 ```
 
 <Note>
@@ -98,7 +98,7 @@ Create a `proxy.env` file on the new server:
 ```bash
 NB_PROXY_DOMAIN=proxy.example.com
 NB_PROXY_TOKEN=nbx_unique_token_for_this_instance
-NB_PROXY_MANAGEMENT_ADDRESS=https://netbird.example.com:443
+NB_PROXY_MANAGEMENT_ADDRESS=https://openzro.example.com:443
 NB_PROXY_ADDRESS=:8443
 NB_PROXY_ACME_CERTIFICATES=true
 NB_PROXY_ACME_CHALLENGE_TYPE=tls-alpn-01
@@ -125,19 +125,19 @@ services:
       - "443:443"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
-    networks: [netbird]
+    networks: [openzro]
 
   proxy:
-    image: netbirdio/reverse-proxy:latest
-    container_name: netbird-proxy
+    image: openzro/reverse-proxy:latest
+    container_name: openzro-proxy
     restart: unless-stopped
-    networks: [netbird]
+    networks: [openzro]
     depends_on:
       - traefik
     env_file:
       - ./proxy.env
     volumes:
-      - netbird_proxy_certs:/certs
+      - openzro_proxy_certs:/certs
     labels:
       - traefik.enable=true
       - traefik.tcp.routers.proxy-passthrough.entrypoints=websecure
@@ -153,14 +153,14 @@ services:
         max-file: "2"
 
 networks:
-  netbird:
+  openzro:
 
 volumes:
-  netbird_proxy_certs:
+  openzro_proxy_certs:
 ```
 
 <Note>
-On additional servers that only run the proxy (not the full NetBird stack), the Traefik configuration is simpler because there are no competing HTTP routers. All traffic on port 443 is passed through to the proxy container.
+On additional servers that only run the proxy (not the full openZro stack), the Traefik configuration is simpler because there are no competing HTTP routers. All traffic on port 443 is passed through to the proxy container.
 </Note>
 
 ### Step 3: Start the instance
@@ -245,7 +245,7 @@ The proxy watches the certificate files for changes and reloads them without a r
 
 After deploying all instances, verify they are connected:
 
-1. Open the NetBird dashboard and navigate to **Reverse Proxy** > **Services**
+1. Open the openZro dashboard and navigate to **Reverse Proxy** > **Services**
 2. Click **Add Service** and check the domain selector - your cluster domain should appear with a **Cluster** badge
 3. The management server tracks all connected proxy instances; if an instance disconnects, it is removed from the active cluster
 
@@ -279,14 +279,14 @@ To gracefully remove a proxy instance from the cluster:
 docker compose down
 
 # Revoke its token on the management server (combined container)
-docker exec -it netbird-server /go/bin/netbird-server token list \
-  --config <netbird-data-dir>/config.yaml
-docker exec -it netbird-server /go/bin/netbird-server token revoke <token-id> \
-  --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token list \
+  --config <openzro-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token revoke <token-id> \
+  --config <openzro-data-dir>/config.yaml
 
 # Revoke its token on the management server (multi-container)
-docker exec -it netbird-management /go/bin/netbird-mgmt token list
-docker exec -it netbird-management /go/bin/netbird-mgmt token revoke <token-id>
+docker exec -it openzro-management /go/bin/openzro-mgmt token list
+docker exec -it openzro-management /go/bin/openzro-mgmt token revoke <token-id>
 ```
 
 After stopping the instance, update your DNS records to remove the server's IP address so clients are no longer directed to it.
@@ -295,5 +295,5 @@ After stopping the instance, update your DNS records to remove the server's IP a
 
 - [Reverse Proxy Overview](/manage/reverse-proxy) - core concepts, service configuration, and quick start guide
 - [Enable Reverse Proxy](/selfhosted/migration/enable-reverse-proxy) - migration guide for adding the proxy to an existing deployment
-- [Scaling Your Deployment](/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment) - overview of scaling options for self-hosted NetBird
+- [Scaling Your Deployment](/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment) - overview of scaling options for self-hosted openZro
 - [Custom Domains](/manage/reverse-proxy/custom-domains) - use your own domain names for reverse proxy services

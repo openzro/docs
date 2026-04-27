@@ -15,7 +15,7 @@ human-readable descriptions. Use these codes when configuring
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/integrations/notifications/types">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/integrations/notifications/types \
+curl -X GET https://api.openzro.io/api/integrations/notifications/types \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -46,7 +46,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/notifications/types"
+url = "https://api.openzro.io/api/integrations/notifications/types"
 
 headers = {     
   'Accept': 'application/json',
@@ -70,7 +70,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/notifications/types"
+  url := "https://api.openzro.io/api/integrations/notifications/types"
   method := "GET"
   
   client := &http.Client {
@@ -106,7 +106,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/notifications/types")
+url = URI("https://api.openzro.io/api/integrations/notifications/types")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -124,7 +124,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/notifications/types")
+  .url("https://api.openzro.io/api/integrations/notifications/types")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -138,7 +138,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/notifications/types',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/notifications/types',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -196,7 +196,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/integrations/notifications/channels">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/integrations/notifications/channels \
+curl -X GET https://api.openzro.io/api/integrations/notifications/channels \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -227,7 +227,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/notifications/channels"
+url = "https://api.openzro.io/api/integrations/notifications/channels"
 
 headers = {     
   'Accept': 'application/json',
@@ -251,7 +251,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/notifications/channels"
+  url := "https://api.openzro.io/api/integrations/notifications/channels"
   method := "GET"
   
   client := &http.Client {
@@ -287,7 +287,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/notifications/channels")
+url = URI("https://api.openzro.io/api/integrations/notifications/channels")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -305,7 +305,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/notifications/channels")
+  .url("https://api.openzro.io/api/integrations/notifications/channels")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -319,7 +319,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/notifications/channels',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/notifications/channels',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -358,7 +358,7 @@ echo $response;
           ]
         },
         {
-          "url": "https://hooks.example.com/netbird",
+          "url": "https://hooks.example.com/openzro",
           "headers": {
             "Authorization": "Bearer token",
             "X-Webhook-Secret": "secret"
@@ -459,7 +459,7 @@ Supported channel types are `email` and `webhook`.
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/integrations/notifications/channels">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/integrations/notifications/channels \
+curl -X POST https://api.openzro.io/api/integrations/notifications/channels \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -475,7 +475,7 @@ curl -X POST https://api.netbird.io/api/integrations/notifications/channels \
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -506,7 +506,7 @@ let data = JSON.stringify({
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -546,7 +546,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/notifications/channels"
+url = "https://api.openzro.io/api/integrations/notifications/channels"
 payload = json.dumps({
   "type": "email",
   "target": {
@@ -559,7 +559,7 @@ payload = json.dumps({
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -597,7 +597,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/notifications/channels"
+  url := "https://api.openzro.io/api/integrations/notifications/channels"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -612,7 +612,7 @@ func main() {
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -661,7 +661,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/notifications/channels")
+url = URI("https://api.openzro.io/api/integrations/notifications/channels")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -683,7 +683,7 @@ request.body = JSON.dump({
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -718,7 +718,7 @@ RequestBody body = RequestBody.create(mediaType, '{
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -734,7 +734,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "enabled": true
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/notifications/channels")
+  .url("https://api.openzro.io/api/integrations/notifications/channels")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -749,7 +749,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/notifications/channels',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/notifications/channels',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -769,7 +769,7 @@ curl_setopt_array($curl, array(
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -815,7 +815,7 @@ echo $response;
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -882,7 +882,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/integrations/notifications/channels/{channelId}">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/integrations/notifications/channels/{channelId} \
+curl -X GET https://api.openzro.io/api/integrations/notifications/channels/{channelId} \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -913,7 +913,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/notifications/channels/{channelId}"
+url = "https://api.openzro.io/api/integrations/notifications/channels/{channelId}"
 
 headers = {     
   'Accept': 'application/json',
@@ -937,7 +937,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/notifications/channels/{channelId}"
+  url := "https://api.openzro.io/api/integrations/notifications/channels/{channelId}"
   method := "GET"
   
   client := &http.Client {
@@ -973,7 +973,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/notifications/channels/{channelId}")
+url = URI("https://api.openzro.io/api/integrations/notifications/channels/{channelId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -991,7 +991,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/notifications/channels/{channelId}")
+  .url("https://api.openzro.io/api/integrations/notifications/channels/{channelId}")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -1005,7 +1005,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/notifications/channels/{channelId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/notifications/channels/{channelId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1043,7 +1043,7 @@ echo $response;
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1139,7 +1139,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="PUT" label="/api/integrations/notifications/channels/{channelId}">
 ```bash {{ title: 'cURL' }}
-curl -X PUT https://api.netbird.io/api/integrations/notifications/channels/{channelId} \
+curl -X PUT https://api.openzro.io/api/integrations/notifications/channels/{channelId} \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -1155,7 +1155,7 @@ curl -X PUT https://api.netbird.io/api/integrations/notifications/channels/{chan
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1186,7 +1186,7 @@ let data = JSON.stringify({
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1226,7 +1226,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/notifications/channels/{channelId}"
+url = "https://api.openzro.io/api/integrations/notifications/channels/{channelId}"
 payload = json.dumps({
   "type": "email",
   "target": {
@@ -1239,7 +1239,7 @@ payload = json.dumps({
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1277,7 +1277,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/notifications/channels/{channelId}"
+  url := "https://api.openzro.io/api/integrations/notifications/channels/{channelId}"
   method := "PUT"
   
   payload := strings.NewReader(`{
@@ -1292,7 +1292,7 @@ func main() {
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1341,7 +1341,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/notifications/channels/{channelId}")
+url = URI("https://api.openzro.io/api/integrations/notifications/channels/{channelId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1363,7 +1363,7 @@ request.body = JSON.dump({
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1398,7 +1398,7 @@ RequestBody body = RequestBody.create(mediaType, '{
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1414,7 +1414,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "enabled": true
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/notifications/channels/{channelId}")
+  .url("https://api.openzro.io/api/integrations/notifications/channels/{channelId}")
   .method("PUT", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -1429,7 +1429,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/notifications/channels/{channelId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/notifications/channels/{channelId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1449,7 +1449,7 @@ curl_setopt_array($curl, array(
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1495,7 +1495,7 @@ echo $response;
         ]
       },
       {
-        "url": "https://hooks.example.com/netbird",
+        "url": "https://hooks.example.com/openzro",
         "headers": {
           "Authorization": "Bearer token",
           "X-Webhook-Secret": "secret"
@@ -1562,7 +1562,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/integrations/notifications/channels/{channelId}">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/integrations/notifications/channels/{channelId} \
+curl -X DELETE https://api.openzro.io/api/integrations/notifications/channels/{channelId} \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -1593,7 +1593,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/notifications/channels/{channelId}"
+url = "https://api.openzro.io/api/integrations/notifications/channels/{channelId}"
 
 headers = {     
   'Accept': 'application/json',
@@ -1617,7 +1617,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/notifications/channels/{channelId}"
+  url := "https://api.openzro.io/api/integrations/notifications/channels/{channelId}"
   method := "DELETE"
   
   client := &http.Client {
@@ -1653,7 +1653,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/notifications/channels/{channelId}")
+url = URI("https://api.openzro.io/api/integrations/notifications/channels/{channelId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1671,7 +1671,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/notifications/channels/{channelId}")
+  .url("https://api.openzro.io/api/integrations/notifications/channels/{channelId}")
   .method("DELETE")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -1685,7 +1685,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/notifications/channels/{channelId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/notifications/channels/{channelId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

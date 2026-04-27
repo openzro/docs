@@ -1,6 +1,6 @@
 ---
-id: using-netbird-with-azure-ad
-title: Using NetBird with Azure AD
+id: using-openzro-with-azure-ad
+title: Using openZro with Azure AD
 sidebar_position: 4
 tags:
 - integrations
@@ -10,14 +10,14 @@ tags:
 - how-to
 ---
 
-This guide is a part of the [NetBird Self-hosting Guide](/getting-started/self-hosting) and explains how to integrate **self-hosted** NetBird with [Azure AD](https://azure.microsoft.com/en-us/products/active-directory/).
+This guide is a part of the [openZro Self-hosting Guide](/getting-started/self-hosting) and explains how to integrate **self-hosted** openZro with [Azure AD](https://azure.microsoft.com/en-us/products/active-directory/).
 
 Azure AD is a an enterprise identity service that provides single sign-on and multifactor authentication to your applications. 
 It is a 3rd party managed service and can't be self-hosted.
 
 :::tip self-hosted idp
-If you prefer to have full control over authentication and authorization of your NetBird network, there are good
-self-hosted alternatives to the managed Auth0 service like [Keycloak](/integrations/identity-providers/self-hosted/using-netbird-with-keycloak).
+If you prefer to have full control over authentication and authorization of your openZro network, there are good
+self-hosted alternatives to the managed Auth0 service like [Keycloak](/integrations/identity-providers/self-hosted/using-openzro-with-keycloak).
 :::
 
 Before you start creating and configuring an Azure AD application, ensure that you have the following:
@@ -27,26 +27,26 @@ Before you start creating and configuring an Azure AD application, ensure that y
 
 
 ### 1. Create and configure Azure AD application
-In this step, we will create and configure Netbird application in azure AD.
+In this step, we will create and configure openZro application in azure AD.
 - Navigate to [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview)
 - Click `App Registrations` in the left menu then click on the `+ New registration` button to create a new application.
 - Fill in the form with the following values and click Register
-  - Name: `Netbird`
+  - Name: `openZro`
   - Account Types: `Accounts in this organizational directory only (Default Directory only - Single tenant)`
-  - Redirect URI: select `Single-page application (SPA)` and URI as `https://<yournetbirddomain.com>/silent-auth`
+  - Redirect URI: select `Single-page application (SPA)` and URI as `https://<youropenzrodomain.com>/silent-auth`
 
 ![](/img/integrations/identity-providers/self-hosted/azure-new-application.png)
 
 ### 2. Platform configurations
 - Click `Authentication` on the left side menu
-- Under the `Single-page application` Section, add another URI `https://<yournetbirddomain.com>/auth`
+- Under the `Single-page application` Section, add another URI `https://<youropenzrodomain.com>/auth`
   ![](/img/integrations/identity-providers/self-hosted/azure-spa-uri-setup.png)
 
 - Scroll down and setup other options as on the screenshot below and click Save
 
 ![](/img/integrations/identity-providers/self-hosted/azure-flows-setup.png)
 
-### 3. Create a NetBird application scope
+### 3. Create a openZro application scope
 - Click `Expose an API` on the left menu
 - Under `Application ID URI` click `Set` and then `Save`
 - Click `+ Add a Scope`
@@ -63,12 +63,12 @@ In this step, we will create and configure Netbird application in azure AD.
 
 
 ### 4. Add API permissions
-- Add `Netbird` permissions
+- Add `openZro` permissions
   - Click `API permissions` on the left menu
   - Click `Add a permission`
-  - Click `My APIs` tab, and select `Netbird`. Next check `api` permission checkbox and click `Add permissions`.
+  - Click `My APIs` tab, and select `openZro`. Next check `api` permission checkbox and click `Add permissions`.
 
-  ![](/img/integrations/identity-providers/self-hosted/azure-netbird-api-permisssions.png)
+  ![](/img/integrations/identity-providers/self-hosted/azure-openzro-api-permisssions.png)
 
 - Add `Delagated permissions` to Microsoft Graph
   - Click `Add a permission`
@@ -101,7 +101,7 @@ In this step, we will create and configure Netbird application in azure AD.
 - Click `Certificates & secrets` on left menu
 - Click `New client secret`
 - Fill in the form with the following values and click `Add`
-  - Description: `Netbird`
+  - Description: `openZro`
 - Copy `Value` and save it as it can be viewed only once after creation.
 
 ![](/img/integrations/identity-providers/self-hosted/azure-client-secret.png)
@@ -126,7 +126,7 @@ Double-check if the endpoint returns a JSON response by calling it from your bro
   NETBIRD_AUTH_USER_ID_CLAIM="oid"
   ```
 
-- You can now continue with the [NetBird Self-hosting Guide](/getting-started/self-hosting#step-3-configure-identity-provider).
+- You can now continue with the [openZro Self-hosting Guide](/getting-started/self-hosting#step-3-configure-identity-provider).
 
 - Set property `IdpManagerConfig` in the `management.json` file with:
   :::caution

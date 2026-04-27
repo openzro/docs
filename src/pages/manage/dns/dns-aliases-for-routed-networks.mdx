@@ -1,16 +1,16 @@
 # DNS Aliases for Routed Networks
 
-This guide explains how to use Custom DNS Zones with NetBird's Networks to provide easy-to-remember DNS names for resources in private
+This guide explains how to use Custom DNS Zones with openZro's Networks to provide easy-to-remember DNS names for resources in private
 networks.
 
 
-Custom DNS Zones work seamlessly with NetBird's [Networks](/manage/networks) feature to provide friendly DNS names for resources behind routing peers. This eliminates the need to remember IP addresses when accessing private network resources, creating a professional enterprise-like experience.
+Custom DNS Zones work seamlessly with openZro's [Networks](/manage/networks) feature to provide friendly DNS names for resources behind routing peers. This eliminates the need to remember IP addresses when accessing private network resources, creating a professional enterprise-like experience.
 
 ## How It Works
 
 ### The Challenge
 
-Imagine you're a developer who needs to connect to a PostgreSQL database in your company's data center. The database is at IP address `192.168.0.68`, accessible through a NetBird routing peer. You might write connection strings like this:
+Imagine you're a developer who needs to connect to a PostgreSQL database in your company's data center. The database is at IP address `192.168.0.68`, accessible through a openZro routing peer. You might write connection strings like this:
 
 ```bash
 psql -h 192.168.0.68 -U admin
@@ -23,25 +23,25 @@ This works, but it's problematic:
 
 ### The Solution
 
-DNS Aliases with Custom DNS Zones solve this by giving your private network resources friendly, memorable DNS names. Instead of `192.168.0.68`, your developers connect to `postgres.netbird.internal` or simply `postgres`.
+DNS Aliases with Custom DNS Zones solve this by giving your private network resources friendly, memorable DNS names. Instead of `192.168.0.68`, your developers connect to `postgres.openzro.internal` or simply `postgres`.
 
 ### How the DNS Resolution Works
 
-Here's what happens when you set up a DNS Alias and a developer tries to connect to `postgres.netbird.internal`:
+Here's what happens when you set up a DNS Alias and a developer tries to connect to `postgres.openzro.internal`:
 
 **Setup (One-Time):**
 
-1. **Admin creates a Custom DNS Zone** called `netbird.internal` in the NetBird dashboard
+1. **Admin creates a Custom DNS Zone** called `openzro.internal` in the openZro dashboard
 2. **Admin adds an A record**: `postgres` → `192.168.0.68` (the actual database IP on the private network)
 3. **Zone is distributed** to the developer's distribution group (e.g., dev)
 
 **When a developer connects:**
 
-1. **Developer's laptop** queries `postgres.netbird.internal`
-2. **NetBird's DNS resolver** on the laptop receives the query
-3. **Custom Zone record is matched**: NetBird finds the A record: `postgres.netbird.internal` → `192.168.0.68`
+1. **Developer's laptop** queries `postgres.openzro.internal`
+2. **openZro's DNS resolver** on the laptop receives the query
+3. **Custom Zone record is matched**: openZro finds the A record: `postgres.openzro.internal` → `192.168.0.68`
 4. **DNS response returned**: The IP `192.168.0.68` is returned to the application
-5. **Routing kicks in**: Traffic to `192.168.0.68` is automatically routed through the NetBird routing peer that has access to the `192.168.0.0/24` network
+5. **Routing kicks in**: Traffic to `192.168.0.68` is automatically routed through the openZro routing peer that has access to the `192.168.0.0/24` network
 6. **Connection established**: The application connects successfully to the database
 
 ## Step-by-Step Guide
@@ -50,7 +50,7 @@ This guide will walk you through a common use case: providing DNS names for a Po
 
 **Network Setup:**
 
-- **NetBird Peers**: Devices organized into groups, such as a `dev` for developers.
+- **openZro Peers**: Devices organized into groups, such as a `dev` for developers.
 - **Routing Peer**: A gateway server in the data center.
 - **Private Network**: Subnet `192.168.0.0/24` with internal services:
   - PostgreSQL Database: `192.168.0.68`
@@ -60,12 +60,12 @@ This guide will walk you through a common use case: providing DNS names for a Po
 
 First, create a Custom DNS Zone to manage the DNS records for your private services.
 
-1.  Navigate to **DNS** > **Zones** in the NetBird dashboard.
+1.  Navigate to **DNS** > **Zones** in the openZro dashboard.
 2.  Click **Add Zone**.
 3.  Configure the zone:
-    - **Domain**: `netbird.internal`.
+    - **Domain**: `openzro.internal`.
     - **Distribution Groups**: Select the groups that should have access to this DNS zone (e.g., `dev`, `internal-services`).
-    - **Enable Search Domain**: Keep this enabled to allow using short names (e.g., `postgres` instead of `postgres.netbird.internal`).
+    - **Enable Search Domain**: Keep this enabled to allow using short names (e.g., `postgres` instead of `postgres.openzro.internal`).
 4.  Click **Add Zone**.
 
 <img src="/docs-static/img/manage/dns/dns-aliases/zone-config.png" alt="Delete DNS Zone" className="imagewrapper-big"/>
@@ -95,7 +95,7 @@ To enable access to your private resources, you need to set up a network with ro
 
 #### Create a Network
 
-1. Navigate to **Networks** > **Networks** in the NetBird dashboard.
+1. Navigate to **Networks** > **Networks** in the openZro dashboard.
 2. Click **Add Network** to start the network creation wizard.
 3. Fill out the network details:
    - **Name**: `Internal Network`
@@ -110,14 +110,14 @@ Add a wildcard resource that will match all services in your DNS zone.
 
 1. Click **Add Resource** and configure:
    - **Name**: `Internal Wiki`
-   - **Address**: `wiki.netbird.internal`
+   - **Address**: `wiki.openzro.internal`
    - **Groups**: Assign to a resource group (e.g., `internal-services`)
 2. Click **Add Resource**.
 
 <img src="/docs-static/img/manage/dns/dns-aliases/add-resource.png" alt="Add Network Resource" className="imagewrapper-big"/>
 
 <Note>
-    Repeat the same steps to add the **Internal Postgres** resource with the address `postgres.netbird.internal`.
+    Repeat the same steps to add the **Internal Postgres** resource with the address `postgres.openzro.internal`.
 </Note>
 
 #### Create Access Control Policy
@@ -156,12 +156,12 @@ With the DNS zone and records configured, your developers can now access the ser
 
 #### Verify Network Routes
 
-First, confirm that peers in the `dev` group have received the network routes for `wiki.netbird.internal` and `postgres.netbird.internal`.
+First, confirm that peers in the `dev` group have received the network routes for `wiki.openzro.internal` and `postgres.openzro.internal`.
 
 On a peer device in the `dev` group, run:
 
 ```bash
-netbird networks ls
+openzro networks ls
 ```
 
 You should see output similar to:
@@ -170,13 +170,13 @@ You should see output similar to:
 Available Networks:
 
   - ID: Internal Wiki
-    Domains: wiki.netbird.internal
+    Domains: wiki.openzro.internal
     Status: Selected
     Resolved IPs: -
     Routes:
 
   - ID: Internal Postgres
-    Domains: postgres.netbird.internal
+    Domains: postgres.openzro.internal
     Status: Selected
     Resolved IPs: -
 ```
@@ -187,10 +187,10 @@ Now your developers can access the services using DNS names:
 
 ```bash
 # Connect to the database using full DNS name
-psql -h postgres.netbird.internal -U admin
+psql -h postgres.openzro.internal -U admin
 
 # Access the internal wiki using full DNS name
-curl http://wiki.netbird.internal
+curl http://wiki.openzro.internal
 ```
 
 With search domain enabled, you can use short names:
@@ -218,10 +218,10 @@ You can create separate DNS zones for different environments (e.g., production, 
 
 - **Production**:
   - Network routing to `10.0.1.0/24`.
-  - DNS zone `prod.netbird.internal` distributed to the `SRE Team`.
+  - DNS zone `prod.openzro.internal` distributed to the `SRE Team`.
 - **Staging**:
   - Network routing to `10.0.2.0/24`.
-  - DNS zone `staging.netbird.internal` distributed to `Developers` and `QA`.
+  - DNS zone `staging.openzro.internal` distributed to `Developers` and `QA`.
 
 ### Multi-Site Architecture
 
@@ -229,10 +229,10 @@ For organizations with multiple data centers, you can create separate networks a
 
 - **US East**:
   - Network to `10.1.0.0/16`.
-  - DNS zone `us-east.netbird.internal` for the `US Team`.
+  - DNS zone `us-east.openzro.internal` for the `US Team`.
 - **EU West**:
   - Network to `10.2.0.0/16`.
-  - DNS zone `eu-west.netbird.internal` for the `EU Team`.
+  - DNS zone `eu-west.openzro.internal` for the `EU Team`.
 
 ### Failover and Load Balancing
 

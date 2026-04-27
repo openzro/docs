@@ -1,17 +1,17 @@
 # Migration Guide: Enable Reverse Proxy Feature
 
-This guide walks you through adding the NetBird Reverse Proxy to an existing self-hosted deployment. By the end, you'll have a `netbird-proxy` container running alongside your existing services, ready to expose internal applications to the public internet.
+This guide walks you through adding the openZro Reverse Proxy to an existing self-hosted deployment. By the end, you'll have a `openzro-proxy` container running alongside your existing services, ready to expose internal applications to the public internet.
 
 <Note>
 **Who is this guide for?** This migration guide is for existing self-hosted users who:
-- Already have a working NetBird deployment (management server, dashboard, signal, relay)
+- Already have a working openZro deployment (management server, dashboard, signal, relay)
 - Want to enable the [Reverse Proxy](/manage/reverse-proxy) feature to expose internal services publicly
 - Are running their services via Docker Compose
 </Note>
 
 ## Why Traefik is required
 
-The NetBird proxy container manages its own TLS certificates (via Let's Encrypt or static files). This means the reverse proxy sitting in front of it **must not terminate TLS** - it needs to pass raw TLS connections through to the proxy container untouched.
+The openZro proxy container manages its own TLS certificates (via Let's Encrypt or static files). This means the reverse proxy sitting in front of it **must not terminate TLS** - it needs to pass raw TLS connections through to the proxy container untouched.
 
 This capability is called **TLS passthrough**, and among common reverse proxies, **only Traefik supports it** via its TCP routers. Other reverse proxies (Nginx, Caddy, Nginx Proxy Manager) terminate TLS themselves and cannot forward the raw encrypted connection, which breaks the proxy's certificate management.
 
@@ -21,7 +21,7 @@ If your current deployment uses a reverse proxy other than Traefik, you'll need 
 
 ### What you're adding
 
-- **`proxy` service (container: `netbird-proxy`)** - a new service in your Docker Compose stack that handles TLS termination, certificate provisioning, and traffic forwarding for reverse proxy services
+- **`proxy` service (container: `openzro-proxy`)** - a new service in your Docker Compose stack that handles TLS termination, certificate provisioning, and traffic forwarding for reverse proxy services
 - **`proxy.env` file** - environment variables for the proxy container, including domain, token, and ACME configuration
 - **Traefik TCP labels** - routing rules that tell Traefik to pass TLS connections through to the proxy container
 - **Wildcard DNS record** - so that all service subdomains (e.g., `myapp.proxy.example.com`) resolve to your server
@@ -29,7 +29,7 @@ If your current deployment uses a reverse proxy other than Traefik, you'll need 
 
 ### What stays the same
 
-- Your existing NetBird services are unchanged
+- Your existing openZro services are unchanged
 - Your configuration files (`config.yaml` for combined setup, `management.json` for multi-container setup) require no modifications - **unless** you use an external identity provider (not the embedded IdP). See [Configure SSO for external identity providers](#configure-sso-for-external-identity-providers) below.
 - Existing peers, networks, and access policies are unaffected
 
@@ -38,13 +38,13 @@ If your current deployment uses a reverse proxy other than Traefik, you'll need 
 Before starting, ensure you have:
 
 - **Traefik** as your reverse proxy (see [Why Traefik is required](#why-traefik-is-required) above)
-- **Latest NetBird images** - pull the latest version to ensure the management server and CLI support the reverse proxy feature and token creation
-- **A domain for the proxy** - e.g., `proxy.example.com` or `netbird.example.com` (it can be the same domain as the NetBird server itself). Service subdomains will be created under this domain (e.g., `myapp.netbird.example.com`)
-- **Wildcard DNS capability** - ability to create a `*.netbird.example.com` DNS record pointing to your server
+- **Latest openZro images** - pull the latest version to ensure the management server and CLI support the reverse proxy feature and token creation
+- **A domain for the proxy** - e.g., `proxy.example.com` or `openzro.example.com` (it can be the same domain as the openZro server itself). Service subdomains will be created under this domain (e.g., `myapp.openzro.example.com`)
+- **Wildcard DNS capability** - ability to create a `*.openzro.example.com` DNS record pointing to your server
 - **Port 443 accessible** - the proxy needs this for ACME TLS-ALPN-01 challenges (certificate provisioning)
 
 <Note>
-This guide covers both the **combined container** setup (`netbirdio/netbird-server`, the default for new deployments) and the **multi-container** setup (separate `management`, `signal`, and `relay` images). Where commands or configuration differ between the two setups, both variants are shown.
+This guide covers both the **combined container** setup (`openzro/openzro-server`, the default for new deployments) and the **multi-container** setup (separate `management`, `signal`, and `relay` images). Where commands or configuration differ between the two setups, both variants are shown.
 </Note>
 
 ## Migration steps
@@ -53,8 +53,8 @@ This guide covers both the **combined container** setup (`netbirdio/netbird-serv
 
 ```bash
 # Create a backup directory
-mkdir -p netbird-backup-$(date +%Y%m%d)
-cd netbird-backup-$(date +%Y%m%d)
+mkdir -p openzro-backup-$(date +%Y%m%d)
+cd openzro-backup-$(date +%Y%m%d)
 
 # Backup configuration files
 cp ../docker-compose.yml .
@@ -67,17 +67,17 @@ cp ../*.env . 2>/dev/null || echo "No .env files found"
 
 The proxy authenticates with the management server using an access token. Generate one using the server CLI.
 
-**Combined container** (`netbirdio/netbird-server`):
+**Combined container** (`openzro/openzro-server`):
 
 ```bash
-docker exec -it netbird-server /go/bin/netbird-server token create \
-  --name "my-proxy" --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token create \
+  --name "my-proxy" --config <openzro-data-dir>/config.yaml
 ```
 
-**Multi-container** (separate `netbirdio/management` image):
+**Multi-container** (separate `openzro/management` image):
 
 ```bash
-docker exec -it netbird-management /go/bin/netbird-mgmt token create --name "my-proxy"
+docker exec -it openzro-management /go/bin/openzro-mgmt token create --name "my-proxy"
 ```
 
 This outputs a token in the format `nbx_...` (40 characters). **Save the token immediately** - it is only displayed once. The management server stores only a SHA-256 hash.
@@ -86,18 +86,18 @@ You can manage tokens later with:
 
 ```bash
 # List all tokens (combined container)
-docker exec -it netbird-server /go/bin/netbird-server token list \
-  --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token list \
+  --config <openzro-data-dir>/config.yaml
 
 # List all tokens (multi-container)
-docker exec -it netbird-management /go/bin/netbird-mgmt token list
+docker exec -it openzro-management /go/bin/openzro-mgmt token list
 
 # Revoke a token by ID (combined container)
-docker exec -it netbird-server /go/bin/netbird-server token revoke <token-id> \
-  --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token revoke <token-id> \
+  --config <openzro-data-dir>/config.yaml
 
 # Revoke a token by ID (multi-container)
-docker exec -it netbird-management /go/bin/netbird-mgmt token revoke <token-id>
+docker exec -it openzro-management /go/bin/openzro-mgmt token revoke <token-id>
 ```
 
 ### Step 3: Add the proxy service to docker-compose.yml
@@ -106,16 +106,16 @@ Add the following service to your `docker-compose.yml`. Adjust the `depends_on` 
 
 ```yaml
 proxy:
-  image: netbirdio/reverse-proxy:latest
-  container_name: netbird-proxy
+  image: openzro/reverse-proxy:latest
+  container_name: openzro-proxy
   restart: unless-stopped
-  networks: [netbird]
+  networks: [openzro]
   depends_on:
-    - netbird-server  # Use "management" for multi-container setup
+    - openzro-server  # Use "management" for multi-container setup
   env_file:
     - ./proxy.env
   volumes:
-    - netbird_proxy_certs:/certs
+    - openzro_proxy_certs:/certs
   labels:
     - traefik.enable=true
     - traefik.tcp.routers.proxy-passthrough.entrypoints=websecure
@@ -131,22 +131,22 @@ proxy:
       max-file: "2"
 ```
 
-Also add the `netbird_proxy_certs` volume to your `volumes:` section:
+Also add the `openzro_proxy_certs` volume to your `volumes:` section:
 
 ```yaml
 volumes:
   # ...existing volumes...
-  netbird_proxy_certs:
+  openzro_proxy_certs:
 ```
 
 Then create a `proxy.env` file with the proxy configuration.
 
-**Combined container** (`netbirdio/netbird-server`):
+**Combined container** (`openzro/openzro-server`):
 
 ```bash
 NB_PROXY_DOMAIN=proxy.example.com
 NB_PROXY_TOKEN=nbx_your_token_here
-NB_PROXY_MANAGEMENT_ADDRESS=http://netbird-server:80
+NB_PROXY_MANAGEMENT_ADDRESS=http://openzro-server:80
 NB_PROXY_ALLOW_INSECURE=true
 NB_PROXY_ADDRESS=:8443
 NB_PROXY_ACME_CERTIFICATES=true
@@ -154,7 +154,7 @@ NB_PROXY_ACME_CHALLENGE_TYPE=tls-alpn-01
 NB_PROXY_CERTIFICATE_DIRECTORY=/certs
 ```
 
-**Multi-container** (separate `netbirdio/management` image):
+**Multi-container** (separate `openzro/management` image):
 
 ```bash
 NB_PROXY_DOMAIN=proxy.example.com
@@ -177,11 +177,11 @@ The Traefik labels configure a **TCP router** that:
 - Catches any request not matched by higher-priority HTTP routers via `HostSNI(*)` (wildcard)
 - Uses the `websecure` entrypoint (port 443)
 - Passes the TLS connection through **without termination** (`tls.passthrough=true`)
-- Uses `priority=1` to avoid intercepting traffic meant for the main NetBird HTTP routers on the same entrypoint
+- Uses `priority=1` to avoid intercepting traffic meant for the main openZro HTTP routers on the same entrypoint
 - Forwards traffic to the proxy container on port 8443
 
 <Note>
-The `HostSNI(*)` rule acts as a catch-all for any domain not matched by the existing NetBird HTTP routers. The `priority=1` ensures this TCP router only handles traffic that no other router claims. Any domain pointing to your server that isn't `netbird.example.com` will be forwarded to the proxy.
+The `HostSNI(*)` rule acts as a catch-all for any domain not matched by the existing openZro HTTP routers. The `priority=1` ensures this TCP router only handles traffic that no other router claims. Any domain pointing to your server that isn't `openzro.example.com` will be forwarded to the proxy.
 </Note>
 
 ### Exposing L4 ports
@@ -211,13 +211,13 @@ You only need port mappings for TCP and UDP mode services. HTTP and TLS mode ser
 
 ### Step 4: Set up DNS records
 
-Create one DNS record pointing to the server running your NetBird stack - one for the base proxy domain and one wildcard for service subdomains:
+Create one DNS record pointing to the server running your openZro stack - one for the base proxy domain and one wildcard for service subdomains:
 
 | Type | Name | Content |
 |------|------|---------|
-| `CNAME` | `*.netbird.example.com` | `netbird.example.com` |
+| `CNAME` | `*.openzro.example.com` | `openzro.example.com` |
 
-The base domain record is required because a wildcard DNS record does not cover the bare domain itself. The wildcard record ensures that all service subdomains (e.g., `myapp.netbird.example.com`, `dashboard.netbird.example.com`) resolve to your server where Traefik forwards them to the proxy container.
+The base domain record is required because a wildcard DNS record does not cover the bare domain itself. The wildcard record ensures that all service subdomains (e.g., `myapp.openzro.example.com`, `dashboard.openzro.example.com`) resolve to your server where Traefik forwards them to the proxy container.
 
 ### Step 5: Apply changes
 
@@ -241,7 +241,7 @@ You should see log messages indicating the proxy has connected to the management
 
 Once the proxy connects to the management server:
 
-1. Open your NetBird dashboard
+1. Open your openZro dashboard
 2. Navigate to **Reverse Proxy** > **Services**
 3. Click **Add Service**
 4. In the domain selector, you should see your proxy domain (e.g., `proxy.example.com`) with a **Cluster** badge
@@ -250,7 +250,7 @@ If the domain appears, the proxy is connected and ready. You can now [create you
 
 ### Step 7 (optional): Enable CrowdSec IP reputation
 
-[CrowdSec](https://www.crowdsec.net) is an open-source security engine that shares threat intelligence across its community network. When integrated with the NetBird Proxy, it checks every incoming client IP against a local cache of known malicious addresses and blocks them before they reach your services. This step is entirely optional.
+[CrowdSec](https://www.crowdsec.net) is an open-source security engine that shares threat intelligence across its community network. When integrated with the openZro Proxy, it checks every incoming client IP against a local cache of known malicious addresses and blocks them before they reach your services. This step is entirely optional.
 
 <Note>
 **Already have the proxy running?** If you completed steps 1-6 previously and are coming back to add CrowdSec, start here. The instructions below work whether you're setting up the proxy for the first time or adding CrowdSec to an existing proxy deployment.
@@ -270,9 +270,9 @@ Add the following service to your `docker-compose.yml`:
 ```yaml
   crowdsec:
     image: crowdsecurity/crowdsec:v1.7.7
-    container_name: netbird-crowdsec
+    container_name: openzro-crowdsec
     restart: unless-stopped
-    networks: [netbird]
+    networks: [openzro]
     environment:
       COLLECTIONS: crowdsecurity/linux
     volumes:
@@ -297,7 +297,7 @@ Add `crowdsec_db:` to the `volumes:` section, and update the proxy's `depends_on
 ```yaml
   proxy:
     depends_on:
-      netbird-server:
+      openzro-server:
         condition: service_started
       crowdsec:
         condition: service_healthy
@@ -319,7 +319,7 @@ docker compose exec crowdsec cscli lapi status
 Then register a bouncer:
 
 ```bash
-docker compose exec crowdsec cscli bouncers add netbird-proxy -o raw
+docker compose exec crowdsec cscli bouncers add openzro-proxy -o raw
 ```
 
 This prints a single API key. Copy it.
@@ -423,7 +423,7 @@ Add the `AuthCallbackURL` and `AuthClientID` fields to the `HttpConfig` section 
 }
 ```
 
-Replace `<your-management-domain>` with your NetBird management server domain (the same domain used for the dashboard). Replace `<your-auth-client-id>` with the OAuth2 client ID from your identity provider (the same client ID used for the dashboard application).
+Replace `<your-management-domain>` with your openZro management server domain (the same domain used for the dashboard). Replace `<your-auth-client-id>` with the OAuth2 client ID from your identity provider (the same client ID used for the dashboard application).
 
 #### Step 2: Register callback in your IdP
 
@@ -462,7 +462,7 @@ With the embedded IdP, external identity providers can still be used as **connec
 See the [Identity Providers page](/selfhosted/identity-providers) for instructions on adding external IdPs as connectors.
 
 <Note>
-Migrating from a standalone external IdP to the embedded IdP with your IdP as a connector requires user ID migration. See the [Migration Guide](/selfhosted/identity-providers#migration-guide-and-backwards-compatibility) or contact [support@netbird.io](mailto:support@netbird.io) for assistance.
+Migrating from a standalone external IdP to the embedded IdP with your IdP as a connector requires user ID migration. See the [Migration Guide](/selfhosted/identity-providers#migration-guide-and-backwards-compatibility) or contact [support@openzro.io](mailto:support@openzro.io) for assistance.
 </Note>
 
 ### Verification
@@ -482,10 +482,10 @@ If your proxy container cannot reach the management container directly - for exa
 
 ### 1. Add the ProxyService gRPC route
 
-The proxy communicates with the management server over two gRPC services: `ManagementService` and `ProxyService`. Both paths must be routed through Traefik. Find the existing gRPC router label in your `docker-compose.yml` - in a standard deployment this is `traefik.http.routers.netbird-grpc` - and add the `ProxyService` path prefix:
+The proxy communicates with the management server over two gRPC services: `ManagementService` and `ProxyService`. Both paths must be routed through Traefik. Find the existing gRPC router label in your `docker-compose.yml` - in a standard deployment this is `traefik.http.routers.openzro-grpc` - and add the `ProxyService` path prefix:
 
 ```
-traefik.http.routers.netbird-grpc.rule=Host(`netbird.example.com`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
+traefik.http.routers.openzro-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
 ```
 
 Without the `/management.ProxyService/` route, the proxy will fail to register with the management server.
@@ -504,7 +504,7 @@ To fix DNS resolution on the same host, assign a static IP to the Traefik contai
 # In your docker-compose.yml
 
 networks:
-  netbird:
+  openzro:
     driver: bridge
     ipam:
       config:
@@ -515,16 +515,16 @@ services:
   traefik:
     # ...existing traefik config...
     networks:
-      netbird:
+      openzro:
         ipv4_address: 172.30.0.10
 
   proxy:
     # ...existing proxy config...
     extra_hosts:
-      - "netbird.example.com:172.30.0.10"
+      - "openzro.example.com:172.30.0.10"
 ```
 
-Replace `netbird.example.com` with your actual management domain.
+Replace `openzro.example.com` with your actual management domain.
 
 ### 3. Increase Traefik's idle timeout for gRPC
 
@@ -556,7 +556,7 @@ services:
 Finally, update `proxy.env` to connect through Traefik and remove `NB_PROXY_ALLOW_INSECURE`:
 
 ```bash
-NB_PROXY_MANAGEMENT_ADDRESS=https://netbird.example.com:443
+NB_PROXY_MANAGEMENT_ADDRESS=https://openzro.example.com:443
 # Do NOT set NB_PROXY_ALLOW_INSECURE when connecting over TLS through Traefik
 ```
 
@@ -566,15 +566,15 @@ If you use the `extra_hosts` approach above, you **must** assign a static IP to 
 
 ## For users not on Traefik
 
-If your self-hosted deployment currently uses Nginx, Caddy, or another reverse proxy, you'll need to switch to Traefik before enabling the Reverse Proxy feature. See the [Traefik setup instructions](/selfhosted/external-reverse-proxy#traefik) for a step-by-step guide on configuring Traefik for your NetBird deployment.
+If your self-hosted deployment currently uses Nginx, Caddy, or another reverse proxy, you'll need to switch to Traefik before enabling the Reverse Proxy feature. See the [Traefik setup instructions](/selfhosted/external-reverse-proxy#traefik) for a step-by-step guide on configuring Traefik for your openZro deployment.
 
 ## Environment variable reference
 
 | Variable | Required | Description | Default |
 |----------|----------|-------------|---------|
-| `NB_PROXY_TOKEN` | Yes | Access token generated via `netbird-server token create` (combined) or `netbird-mgmt token create` (multi-container). The proxy refuses to start without it. | - |
-| `NB_PROXY_DOMAIN` | Yes | Base domain for this proxy instance (e.g., `proxy.example.com`or `netbird.example.com`). Determines the domain available for services. | - |
-| `NB_PROXY_MANAGEMENT_ADDRESS` | No | URL of your NetBird management server. The proxy connects via gRPC to register itself. | `https://api.netbird.io:443` |
+| `NB_PROXY_TOKEN` | Yes | Access token generated via `openzro-server token create` (combined) or `openzro-mgmt token create` (multi-container). The proxy refuses to start without it. | - |
+| `NB_PROXY_DOMAIN` | Yes | Base domain for this proxy instance (e.g., `proxy.example.com`or `openzro.example.com`). Determines the domain available for services. | - |
+| `NB_PROXY_MANAGEMENT_ADDRESS` | No | URL of your openZro management server. The proxy connects via gRPC to register itself. | `https://api.openzro.io:443` |
 | `NB_PROXY_ADDRESS` | No | Address the proxy listens on. | `:8443` (Docker), `:443` (binary) |
 | `NB_PROXY_ACME_CERTIFICATES` | No | Set to `true` to enable automatic TLS certificate provisioning via Let's Encrypt. | `false` |
 | `NB_PROXY_ACME_CHALLENGE_TYPE` | No | ACME challenge type: `tls-alpn-01` (port 443) or `http-01` (port 80). | `tls-alpn-01` |
@@ -609,7 +609,7 @@ For a full explanation of TLS-ALPN-01 requirements, see [TLS-ALPN-01 requirement
 1. Verify Traefik labels include `tls.passthrough=true`
 2. Confirm the router is configured as a **TCP** router (not HTTP) - labels should use `traefik.tcp.routers`, not `traefik.http.routers`
 3. Check that the `HostSNI` rule is set to `HostSNI(*)` (wildcard catch-all)
-4. Verify the TCP router has `priority=1` to prevent it from intercepting traffic meant for the main NetBird HTTP routers
+4. Verify the TCP router has `priority=1` to prevent it from intercepting traffic meant for the main openZro HTTP routers
 5. Ensure the `websecure` entrypoint is configured in your Traefik configuration
 6. Restart Traefik after adding the proxy container: `docker compose restart traefik`
 
@@ -628,7 +628,7 @@ If you need to remove the proxy and revert to your previous configuration:
 docker compose down
 
 # Restore your backup
-cd netbird-backup-YYYYMMDD
+cd openzro-backup-YYYYMMDD
 cp docker-compose.yml ../
 
 # Restart without the proxy
@@ -640,14 +640,14 @@ You can also revoke the proxy token to prevent the proxy from reconnecting:
 
 ```bash
 # Combined container
-docker exec -it netbird-server /go/bin/netbird-server token list \
-  --config <netbird-data-dir>/config.yaml
-docker exec -it netbird-server /go/bin/netbird-server token revoke <token-id> \
-  --config <netbird-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token list \
+  --config <openzro-data-dir>/config.yaml
+docker exec -it openzro-server /go/bin/openzro-server token revoke <token-id> \
+  --config <openzro-data-dir>/config.yaml
 
 # Multi-container
-docker exec -it netbird-management /go/bin/netbird-mgmt token list
-docker exec -it netbird-management /go/bin/netbird-mgmt token revoke <token-id>
+docker exec -it openzro-management /go/bin/openzro-mgmt token list
+docker exec -it openzro-management /go/bin/openzro-mgmt token revoke <token-id>
 ```
 
 ## Additional resources
@@ -655,4 +655,4 @@ docker exec -it netbird-management /go/bin/netbird-mgmt token revoke <token-id>
 - [Reverse Proxy feature documentation](/manage/reverse-proxy) - full overview of services, targets, domains, and authentication
 - [Custom Domains](/manage/reverse-proxy/custom-domains) - use your own domain names for reverse proxy services
 - [Reverse Proxy configuration reference](/selfhosted/configuration-files#reverse-proxy-configuration) - all proxy environment variables and options
-- [Self-Hosting Quickstart](/selfhosted/selfhosted-quickstart) - getting started with self-hosted NetBird
+- [Self-Hosting Quickstart](/selfhosted/selfhosted-quickstart) - getting started with self-hosted openZro

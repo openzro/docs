@@ -1,9 +1,9 @@
 # Traffic Events Logging
 
 <Note>
-This feature is available only in the NetBird cloud under the [Business plan](https://www.netbird.io/pricing?utm_source=docs&utm_content=traffic-events).
+This feature is available only in the openZro cloud under the [Business plan](https://www.openzro.io/pricing?utm_source=docs&utm_content=traffic-events).
 This is feature is in Beta and may change over time — including how data is collected and reported.
-To use this feature, make sure you're running NetBird client version 0.39 or higher.
+To use this feature, make sure you're running openZro client version 0.39 or higher.
 </Note>
 
 
@@ -17,19 +17,19 @@ you to better manage and secure your environment.
 
 ## How Traffic Events Logging Works
 
-NetBird offers flexibility as a peer-to-peer (p2p) overlay network and a remote network access solution. You can use NetBird to connect
-machines directly (p2p) when running the NetBird client on each machine. You can also use NetBird to organize remote employee access
-to internal networks like VPCs, office networks, and internal services without running the NetBird client on the remote resources using the [NetBird Networks](/manage/networks) feature.
-The way you use NetBird influences the way traffic events are captured and logged. Below are the two main scenarios for traffic events logging
-that describe how NetBird logs traffic events for different types of connections.
+openZro offers flexibility as a peer-to-peer (p2p) overlay network and a remote network access solution. You can use openZro to connect
+machines directly (p2p) when running the openZro client on each machine. You can also use openZro to organize remote employee access
+to internal networks like VPCs, office networks, and internal services without running the openZro client on the remote resources using the [openZro Networks](/manage/networks) feature.
+The way you use openZro influences the way traffic events are captured and logged. Below are the two main scenarios for traffic events logging
+that describe how openZro logs traffic events for different types of connections.
 
 ### Peer-to-Peer Connections
 
-When two peers are connected directly (p2p), NetBird captures and logs the traffic events for that connection on both peers.
-For example, if a user accessed an internal CRM server from their laptop via a browser and port 443, NetBird would log the traffic events for that
+When two peers are connected directly (p2p), openZro captures and logs the traffic events for that connection on both peers.
+For example, if a user accessed an internal CRM server from their laptop via a browser and port 443, openZro would log the traffic events for that
 connection on both the user's machine and the CRM server. If the connection was blocked, such as when there is a
 [policy](/manage/access-control/manage-network-access#managing-policies) that restricts access to the CRM server,
-NetBird would log the blocked event on the peer that refused the connection.
+openZro would log the blocked event on the peer that refused the connection.
 
 <p>
     <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-traffic-events.png" alt="traffic-events-p2p-diagram" className="imagewrapper-big"/>
@@ -37,7 +37,7 @@ NetBird would log the blocked event on the peer that refused the connection.
 
 #### Successful P2P Connection Events
 
-NetBird helps you better understand connection flows by correlating related events and presenting them in a clear, organized manner.
+openZro helps you better understand connection flows by correlating related events and presenting them in a clear, organized manner.
 
 For example, in a successful peer-to-peer connection scenario, a user initiates a connection from the peer `Alice` to the peer `server`.
 This is illustrated in the screenshot below.
@@ -59,7 +59,7 @@ that authorized the connection over the `ICMP` protocol.
 
 #### Blocked P2P Connections Events
 
-If a connection is refused, NetBird logs the blocked event on the peer that denies the connection, in this case, `server`.
+If a connection is refused, openZro logs the blocked event on the peer that denies the connection, in this case, `server`.
 The initiating peer `Alice` will still report the connection attempt but won't be aware that it was blocked.
 
 In this scenario, the `IT Admins to Servers` policy is configured to allow only ping requests (`ICMP`),
@@ -70,14 +70,14 @@ meaning all `HTTP` requests are intentionally not allowed. The screenshot below 
 
 ### Peer-to-Network Resource Connections
 
-When a peer connects to a [network resource](/manage/networks#resources), NetBird captures and logs the traffic
+When a peer connects to a [network resource](/manage/networks#resources), openZro captures and logs the traffic
 events for that connection on the peer that initiated the connection, and on the [routing peer](/manage/networks#routing-peers) that connects the peer to
 the internal network resource.
 
-A slightly modified example of the CRM server connection scenario would be if instead of running the NetBird client on the CRM server,
-you used the [NetBird Networks feature](/manage/networks) and created a network resource for the CRM server. In this case, if a user accessed an internal CRM from their laptop via a browser
-and port 443, NetBird would log the traffic events for that connection on the user's machine and the routing peer that
-routed the connection to the CRM server. If the connection was blocked, NetBird would log the blocked event on the routing peer.
+A slightly modified example of the CRM server connection scenario would be if instead of running the openZro client on the CRM server,
+you used the [openZro Networks feature](/manage/networks) and created a network resource for the CRM server. In this case, if a user accessed an internal CRM from their laptop via a browser
+and port 443, openZro would log the traffic events for that connection on the user's machine and the routing peer that
+routed the connection to the CRM server. If the connection was blocked, openZro would log the blocked event on the routing peer.
 
 <p>
     <img src="/docs-static/img/manage/activity/traffic-events-logging/routed-traffic-events.png" alt="traffic-events-routed-diagram" className="imagewrapper-big"/>
@@ -86,7 +86,7 @@ routed the connection to the CRM server. If the connection was blocked, NetBird 
 #### Successful Peer-to-Network Resource Events
 
 The screenshot below illustrates a successful connection from `Alice` to the network resource `CRM` running in the AWS VPC.
-The traffic is routed through a routing peer, which logs the connection event and reports it to the NetBird servers.
+The traffic is routed through a routing peer, which logs the connection event and reports it to the openZro servers.
 The access is permitted by the policy `IT Admins to AWS Servers`, which allows connections over the `TCP` protocol on port `443`.
 Note the `ROUTER` column in the table, which identifies the routing peer responsible for routing to the internal network resource.
 
@@ -112,12 +112,12 @@ in one TCP session, but the routing peer blocked all attempts.
 
 <Note>
     For all the examples above, we used the `nc` command to initiate the connection to the CRM server from the peer `Alice`.
-    E.g., `nc -v crm.netbird.cloud 443`.
+    E.g., `nc -v crm.openzro.cloud 443`.
 </Note>
 
 ## Enabling Traffic Events Logging
 
-Traffic events logging feature is disabled by default. To enable it on the NetBird dashboard, navigate to `Settings > Networks`.
+Traffic events logging feature is disabled by default. To enable it on the openZro dashboard, navigate to `Settings > Networks`.
 Under the Experimental section, you'll find the `Enable Traffic Events` option. Toggle the switch to enable traffic event logging.
 
 By default, traffic reporting in userspace is always enabled, providing basic logging of network interactions.
@@ -125,7 +125,7 @@ However, packet size reporting at the kernel level is disabled by default to min
 
 <Note>
 You can optionally enable `Traffic Reporting (Kernel)` to capture additional details, such as network packet sizes,
-at the kernel level. Be aware that enabling this option may lead to higher CPU usage on the NetBird client.
+at the kernel level. Be aware that enabling this option may lead to higher CPU usage on the openZro client.
 </Note>
 
 
@@ -157,37 +157,37 @@ The events might take up to **ten minutes** to become available via API and Dash
 
 ## Enable Traffic Events Streaming to SIEM Systems
 
-NetBird allows you to stream traffic events directly to your Security Information and Event Management (SIEM) system in real time.
-By enabling this feature, you can seamlessly monitor and analyze NetBird network flow events within your existing SIEM infrastructure,
+openZro allows you to stream traffic events directly to your Security Information and Event Management (SIEM) system in real time.
+By enabling this feature, you can seamlessly monitor and analyze openZro network flow events within your existing SIEM infrastructure,
 enhancing your ability to detect and respond to security events.
 
 For detailed instructions on supported integrations and how to set them up, refer to the [integrations guide](/manage/activity/event-streaming).
 
 ## Traffic Events Data
 
-When enabled, a NetBird peer will record metadata for each network flow that it participates in. The data collected by peers includes:
+When enabled, a openZro peer will record metadata for each network flow that it participates in. The data collected by peers includes:
 
 * **Timestamp**: When the flow started and ended.
 * **Flow ID**: A unique identifier for the traffic event flow.
 * **Type**: The type of traffic event, such as Start, End, or Blocked.
 * **Source and Destination IP Addresses**: The IP of the peer (source) and the IP of the remote endpoint (destination). For peer-to-peer traffic,
-these will be the NetBird network IPs (e.g. 100.x.x.x addresses of each peer). For traffic to an external resource (like a private server or subnet), the destination might be an IP in that remote network.
+these will be the openZro network IPs (e.g. 100.x.x.x addresses of each peer). For traffic to an external resource (like a private server or subnet), the destination might be an IP in that remote network.
 * **Source and Destination Ports**: The network ports used by the connection (for TCP/UDP flows).
 * **ICMP Code and Type**: For ICMP traffic, the ICMP code and type.
 * **Protocol**: The protocol of the traffic, such as TCP, UDP, or ICMP.
-* **Direction**: Whether the flow was inbound or outbound. This takes into consideration the perspective of the **peer reporting the traffic** and the NetBird interface.
+* **Direction**: Whether the flow was inbound or outbound. This takes into consideration the perspective of the **peer reporting the traffic** and the openZro interface.
 * **Volume of Data**: The amount of data transferred, measured in number of packets and bytes sent/received for the duration of the flow.
 * **Resource ID**: Network route or Networks resource ID that the flow is associated with. This is useful for identifying the routing configuration that allowed the flow. DNS route information is **available only** on the routing client.
 * **Rule ID**: The ID of the policy that allowed the flow. This is useful for identifying the access control policy that allowed the flow. This information is **available only** on the receiving side of the traffic.
 
-In addition to the data collected by the peers, the NetBird API provides additional context about the peers and resources involved in the traffic event. These details include:
+In addition to the data collected by the peers, the openZro API provides additional context about the peers and resources involved in the traffic event. These details include:
 * **Peer Name**: The name of the peer.
 * **Peer ID**: The unique identifier of the peer.
 * **Resource name**: The name of the resource or network route.
 * **Policy Name**: The name of the policy that allowed the flow.
 * **User ID, name, and email**: The name and email of the user associated with the source peer.
 * **Reporter ID**: The unique identifier of the peer that reported the traffic event.
-* **Received timestamp**: The timestamp when the event was received by the NetBird servers.
+* **Received timestamp**: The timestamp when the event was received by the openZro servers.
 
 <details>
 <summary>API sample response</summary>
@@ -241,7 +241,7 @@ In addition to the data collected by the peers, the NetBird API provides additio
 </details>
 
 ## Viewing Traffic Events on the Dashboard
-There are two places where you can see the traffic events on the NetBird dashboard:
+There are two places where you can see the traffic events on the openZro dashboard:
 1. **Traffic events**: Under Activity, you will find the Traffic events menu. This view shows the traffic events in a table format for all peers in your network.
 2. **Peer details**: When you click on a peer, you will see the traffic events for that peer in the Peer details view.
 
@@ -267,7 +267,7 @@ Events can be correlated by observing the traffic from both peers involved in a 
 you will see up to 4 events from these peers. If the connection was successful, you will see a started and a stopped event from Peer A and Peer B. But, if one peer blocks the connection, then you will see a started and stopped events from the initiator and
 a blocked event from the responder.
 <Note>
- The blocked event will be available only if the destination uses the NetBird client in userspace mode.
+ The blocked event will be available only if the destination uses the openZro client in userspace mode.
  This is the case for Windows and MacOs nodes. For Linux, you can enable userspace mode with the environment variable `NB_WG_KERNEL_DISABLED=true` and `NB_FORCE_USERSPACE_ROUTER=true`
 </Note>
 
@@ -309,7 +309,7 @@ Key differences:
 - There are no events that have started or stopped on the refusing side. The connection is blocked right after the request.
 - Depending on the application making a request in the initiator, you may see multiple blocked events from the receiving side of the connection due to retries:
 <Note>
- The blocked event will be available only if the destination is using the NetBird client in userspace mode.
+ The blocked event will be available only if the destination is using the openZro client in userspace mode.
  This is the case for Windows and MacOs nodes. For Linux, you can enable userspace mode with the environment variable `NB_WG_KERNEL_DISABLED=true` and `NB_FORCE_USERSPACE_ROUTER=true`
 </Note>
 
@@ -343,7 +343,7 @@ For site-2-site connections, the events will be similar to the above examples, b
 </p>
 
 ## Limitations
-There are a few differences between the different WireGuard modes NetBird supports and the data captured by the NetBird client.
+There are a few differences between the different WireGuard modes openZro supports and the data captured by the openZro client.
 | Feature | Kernel Mode | Userspace Mode | Netstack Mode |
 |:---------:|:-------------:|:----------------:|:---------------:|
 | Blocked traffic event | No | Yes | Yes |
@@ -352,7 +352,7 @@ There are a few differences between the different WireGuard modes NetBird suppor
 | Allowed rule ID for routed events | Yes | No | No |
 | Byte counters for routed events | Yes | No | No |
 
-We are actively working to improve the data captured by the NetBird client in Kernel and userspace modes to align with customers' expectations.
+We are actively working to improve the data captured by the openZro client in Kernel and userspace modes to align with customers' expectations.
 
 ## Conclusion
 Traffic events logging provides a powerful tool for monitoring and analyzing network traffic across your infrastructure.

@@ -9,7 +9,7 @@ This guide shows how to connect cloud VPCs across providers or bridge cloud and 
 After following this guide, workloads across different cloud providers (AWS, GCP, Azure) or between cloud and on-premise can communicate without exposing traffic to the public internet.
 
 ```
-AWS VPC ────► Routing Peer ────► NetBird ────► Routing Peer ────► GCP VPC
+AWS VPC ────► Routing Peer ────► openZro ────► Routing Peer ────► GCP VPC
 (10.0.0.0/16)   (peer)                           (peer)         (10.1.0.0/16)
 ```
 
@@ -19,7 +19,7 @@ Multi-cloud Site-to-Site requires Network Routes because the Networks feature do
 
 ## Prerequisites
 
-- A [NetBird cloud account](https://app.netbird.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - Access to deploy VMs in your cloud environments
 - Network configuration permissions in your cloud VPCs
 
@@ -34,7 +34,7 @@ Connect workloads across AWS and GCP:
 
 Before deploying routing peers, create setup keys with auto-assigned groups:
 
-1. Go to **Setup Keys** in the NetBird dashboard
+1. Go to **Setup Keys** in the openZro dashboard
 2. Click **Create Setup Key**
 3. For AWS:
    - Name: "AWS Routing Peer"
@@ -52,12 +52,12 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 
 **AWS:**
 
-Launch an EC2 instance in your VPC with NetBird installed. Use the following user data:
+Launch an EC2 instance in your VPC with openZro installed. Use the following user data:
 
 ```bash
 #!/bin/bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-netbird up --setup-key YOUR_AWS_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+openzro up --setup-key YOUR_AWS_SETUP_KEY
 ```
 
 **GCP:**
@@ -66,8 +66,8 @@ Launch a Compute Engine instance in your VPC:
 
 ```bash
 #!/bin/bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-netbird up --setup-key YOUR_GCP_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+openzro up --setup-key YOUR_GCP_SETUP_KEY
 ```
 
 ## Step 3: Create Network Routes
@@ -150,13 +150,13 @@ Source: gcp-routing-peers → Destination: aws-routing-peers (specific protocols
 
 Add a route in your route table:
 - Destination: `10.1.0.0/16` (GCP CIDR)
-- Target: Your NetBird routing peer instance (ENI)
+- Target: Your openZro routing peer instance (ENI)
 
 **GCP VPC:**
 
 Add a custom route:
 - Destination: `10.0.0.0/16` (AWS CIDR)
-- Next hop: Your NetBird routing peer instance
+- Next hop: Your openZro routing peer instance
 
 <Note>
 Enable IP forwarding on routing peer instances in both clouds.
@@ -180,7 +180,7 @@ ping 10.0.0.100  # AWS instance
 
 ### AWS
 
-- Security groups must allow traffic from the NetBird routing peer
+- Security groups must allow traffic from the openZro routing peer
 - Enable source/destination check disabled on the routing peer instance
 - Consider using an Auto Scaling group for the routing peer with a static ENI
 
@@ -205,7 +205,7 @@ Use Site-to-Site connectivity for migrating workloads between environments:
 1. **Before migration**: Application and database both on-premise
 2. **During migration**: Application in cloud, database still on-premise (use VPN-to-Site via [Networks](/manage/networks/use-cases/by-scenario/cloud-to-on-premise))
 3. **Cutover**: Switch traffic to the cloud application
-4. **After migration**: Once database is also migrated, update connection strings and remove NetBird if no longer needed
+4. **After migration**: Once database is also migrated, update connection strings and remove openZro if no longer needed
 
 ## Best Practices
 
@@ -224,13 +224,13 @@ Use Site-to-Site connectivity for migrating workloads between environments:
 ### Performance
 
 - Place routing peers close to the resources they serve
-- Use direct peering where possible (NetBird will automatically optimize paths)
+- Use direct peering where possible (openZro will automatically optimize paths)
 - Monitor latency and throughput between environments
 
 ## Troubleshooting
 
 **Multi-cloud connectivity issues:**
-1. Confirm both routing peers are connected to NetBird
+1. Confirm both routing peers are connected to openZro
 2. Check VPC routing tables have correct entries
 3. Verify security groups/firewall rules allow traffic
 

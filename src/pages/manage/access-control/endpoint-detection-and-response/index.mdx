@@ -1,4 +1,4 @@
-# Integrate NetBird with MDM & EDR Platforms
+# Integrate openZro with MDM & EDR Platforms
 
 ![Endpoint Detection and Response](/docs-static/img/manage/access-control/endpoint-detection-and-response/edr-integrations.png)
 
@@ -14,26 +14,26 @@ across various service providers and operating system.
 MDM focuses on managing and securing mobile devices, while EDR focuses on detecting and responding to threats on various
 endpoints, including desktops, laptops, and servers.
 
-## NetBird's EDR and MDM Integration
+## openZro's EDR and MDM Integration
 With the rise of remote work, endpoints often operate outside the traditional corporate network perimeter,
 making them more vulnerable to attacks. EDR provides a layer of security that is not dependent on the physical location
 of the endpoint, thus extending protection to remote workers and their devices.
 
-NetBird integrates with major EDR and MDM platforms to restrict network access only to devices managed by the company's IT department.
-With the integration enabled, NetBird synchronizes the list of devices managed by the MDM or EDR platform via the API and
+openZro integrates with major EDR and MDM platforms to restrict network access only to devices managed by the company's IT department.
+With the integration enabled, openZro synchronizes the list of devices managed by the MDM or EDR platform via the API and
 checks the presence of the MDM or EDR agent on the device, blocking access to the network if the agent is not installed or
 not compliant with the organization's security policies.
 
-NetBird doesn't apply the MDM and EDR checks to all devices in the network. Instead, you can select specific groups of devices for
+openZro doesn't apply the MDM and EDR checks to all devices in the network. Instead, you can select specific groups of devices for
 the checks to apply.
 
 <Note>
-     This feature is only available in the cloud version of NetBird.
+     This feature is only available in the cloud version of openZro.
 </Note>
 
 ## Supported EDR Platforms
 
-NetBird integrates with the following EDR and MDM platforms:
+openZro integrates with the following EDR and MDM platforms:
 
 * [CrowdStrike Falcon](/manage/access-control/endpoint-detection-and-response/crowdstrike-edr)
 * [FleetDM](/manage/access-control/endpoint-detection-and-response/fleetdm-edr)
@@ -43,6 +43,6 @@ NetBird integrates with the following EDR and MDM platforms:
 
 ## Managing Exceptions
 
-In some cases, you may need to grant network access to devices that don't meet EDR compliance requirements. NetBird provides a compliance bypass mechanism for these scenarios:
+In some cases, you may need to grant network access to devices that don't meet EDR compliance requirements. openZro provides a compliance bypass mechanism for these scenarios:
 
 * [Bypass Compliance for Non-Compliant Peers](/manage/access-control/endpoint-detection-and-response/bypass-compliance)

@@ -1,7 +1,7 @@
 # Configuring Routes with Access Control
 
 <Note>
-    This feature requires NetBird version 0.30.0 or later.
+    This feature requires openZro version 0.30.0 or later.
 </Note>
 
 By default, network routes allow unrestricted access when no access control groups are assigned. When you assign access control groups to a route, only traffic that matches the defined policies can access the routed network.
@@ -104,7 +104,7 @@ Before version 0.30.0, routing clients accepted any traffic initiated from route
 
 ```mermaid
 graph LR
-    A[NetBird Peer A<br>Routing Client] --- B[NetBird Peer B<br>Routing Peer]
+    A[openZro Peer A<br>Routing Client] --- B[openZro Peer B<br>Routing Peer]
     B --- C[Routed Network]
 ```
 

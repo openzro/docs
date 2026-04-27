@@ -1,22 +1,22 @@
-# Understanding NetBird Posture Checks
+# Understanding openZro Posture Checks
 Posture Checks is a security feature that enhances network protection by implementing automated assessments of a device's security status before granting network access, thus ensuring that only compliant devices can access your network resources.
 
-In this regard, NetBird posture checks verify various aspects of a connecting device, offering granular control over network access. These checks include **verifying the NetBird client version**, allowing you to restrict access to peers with specific versions of the client software. Additionally, you can implement **geographical restrictions** based on country or region, giving you control over where connections can originate from.
+In this regard, openZro posture checks verify various aspects of a connecting device, offering granular control over network access. These checks include **verifying the openZro client version**, allowing you to restrict access to peers with specific versions of the client software. Additionally, you can implement **geographical restrictions** based on country or region, giving you control over where connections can originate from.
 
 The feature also allows for network-level restrictions by enabling you to **allow or block specific peer network ranges**. Furthermore, you can set constraints based on the operating system of the connecting device, **ensuring that only approved OS versions can gain access**. For an even more detailed level of control, Posture Checks can examine the running processes on a peer device, **allowing or denying access based on the presence of specific applications or services**.
 
-By using these diverse checking capabilities, NetBird empowers you to create a robust and finely-tuned security posture for your network, significantly reducing the risk of unauthorized access and potential security breaches.
+By using these diverse checking capabilities, openZro empowers you to create a robust and finely-tuned security posture for your network, significantly reducing the risk of unauthorized access and potential security breaches.
 
 ## Setting Up Posture Checks
 
-Setting up posture checks in NetBird is straightforward, you can follow the example in the video below:
+Setting up posture checks in openZro is straightforward, you can follow the example in the video below:
 <YouTube videoId="-KlJUBuZrpo" />
 
 Or follow the guide with other examples below:
 
-Log in to your NetBird dashboard and navigate to `Access Control` > `Posture Checks` in the left menu. Click `Create Posture Check` or edit an existing one.
+Log in to your openZro dashboard and navigate to `Access Control` > `Posture Checks` in the left menu. Click `Create Posture Check` or edit an existing one.
 
-![NetBird Posture Checks](/docs-static/img/manage/access-control/posture-checks/posture-checks-01.png)
+![openZro Posture Checks](/docs-static/img/manage/access-control/posture-checks/posture-checks-01.png)
 
 A pop-up window will open with two tabs: `Checks` and `Name & Description`.
 
@@ -24,10 +24,10 @@ A pop-up window will open with two tabs: `Checks` and `Name & Description`.
 
 From here, you can manage access with posture checks based on several aspects:
 
-### NetBird Client Version
-Restrict access to peers with specific NetBird client versions, thus ensuring that all devices connecting to the network use up-to-date, secure client software.
+### openZro Client Version
+Restrict access to peers with specific openZro client versions, thus ensuring that all devices connecting to the network use up-to-date, secure client software.
 
-![NetBird Client Version Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-03.png)
+![openZro Client Version Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-03.png)
 
 ### Country and Region
 Limit network access based on geographical location, helping comply with data regulations or restrict access from high-risk areas. Note that you have two tabs available for this: `Allow` (green) and `Block` (red), making it easy to set up your preferred access rules..
@@ -46,7 +46,7 @@ Restrict access based on the connecting device's OS, ensuring only approved and 
 
 ![Operating System Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-06.png)
 <Note>
-    The Operating System Check requires NetBird version [0.26.0](https://github.com/netbirdio/netbird/releases) or newer.
+    The Operating System Check requires openZro version [0.26.0](https://github.com/openzro/openzro/releases) or newer.
 </Note>
 
 The check evaluates the actual `OS version` for Android, macOS, and iOS, while for Linux and Windows, it assesses the `kernel version`.
@@ -63,9 +63,9 @@ Below are some examples of OS versions for each operating system:
 * Windows Server 2022, Version 21H2: `10.0.20348`
 
 ### Process
-[Limit network access based on specific applications or services running on the connecting device](https://netbird.io/knowledge-hub/limit-network-access-based-on-running-processes). By verifying specific applications or processes, you ensure that only devices running essential security software, such as antivirus, firewalls, or endpoint protection agents, can connect to your network, reducing the risk of malware entering your network through unprotected devices. It also aids in maintaining compliance with regulatory requirements by enforcing consistent security measures across all devices.
+[Limit network access based on specific applications or services running on the connecting device](https://openzro.io/knowledge-hub/limit-network-access-based-on-running-processes). By verifying specific applications or processes, you ensure that only devices running essential security software, such as antivirus, firewalls, or endpoint protection agents, can connect to your network, reducing the risk of malware entering your network through unprotected devices. It also aids in maintaining compliance with regulatory requirements by enforcing consistent security measures across all devices.
 
-Furthermore, this process-based posture check allows you to create specific policies for different user groups or network segments based on their unique security needs. Working in conjunction with other posture checks in NetBird, this setting offers a comprehensive and user-friendly approach to network security.
+Furthermore, this process-based posture check allows you to create specific policies for different user groups or network segments based on their unique security needs. Working in conjunction with other posture checks in openZro, this setting offers a comprehensive and user-friendly approach to network security.
 
 ![Process Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-07.png)
 
@@ -82,7 +82,7 @@ You'll notice a gray dot to the left of the posture check name, indicating it's 
 
 To apply a posture check:
 
-* [Create or edit an access control policy](https://docs.netbird.io/access-control).
+* [Create or edit an access control policy](https://docs.openzro.io/access-control).
 * Find the `Posture Checks` tab within the policy settings.
 * Choose `Browse Checks` to select an existing check or `New Posture Check` to create one.
 
@@ -98,7 +98,7 @@ If you revisit the `Posture Checks` dashboard, you'll notice a green dot next to
 
 ![Posture Checks Dashboard](/docs-static/img/manage/access-control/posture-checks/posture-checks-12.png)
 
-Following these steps, you can effectively implement and manage NetBird's Posture Checks, significantly enhancing your network's security posture.
+Following these steps, you can effectively implement and manage openZro's Posture Checks, significantly enhancing your network's security posture.
 
 ## Known Limitations
 
@@ -122,12 +122,12 @@ If your deployment includes iOS or Android clients, consider one of the followin
 - Use alternative posture checks (such as Geo Location) that are supported on mobile platforms
 - Apply Peer Network Range posture checks only to policies targeting desktop platforms (Windows, macOS, Linux)
 
-## Get started with NetBird
+## Get started with openZro
 <p float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://netbird.io/pricing")}>Use NetBird</Button>
+    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
 </p>
 
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

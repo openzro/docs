@@ -68,11 +68,11 @@ export function NavigationAPI({tableOfContents, className}) {
   return (
       <nav className={className}>
         <ul role="list">
-          <TopLevelNavItem href="https://netbird.io/">Home</TopLevelNavItem>
+          <TopLevelNavItem href="https://openzro.io/">Home</TopLevelNavItem>
           <TopLevelNavItem href="/">Docs</TopLevelNavItem>
           <TopLevelNavItem href="/api">API</TopLevelNavItem>
-          <TopLevelNavItem href="https://netbird.io/knowledge-hub/">Learn</TopLevelNavItem>
-          <TopLevelNavItem href="https://github.com/netbirdio/netbird">Github</TopLevelNavItem>
+          <TopLevelNavItem href="https://openzro.io/knowledge-hub/">Learn</TopLevelNavItem>
+          <TopLevelNavItem href="https://github.com/openzro/openzro">Github</TopLevelNavItem>
           <TopLevelNavItem href="/slack-url">Support</TopLevelNavItem>
           {apiNavigation.map((group, groupIndex) => (
               <NavigationStateProvider key={group.title} index={groupIndex}>
@@ -84,7 +84,7 @@ export function NavigationAPI({tableOfContents, className}) {
               </NavigationStateProvider>
             ))}
           <li className="sticky bottom-0 z-10 mt-6 min-[416px]:hidden">
-            <Button href="https://app.netbird.io/" variant="filled" className="w-full">
+            <Button href="https://app.openzro.io/" variant="filled" className="w-full">
               Sign in
             </Button>
           </li>

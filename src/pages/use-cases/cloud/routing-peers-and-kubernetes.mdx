@@ -1,13 +1,13 @@
 import {Note} from "@/components/mdx";
 
 # Deploy routing peers to a Kubernetes cluster
-This guide provides instructions on how to use NetBird agent within a Kubernetes cluster to establish secure, peer-to-peer
+This guide provides instructions on how to use openZro agent within a Kubernetes cluster to establish secure, peer-to-peer
 networking between your Kubernetes pods and external services or other clusters.
 
 ## Prerequisites
 - Access to a Kubernetes cluster
 - Kubernetes CLI (kubectl) installed and configured
-- Access to the NetBird management dashboard
+- Access to the openZro management dashboard
 
 ## Use Case Scenario
 Imagine you're running a multi-cloud Kubernetes environment where your application components are distributed across
@@ -16,7 +16,7 @@ from hosts running on a Hetzner without exposing them to the public internet.
 
 ## Step-by-Step guide
 ### Step 1: Create a setup key
-Navigate to Setup Keys in the NetBird management dashboard and click on "Create setup key".
+Navigate to Setup Keys in the openZro management dashboard and click on "Create setup key".
 
 Choose a name, e.g. `Kubernetes routing peers`, mark the key as `reusable` and enable `Ephemeral peers`. This option is
 ideal for stateless workloads like containers, where peers that are offline for over 10 minutes are automatically removed.
@@ -32,7 +32,7 @@ See the screenshot below for reference:
 With your setup key created, note it down for the next steps.
 
 ### Step 2: Add a network route
-Navigate to Network Routes in the NetBird management dashboard and click on `Add Route`.
+Navigate to Network Routes in the openZro management dashboard and click on `Add Route`.
 
 Set your kubernetes pod range as the destination network, and select the `Peer group` option, choosing the
 "kubernetes-routers" group. This configuration allows for scaling pods as necessary within your Kubernetes cluster.
@@ -50,7 +50,7 @@ Click on Name & Description to give your route a name and description. Then clic
 </p>
 
 ### Step 3: Create an access control policy
-Navigate to Access Control Policies in the NetBird management dashboard and click on `Add Policy`.
+Navigate to Access Control Policies in the openZro management dashboard and click on `Add Policy`.
 
 Set the source group to `hetzner-servers` and the destination group to `kubernetes-routers`. This configuration allows
 the Hetzner servers to access the kubernetes pods.
@@ -63,34 +63,34 @@ Click on Name & Description to give your policy a name and description. Then cli
     <img src="/docs-static/img/use-cases/routing-peers-and-kubernetes/k8s-name-access-control-policy.png" alt="k8s-name-access-control-policy" width="400" className="imagewrapper"/>
 </p>
 
-### Step 4: Deploy the NetBird agent
-You can deploy the NetBird agent using a daemon set or a deployment. Below is an example of a deployment configuration with 1 replica.
+### Step 4: Deploy the openZro agent
+You can deploy the openZro agent using a daemon set or a deployment. Below is an example of a deployment configuration with 1 replica.
 
 ```yaml
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: netbird
+  name: openzro
   namespace: default
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: netbird
+      app: openzro
   template:
     metadata:
       labels:
-        app: netbird
+        app: openzro
     spec:
       containers:
-        - name: netbird
-          image: netbirdio/netbird:latest
+        - name: openzro
+          image: openzro/openzro:latest
           env:
             - name: NB_SETUP_KEY
               value: "0000000000-0000-0000-0000-0000000000" # replace with your setup key
             - name: NB_HOSTNAME
-              value: "netbird-k8s-router" # name that will appear in the management UI
+              value: "openzro-k8s-router" # name that will appear in the management UI
             - name: NB_LOG_LEVEL
               value: "info"
           securityContext:
@@ -101,27 +101,27 @@ spec:
                 - SYS_ADMIN
           livenessProbe:
             exec:
-              command: ["netbird", "status", "--check", "live"]
+              command: ["openzro", "status", "--check", "live"]
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           readinessProbe:
             exec:
-              command: ["netbird", "status", "--check", "ready"]
+              command: ["openzro", "status", "--check", "ready"]
             initialDelaySeconds: 5
             periodSeconds: 10
             timeoutSeconds: 5
             failureThreshold: 3
           startupProbe:
             exec:
-              command: ["netbird", "status", "--check", "startup"]
+              command: ["openzro", "status", "--check", "startup"]
             periodSeconds: 2
             timeoutSeconds: 10
             failureThreshold: 30
 ```
 
-The health probes use `netbird status --check` to verify the client state:
+The health probes use `openzro status --check` to verify the client state:
 - **live**: checks that the daemon process is responsive
 - **ready**: checks that the client is not in an authentication-required state (NeedsLogin, LoginFailed, SessionExpired)
 - **startup**: checks that management and signal are connected, and that at least one relay server is available if any are configured
@@ -138,7 +138,7 @@ kubectl apply -f deployment.yml
 </Note>
 
 ### Step 5: Make the deployment highly available
-NetBird network routes support multiple routing peers running in a fail-over mode, where one routing peer will be select
+openZro network routes support multiple routing peers running in a fail-over mode, where one routing peer will be select
 as gateway for a network and when this peer becomes unavailable other routing peer will be select for the role, proving a
 highly available network route.
 
@@ -156,18 +156,18 @@ Apply the updated deployment file to your Kubernetes cluster using the following
 kubectl apply -f deployment.yml
 ```
 ### Step 6: Verify the deployment
-After deploying the NetBird agent, you can verify that the agent is running by checking the logs of the pods.
+After deploying the openZro agent, you can verify that the agent is running by checking the logs of the pods.
 
 ```shell
-kubectl logs -l app=netbird
+kubectl logs -l app=openzro
 ```
 
-You can also verify that the agent is connected to the NetBird management dashboard by checking the dashboard.
+You can also verify that the agent is connected to the openZro management dashboard by checking the dashboard.
 <p>
-    <img src="/docs-static/img/use-cases/routing-peers-and-kubernetes/k8s-netbird-agent-connected.png" alt="k8s-netbird-agent-connected" className="imagewrapper-big"/>
+    <img src="/docs-static/img/use-cases/routing-peers-and-kubernetes/k8s-openzro-agent-connected.png" alt="k8s-openzro-agent-connected" className="imagewrapper-big"/>
 </p>
 
 ## Conclusion
-By following these steps, you've successfully integrated Netbird within your Kubernetes cluster, enabling secure,
+By following these steps, you've successfully integrated openZro within your Kubernetes cluster, enabling secure,
 peer-to-peer networking between your Kubernetes pods and external services. This setup is particularly beneficial for
 hybrid, multi-cloud environments and remote access, ensuring seamless connectivity and security across your infrastructure.

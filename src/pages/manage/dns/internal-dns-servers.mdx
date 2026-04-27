@@ -1,9 +1,9 @@
-export const description = 'Configure NetBird to work with internal DNS servers like Active Directory, BIND, and Unbound. Includes troubleshooting WireGuard port conflicts on Domain Controllers.'
+export const description = 'Configure openZro to work with internal DNS servers like Active Directory, BIND, and Unbound. Includes troubleshooting WireGuard port conflicts on Domain Controllers.'
 import {Note, Warning} from "@/components/mdx"
 
 # Internal DNS Servers
 
-When your network has on-premise DNS infrastructure — Active Directory, BIND, Unbound, or other internal DNS servers — you may need to configure NetBird to use them. This page covers when a nameserver configuration is needed and when it isn't.
+When your network has on-premise DNS infrastructure — Active Directory, BIND, Unbound, or other internal DNS servers — you may need to configure openZro to use them. This page covers when a nameserver configuration is needed and when it isn't.
 
 ## When You Don't Need a Nameserver
 
@@ -33,21 +33,21 @@ This applies to all domain-based resources, not just Active Directory domains. A
 
 ## Configuring Nameservers for Internal Domains
 
-To resolve internal domains through NetBird, create a **match domain** Nameserver pointing to your internal DNS server:
+To resolve internal domains through openZro, create a **match domain** Nameserver pointing to your internal DNS server:
 
 1. Go to **DNS** → **Nameservers** → **Add Nameserver**
 2. Choose **Custom DNS**
 
-<img src="/docs-static/img/manage/dns/netbird-nameserver-add-button.png" alt="Add nameserver" className="imagewrapper"/>
+<img src="/docs-static/img/manage/dns/openzro-nameserver-add-button.png" alt="Add nameserver" className="imagewrapper"/>
 
 3. Add the IP addresses of your internal DNS servers (e.g., `192.168.0.32`)
 4. Select the **Distribution Groups** — the peer groups that should use this nameserver
 
-<img src="/docs-static/img/manage/dns/netbird-nameserver-custom.png" alt="Custom DNS provider" className="imagewrapper"/>
+<img src="/docs-static/img/manage/dns/openzro-nameserver-custom.png" alt="Custom DNS provider" className="imagewrapper"/>
 
 5. Under **Domains**, add a **Match Domain** and enter your internal domains (e.g., `corp.local`, `company.internal`)
 
-<img src="/docs-static/img/manage/dns/netbird-nameserver-add-domain.png" alt="Add match domain" className="imagewrapper"/>
+<img src="/docs-static/img/manage/dns/openzro-nameserver-add-domain.png" alt="Add match domain" className="imagewrapper"/>
 
 6. Save the nameserver
 
@@ -155,7 +155,7 @@ Active Directory (AD) environments have specific DNS requirements because Domain
 
 ### Domain Controllers as Routing Peers
 
-We do not recommend using Domain Controllers as routing peers. If you must, you need to **disable DNS management** for the DC's group. If NetBird manages DNS on a Domain Controller, it can interfere with the AD DNS services that the DC depends on.
+We do not recommend using Domain Controllers as routing peers. If you must, you need to **disable DNS management** for the DC's group. If openZro manages DNS on a Domain Controller, it can interfere with the AD DNS services that the DC depends on.
 
 To configure this:
 
@@ -164,17 +164,17 @@ To configure this:
 3. Add the Domain Controller group to **Disable DNS management for these groups**
 4. Save Changes
 
-This prevents NetBird from modifying the DC's DNS configuration while still allowing the DC to act as a routing peer. The DC continues using its own DNS for Active Directory services.
+This prevents openZro from modifying the DC's DNS configuration while still allowing the DC to act as a routing peer. The DC continues using its own DNS for Active Directory services.
 
 For more details on DNS management modes, see [DNS Settings](/manage/dns/dns-settings).
 
 ### WireGuard Port Conflict on Domain Controllers
 
-When NetBird is installed on a Windows Domain Controller, the Windows DNS Server service may already be using UDP port 51820 — WireGuard's default port. This causes NetBird to fail during startup.
+When openZro is installed on a Windows Domain Controller, the Windows DNS Server service may already be using UDP port 51820 — WireGuard's default port. This causes openZro to fail during startup.
 
 **Symptoms:**
-- NetBird fails with: `Error: daemon up failed: call service up method: rpc error: code = DeadlineExceeded desc = context deadline exceeded`
-- The peer appears as **disconnected** in the NetBird management portal
+- openZro fails with: `Error: daemon up failed: call service up method: rpc error: code = DeadlineExceeded desc = context deadline exceeded`
+- The peer appears as **disconnected** in the openZro management portal
 - The WireGuard tunnel cannot establish a connection
 
 **Cause:**
@@ -197,10 +197,10 @@ tasklist /FI "PID eq <PID>"
 
 If the process is `dns.exe` or `svchost.exe` (hosting the DNS Server service), this confirms the port conflict.
 
-3. Optionally, capture a NetBird debug bundle for further investigation:
+3. Optionally, capture a openZro debug bundle for further investigation:
 
 ```cmd
-netbird debug for 1m -U
+openzro debug for 1m -U
 ```
 
 **Fix:**
@@ -217,10 +217,10 @@ Then restart the DNS Server service:
 net stop dns && net start dns
 ```
 
-Then restart the NetBird service:
+Then restart the openZro service:
 
 ```cmd
-netbird service restart
+openzro service restart
 ```
 
 <Warning>
@@ -228,5 +228,5 @@ Restarting the DNS Server service temporarily disrupts DNS resolution for all cl
 </Warning>
 
 <Note>
-This port exclusion persists across reboots. If you later change the WireGuard listen port in your NetBird configuration, update the exclusion range accordingly.
+This port exclusion persists across reboots. If you later change the WireGuard listen port in your openZro configuration, update the exclusion range accordingly.
 </Note>

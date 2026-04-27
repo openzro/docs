@@ -1,50 +1,50 @@
-export const description = 'Understanding how DNS works in NetBird'
+export const description = 'Understanding how DNS works in openZro'
 import {Note} from "@/components/mdx"
 
 
-# DNS in NetBird
+# DNS in openZro
 
-NetBird provides centralized DNS management to help your peers resolve domain names within your private network and control how they access external domains.
+openZro provides centralized DNS management to help your peers resolve domain names within your private network and control how they access external domains.
 
 ## Key Concepts
 
-- **Nameserver**: A DNS server that NetBird distributes to peers. You configure these in the dashboard under **DNS → Nameservers**.
+- **Nameserver**: A DNS server that openZro distributes to peers. You configure these in the dashboard under **DNS → Nameservers**.
 - **Match Domains**: Specific domains that should be resolved by a particular nameserver (e.g., `company.internal`). Adding a domain automatically matches all its subdomains.
 - **Primary Nameserver**: The default nameserver that handles all domains not matched by specific rules. Configured by leaving match domains empty.
 - **Search Domains**: Domain suffixes automatically appended to short hostnames. If you configure `company.internal` as a search domain, typing `server1` will try `server1.company.internal`. Available in v0.24.0+.
-- **DNS Resolver**: NetBird runs a local DNS resolver on each peer that routes queries based on your nameserver configuration.
+- **DNS Resolver**: openZro runs a local DNS resolver on each peer that routes queries based on your nameserver configuration.
 
 ### Automatic Peer Domain Names
 
-Starting with [v0.11.0](https://github.com/netbirdio/netbird/releases), NetBird automatically assigns a domain name to each peer in a private `netbird.cloud` space. You can access machines using names like `my-server.netbird.cloud` instead of IP addresses.
+Starting with [v0.11.0](https://github.com/openzro/openzro/releases), openZro automatically assigns a domain name to each peer in a private `openzro.cloud` space. You can access machines using names like `my-server.openzro.cloud` instead of IP addresses.
 
 <Note>
-Available on both NetBird Cloud and self-hosted versions running v0.11.0 or later.
+Available on both openZro Cloud and self-hosted versions running v0.11.0 or later.
 </Note>
 
-## How NetBird Handles DNS
+## How openZro Handles DNS
 
-NetBird gives you centralized control over DNS resolution for all peers in your network, solving common challenges with split-horizon DNS, private networks, and secure name resolution.
+openZro gives you centralized control over DNS resolution for all peers in your network, solving common challenges with split-horizon DNS, private networks, and secure name resolution.
 
 ### Architecture Overview
 
 <div className="spacer-sm" />
 
-<img src="/docs-static/img/manage/dns/netbird-dns-diagram.png" alt="NetBird DNS Diagram" className="imagewrapper-big"/>
+<img src="/docs-static/img/manage/dns/openzro-dns-diagram.png" alt="openZro DNS Diagram" className="imagewrapper-big"/>
 
-#### NetBird's DHCP Role
+#### openZro's DHCP Role
 
-The NetBird management service acts as a DHCP server **only for the NetBird network**, not your LAN:
+The openZro management service acts as a DHCP server **only for the openZro network**, not your LAN:
 
-- **NetBird IPs**: Management assigns each peer a unique IP from one of 64 possible /16 blocks within the `100.64.0.0/10` CGNAT range (e.g., `100.64.0.0/16` through `100.127.0.0/16`). The block is randomly selected per account and can be customized.
+- **openZro IPs**: Management assigns each peer a unique IP from one of 64 possible /16 blocks within the `100.64.0.0/10` CGNAT range (e.g., `100.64.0.0/16` through `100.127.0.0/16`). The block is randomly selected per account and can be customized.
 - **LAN IPs remain unchanged**: Your local network DHCP continues to work normally
-- **Two networks, two IPs**: Each peer has both a LAN IP (e.g., `192.168.1.100`) and a NetBird IP (e.g., `100.121.5.10`)
+- **Two networks, two IPs**: Each peer has both a LAN IP (e.g., `192.168.1.100`) and a openZro IP (e.g., `100.121.5.10`)
 
-NetBird creates a **parallel overlay network** on top of your existing network infrastructure.
+openZro creates a **parallel overlay network** on top of your existing network infrastructure.
 
 ### Query Routing
 
-When an application makes a DNS query, NetBird's local resolver:
+When an application makes a DNS query, openZro's local resolver:
 
 1. **Checks match domains**: Does this query match a specific nameserver?
    - If yes → Forward to that nameserver
@@ -67,27 +67,27 @@ Query: "server" (with search domain "company.internal")
 ```
 
 <Note>
-NetBird does **not** cache most DNS queries. Caching only occurs for DNS forwarder on routing peers during upstream failures, and for NetBird infrastructure addresses (management, relay, STUN).
+openZro does **not** cache most DNS queries. Caching only occurs for DNS forwarder on routing peers during upstream failures, and for openZro infrastructure addresses (management, relay, STUN).
 </Note>
 
 Each peer can have one primary nameserver and multiple match domain nameservers. If a peer belongs to multiple distribution groups, all nameserver configurations from those groups are merged. When multiple nameservers match a query, the most specific match domain wins.
 
 ### Default Behavior (No Nameservers Configured)
 
-If you don't configure any nameservers in NetBird, the behavior varies by platform:
+If you don't configure any nameservers in openZro, the behavior varies by platform:
 
 **Linux** (always sets up DNS):
-- NetBird always configures DNS so peer domain names (like `my-server.netbird.cloud`) work
+- openZro always configures DNS so peer domain names (like `my-server.openzro.cloud`) work
 - Your original nameservers are preserved as upstream
-- Both NetBird peer domains and regular DNS continue to work
+- Both openZro peer domains and regular DNS continue to work
 
 **macOS/Windows/Mobile** (only when nameservers configured):
-- Without nameservers configured, NetBird doesn't modify DNS
-- Peer domain names like `my-server.netbird.cloud` won't resolve
-- You can still use NetBird IPs directly (e.g., `100.121.5.10`)
+- Without nameservers configured, openZro doesn't modify DNS
+- Peer domain names like `my-server.openzro.cloud` won't resolve
+- You can still use openZro IPs directly (e.g., `100.121.5.10`)
 
 <Note>
-You don't need to configure custom nameservers to use NetBird. On Linux, peer domains work automatically. On other platforms, you can use NetBird IPs directly or configure nameservers for domain resolution.
+You don't need to configure custom nameservers to use openZro. On Linux, peer domains work automatically. On other platforms, you can use openZro IPs directly or configure nameservers for domain resolution.
 </Note>
 
 **When you add custom nameservers**:
@@ -97,18 +97,18 @@ You don't need to configure custom nameservers to use NetBird. On Linux, peer do
 
 ### DNS Setup Per Platform
 
-NetBird configures the operating system to use its DNS resolver:
+openZro configures the operating system to use its DNS resolver:
 
 - **Linux**: Always sets up DNS via `/etc/resolv.conf` or `resolvconf`. Original nameservers preserved as upstream.
 - **macOS**: Uses system APIs (does **not** modify `/etc/resolv.conf` directly)
-- **Windows**: Sets the network adapter's DNS server to the local NetBird resolver
+- **Windows**: Sets the network adapter's DNS server to the local openZro resolver
 - **Android/iOS**: Uses VPN DNS configuration
 
 <Note>
 **Android**: Custom DNS resolution requires disabling **Private DNS**. Go to **Settings → Network & Internet → Private DNS** and set it to **Off**. When enabled, Android bypasses VPN DNS.
 </Note>
 
-The local resolver runs on `100.x.255.254:53` (in userspace mode), where `x` corresponds to the second octet of your NetBird /16 block.
+The local resolver runs on `100.x.255.254:53` (in userspace mode), where `x` corresponds to the second octet of your openZro /16 block.
 
 ### DNS Forwarder on Routing Peers
 
@@ -117,15 +117,15 @@ When a [Network resource](/manage/networks) uses a domain name, the routing peer
 The DNS forwarder listens on port `22054` (changed from `5353` in v0.59.0 to avoid collisions with mDNS). For backward compatibility, port `5353` is used if any peer in your account runs below v0.59.0.
 
 <Note>
-NetBird attempts to automatically open the forwarder port on routing peer firewalls, but this may fail on some systems. If domain resources aren't resolving, verify the port is open: `nslookup -port=22054 <domain> <routing-peer-ip>`.
+openZro attempts to automatically open the forwarder port on routing peer firewalls, but this may fail on some systems. If domain resources aren't resolving, verify the port is open: `nslookup -port=22054 <domain> <routing-peer-ip>`.
 </Note>
 
 ### DNS Management Modes
 
-NetBird supports two modes per peer group:
+openZro supports two modes per peer group:
 
-- **Managed Mode** (default): NetBird fully controls DNS settings. All queries go through NetBird's resolver.
-- **Unmanaged Mode**: NetBird doesn't modify DNS settings. The peer uses its existing DNS configuration.
+- **Managed Mode** (default): openZro fully controls DNS settings. All queries go through openZro's resolver.
+- **Unmanaged Mode**: openZro doesn't modify DNS settings. The peer uses its existing DNS configuration.
 
 You can disable DNS management for specific groups in [DNS Settings](/manage/dns/dns-settings).
 

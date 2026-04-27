@@ -2,25 +2,25 @@
 
 import {Note, Warning} from "@/components/mdx";
 
-This guide explains how to split your NetBird self-hosted deployment from a single-server setup into a distributed architecture for better reliability and performance.
+This guide explains how to split your openZro self-hosted deployment from a single-server setup into a distributed architecture for better reliability and performance.
 
 The most common approach is extracting the relay service (with its embedded STUN server) to separate servers and moving the PostgreSQL database to a dedicated machine.
 In most cases, you won't need to extract the Signal server, but for completeness, this guide covers that as well.
 
-NetBird clients can tolerate a Management server outage as long as connections are already established through relays or peer-to-peer.
+openZro clients can tolerate a Management server outage as long as connections are already established through relays or peer-to-peer.
 This makes a stable relay infrastructure especially important.
 
-This guide assumes you have already [deployed a single-server NetBird](/selfhosted/selfhosted-quickstart) and have a working configuration.
+This guide assumes you have already [deployed a single-server openZro](/selfhosted/selfhosted-quickstart) and have a working configuration.
 
 <Note>
     If you are looking for a high-availability setup for the Management and Signal services, this is available through an enterprise
-    commercial license [here](https://netbird.io/pricing#on-prem).
+    commercial license [here](https://openzro.io/pricing#on-prem).
 </Note>
 
 ## Architecture Overview
 
 The default single-server deployment runs all services on one machine: **Traefik** (reverse proxy), **Dashboard** (web UI),
-and a **combined netbird-server** container that includes Management, Signal, and Relay + STUN as components. Traefik handles TLS termination on ports 80/443, while STUN listens on UDP port 3478. The Management server uses a **SQLite** database by default.
+and a **combined openzro-server** container that includes Management, Signal, and Relay + STUN as components. Traefik handles TLS termination on ports 80/443, while STUN listens on UDP port 3478. The Management server uses a **SQLite** database by default.
 
 After splitting, the **main server** keeps Traefik, Dashboard, Management, and optionally Signal.
 The **relay servers** run independently on different machines, each handling relay (port 443) and STUN (port 3478) traffic. Peers receive relay addresses from the Management server and connect to them directly. Optionally, the SQLite database can be migrated to **PostgreSQL** on a dedicated server, and Signal can also be extracted to its own machine.

@@ -1,29 +1,29 @@
 # Client Environment Variables
 
-The NetBird client supports environment variables for advanced configuration. These are separate from the CLI flag environment variables (like `NB_LOG_LEVEL`) which are described in the [CLI reference](/get-started/cli#environment-variables).
+The openZro client supports environment variables for advanced configuration. These are separate from the CLI flag environment variables (like `NB_LOG_LEVEL`) which are described in the [CLI reference](/get-started/cli#environment-variables).
 
 ## Setting environment variables
 
-Environment variables must be set on the **daemon process**, not the CLI. When running NetBird as a system service, use `--service-env` to persist them:
+Environment variables must be set on the **daemon process**, not the CLI. When running openZro as a system service, use `--service-env` to persist them:
 
 ```shell
 # Set during install
-sudo netbird service install --service-env NB_WG_KERNEL_DISABLED=true
+sudo openzro service install --service-env NB_WG_KERNEL_DISABLED=true
 
 # Or reconfigure a running service
-sudo netbird service reconfigure --service-env NB_WG_KERNEL_DISABLED=true
+sudo openzro service reconfigure --service-env NB_WG_KERNEL_DISABLED=true
 
 # Multiple variables
-sudo netbird service install --service-env NB_LOG_LEVEL=debug,NB_USE_LEGACY_ROUTING=true
+sudo openzro service install --service-env NB_LOG_LEVEL=debug,NB_USE_LEGACY_ROUTING=true
 ```
 
 When running in foreground mode, set them in the shell before starting:
 ```shell
-NB_WG_KERNEL_DISABLED=true netbird up --foreground-mode
+NB_WG_KERNEL_DISABLED=true openzro up --foreground-mode
 ```
 
 <Note>
-To clear all saved service parameters (including env vars), run `sudo netbird service reset-params` followed by `sudo netbird service reconfigure`.
+To clear all saved service parameters (including env vars), run `sudo openzro service reset-params` followed by `sudo openzro service reconfigure`.
 </Note>
 
 ## Networking and routing
@@ -52,7 +52,7 @@ To clear all saved service parameters (including env vars), run `sudo netbird se
 | Variable | Platform | Description |
 |---|---|---|
 | `NB_SKIP_NFTABLES_CHECK` | Linux | Do not probe for nftables support at startup; go straight to the iptables backend. Useful on systems where nftables is installed but non-functional (e.g. missing kernel modules). |
-| `NB_NFTABLES_TABLE` | Linux | Name of the nftables table the client creates for ACL rules (default: `netbird`). Change this if the default name conflicts with existing firewall configuration. |
+| `NB_NFTABLES_TABLE` | Linux | Name of the nftables table the client creates for ACL rules (default: `openzro`). Change this if the default name conflicts with existing firewall configuration. |
 | `NB_DISABLE_CONNTRACK` | All | Turn off the stateful connection tracker in the userspace packet filter. With conntrack enabled (default), inbound rules for return traffic sent by management are ignored because conntrack handles them automatically. Disabling conntrack means those inbound rules will be applied explicitly instead. |
 | `NB_DISABLE_USERSPACE_ROUTING` | All | Prevent the userspace packet filter from forwarding packets between interfaces. Routing rules from the management server will be ignored when this is set. |
 | `NB_DISABLE_MSS_CLAMPING` | All | Stop the userspace filter from rewriting TCP SYN/SYN-ACK MSS options to fit the WireGuard MTU. May cause path-MTU black holes if disabled. |
@@ -80,7 +80,7 @@ To clear all saved service parameters (including env vars), run `sudo netbird se
 |---|---|---|
 | `NB_DNS_FORWARDER_PORT` | All | Override the port the internal DNS forwarder binds to for handling DNS routes received from clients (default: `22054`). The forwarder is separate from the local resolver. |
 | `NB_SKIP_DNS_PROBE` | All | Skip the startup check that sends a test query to the local resolver to verify it is reachable. Set this if the probe causes delays (e.g. in air-gapped networks). |
-| `NB_UNCLEAN_SHUTDOWN_RESOLV_FILE` | Linux, FreeBSD | Custom file path to store a backup of `/etc/resolv.conf` before the client modifies it. Used to restore the original on next startup if the client crashed without cleaning up (default: `<state-dir>/resolv.conf`, i.e. `/var/lib/netbird/resolv.conf` on Linux, `/var/db/netbird/resolv.conf` on FreeBSD). |
+| `NB_UNCLEAN_SHUTDOWN_RESOLV_FILE` | Linux, FreeBSD | Custom file path to store a backup of `/etc/resolv.conf` before the client modifies it. Used to restore the original on next startup if the client crashed without cleaning up (default: `<state-dir>/resolv.conf`, i.e. `/var/lib/openzro/resolv.conf` on Linux, `/var/db/openzro/resolv.conf` on FreeBSD). |
 
 ## Connection retry
 
@@ -97,7 +97,7 @@ These control the exponential backoff when the client loses its connection to th
 
 | Variable | Platform | Description |
 |---|---|---|
-| `NB_DISABLE_SSH_CONFIG` | All | Prevent the client from writing NetBird peer entries into the system SSH config directory (`/etc/ssh/ssh_config.d/99-netbird.conf` on Unix, `%PROGRAMDATA%\ssh\ssh_config.d\99-netbird.conf` on Windows). By default, the client adds `Host` blocks so you can `ssh peer-name` without specifying the IP. |
+| `NB_DISABLE_SSH_CONFIG` | All | Prevent the client from writing openZro peer entries into the system SSH config directory (`/etc/ssh/ssh_config.d/99-openzro.conf` on Unix, `%PROGRAMDATA%\ssh\ssh_config.d\99-openzro.conf` on Windows). By default, the client adds `Host` blocks so you can `ssh peer-name` without specifying the IP. |
 | `NB_FORCE_SSH_CONFIG` | All | Write the SSH config entries even when the peer count exceeds the default limit of 200. Without this, the client skips SSH config generation for large networks to avoid slow file writes. |
 
 ## Relay
@@ -116,8 +116,8 @@ These control the exponential backoff when the client loses its connection to th
 
 | Variable | Platform | Description |
 |---|---|---|
-| `NB_STATE_DIR` | All | Override the directory where the client stores persistent state files (config, state.json, WireGuard keys). Defaults to `/var/lib/netbird` on Linux/macOS, `/var/db/netbird` on FreeBSD, `%PROGRAMDATA%\Netbird` on Windows. |
-| `NB_DNS_STATE_FILE` | All | Override the path to the client state file (`state.json`). Despite the name, this is not DNS-specific: it stores all shutdown/recovery state including DNS settings, SSH config, routes, and auto-update progress. The default path is per-profile (e.g. `/var/lib/netbird/state.json` for the default profile). Setting this bypasses per-profile state isolation. Primarily used by the embedded client API (`embed.Options.StatePath`). |
+| `NB_STATE_DIR` | All | Override the directory where the client stores persistent state files (config, state.json, WireGuard keys). Defaults to `/var/lib/openzro` on Linux/macOS, `/var/db/openzro` on FreeBSD, `%PROGRAMDATA%\openZro` on Windows. |
+| `NB_DNS_STATE_FILE` | All | Override the path to the client state file (`state.json`). Despite the name, this is not DNS-specific: it stores all shutdown/recovery state including DNS settings, SSH config, routes, and auto-update progress. The default path is per-profile (e.g. `/var/lib/openzro/state.json` for the default profile). Setting this bypasses per-profile state isolation. Primarily used by the embedded client API (`embed.Options.StatePath`). |
 | `NB_ROSENPASS_LOG_LEVEL` | All | Log level for the Rosenpass post-quantum key exchange subprocess. Accepted values: `debug`, `info`, `warn`, `error` (default: `info`). Separate from the main client log level. |
 | `NB_AUTO_UPDATE_DRY_RUN` | All | Set to `true` to run the auto-update check and download steps without actually replacing the binary. Useful for testing update infrastructure. |
 | `NB_PPROF_ADDR` | All | Start a Go pprof HTTP endpoint at this address (e.g. `localhost:6060`). For profiling CPU, memory, and goroutine usage in production. |

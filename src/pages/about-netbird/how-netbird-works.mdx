@@ -1,14 +1,14 @@
 import {Note} from "@/components/mdx";
 
-# How NetBird Works
+# How openZro Works
 
-NetBird is an open source platform consisting of a collection of components, responsible for handling peer-to-peer
+openZro is an open source platform consisting of a collection of components, responsible for handling peer-to-peer
 connections, tunneling, authentication, and network management (IPs, keys, ACLs, etc).
 
 It uses open-source technologies like [WireGuard®](https://www.wireguard.com/), [Pion ICE (WebRTC)](https://github.com/pion/ice), [Coturn](https://github.com/coturn/coturn),
-and [software](https://github.com/netbirdio/netbird) developed by NetBird to make secure private networks deployment and management simple.
+and [software](https://github.com/openzro/openzro) developed by openZro to make secure private networks deployment and management simple.
 
-NetBird relies on four components - **Client** application (or agent), **Management**, **Signal** and **Relay** services.
+openZro relies on four components - **Client** application (or agent), **Management**, **Signal** and **Relay** services.
 
 The combination of these elements ensures that direct point-to-point connections are established and only authenticated
 users (or machines) have access to the resources for which they are authorized.
@@ -17,30 +17,30 @@ A **Peer** is a machine or any device that is connected to the network.
 It can be a Linux server running in the cloud or on-premises, a personal laptop, mobile phone, or even a Raspberry Pi.
 
 <p>
-    <img src="/docs-static/img/about-netbird/high-level-dia.png" alt="high-level-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/about-openzro/high-level-dia.png" alt="high-level-dia" className="imagewrapper-big"/>
 </p>
 
-With NetBird clients installed and authorized on the Management service, machines form a mesh network connecting
+With openZro clients installed and authorized on the Management service, machines form a mesh network connecting
 to each other directly via an encrypted point-to-point WireGuard tunnel.
 
 <p>
-    <img src="/docs-static/img/about-netbird/mesh.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/about-openzro/mesh.png" alt="high-level-dia" className="imagewrapper"/>
 </p>
 
 While it is possible to create a full mesh network, it might be not a desirable outcome.
 In this case, [groups and access controls](/manage/access-control/manage-network-access) can be utilized to limit the access to certain machines.
 
-Let's now take a closer look at each of NetBird's components.
+Let's now take a closer look at each of openZro's components.
 
 ## Management Service
 
-The Management service is the central coordination component for NetBird with a UI dashboard.
+The Management service is the central coordination component for openZro with a UI dashboard.
 It keeps the network state, public WireGuard keys of the peers, authenticates and distributes network changes to peers.
 
 The Management Service's responsibilities include:
 
 * **Registering and authenticating new peers.**  Every new machine has to register itself in the network in order to connect to other machines.
-After installation, NetBird client requires login that can be done through Identity Provider (IDP) like Okta or with a [setup key](/manage/peers/register-machines-using-setup-keys).
+After installation, openZro client requires login that can be done through Identity Provider (IDP) like Okta or with a [setup key](/manage/peers/register-machines-using-setup-keys).
 * **Keeping the network map.** The Management service stores information about all the registered peers including WireGuard public key that was sent during the registration process.
 * **Managing private IP addresses.** Each peer receives a unique private IP with which it can be identified in the network.
 We use [Carrier Grade NAT](https://en.wikipedia.org/wiki/Carrier-grade_NAT) address space with an allocated address block <em>100.64.0.0/10</em>.
@@ -52,15 +52,15 @@ After that, they are able to establish a connection to the new peer.
 * **Logging network activity.**
 * **Managing users.**
 
-The Management service runs in the cloud NetBird-managed. It can also be self-hosted.
+The Management service runs in the cloud openZro-managed. It can also be self-hosted.
 
 <p>
-    <img src="/docs-static/img/about-netbird/management.png" alt="management-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/about-openzro/management.png" alt="management-dia" className="imagewrapper-big"/>
 </p>
 
 ## Client Application
 
-The NetBird Client application (or agent) is a software that is installed on the machines within a NetBird network.
+The openZro Client application (or agent) is a software that is installed on the machines within a openZro network.
 It is an entry point to your private network that makes it possible for machines to communicate with each other.
 Once installed and registered, a machine becomes a peer within the network.
 
@@ -78,11 +78,11 @@ It then sends it to the remote peer via Signal. This message is encrypted with t
 The remote peer does the same and once the peers can reach each other, they establish an encrypted WireGuard tunnel.
 * **Applying access control policies.** The client application applies access control rules that are received from the Management service.
 The client uses a system's available firewall manager like `nftables` to apply the rules.
-* **Applying DNS settings.** The client application runs an [embedded DNS resolver](https://netbird.io/knowledge-hub/using-xdp-ebpf-to-share-default-dns-port-between-resolvers) and ensures that the machine can resolve other peers' FQDNs in the `netbird.cloud` namespaces.
+* **Applying DNS settings.** The client application runs an [embedded DNS resolver](https://openzro.io/knowledge-hub/using-xdp-ebpf-to-share-default-dns-port-between-resolvers) and ensures that the machine can resolve other peers' FQDNs in the `openzro.cloud` namespaces.
 The client also applies other DNS settings that are received from the Management service.
 
 <Note>
-The **private key**, generated by the NetBird client, **never leaves the machine**, ensuring that only the machine that owns the key can decrypt traffic addressed to it.
+The **private key**, generated by the openZro client, **never leaves the machine**, ensuring that only the machine that owns the key can decrypt traffic addressed to it.
 </Note>
 
 ## Signal Service
@@ -96,23 +96,23 @@ peers need to find each other and exchange the most suitable connection candidat
 This is done through Signal. After a connection has been established, Signal steps out.
 
 <p>
-    <img src="/docs-static/img/about-netbird/signal.png" alt="signal-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/about-openzro/signal.png" alt="signal-dia" className="imagewrapper-big"/>
 </p>
 
 <Note>
     Messages that are sent over Signal are **point-to-point encrypted**, so Signal can't see the contents.
 </Note>
 
-NetBird Signal is very similar to the signaling servers used in [WebRTC](https://developer.mozilla.org/en-US/Web/API/WebRTC_API/Signaling_and_video_calling#the_signaling_server).
-It runs in the cloud NetBird-managed and can be self-hosted.
+openZro Signal is very similar to the signaling servers used in [WebRTC](https://developer.mozilla.org/en-US/Web/API/WebRTC_API/Signaling_and_video_calling#the_signaling_server).
+It runs in the cloud openZro-managed and can be self-hosted.
 
 ## Relay Service
 
 The Relay service is a [TURN server](https://webrtc.org/getting-started/turn-server) in WebRTC terminology.
 In fact, we use an open-source implementation called [Coturn](https://github.com/coturn/coturn).
-The purpose of the Relay service is to gracefully implement a "Plan B" by relaying traffic between peers when a direct point-to-point connection is not possible. However, starting with v0.29.0, a new WebSocket-based relay has been introduced with the intent of replacing the previous TURN relay (Coturn). [More info](https://netbird.io/knowledge-hub/september-newsletter).
+The purpose of the Relay service is to gracefully implement a "Plan B" by relaying traffic between peers when a direct point-to-point connection is not possible. However, starting with v0.29.0, a new WebSocket-based relay has been introduced with the intent of replacing the previous TURN relay (Coturn). [More info](https://openzro.io/knowledge-hub/september-newsletter).
 <p>
-    <img src="/docs-static/img/about-netbird/relay.png" alt="relay-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/about-openzro/relay.png" alt="relay-dia" className="imagewrapper-big"/>
 </p>
 
 <Note>

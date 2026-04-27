@@ -41,7 +41,7 @@ function AnnouncementItem({ announcement, onClose }) {
     <div
       id="announcement-banner"
       className={clsx(
-        'sticky top-0 z-50 flex w-full items-center justify-center border-b border-zinc-800 bg-netbird/95 px-4 py-1.5 text-[11px] font-medium text-black shadow-sm backdrop-blur'
+        'sticky top-0 z-50 flex w-full items-center justify-center border-b border-zinc-800 bg-openzro/95 px-4 py-1.5 text-[11px] font-medium text-black shadow-sm backdrop-blur'
       )}
     >
       <div className="flex flex-col items-start gap-1 pr-8 leading-snug md:flex-row md:items-center">

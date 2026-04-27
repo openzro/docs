@@ -95,7 +95,7 @@ export const title = 'EDR SentinelOne Integrations'
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/integrations/edr/sentinelone">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/integrations/edr/sentinelone \
+curl -X POST https://api.openzro.io/api/integrations/edr/sentinelone \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -250,7 +250,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/edr/sentinelone"
+url = "https://api.openzro.io/api/integrations/edr/sentinelone"
 payload = json.dumps({
   "api_token": {
     "type": "string",
@@ -335,7 +335,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/edr/sentinelone"
+  url := "https://api.openzro.io/api/integrations/edr/sentinelone"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -433,7 +433,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/edr/sentinelone")
+url = URI("https://api.openzro.io/api/integrations/edr/sentinelone")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -574,7 +574,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   }
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/edr/sentinelone")
+  .url("https://api.openzro.io/api/integrations/edr/sentinelone")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -589,7 +589,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/edr/sentinelone',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/edr/sentinelone',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -820,7 +820,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/integrations/edr/sentinelone">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/integrations/edr/sentinelone \
+curl -X GET https://api.openzro.io/api/integrations/edr/sentinelone \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -851,7 +851,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/edr/sentinelone"
+url = "https://api.openzro.io/api/integrations/edr/sentinelone"
 
 headers = {     
   'Accept': 'application/json',
@@ -875,7 +875,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/edr/sentinelone"
+  url := "https://api.openzro.io/api/integrations/edr/sentinelone"
   method := "GET"
   
   client := &http.Client {
@@ -911,7 +911,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/edr/sentinelone")
+url = URI("https://api.openzro.io/api/integrations/edr/sentinelone")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -929,7 +929,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/edr/sentinelone")
+  .url("https://api.openzro.io/api/integrations/edr/sentinelone")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -943,7 +943,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/edr/sentinelone',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/edr/sentinelone',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1195,7 +1195,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="PUT" label="/api/integrations/edr/sentinelone">
 ```bash {{ title: 'cURL' }}
-curl -X PUT https://api.netbird.io/api/integrations/edr/sentinelone \
+curl -X PUT https://api.openzro.io/api/integrations/edr/sentinelone \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -1350,7 +1350,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/edr/sentinelone"
+url = "https://api.openzro.io/api/integrations/edr/sentinelone"
 payload = json.dumps({
   "api_token": {
     "type": "string",
@@ -1435,7 +1435,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/edr/sentinelone"
+  url := "https://api.openzro.io/api/integrations/edr/sentinelone"
   method := "PUT"
   
   payload := strings.NewReader(`{
@@ -1533,7 +1533,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/edr/sentinelone")
+url = URI("https://api.openzro.io/api/integrations/edr/sentinelone")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1674,7 +1674,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   }
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/edr/sentinelone")
+  .url("https://api.openzro.io/api/integrations/edr/sentinelone")
   .method("PUT", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -1689,7 +1689,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/edr/sentinelone',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/edr/sentinelone',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1920,7 +1920,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/integrations/edr/sentinelone">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/integrations/edr/sentinelone \
+curl -X DELETE https://api.openzro.io/api/integrations/edr/sentinelone \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -1951,7 +1951,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/edr/sentinelone"
+url = "https://api.openzro.io/api/integrations/edr/sentinelone"
 
 headers = {     
   'Accept': 'application/json',
@@ -1975,7 +1975,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/edr/sentinelone"
+  url := "https://api.openzro.io/api/integrations/edr/sentinelone"
   method := "DELETE"
   
   client := &http.Client {
@@ -2011,7 +2011,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/edr/sentinelone")
+url = URI("https://api.openzro.io/api/integrations/edr/sentinelone")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2029,7 +2029,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/edr/sentinelone")
+  .url("https://api.openzro.io/api/integrations/edr/sentinelone")
   .method("DELETE")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -2043,7 +2043,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/edr/sentinelone',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/edr/sentinelone',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

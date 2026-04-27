@@ -2,7 +2,7 @@ import {Note, Warning} from "@/components/mdx";
 
 # Client Automatic Updates
 
-The Automatic Updates feature allows the NetBird client to notify users when a new version is available and prompt them to install it. This ensures that users always have the latest features and security patches without needing to manually download and install updates.
+The Automatic Updates feature allows the openZro client to notify users when a new version is available and prompt them to install it. This ensures that users always have the latest features and security patches without needing to manually download and install updates.
 
 <Note>
     Minimum supported agent version: <strong>v0.61.0</strong>.
@@ -10,8 +10,8 @@ The Automatic Updates feature allows the NetBird client to notify users when a n
 </Note>
 
 <Note>
-    This feature also requires an upgraded NetBird Management server.
-    If you're self-hosting NetBird, ensure your server is updated to version <strong>v0.61.0</strong>, which adds support for Automatic Updates.
+    This feature also requires an upgraded openZro Management server.
+    If you're self-hosting openZro, ensure your server is updated to version <strong>v0.61.0</strong>, which adds support for Automatic Updates.
 </Note>
 
 <Note>
@@ -22,7 +22,7 @@ The Automatic Updates feature allows the NetBird client to notify users when a n
 
 ![Automatic Updates](/docs-static/img/how-to-guides/auto-update/dashboard.png)
 
-To enable client auto updates, navigate to [Settings &raquo; Clients](https://app.netbird.io/settings) and enable 'Automatic Updates'.
+To enable client auto updates, navigate to [Settings &raquo; Clients](https://app.openzro.io/settings) and enable 'Automatic Updates'.
 
 You can either:
 
@@ -30,7 +30,7 @@ You can either:
 * Update to a specific version.
 
 <Note>
-    Once enabled, NetBird clients will prompt the user to install the specified version when connecting via the UI, if the current version is older than the specified version.
+    Once enabled, openZro clients will prompt the user to install the specified version when connecting via the UI, if the current version is older than the specified version.
 </Note>
 
 ### Force Automatic Updates
@@ -38,7 +38,7 @@ You can either:
 When you need updates to be installed without user interaction, enable the **Force Automatic Updates** toggle. With this option, updates are installed automatically in the background without prompting the user.
 
 <Warning>
-    Enabling Force Automatic Updates will restart the NetBird client during updates, which can temporarily disrupt active connections. Use with caution in production environments.
+    Enabling Force Automatic Updates will restart the openZro client during updates, which can temporarily disrupt active connections. Use with caution in production environments.
 </Warning>
 
 
@@ -48,7 +48,7 @@ When you need updates to be installed without user interaction, enable the **For
 2. **Version Check**: The Peer will compare its current version with the version specified in the Automatic Updates settings.
 3. **Update Process**:
     1. If the Peer is running an older version than specified, it will prompt the user to install the update.
-    2. Client will then download the update package from the official NetBird repository.
+    2. Client will then download the update package from the official openZro repository.
     3. The Peer will then install the update and restart itself to apply the changes.
 
 When **Force Automatic Updates** is enabled, step 3.1 is skipped, the update is installed automatically in the background without user interaction.
@@ -64,21 +64,21 @@ Linux support is not available at this time due to the variety of distributions 
 ## Backward and Forward Compatibility
 
 * If Management server version &lt; v0.61.0, clients will **not** automatically update.
-* If Management server version &gt;= v0.61.0, NetBird clients with version &gt;= v0.61.0 will automatically update according to the Automatic Updates settings.
+* If Management server version &gt;= v0.61.0, openZro clients with version &gt;= v0.61.0 will automatically update according to the Automatic Updates settings.
 
 ## Notes
 
 1. Automatic Updates will be set to "disabled" by default.
 2. If the Peer is unable to download or install the update (e.g., due to network issues), it will show an error notification but will not retry until the next restart.
 3. For long-running Peers, a future release may include support for periodic update checks during runtime.
-4. All notifications related to Automatic Updates will be shown only if NetBird UI is running and Notifications are enabled.
+4. All notifications related to Automatic Updates will be shown only if openZro UI is running and Notifications are enabled.
 
 ## Get started
 <p float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://netbird.io/pricing")}>Use NetBird</Button>
+    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
 </p>
 
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

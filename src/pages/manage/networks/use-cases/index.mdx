@@ -3,15 +3,15 @@ import { Note } from '@/components/mdx'
 
 # Networks Use Cases
 
-These guides show how to use the [Networks](/manage/networks) feature for VPN-to-Site access—where NetBird peers access devices on remote networks that don't have NetBird installed.
+These guides show how to use the [Networks](/manage/networks) feature for VPN-to-Site access—where openZro peers access devices on remote networks that don't have openZro installed.
 
 ## What is VPN-to-Site?
 
-VPN-to-Site allows a device running NetBird (like your laptop) to access devices on a remote network (like your home or office) without installing NetBird on every device.
+VPN-to-Site allows a device running openZro (like your laptop) to access devices on a remote network (like your home or office) without installing openZro on every device.
 
 ```
-Your Laptop ──────► NetBird Tunnel ──────► Routing Peer ──────► Target Device
-  (peer)                                    (peer)              (no NetBird)
+Your Laptop ──────► openZro Tunnel ──────► Routing Peer ──────► Target Device
+  (peer)                                    (peer)              (no openZro)
 ```
 
 **Example scenarios:**
@@ -46,9 +46,9 @@ Networks supports VPN-to-Site only. For Site-to-VPN (clientless devices initiati
 
 ## Understanding Resource Types
 
-In Networks, a **resource** represents something you want to make accessible through the VPN tunnel—whether that's a single server, an entire subnet, or a domain-based service. Resources are what your routing peers make reachable to authorized NetBird clients.
+In Networks, a **resource** represents something you want to make accessible through the VPN tunnel—whether that's a single server, an entire subnet, or a domain-based service. Resources are what your routing peers make reachable to authorized openZro clients.
 
-NetBird supports three types of resources:
+openZro supports three types of resources:
 
 - **IP resources** — Single IP addresses (`192.168.1.10`) or CIDR ranges (`172.16.0.0/16`). Use these when you know the exact IP addresses of your target devices or want to grant access to an entire subnet.
 

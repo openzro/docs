@@ -1,16 +1,16 @@
 import {Note} from "@/components/mdx";
 
-# Duo SSO with NetBird Self-Hosted
+# Duo SSO with openZro Self-Hosted
 
 [Duo](https://duo.com/) is a cloud-based identity and access management platform by Cisco that provides single sign-on (SSO), multi-factor authentication (MFA), and adaptive access policies. Duo Single Sign-On acts as an OpenID provider (OP), authenticating your users and prompting for two-factor authentication before permitting access.
 
 ## Management Setup
 
-Add Duo as an external IdP directly in the NetBird Management Dashboard. This is the simplest approach and recommended for most deployments.
+Add Duo as an external IdP directly in the openZro Management Dashboard. This is the simplest approach and recommended for most deployments.
 
 ### Prerequisites
 
-- NetBird self-hosted with embedded IdP enabled
+- openZro self-hosted with embedded IdP enabled
 - Duo account with admin permissions (Duo Premier, Duo Advantage, or Duo Essentials plan)
 - Duo Single Sign-On [configured with an authentication source](https://duo.com/docs/sso#configure-duo-single-sign-on)
 
@@ -30,7 +30,7 @@ Add Duo as an external IdP directly in the NetBird Management Dashboard. This is
     <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/2_generic-oidc.png" alt="Generic OIDC Relying Party" className="imagewrapper-big"/>
 </p>
 
-5. Give the application a name such as `NetBird SSO`
+5. Give the application a name such as `openZro SSO`
 6. Under **User access**, grant access to users in selected Duo groups or to all users
 7. Scroll down to the **Metadata** section and note the following values (you'll need these in Step 3):
     - **Client ID**
@@ -43,9 +43,9 @@ Add Duo as an external IdP directly in the NetBird Management Dashboard. This is
 
 8. Keep this tab open and proceed to Step 2
 
-### Step 2: Get Redirect URL from NetBird
+### Step 2: Get Redirect URL from openZro
 
-1. Open a new tab or window and log in to your NetBird Dashboard
+1. Open a new tab or window and log in to your openZro Dashboard
 2. Navigate to **Settings** → **Identity Providers**
 3. Click **Add Identity Provider**
 4. Fill in the fields:
@@ -62,7 +62,7 @@ Add Duo as an external IdP directly in the NetBird Management Dashboard. This is
 **Important:** Copy the Issuer URL exactly as shown in Duo's Metadata section. The format is `https://sso-{your-id}.sso.duosecurity.com/oidc/{application-id}`.
 </Note>
 
-5. **Copy the Redirect URL** that NetBird displays (but don't click **Add Provider** yet)
+5. **Copy the Redirect URL** that openZro displays (but don't click **Add Provider** yet)
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/4_copy-redirect.png" alt="Copy redirect URL" className="imagewrapper-big"/>
@@ -72,7 +72,7 @@ Add Duo as an external IdP directly in the NetBird Management Dashboard. This is
 
 1. Return to the Duo Admin Panel tab
 2. Scroll down to the **Relying Party** section
-3. Under **Sign-In Redirect URLs**, enter the redirect URL you copied from NetBird (e.g., `https://netbird.example.com/oauth2/callback`)
+3. Under **Sign-In Redirect URLs**, enter the redirect URL you copied from openZro (e.g., `https://openzro.example.com/oauth2/callback`)
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/5_redirect-urls.png" alt="Configure Redirect URLs" className="imagewrapper-big"/>
@@ -89,24 +89,24 @@ Add Duo as an external IdP directly in the NetBird Management Dashboard. This is
 
 5. Scroll down and click **Save**
 
-### Step 4: Complete NetBird Setup
+### Step 4: Complete openZro Setup
 
-1. Return to the NetBird tab
+1. Return to the openZro tab
 2. Fill in the **Client ID** and **Client Secret** from Duo's Metadata section
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/7_netbird-config.png" alt="Duo configuration in NetBird" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/7_openzro-config.png" alt="Duo configuration in openZro" className="imagewrapper-big"/>
 </p>
 
 3. Click **Add Provider**
 
 ### Step 5: Test the Connection
 
-1. Log out of NetBird Dashboard
+1. Log out of openZro Dashboard
 2. On the login page, you should see a "Duo" button
 3. Click it and authenticate with your Duo credentials
 4. Complete Duo two-factor authentication when prompted
-5. You should be redirected back to NetBird and logged in. Unless your user approval settings were changed, you will need to log back into your local admin account to approve the user.
+5. You should be redirected back to openZro and logged in. Unless your user approval settings were changed, you will need to log back into your local admin account to approve the user.
 
 <Note>
 Duo Single Sign-On requires users to complete two-factor authentication. Make sure your users have enrolled in Duo MFA before attempting to log in.
@@ -114,12 +114,12 @@ Duo Single Sign-On requires users to complete two-factor authentication. Make su
 
 ### Configuring JWT 'groups' Claim
 
-To sync Duo groups with NetBird, you need to add a custom scope with group claims in your Duo OIDC application. This will require a [custom attribute](https://duo.com/docs/user-attributes#overview) for the groups.
+To sync Duo groups with openZro, you need to add a custom scope with group claims in your Duo OIDC application. This will require a [custom attribute](https://duo.com/docs/user-attributes#overview) for the groups.
 
 #### Step 1: Add Custom Group Scope in Duo
 
 1. In [Duo Admin Panel](https://admin.duosecurity.com/), go to **Applications**
-2. Select your NetBird (Generic OIDC Relying Party) application
+2. Select your openZro (Generic OIDC Relying Party) application
 3. Scroll down to the **OIDC Response** section
 4. Click **Add Custom Scope**
 5. Enter the scope name: `groups`
@@ -134,9 +134,9 @@ To sync Duo groups with NetBird, you need to add a custom scope with group claim
 The group attribute name depends on your Duo authentication source. For Active Directory, this is typically the group membership attribute. For SAML IdPs, verify your IdP sends group information in the expected attribute.
 </Note>
 
-#### Step 2: Enable JWT Group Sync in NetBird
+#### Step 2: Enable JWT Group Sync in openZro
 
-1. In NetBird Dashboard, go to **Settings** → **Groups**
+1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to `groups`
 4. Optionally configure **JWT allow groups** to restrict access
@@ -149,7 +149,7 @@ The group attribute name depends on your Duo authentication source. For Active D
 
 - Ensure the **Issuer** URL is copied exactly from Duo's Metadata section
 - Verify both **profile** and **email** scopes are enabled in Duo
-- Check that the **Redirect URL** in Duo exactly matches the URL from NetBird
+- Check that the **Redirect URL** in Duo exactly matches the URL from openZro
 - Make sure the application is saved and you have the correct **Client ID** and **Client Secret**
 - Confirm your Duo authentication source is properly configured
 

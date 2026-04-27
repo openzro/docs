@@ -1,15 +1,15 @@
 import {Note} from "@/components/mdx"
 
 export const description =
-    'Monitor and audit HTTP requests and L4 connections flowing through your NetBird reverse proxy services with detailed access logs.'
+    'Monitor and audit HTTP requests and L4 connections flowing through your openZro reverse proxy services with detailed access logs.'
 
 # Reverse Proxy Access Logs
 
-NetBird logs every request and connection that passes through your reverse proxy services, including both HTTP and L4 (TCP, UDP, TLS) traffic. Access logs provide visibility into who is accessing your services, from where, and whether requests were allowed or denied. This is useful for auditing, debugging, and monitoring traffic to your publicly exposed services.
+openZro logs every request and connection that passes through your reverse proxy services, including both HTTP and L4 (TCP, UDP, TLS) traffic. Access logs provide visibility into who is accessing your services, from where, and whether requests were allowed or denied. This is useful for auditing, debugging, and monitoring traffic to your publicly exposed services.
 
 ## Viewing access logs
 
-Access logs are available in the NetBird dashboard under **Activity** > **Proxy Events**. This view displays a table of all HTTP requests and L4 connections that have passed through your reverse proxy services, with filters to narrow down results by time range, status, or other fields.
+Access logs are available in the openZro dashboard under **Activity** > **Proxy Events**. This view displays a table of all HTTP requests and L4 connections that have passed through your reverse proxy services, with filters to narrow down results by time range, status, or other fields.
 
 <p>
     <img src="/docs-static/img/manage/reverse-proxy/access-logs/access-logs-table.png" alt="Proxy Events table showing reverse proxy access log entries" className="imagewrapper"/>
@@ -86,7 +86,7 @@ Access logs support several operational and security workflows:
 
 ## Retention and Cleanup
 
-For the cloud version of NetBird, access logs are retained for 7 days.
+For the cloud version of openZro, access logs are retained for 7 days.
 For the self-hosted version, access log retention can be configured in the `management.json` or `config.yaml` by setting the following config parameters:
 
 ```json
@@ -111,4 +111,4 @@ reverseProxy:
 
 - [Reverse Proxy Overview](/manage/reverse-proxy) - learn how to create and manage reverse proxy services
 - [Audit Events Logging](/manage/activity) - view management-level events such as configuration changes and user activity
-- [Traffic Events Logging](/manage/activity/traffic-events-logging) - monitor network-level traffic events across your NetBird mesh
+- [Traffic Events Logging](/manage/activity/traffic-events-logging) - monitor network-level traffic events across your openZro mesh

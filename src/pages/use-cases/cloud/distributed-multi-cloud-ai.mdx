@@ -1,8 +1,8 @@
 import {Note} from "@/components/mdx";
 
-# Open Source Distributed AI Stack: ArgoCD, MicroK8s, vLLM, and NetBird
+# Open Source Distributed AI Stack: ArgoCD, MicroK8s, vLLM, and openZro
 
-We are building a distributed AI infrastructure project that connects GPU clusters across many different cloud providers using Kubernetes orchestration. After some trial and error we got everything working. If you want to learn more about the process, the why, and how we got here check out our [article on the Knowledge Hub](https://netbird.io/knowledge-hub/multi-cloud-ai-mega-mesh). This setup uses ArgoCD as a GitOps control plane to manage workloads across multiple MicroK8s clusters, with NetBird providing secure zero-trust networking between all components.
+We are building a distributed AI infrastructure project that connects GPU clusters across many different cloud providers using Kubernetes orchestration. After some trial and error we got everything working. If you want to learn more about the process, the why, and how we got here check out our [article on the Knowledge Hub](https://openzro.io/knowledge-hub/multi-cloud-ai-mega-mesh). This setup uses ArgoCD as a GitOps control plane to manage workloads across multiple MicroK8s clusters, with openZro providing secure zero-trust networking between all components.
 
 <Note>
     This document is actively being changed and tested. Please see 'Known Issues and Future Improvements' at the bottom of the page.
@@ -26,7 +26,7 @@ We are building a distributed AI infrastructure project that connects GPU cluste
 First, we'll create a Google Kubernetes Engine (GKE) cluster to host our ArgoCD control plane. This cluster will be the central management point for all our edge MicroK8s clusters. You don't need to use GKE, but you will need to adapt these step to work with your provider.
 
 ```jsx
-export GCP_PROJECT=netbird-demos
+export GCP_PROJECT=openzro-demos
 export GCP_CLUSTER_NAME=megamesh
 export GCP_REGION=europe-west4
 
@@ -46,9 +46,9 @@ gcloud container --project "${GCP_PROJECT}" clusters create "${GCP_CLUSTER_NAME}
 --region "${GCP_REGION}" --node-locations "${GCP_REGION}-b,${GCP_REGION}-c"
 ```
 
-### Install NetBird Operator
+### Install openZro Operator
 
-NetBird provides the secure networking layer that will allow users to connect our GKE control plane without exposing any services to the open internet.
+openZro provides the secure networking layer that will allow users to connect our GKE control plane without exposing any services to the open internet.
 
 **Prerequisites**
 
@@ -60,45 +60,45 @@ NetBird provides the secure networking layer that will allow users to connect ou
 Add helm repository:
 
 ```jsx
-helm repo add netbirdio https://netbirdio.github.io/helms
+helm repo add openzro https://openzro.github.io/helms
 ```
 
-Install [**cert-manager**](https://cert-manager.io/docs/installation/#default-static-install) for k8s API to communicate with the NetBird operator
+Install [**cert-manager**](https://cert-manager.io/docs/installation/#default-static-install) for k8s API to communicate with the openZro operator
 
 ```jsx
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml
 ```
 
-Add NetBird API token. You can create a PAT by following the steps [**here**](/manage/public-api#creating-a-service-user)
+Add openZro API token. You can create a PAT by following the steps [**here**](/manage/public-api#creating-a-service-user)
 
 ```jsx
-kubectl create namespace netbirdkubectl -n netbird create secret generic netbird-mgmt-api-key --from-literal=NB_API_KEY=$(cat ~/nb-pat.secret)
+kubectl create namespace openzrokubectl -n openzro create secret generic openzro-mgmt-api-key --from-literal=NB_API_KEY=$(cat ~/nb-pat.secret)
 ```
 
-Replace `~/nb-pat.secret` with your NetBird API key and create a [**`values.yaml`**](https://github.com/netbirdio/kubernetes-operator/blob/main/examples/ingress/values.yaml) file, check `helm show values netbirdio/kubernetes-operator` for more info
+Replace `~/nb-pat.secret` with your openZro API key and create a [**`values.yaml`**](https://github.com/openzro/kubernetes-operator/blob/main/examples/ingress/values.yaml) file, check `helm show values openzro/kubernetes-operator` for more info
 
 ```jsx
-# managementURL: "https://netbird.example.io:443"
+# managementURL: "https://openzro.example.io:443"
 ingress:
   enabled: true
   router:
     enabled: true
 
-netbirdAPI:
+openzroAPI:
   keyFromSecret:
-    name: "netbird-mgmt-api-key"
+    name: "openzro-mgmt-api-key"
     key: "NB_API_KEY"
 ```
 
 Install using helm install command
 
 ```jsx
-helm install --create-namespace -f values.yaml -n netbird netbird-operator netbirdio/kubernetes-operator
+helm install --create-namespace -f values.yaml -n openzro openzro-operator openzro/kubernetes-operator
 ```
 
-**Expose Kubernetes Control Plane to your NetBird Network**
+**Expose Kubernetes Control Plane to your openZro Network**
 
-To access your Kubernetes control plane from a NetBird network, you can expose your Kubernetes control plane as a [**NetBird resource**](https://docs.netbird.io/manage/networks#resources) by enabling the following option in the operator values:
+To access your Kubernetes control plane from a openZro network, you can expose your Kubernetes control plane as a [**openZro resource**](https://docs.openzro.io/manage/networks#resources) by enabling the following option in the operator values:
 
 ```jsx
 ingres:
@@ -128,20 +128,20 @@ argocd account update-password
 
 This will deploy all ArgoCD components; API server, application controller, repo server, set up the web UI for visual management, creates the initial admin credentials, and configures CLI access for command-line management.
 
-### Configure NetBird Integration with ArgoCD
+### Configure openZro Integration with ArgoCD
 
-Now we need to integrate NetBird with ArgoCD and the statefulset service so that:
+Now we need to integrate openZro with ArgoCD and the statefulset service so that:
 
-**argocd-server** needs to be accessible over the NetBird network as a resource allowing us to access the user interface and manage our clusters. This is done with a `annotate` command, these are key-value pairs that can store arbitrary, non-identifying metadata about a Kubernetes object.
+**argocd-server** needs to be accessible over the openZro network as a resource allowing us to access the user interface and manage our clusters. This is done with a `annotate` command, these are key-value pairs that can store arbitrary, non-identifying metadata about a Kubernetes object.
 
 ```bash
 # Expose service
-kubectl -n argocd  annotate svc/argocd-server  netbird.io/expose="true" netbird.io/groups="argo-management-ui"
+kubectl -n argocd  annotate svc/argocd-server  openzro.io/expose="true" openzro.io/groups="argo-management-ui"
 ```
 
-Next we will enable sidecars. **Why Sidecars?** The application controller needs to make API calls to remote MicroK8s clusters. The sidecar provides transparent network access to those clusters through the NetBird mesh.
+Next we will enable sidecars. **Why Sidecars?** The application controller needs to make API calls to remote MicroK8s clusters. The sidecar provides transparent network access to those clusters through the openZro mesh.
 
-To enable sidecar functionality in your deployments, you first need to generate a setup key, either via the UI (enable the **Ephemeral Peers** options) or by following [**this guide**](https://docs.netbird.io/manage/peers/register-machines-using-setup-keys) for more details on setup keys. We will inject side-cars to ArgoCD application controller so it can communicate with remote MicroK8s clusters.
+To enable sidecar functionality in your deployments, you first need to generate a setup key, either via the UI (enable the **Ephemeral Peers** options) or by following [**this guide**](https://docs.openzro.io/manage/peers/register-machines-using-setup-keys) for more details on setup keys. We will inject side-cars to ArgoCD application controller so it can communicate with remote MicroK8s clusters.
 
 Note: We recommend checking out the section of our [Kubernetes Operator docs on using sidecars](/manage/integrations/kubernetes#accessing-remote-services-using-sidecars) for more context and detail.
 
@@ -161,14 +161,14 @@ NBSetupKey:
 
 ```jsx
 # nbsetup-key.yaml
-apiVersion: netbird.io/v1
+apiVersion: openzro.io/v1
 kind: NBSetupKey
 metadata:
   name: app-setup-key
 spec:
   # Optional, overrides management URL for this setupkey only
-  # defaults to https://api.netbird.io
-  # managementURL: https://netbird.example.com
+  # defaults to https://api.openzro.io
+  # managementURL: https://openzro.example.com
   secretKeyRef:
     name: app-setup-key # Required
     key: setupkey # Required
@@ -181,12 +181,12 @@ Amend the application controller to apply the secrets:
 kubectl -n argocd apply -f secret.yaml
 kubectl -n argocd apply -f nbsetup-key.yaml
 # Inject side-cars
-kubectl -n argocd patch statefulset argocd-application-controller --type merge -p '{"spec":{"template":{"metadata":{"annotations":{"netbird.io/setup-key":"app-setup-key","netbird.io/extra-dns-labels": "argocd"}}}}}'
+kubectl -n argocd patch statefulset argocd-application-controller --type merge -p '{"spec":{"template":{"metadata":{"annotations":{"openzro.io/setup-key":"app-setup-key","openzro.io/extra-dns-labels": "argocd"}}}}}'
 ```
 
-### Create NetBird Access Policies
+### Create openZro Access Policies
 
-In the NetBird dashboard, create two groups and configure policies:
+In the openZro dashboard, create two groups and configure policies:
 
 **Example Policy Configuration:**
 
@@ -196,7 +196,7 @@ In the NetBird dashboard, create two groups and configure policies:
 Where argocd group is applied to the GKE Cluster running Argo, microK8s GPU is applied to other provider GPU enabled VMs, agro-access is the group created by the operator.
 
 <p>
-    <img src="/docs-static/img/use-cases/distributed-ai-argo/argo-access-policy.png" alt="argo netbird policies" className="imagewrapper"/>
+    <img src="/docs-static/img/use-cases/distributed-ai-argo/argo-access-policy.png" alt="argo openzro policies" className="imagewrapper"/>
 </p>
 
 ## Part 2: MicroK8s Edge Cluster Setup
@@ -207,7 +207,7 @@ Each MicroK8s cluster represents a GPU enabled VM in our distributed AI infrastr
 
 - Runs a lightweight Kubernetes distribution (MicroK8s)
 - Has GPU hardware for AI inference workloads
-- Connects to the NetBird mesh for secure communication
+- Connects to the openZro mesh for secure communication
 - Is managed by the central ArgoCD control plane
 
 ### VM Provisioning with User Data
@@ -221,13 +221,13 @@ sudo hostnamectl set-hostname telekom-germany-cluster
 sudo apt update
 
 sudo DEBIAN_FRONTEND=noninteractive apt install ca-certificates curl gnupg snapd vim ubuntu-drivers-common -y
-sudo curl -L https://pkgs.netbird.io/debian/public.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/netbird.gpg
-sudo echo 'deb https://pkgs.netbird.io/debian stable main' | sudo tee /etc/apt/sources.list.d/netbird.list
+sudo curl -L https://pkgs.openzro.io/debian/public.key | sudo gpg --dearmor -o /etc/apt/trusted.gpg.d/openzro.gpg
+sudo echo 'deb https://pkgs.openzro.io/debian stable main' | sudo tee /etc/apt/sources.list.d/openzro.list
 
-sudo apt update && apt install netbird -y
+sudo apt update && apt install openzro -y
 exec 1>/root/startup.log 2>&1
 
-sudo netbird up --setup-key <SETUP-KEY> --management-url https://api.netbird.io --hostname telekom-germany-cluster --allow-server-ssh
+sudo openzro up --setup-key <SETUP-KEY> --management-url https://api.openzro.io --hostname telekom-germany-cluster --allow-server-ssh
 
 sudo ufw disable || true
 
@@ -255,10 +255,10 @@ echo "End of startup.sh"
 
 1. **Hostname Configuration**: Sets a descriptive hostname for easy identification
 2. **System Updates**: Installs required packages and repositories
-3. **NetBird Installation**:
-    - Adds NetBird's package repository
-    - Installs the NetBird client
-    - Connects to the NetBird mesh using a setup key
+3. **openZro Installation**:
+    - Adds openZro's package repository
+    - Installs the openZro client
+    - Connects to the openZro mesh using a setup key
     - Enables SSH access through the mesh
 4. **Firewall Configuration**: Disables UFW to prevent conflicts with MicroK8s networking
 5. **MicroK8s Installation**: Installs MicroK8s from the stable channel
@@ -415,10 +415,10 @@ stringData:
 **Key Components:**
 
 - **name**: Human-readable cluster identifier
-- **server**: The Kubernetes API server endpoint (this is the NetBird mesh IP)
+- **server**: The Kubernetes API server endpoint (this is the openZro mesh IP)
 
 - **bearerToken**: The JWT token we extracted earlier
-- **insecure: true**: Skips TLS certificate verification (acceptable since we're using NetBird's encrypted mesh)
+- **insecure: true**: Skips TLS certificate verification (acceptable since we're using openZro's encrypted mesh)
 - **labels**:
     - `megamesh: 'true'`: Used by ApplicationSet to target this cluster
     - `gpu: 'true'`: Indicates this cluster has GPU capabilities
@@ -508,7 +508,7 @@ microk8s.kubectl apply -f tls-secret.yaml
 
 The application manifests are stored in a private GitHub repository. We need to give ArgoCD access to this repo.
 
-**Repository Location:** [https://github.com/netbirdio/megamesh-argocd](https://github.com/netbirdio/megamesh-argocd)
+**Repository Location:** [https://github.com/openzro/megamesh-argocd](https://github.com/openzro/megamesh-argocd)
 
 **Security Note:** This repository contains secrets and should NOT be public.
 
@@ -549,7 +549,7 @@ spec:
           - git:
               # even though the repo is named "megamesh" in Argo,
               # ApplicationSet needs the *repo URL*:
-              repoURL: git@github.com:netbirdio/megamesh-argocd.git
+              repoURL: git@github.com:openzro/megamesh-argocd.git
               revision: main
               directories:
                 - path: "apps/*"
@@ -560,7 +560,7 @@ spec:
       project: default
       source:
         # same repo URL here
-        repoURL: git@github.com:netbirdio/megamesh-argocd.git
+        repoURL: git@github.com:openzro/megamesh-argocd.git
         targetRevision: main
         path: '{{path}}'
       destination:
@@ -635,7 +635,7 @@ Geographic DNS routing ensures users connect to the nearest cluster for optimal 
 
 ### Verification Tools
 
-**Check DNS propagation:** [https://www.whatsmydns.net/#A/mega-mesh.net](https://www.whatsmydns.net/#A/relay.netbird.io)
+**Check DNS propagation:** [https://www.whatsmydns.net/#A/mega-mesh.net](https://www.whatsmydns.net/#A/relay.openzro.io)
 
 **Global health monitoring:** [https://www.openstatus.dev/play/checker](https://www.openstatus.dev/play/checker)
 
@@ -654,7 +654,7 @@ curl https://mega-mesh.net/v1/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "meta-llama/Meta-Llama-3-8B-Instruct",
-    "prompt": "Why NetBird rocks?",
+    "prompt": "Why openZro rocks?",
     "max_tokens": 500
   }' | jq
 ```
@@ -687,7 +687,7 @@ curl https://mega-mesh.net/v1/completions \
 - **ArgoCD with MicroK8s**: [https://medium.com/@orangecola3/gitops-with-argocd-and-microk8s-4c70a92e43b2](https://medium.com/@orangecola3/gitops-with-argocd-and-microk8s-4c70a92e43b2)
 - **External Cluster Registration**: [https://medium.com/pickme-engineering-blog/how-to-connect-an-external-kubernetes-cluster-to-argo-cd-using-bearer-token-authentication-d9ab093f081d](https://medium.com/pickme-engineering-blog/how-to-connect-an-external-kubernetes-cluster-to-argo-cd-using-bearer-token-authentication-d9ab093f081d)
 
-### NetBird Resources
+### openZro Resources
 
 - **Kubernetes Operator Deployment**: [/manage/integrations/kubernetes#deployment](/manage/integrations/kubernetes#deployment)
 - **Service Mesh Sidecars**: [/manage/integrations/kubernetes#accessing-remote-services-using-sidecars](/manage/integrations/kubernetes#accessing-remote-services-using-sidecars)

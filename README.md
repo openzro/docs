@@ -1,6 +1,6 @@
-# The NetBird documentation
+# The openZro documentation
 
-This repository contains assets required to build the [documentation website for NetBird](https://netbird.io/docs/). It is built using [Next.js](https://nextjs.org/) with MDX support, a modern React framework for building static and dynamic websites.
+This repository contains assets required to build the [documentation website for openZro](https://openzro.io/docs/). It is built using [Next.js](https://nextjs.org/) with MDX support, a modern React framework for building static and dynamic websites.
 
 We're glad that you want to contribute!
 
@@ -28,15 +28,15 @@ This command starts a local development server and opens up a browser window. Mo
 
 You can click the **Fork** button in the upper-right area of the screen to create a copy of this repository in your GitHub account. This copy is called a _fork_. Make any changes you want in your fork, and when you are ready to send those changes to us, go to your fork and create a new pull request to let us know about it.
 
-Once your pull request is created, a NetBird reviewer will take responsibility for providing clear, actionable feedback. As the owner of the pull request, **it is your responsibility to modify your pull request to address the feedback that has been provided to you by the NetBird reviewer.**
+Once your pull request is created, a openZro reviewer will take responsibility for providing clear, actionable feedback. As the owner of the pull request, **it is your responsibility to modify your pull request to address the feedback that has been provided to you by the openZro reviewer.**
 
-Also, note that you may end up having more than one NetBird reviewer provide you feedback or you may end up getting feedback from a NetBird reviewer that is different than the one initially assigned to provide you feedback.
+Also, note that you may end up having more than one openZro reviewer provide you feedback or you may end up getting feedback from a openZro reviewer that is different than the one initially assigned to provide you feedback.
 
-Furthermore, in some cases, one of your reviewers might ask for a technical review from a NetBird author when needed. Reviewers will do their best to provide feedback in a timely fashion but response time can vary based on circumstances.
+Furthermore, in some cases, one of your reviewers might ask for a technical review from a openZro author when needed. Reviewers will do their best to provide feedback in a timely fashion but response time can vary based on circumstances.
 
 ## Code of conduct
 
-Participation in the NetBird community is governed by the [NetBirds' Code of Conduct](https://github.com/netbirdio/netbird/blob/main/CODE_OF_CONDUCT.md).
+Participation in the openZro community is governed by the [openZros' Code of Conduct](https://github.com/openzro/openzro/blob/main/CODE_OF_CONDUCT.md).
 
 ## Components and Use
 
@@ -53,8 +53,8 @@ Displays informational content with an orange theme:
 import {Note} from "@/components/mdx"
 
 <Note>
-    NetBird is an **[open-source](https://github.com/netbirdio/netbird)** project and can be self-hosted.
-    See a comparison between the self-hosted and cloud-hosted versions [here](/selfhosted/self-hosted-vs-cloud-netbird).
+    openZro is an **[open-source](https://github.com/openzro/openzro)** project and can be self-hosted.
+    See a comparison between the self-hosted and cloud-hosted versions [here](/selfhosted/self-hosted-vs-cloud-openzro).
 </Note>
 ```
 
@@ -88,18 +88,18 @@ Displays a grid of clickable cards with hover effects. Perfect for listing relat
 import {Tiles} from "@/components/Tiles"
 
 <Tiles 
-  title="About NetBird" 
-  id="about-netbird" 
+  title="About openZro" 
+  id="about-openzro" 
   items={[
     {
-      href: '/about-netbird/how-netbird-works',
-      name: 'How NetBird Works',
-      description: 'Learn about NetBird concepts, architecture, protocols, and how it creates secure networks.',
+      href: '/about-openzro/how-openzro-works',
+      name: 'How openZro Works',
+      description: 'Learn about openZro concepts, architecture, protocols, and how it creates secure networks.',
     },
     {
-      href: '/about-netbird/netbird-vs-traditional-vpn',
-      name: 'NetBird vs. Traditional VPN',
-      description: 'Discover how NetBird compares to traditional VPNs and understand the advantages of Zero Trust networking.',
+      href: '/about-openzro/openzro-vs-traditional-vpn',
+      name: 'openZro vs. Traditional VPN',
+      description: 'Discover how openZro compares to traditional VPNs and understand the advantages of Zero Trust networking.',
     },
   ]} 
 />
@@ -152,7 +152,7 @@ Creates styled buttons with multiple variants:
 import {Button} from "@/components/Button"
 
 // Primary button (default)
-<Button href="https://app.netbird.io/install" arrow="right">
+<Button href="https://app.openzro.io/install" arrow="right">
   Get started
 </Button>
 
@@ -249,4 +249,4 @@ npm run dev
 
 ## Thank you
 
-NetBird thrives on community participation, and we appreciate your contributions to our website and our documentation!
+openZro thrives on community participation, and we appreciate your contributions to our website and our documentation!

@@ -1,6 +1,6 @@
 # Migration Guide: From Coturn to Embedded STUN Server
 
-This guide helps you migrate your existing NetBird self-hosted installation from using an external Coturn TURN server to the new embedded STUN server integrated into the relay service.
+This guide helps you migrate your existing openZro self-hosted installation from using an external Coturn TURN server to the new embedded STUN server integrated into the relay service.
 
 <Warning>
 This guide applies only to the **older multi-container setup** with separate `management`, `signal`, `relay`, and `coturn` containers configured via `management.json`. If you deployed using the [`getting-started.sh`](/selfhosted/selfhosted-quickstart) script (combined setup with `config.yaml`), STUN is already embedded — no migration is needed. If you are still on the older setup, consider migrating to the [combined container](/selfhosted/migration/combined-container) instead, which handles this automatically.
@@ -8,10 +8,10 @@ This guide applies only to the **older multi-container setup** with separate `ma
 
 <Note>
 **Who is this guide for?** This migration guide is intended for users who:
-- Have an existing NetBird self-hosted deployment with **Coturn configured for STUN** (NAT traversal)
-- Already have the **NetBird Relay service** running for relayed connections
+- Have an existing openZro self-hosted deployment with **Coturn configured for STUN** (NAT traversal)
+- Already have the **openZro Relay service** running for relayed connections
 
-If you were using Coturn purely for TURN relay functionality, note that NetBird Relay has replaced TURN for relayed connections. This guide focuses on migrating the STUN functionality from Coturn to the embedded STUN server in the relay service.
+If you were using Coturn purely for TURN relay functionality, note that openZro Relay has replaced TURN for relayed connections. This guide focuses on migrating the STUN functionality from Coturn to the embedded STUN server in the relay service.
 </Note>
 
 ## Overview of Changes
@@ -21,7 +21,7 @@ If you were using Coturn purely for TURN relay functionality, note that NetBird 
 - **Embedded STUN Server**: The relay service now includes a built-in STUN server, eliminating the need for a separate Coturn container
 - **Simplified Architecture**: Fewer containers to manage (no more Coturn)
 - **Easier Configuration**: Simple environment variables instead of complex `turnserver.conf`
-- **Better Integration**: STUN server is tightly integrated with the NetBird relay service
+- **Better Integration**: STUN server is tightly integrated with the openZro relay service
 
 ### What's Removed
 
@@ -30,7 +30,7 @@ If you were using Coturn purely for TURN relay functionality, note that NetBird 
 
 ## Prerequisites
 
-- NetBird [relay image](https://hub.docker.com/r/netbirdio/relay) updated to the latest version
+- openZro [relay image](https://hub.docker.com/r/openzro/relay) updated to the latest version
 - Backup of your current configuration files
 - Brief maintenance window (clients will reconnect automatically)
 
@@ -40,8 +40,8 @@ If you were using Coturn purely for TURN relay functionality, note that NetBird 
 
 ```bash
 # Create a backup directory
-mkdir -p netbird-backup-$(date +%Y%m%d)
-cd netbird-backup-$(date +%Y%m%d)
+mkdir -p openzro-backup-$(date +%Y%m%d)
+cd openzro-backup-$(date +%Y%m%d)
 
 # Backup all configuration files
 cp ../docker-compose.yml .
@@ -74,10 +74,10 @@ Add STUN configuration to your relay service. You need to expose the STUN UDP po
 
 ```yaml
   relay:
-    image: netbirdio/relay:latest
-    container_name: netbird-relay
+    image: openzro/relay:latest
+    container_name: openzro-relay
     restart: unless-stopped
-    networks: [netbird]
+    networks: [openzro]
     ports:
       - '3478:3478/udp'  # STUN UDP port (add more lines if using multiple ports)
       # - '3479:3479/udp'  # Example: additional STUN port (optional)
@@ -136,7 +136,7 @@ Update the `Stuns` section in your `management.json` to point to the embedded ST
         }
     ],
     "Relay": {
-        "Addresses": ["rels://your-relay-domain.com:443"], // NetBird Relay domain and port
+        "Addresses": ["rels://your-relay-domain.com:443"], // openZro Relay domain and port
         "CredentialsTTL": "24h",
         "Secret": "your-relay-secret"
     },
@@ -150,11 +150,11 @@ Update the `Stuns` section in your `management.json` to point to the embedded ST
     "Stuns": [
         {
             "Proto": "udp",
-            "URI": "stun:your-relay-domain:3478" // NetBird Relay domain and port
+            "URI": "stun:your-relay-domain:3478" // openZro Relay domain and port
         }
     ],
     "Relay": {
-        "Addresses": ["rels://your-relay-domain.com:443"], // NetBird Relay domain and port
+        "Addresses": ["rels://your-relay-domain.com:443"], // openZro Relay domain and port
         "CredentialsTTL": "24h",
         "Secret": "your-relay-secret"
     },
@@ -163,7 +163,7 @@ Update the `Stuns` section in your `management.json` to point to the embedded ST
 ```
 
 <Note>
-Remove the `TURNConfig` section entirely as TURN is replaced by the NetBird relay service.
+Remove the `TURNConfig` section entirely as TURN is replaced by the openZro relay service.
 </Note>
 
 ### Step 5: Update Firewall Rules
@@ -210,7 +210,7 @@ level=info msg="Starting STUN server on port 3478"
 
    Enable debug logging for the STUN server by setting `NB_STUN_LOG_LEVEL=debug` in your `relay.env`, then restart the relay service and observe the logs:
    ```bash
-   docker logs --tail 100 -f netbird-relay
+   docker logs --tail 100 -f openzro-relay
    ```
 
    When a client connects, you should see STUN binding requests being processed:
@@ -221,7 +221,7 @@ level=info msg="Starting STUN server on port 3478"
    ```
 
 2. **Check Client Connectivity**:
-   - Connect a NetBird client
+   - Connect a openZro client
    - Verify peer connections are established
    - Check the dashboard for connected peers
 
@@ -290,7 +290,7 @@ If running the relay binary directly:
 For new installations, use the updated `getting-started.sh` script which automatically configures the embedded STUN server:
 
 ```bash
-curl -sSL https://github.com/netbirdio/netbird/raw/main/infrastructure_files/getting-started.sh | bash
+curl -sSL https://github.com/openzro/openzro/raw/main/infrastructure_files/getting-started.sh | bash
 ```
 
 ## Rollback Procedure
@@ -302,7 +302,7 @@ If you need to rollback to Coturn:
 docker compose down
 
 # Restore backup
-cd netbird-backup-YYYYMMDD
+cd openzro-backup-YYYYMMDD
 cp docker-compose.yml ../
 cp management.json ../
 cp turnserver.conf ../
@@ -314,5 +314,5 @@ docker compose up -d
 
 ## Additional Resources
 
-- [NetBird Self-Hosting Quickstart](/selfhosted/selfhosted-quickstart)
-- [PR #5062: Embedded STUN Implementation](https://github.com/netbirdio/netbird/pull/5062)
+- [openZro Self-Hosting Quickstart](/selfhosted/selfhosted-quickstart)
+- [PR #5062: Embedded STUN Implementation](https://github.com/openzro/openzro/pull/5062)

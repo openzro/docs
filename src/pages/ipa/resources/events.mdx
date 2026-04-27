@@ -12,7 +12,7 @@ export const title = 'Events'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/events/audit">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/events/audit \
+curl -X GET https://api.openzro.io/api/events/audit \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -43,7 +43,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/events/audit"
+url = "https://api.openzro.io/api/events/audit"
 
 headers = {     
   'Accept': 'application/json',
@@ -67,7 +67,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/events/audit"
+  url := "https://api.openzro.io/api/events/audit"
   method := "GET"
   
   client := &http.Client {
@@ -103,7 +103,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/events/audit")
+url = URI("https://api.openzro.io/api/events/audit")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -121,7 +121,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/events/audit")
+  .url("https://api.openzro.io/api/events/audit")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -135,7 +135,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/events/audit',
+  CURLOPT_URL => 'https://api.openzro.io/api/events/audit',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -168,7 +168,7 @@ echo $response;
     "activity_code": "route.add",
     "initiator_id": "google-oauth2|123456789012345678901",
     "initiator_name": "John Doe",
-    "initiator_email": "demo@netbird.io",
+    "initiator_email": "demo@openzro.io",
     "target_id": "chad9d86lnnc59g18ou0",
     "meta": {
       "name": "my route",
@@ -211,7 +211,7 @@ echo $response;
 ---
 
 
-## List all Traffic Events  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  <Badge status="experimental" text="experimental" hoverText="This feature is experimental. The endpoint will likely change and we do not guarantee backwards compatibility." />  {{ tag: 'GET' , label: '/api/events/network-traffic' }}
+## List all Traffic Events  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  <Badge status="experimental" text="experimental" hoverText="This feature is experimental. The endpoint will likely change and we do not guarantee backwards compatibility." />  {{ tag: 'GET' , label: '/api/events/network-traffic' }}
 
 <Row>
   <Col>
@@ -269,7 +269,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/events/network-traffic">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/events/network-traffic \
+curl -X GET https://api.openzro.io/api/events/network-traffic \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -300,7 +300,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/events/network-traffic"
+url = "https://api.openzro.io/api/events/network-traffic"
 
 headers = {     
   'Accept': 'application/json',
@@ -324,7 +324,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/events/network-traffic"
+  url := "https://api.openzro.io/api/events/network-traffic"
   method := "GET"
   
   client := &http.Client {
@@ -360,7 +360,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/events/network-traffic")
+url = URI("https://api.openzro.io/api/events/network-traffic")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -378,7 +378,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/events/network-traffic")
+  .url("https://api.openzro.io/api/events/network-traffic")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -392,7 +392,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/events/network-traffic',
+  CURLOPT_URL => 'https://api.openzro.io/api/events/network-traffic',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -448,7 +448,7 @@ echo $response;
       },
       "user": {
         "id": "google-oauth2|123456789012345678901",
-        "email": "alice@netbird.io",
+        "email": "alice@openzro.io",
         "name": "Alice Smith"
       },
       "policy": {
@@ -641,7 +641,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/events/proxy">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/events/proxy \
+curl -X GET https://api.openzro.io/api/events/proxy \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -672,7 +672,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/events/proxy"
+url = "https://api.openzro.io/api/events/proxy"
 
 headers = {     
   'Accept': 'application/json',
@@ -696,7 +696,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/events/proxy"
+  url := "https://api.openzro.io/api/events/proxy"
   method := "GET"
   
   client := &http.Client {
@@ -732,7 +732,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/events/proxy")
+url = URI("https://api.openzro.io/api/events/proxy")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -750,7 +750,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/events/proxy")
+  .url("https://api.openzro.io/api/events/proxy")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -764,7 +764,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/events/proxy',
+  CURLOPT_URL => 'https://api.openzro.io/api/events/proxy',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

@@ -1,8 +1,8 @@
 import {Note} from "@/components/mdx";
 
-# Duo Security on NetBird Cloud
+# Duo Security on openZro Cloud
 
-You can use Duo Security as your Identity Provider with NetBird, but it will require some additional configuration steps. Duo Security is a cloud-based security platform that provides secure access through single sign-on (SSO), multi-factor authentication (MFA), and device trust. Duo offers comprehensive identity verification and access policies to protect applications and data.
+You can use Duo Security as your Identity Provider with openZro, but it will require some additional configuration steps. Duo Security is a cloud-based security platform that provides secure access through single sign-on (SSO), multi-factor authentication (MFA), and device trust. Duo offers comprehensive identity verification and access policies to protect applications and data.
 
 <Note>
     Support for OIDC-compliant IdPs is available on the Team plan and higher.
@@ -26,7 +26,7 @@ Log in to the [Duo Admin Panel](https://admin.duosecurity.com/). Navigate to **A
 ## Step 2: Configure Basic Settings
 
 Configure the Basic Configuration section with the following settings:
-- **Application name**: NetBird
+- **Application name**: openZro
 - **Application Type**: Generic OIDC Relying Party - Single Sign-On
 - **User access**: `Enable for all users` (if applicable to all users) or `Enable only for permitted groups` (for fine-grained access control)
 
@@ -38,7 +38,7 @@ Configure the Basic Configuration section with the following settings:
 
 Configure the Relying Party section with the following settings:
 - **Grant Type**: Authorization Code, Refresh Tokens
-- **Sign-In Redirect URLs**: `https://login.netbird.io/login/callback`
+- **Sign-In Redirect URLs**: `https://login.openzro.io/login/callback`
 
 <p>
     <img src="/docs-static/img/manage/team/single-sign-on/duo-idp/duo-relying-party.png" alt="duo-relying-party" className="imagewrapper-big"/>
@@ -55,9 +55,9 @@ Configure the OIDC Response section with the following scopes:
 
 Click **Save** to complete the application configuration.
 
-## Step 5: Share Information with NetBird Support
+## Step 5: Share Information with openZro Support
 
-From the application metadata, copy the **Client ID**, **Client Secret**, and **Discovery URL**. Share the following information with the NetBird support team at support@netbird.io:
+From the application metadata, copy the **Client ID**, **Client Secret**, and **Discovery URL**. Share the following information with the openZro support team at support@openzro.io:
 
 - **Client ID**
 - **Client Secret**

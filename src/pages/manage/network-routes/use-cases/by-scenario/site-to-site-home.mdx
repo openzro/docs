@@ -2,7 +2,7 @@ import { Note } from '@/components/mdx'
 
 # Site-to-Site: Home Networks
 
-This guide shows how to connect two home networks together so devices can communicate across locations—without installing NetBird on every device.
+This guide shows how to connect two home networks together so devices can communicate across locations—without installing openZro on every device.
 
 ## What You'll Achieve
 
@@ -12,8 +12,8 @@ After following this guide, devices on one home network can communicate with dev
 - IoT devices can communicate across homes
 
 ```
-Home A: NAS ──► Routing Peer ──► NetBird Tunnel ──► Routing Peer ──► Parents' NAS
-        (no NetBird)  (peer)                           (peer)        (no NetBird)
+Home A: NAS ──► Routing Peer ──► openZro Tunnel ──► Routing Peer ──► Parents' NAS
+        (no openZro)  (peer)                           (peer)        (no openZro)
 ```
 
 <Note>
@@ -22,7 +22,7 @@ Site-to-Site requires Network Routes because the Networks feature doesn't yet su
 
 ## Prerequisites
 
-- A [NetBird cloud account](https://app.netbird.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - An always-on device at each home to serve as routing peers (Raspberry Pi, NAS with Docker, etc.)
 - Different subnets at each location (if both use `192.168.1.0/24`, see [Resolve Overlapping Routes](/manage/network-routes/use-cases/by-configuration/overlapping-routes))
 
@@ -33,9 +33,9 @@ Site-to-Site requires Network Routes because the Networks feature doesn't yet su
 
 ## Step 1: Create Setup Keys with Groups
 
-Before installing NetBird on your routing peers, create setup keys with auto-assigned groups:
+Before installing openZro on your routing peers, create setup keys with auto-assigned groups:
 
-1. Go to **Setup Keys** in the NetBird dashboard
+1. Go to **Setup Keys** in the openZro dashboard
 2. Click **Create Setup Key**
 3. For your home routing peer:
    - Network Identifier: "Home Routing Peer"
@@ -49,20 +49,20 @@ Before installing NetBird on your routing peers, create setup keys with auto-ass
 You can also add groups to peers manually after setup. Go to **Peers**, select the peer, and add groups under **Assigned Groups**.
 </Note>
 
-## Step 2: Install NetBird on Routing Peers
+## Step 2: Install openZro on Routing Peers
 
 **At your home:**
 
 ```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-sudo netbird up --setup-key YOUR_HOME_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+sudo openzro up --setup-key YOUR_HOME_SETUP_KEY
 ```
 
 **At parents' home:**
 
 ```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-sudo netbird up --setup-key YOUR_PARENTS_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+sudo openzro up --setup-key YOUR_PARENTS_SETUP_KEY
 ```
 
 ## Step 3: Create Network Routes
@@ -123,7 +123,7 @@ Create two policies that allow the routing peers to communicate in both directio
 
 ## Step 5: Configure Clientless Devices
 
-For devices without NetBird to reach the other network, add a static route pointing to the local routing peer.
+For devices without openZro to reach the other network, add a static route pointing to the local routing peer.
 
 **On a Linux device at your home:**
 
@@ -173,7 +173,7 @@ ping 192.168.1.50 # Your NAS
 ## Troubleshooting
 
 **Site-to-site not working:**
-1. Verify both routing peers are online and connected: check `netbird status` on each
+1. Verify both routing peers are online and connected: check `openzro status` on each
 2. Check that static routes are configured on clientless devices
 3. Ensure access policies allow traffic in both directions
 

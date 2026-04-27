@@ -13,7 +13,7 @@ const clients = [
     href: '/client-installation#linux',
     name: 'Linux',
     description:
-      'Learn how to install the NetBird client on Linux devices.',
+      'Learn how to install the openZro client on Linux devices.',
     icon: UserIcon,
     pattern: {
       y: 16,
@@ -27,7 +27,7 @@ const clients = [
     href: '/client-installation#mac-os',
     name: 'MacOS',
     description:
-      'Learn how to install the NetBird client on MacOS devices.',
+      'Learn how to install the openZro client on MacOS devices.',
     icon: ChatBubbleIcon,
     pattern: {
       y: -6,
@@ -41,7 +41,7 @@ const clients = [
     href: '/client-installation#windows',
     name: 'Windows',
     description:
-      'Learn how to install the NetBird client on Windows devices.',
+      'Learn how to install the openZro client on Windows devices.',
     icon: EnvelopeIcon,
     pattern: {
       y: 32,
@@ -55,7 +55,7 @@ const clients = [
     href: '/client-installation#android',
     name: 'Android',
     description:
-      'Learn how to install the NetBird client on Android devices.',
+      'Learn how to install the openZro client on Android devices.',
     icon: UsersIcon,
     pattern: {
       y: 22,
@@ -66,7 +66,7 @@ const clients = [
     href: '/client-installation#ios',
     name: 'iOS',
     description:
-      'Learn how to install the NetBird client on OS devices.',
+      'Learn how to install the openZro client on OS devices.',
     icon: UsersIcon,
     pattern: {
       y: 22,

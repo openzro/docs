@@ -2,11 +2,11 @@ import {Note} from "@/components/mdx";
 
 # Synology Installation
 
-The NetBird client (agent) allows a peer to join a pre-existing NetBird deployment. If a NetBird deployment is not yet available, there are both managed and [self-hosted](https://docs.netbird.io/selfhosted/selfhosted-quickstart) options available.
+The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
 
 ## Installation
 
-Installing a NetBird Peer on Synology will require a few additional steps compared to a typical Linux install despite using the same single line command to get everything going.
+Installing a openZro Peer on Synology will require a few additional steps compared to a typical Linux install despite using the same single line command to get everything going.
 
 1. Ensure your user has administrative privileges. _Control Panel > User & Group > User > Click User and Edit > User Groups > Ensure “administrators” is checked._
 2. Enable SSH Connectivity. _Control Panel > Terminal & SNMP > Terminal > Check the box next to “Enable SSH Service” > Click Apply_
@@ -19,17 +19,17 @@ ssh user@192.168.0.53
 4. Install with one command.
 
 ```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sudo sh
+curl -fsSL https://pkgs.openzro.io/install.sh | sudo sh
 ```
 
-5. Add your Synology NAS as a Peer using the steps from [Add peers to your NetBird network](https://docs.netbird.io/manage/peers/add-machines-to-your-network) in the documentation.
+5. Add your Synology NAS as a Peer using the steps from [Add peers to your openZro network](https://docs.openzro.io/manage/peers/add-machines-to-your-network) in the documentation.
 
 ## Reboot Script
 
-In some cases on Synology, the NetBird service will not have the correct modules loaded on a reboot. In this case you’ll need to run a script every time you reboot your NAS. To automate this process, you can create a scheduled task in the Synology DSM.
+In some cases on Synology, the openZro service will not have the correct modules loaded on a reboot. In this case you’ll need to run a script every time you reboot your NAS. To automate this process, you can create a scheduled task in the Synology DSM.
 
 1. _Control Panel > Task Scheduler > Create > Triggered Task > User defined script_.
-2. Now you’ll have a _Create Task_ dialog box. Give a task name such as “Netbird Reboot”. Set the _User > Root_ and the _Event > Boot-up_. Make sure the Enable Box is checked.
+2. Now you’ll have a _Create Task_ dialog box. Give a task name such as “openZro Reboot”. Set the _User > Root_ and the _Event > Boot-up_. Make sure the Enable Box is checked.
 3. Next, click on _Task Settings_ and copy/paste the script in the text field under _Run command > User-defined script_.
 
 ```sh
@@ -58,19 +58,19 @@ In case you are activating a server peer, you can use a [setup key](/manage/peer
 1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
 
 ```bash
-  netbird up --setup-key <SETUP KEY>
+  openzro up --setup-key <SETUP KEY>
 ```
 
 Alternatively, if you are hosting your own Management Service provide `--management-url` property pointing to your Management Service:
 ```bash
-  netbird up --setup-key <SETUP KEY> --management-url http://localhost:33073
+  openzro up --setup-key <SETUP KEY> --management-url http://localhost:33073
 ```
 
 > You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
 
 2. Check connection status:
 ```bash
-  netbird status
+  openzro status
 ```
 
 3. Check your IP:
@@ -84,15 +84,15 @@ Alternatively, if you are hosting your own Management Service provide `--managem
 If you used the one-command script to install, you can follow this to update:
 
 ```bash
-netbird down
-curl -fsSLO https://pkgs.netbird.io/install.sh
+openzro down
+curl -fsSLO https://pkgs.openzro.io/install.sh
 chmod +x install.sh
 ./install.sh --update
-netbird up
+openzro up
 ```
 
 ## Uninstallation
-The most straightforward method is to use NetBird's built-in uninstall command. You'll need to connect to your Synology NAS via SSH to execute these commands.
+The most straightforward method is to use openZro's built-in uninstall command. You'll need to connect to your Synology NAS via SSH to execute these commands.
 
 1. SSH into your Synology NAS: If you haven't already, enable SSH in your Synology's Control Panel under Terminal & SNMP. Then, use an SSH client to connect to your NAS. Switch to the root user:
 ```bash
@@ -100,23 +100,23 @@ sudo -i
 ```
 2. Run the uninstall command: Once connected, execute the following command:
 ```bash
-netbird service uninstall
+openzro service uninstall
 ```
-3. Remove NetBird binary and configuration files.
+3. Remove openZro binary and configuration files.
 
-/usr/local/bin/netbird: The installation script placed the NetBird binary here.
-/var/lib/netbird: This directory contains the NetBird configuration files.
+/usr/local/bin/openzro: The installation script placed the openZro binary here.
+/var/lib/openzro: This directory contains the openZro configuration files.
 
 You can use the rm command to delete these files and directories:
 ```bash
-rm /usr/local/bin/netbird
-rm -rf /var/lib/netbird
+rm /usr/local/bin/openzro
+rm -rf /var/lib/openzro
 ```
 **Important:** Be very careful when using the `rm -rf` command, as it will permanently delete the specified files and directories. Double-check the paths before executing the command.
 
-4. Remove the Peer from the NetBird UI.
+4. Remove the Peer from the openZro UI.
 
-For a complete cleanup, you should also remove the Synology NAS as a peer from your NetBird account. Log in to the NetBird web UI. Navigate to the Peers section. Find the peer corresponding to your Synology NAS and delete it.
+For a complete cleanup, you should also remove the Synology NAS as a peer from your openZro account. Log in to the openZro web UI. Navigate to the Peers section. Find the peer corresponding to your Synology NAS and delete it.
 
 ## Video Walkthrough
 
@@ -124,7 +124,7 @@ For a complete cleanup, you should also remove the Synology NAS as a peer from y
 
 ## Support Us
 
-- Star us on [GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Star us on [GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird release page on GitHub: [releases](https://github.com/netbirdio/netbird/releases/latest)
+- openZro release page on GitHub: [releases](https://github.com/openzro/openzro/releases/latest)

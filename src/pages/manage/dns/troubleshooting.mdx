@@ -1,19 +1,19 @@
-export const description = 'Diagnose and fix common DNS issues in NetBird'
+export const description = 'Diagnose and fix common DNS issues in openZro'
 
 # DNS Troubleshooting
 
-This guide helps you diagnose and resolve common DNS issues in NetBird. Follow the structured approach below to identify and fix problems quickly.
+This guide helps you diagnose and resolve common DNS issues in openZro. Follow the structured approach below to identify and fix problems quickly.
 
 ## Quick Diagnostics Checklist
 
 Before diving deep, run through this quick checklist:
 
 ```bash
-# 1. Is NetBird connected?
-netbird status -d
+# 1. Is openZro connected?
+openzro status -d
 
 # 2. Is the peer receiving the correct nameservers for match domains?
-netbird status | grep -A 5 Nameserver
+openzro status | grep -A 5 Nameserver
 
 # 3. Check what DNS servers are currently active on the system
 # Linux:
@@ -48,17 +48,17 @@ nslookup google.com
 If any of these fail, continue to the relevant section below.
 
 <Note>
-**Quick isolation test**: To check if an issue is caused by NetBird DNS, temporarily disable DNS management on the peer:
+**Quick isolation test**: To check if an issue is caused by openZro DNS, temporarily disable DNS management on the peer:
 ```bash
-netbird down
-netbird up --disable-dns
+openzro down
+openzro up --disable-dns
 ```
-If the problem goes away, the issue is in your NetBird DNS configuration. If it persists, it's unrelated to NetBird DNS.
+If the problem goes away, the issue is in your openZro DNS configuration. If it persists, it's unrelated to openZro DNS.
 
 **To re-enable DNS management after testing**:
 ```bash
-netbird down
-netbird up --disable-dns=false
+openzro down
+openzro up --disable-dns=false
 ```
 </Note>
 
@@ -73,25 +73,25 @@ netbird up --disable-dns=false
 
 **Solutions**:
 
-#### Solution A: System Not Using NetBird DNS
+#### Solution A: System Not Using openZro DNS
 
-The OS isn't configured to use NetBird's resolver.
+The OS isn't configured to use openZro's resolver.
 
-**Check**: Refer to the [Verifying Configuration](#verifying-configuration) section to confirm if your OS is using NetBird's resolver.
+**Check**: Refer to the [Verifying Configuration](#verifying-configuration) section to confirm if your OS is using openZro's resolver.
 
 **Fix**:
-If the configuration is incorrect, restart NetBird to force the OS to pick up the DNS settings:
+If the configuration is incorrect, restart openZro to force the OS to pick up the DNS settings:
 
 **Linux/macOS**:
 ```bash
-sudo systemctl restart netbird
+sudo systemctl restart openzro
 # or
-sudo netbird down && sudo netbird up
+sudo openzro down && sudo openzro up
 ```
 
 **Windows**:
 ```powershell
-Restart-Service netbird
+Restart-Service openzro
 ```
 
 **Android**:
@@ -101,11 +101,11 @@ If DNS resolution isn't working on Android, check your **Private DNS** setting:
 1. Go to **Settings → Network & Internet → Private DNS**
 2. Set it to **Off**
 
-When Private DNS is enabled, Android bypasses the VPN's DNS configuration and sends DNS queries directly to the configured Private DNS provider, preventing NetBird's custom DNS resolution from working.
+When Private DNS is enabled, Android bypasses the VPN's DNS configuration and sends DNS queries directly to the configured Private DNS provider, preventing openZro's custom DNS resolution from working.
 
 #### Solution B: Wrong Nameserver Configuration
 
-NetBird is routing queries to the wrong DNS server.
+openZro is routing queries to the wrong DNS server.
 
 1. **Go to Dashboard → DNS → Nameservers**
 2. **Check nameserver IPs**:
@@ -142,7 +142,7 @@ dig @10.0.0.1 internal.company.internal
 
 # If this times out:
 # → Firewall or routing issue
-# → Check NetBird routes
+# → Check openZro routes
 # → Check firewall rules on DNS server
 ```
 
@@ -158,7 +158,7 @@ dig @10.0.0.1 internal.company.internal
 Refer to **Step 7** in the [Quick Diagnostics Checklist](#quick-diagnostics-checklist) to verify if public domains resolve.
 
 If public domains resolution fails, check if you can resolve against a public resolver directly (e.g., `nslookup google.com 8.8.8.8`).
-- If direct resolution works: It's likely a NetBird resolver issue.
+- If direct resolution works: It's likely a openZro resolver issue.
 - If direct resolution fails: It's likely a general network connectivity issue.
 
 **Solutions**:
@@ -263,9 +263,9 @@ time dig @10.0.0.2 internal.company.internal
 
 #### Solution B: Network Instability
 
-**Check NetBird connectivity**:
+**Check openZro connectivity**:
 ```bash
-netbird status
+openzro status
 
 # Should show: Status: Connected
 
@@ -276,7 +276,7 @@ netbird status
 **Fix**:
 - Check physical network connection
 - Verify firewall rules
-- Review NetBird logs: `netbird up --log-level debug`
+- Review openZro logs: `openzro up --log-level debug`
 
 #### Solution C: DNS Cache Issues
 
@@ -302,10 +302,10 @@ sudo killall -HUP mDNSResponder
 ipconfig /flushdns
 ```
 
-**NetBird**:
+**openZro**:
 ```bash
-# Restart NetBird to clear its cache
-netbird down && netbird up
+# Restart openZro to clear its cache
+openzro down && openzro up
 ```
 
 ### Issue 4: Search Domains Not Working
@@ -364,23 +364,23 @@ cat /etc/resolv.conf
 
 **Fix**: Limit to 3-4 most important search domains.
 
-### Issue 5: DNS Works on NetBird Network, Fails Outside
+### Issue 5: DNS Works on openZro Network, Fails Outside
 
 **Symptoms**:
-- DNS works when connected to NetBird
-- DNS fails when NetBird disconnects
-- Computer can't resolve anything after using NetBird
+- DNS works when connected to openZro
+- DNS fails when openZro disconnects
+- Computer can't resolve anything after using openZro
 
 **Diagnosis**:
 
 ```bash
-# Disconnect NetBird
-netbird down
+# Disconnect openZro
+openzro down
 
 # Check DNS
 cat /etc/resolv.conf
 
-# If still shows 100.x.255.254, NetBird didn't restore original DNS
+# If still shows 100.x.255.254, openZro didn't restore original DNS
 ```
 
 **Solutions**:
@@ -389,7 +389,7 @@ cat /etc/resolv.conf
 
 **Linux/macOS**:
 ```bash
-# Remove NetBird DNS manually
+# Remove openZro DNS manually
 sudo rm /etc/resolv.conf
 sudo ln -s /run/systemd/resolve/stub-resolv.conf /etc/resolv.conf
 # or create new resolv.conf:
@@ -407,15 +407,15 @@ Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ResetServerAddresses
 If DNS keeps breaking:
 
 ```bash
-# Completely remove NetBird
-sudo netbird down
-sudo systemctl stop netbird
-sudo systemctl disable netbird
+# Completely remove openZro
+sudo openzro down
+sudo systemctl stop openzro
+sudo systemctl disable openzro
 
 # Restore DNS manually (see above)
 
-# Reinstall NetBird
-curl -sSL https://pkgs.netbird.io/install.sh | sh
+# Reinstall openZro
+curl -sSL https://pkgs.openzro.io/install.sh | sh
 ```
 
 ### Issue 6: DNS Rebinding Protection
@@ -427,7 +427,7 @@ curl -sSL https://pkgs.netbird.io/install.sh | sh
 
 **Diagnosis**:
 
-This happens when using NetBird DNS with routers that have DNS rebinding protection (pfSense, OpenWRT, etc.).
+This happens when using openZro DNS with routers that have DNS rebinding protection (pfSense, OpenWRT, etc.).
 
 **Solutions**:
 
@@ -453,16 +453,16 @@ config domain
 
 ### Public nameservers
 
-When you configure a nameserver accessible from the Internet (without a VPN), the NetBird client acts as a proxy to that public nameserver.
+When you configure a nameserver accessible from the Internet (without a VPN), the openZro client acts as a proxy to that public nameserver.
 
 There are two things to verify:
 
-1. The NetBird client has picked up the nameserver
-2. The operating system is configured to use the NetBird client's proxy nameserver
+1. The openZro client has picked up the nameserver
+2. The operating system is configured to use the openZro client's proxy nameserver
 
 To check the first item (works on all operating systems):
 
-1. Run `netbird status -d`
+1. Run `openzro status -d`
 2. Locate the nameserver's IP address
 3. Confirm it shows as "Available" (it could also show as timed out or in another state)
 
@@ -496,9 +496,9 @@ To confirm nameservers are properly registered on Windows using PowerShell:
 
 ```shell
 PS C:\Users\kdn> Get-DnsClientNrptRule
-Name                             : NetBird-Match
+Name                             : openZro-Match
 Version                          : 2
-Namespace                        : {.netbird.cloud, .83.100.in-addr.arpa}
+Namespace                        : {.openzro.cloud, .83.100.in-addr.arpa}
 ...
  NameServers                      : 100.83.255.254
 ...
@@ -510,7 +510,7 @@ Namespace                        : .83.100.in-addr.arpa
 NameServers                      : 100.83.255.254
 ...
 
-Namespace                        : .netbird.cloud
+Namespace                        : .openzro.cloud
 ...
 NameServers                      : 100.83.255.254
 ...
@@ -519,19 +519,19 @@ PS C:\Users\kdn> ipconfig /all
 ...
 Unknown adapter wt0:
 
-   Connection-specific DNS Suffix  . : netbird.cloud
+   Connection-specific DNS Suffix  . : openzro.cloud
    Description . . . . . . . . . . . : WireGuard Tunnel
 ...
    Connection-specific DNS Suffix Search List :
-                                      netbird.cloud
+                                      openzro.cloud
                                       83.100.in-addr.arpa
 ...
 ```
 
 In the output above, look for:
 
-- `100.XXX.255.254` under _NameServers_ (the local proxy address of the NetBird client)
-- `.netbird.cloud` and `.XXX.100.in-addr.arpa` under _Namespace_ for built-in entries
+- `100.XXX.255.254` under _NameServers_ (the local proxy address of the openZro client)
+- `.openzro.cloud` and `.XXX.100.in-addr.arpa` under _Namespace_ for built-in entries
 - `.your.custom.domain.example.com` under _Namespace_ for your custom domains
 
 #### Verifying nameserver registration on macOS
@@ -542,7 +542,7 @@ To confirm nameservers are properly registered on macOS using the terminal:
 > scutil --dns
 ...
 resolver #2
-  domain   : netbird.cloud
+  domain   : openzro.cloud
   nameserver[0] : 100.83.255.254
   port     : 53
   flags    : Supplemental, Request A records, Request AAAA records
@@ -561,8 +561,8 @@ resolver #8
 
 In the output above, look for:
 
-- `100.XXX.255.254` under _nameserver[N]_ (the local proxy address of the NetBird client)
-- `netbird.cloud` and `.XXX.100.in-addr.arpa` under _domain_ for built-in entries
+- `100.XXX.255.254` under _nameserver[N]_ (the local proxy address of the openZro client)
+- `openzro.cloud` and `.XXX.100.in-addr.arpa` under _domain_ for built-in entries
 - `.your.custom.domain.example.com` under _domain_ for your custom domains
 - `Reachable` in the _reach_ field
 
@@ -576,10 +576,10 @@ sudo dscacheutil -flushcache && sudo killall -HUP mDNSResponder
 
 To verify whether caching is causing your issue:
 
-1. Run `netbird down` or disconnect
+1. Run `openzro down` or disconnect
 2. Flush the cache (see above)
 3. Resolve the domain: `dscacheutil -q host -a name <domain>`
-4. Run `netbird up` or connect
+4. Run `openzro up` or connect
 5. Check if `dscacheutil -q host -a name <domain>` works
    - If it doesn't, flush the cache and retry
 
@@ -591,15 +591,15 @@ For `systemd-resolved`, check the configuration with `resolvectl status`.
 
 For other configuration backends, look for these entries in `/etc/resolv.conf`:
 
-- `127.0.0.1` - default address for NetBird DNS proxy listener
-- `127.0.0.153` - fallback address for NetBird DNS proxy listener
-- Value of `$NB_DNS_RESOLVER_ADDRESS` - custom override for the NetBird DNS proxy listener
+- `127.0.0.1` - default address for openZro DNS proxy listener
+- `127.0.0.153` - fallback address for openZro DNS proxy listener
+- Value of `$NB_DNS_RESOLVER_ADDRESS` - custom override for the openZro DNS proxy listener
 
-To find the address the NetBird client is listening on:
+To find the address the openZro client is listening on:
 
 ```shell
-sudo ss -nlptu 'sport = 53' | grep netbird
-sudo netstat -ltnup | grep ':53' | grep netbird
+sudo ss -nlptu 'sport = 53' | grep openzro
+sudo netstat -ltnup | grep ':53' | grep openzro
 ```
 
 ### Internal nameservers
@@ -641,7 +641,7 @@ For the examples in this section, we'll assume:
 - A `*.nb.test` Network Resource is configured
 - We're trying to access `srv.nb.test`
 - `zxc.nb.test` doesn't exist (used to demonstrate errors)
-- The Routing Peer's NetBird address is `100.83.136.209`
+- The Routing Peer's openZro address is `100.83.136.209`
     - It's named `brys-vm-nbt-ubuntu-isolated-02` in the outputs
 - The client is named `brys-vm-nbt-ubuntu-01` in the outputs
     - The client runs Ubuntu, but most commands work across all platforms
@@ -708,7 +708,7 @@ Address:        100.83.136.209#22054
 
 ### Trigger the Domain Resource
 
-While local DNS forwarder failures are rare, using it is a good way to force the NetBird client to set up routing for the domain (see [Domain Resources](/manage/networks#domain-resources) for details).
+While local DNS forwarder failures are rare, using it is a good way to force the openZro client to set up routing for the domain (see [Domain Resources](/manage/networks#domain-resources) for details).
 
 <Note>
   On macOS and Windows, the IP address is always `100.83.255.254` instead of `100.83.73.97`.
@@ -717,7 +717,7 @@ While local DNS forwarder failures are rare, using it is a good way to force the
 Notice that the IP addresses are initially missing from the routing table (`ip route show` on Linux), but are added after resolving the domain for the first time using the local DNS Forwarder:
 
 ```shell
-kdn@brys-vm-nbt-ubuntu-01:~$ netbird networks ls
+kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
 Available Networks:
 
   - ID: *.nb.test
@@ -734,7 +734,7 @@ Name:   srv.nb.test
 Address: 192.168.100.10
 kdn@brys-vm-nbt-ubuntu-01:~$ ip route show table all | grep 192.168.100
 192.168.100.10 dev wt0 table 7120
-kdn@brys-vm-nbt-ubuntu-01:~$ netbird networks ls
+kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
 Available Networks:
 
   - ID: *.nb.test
@@ -746,21 +746,21 @@ Available Networks:
 
 ### Verifying Domain Resource registration with the operating system
 
-After confirming everything works within NetBird's scope, restart NetBird and check whether the operating system's default DNS resolver resolves the Domain Resource correctly.
+After confirming everything works within openZro's scope, restart openZro and check whether the operating system's default DNS resolver resolves the Domain Resource correctly.
 
 <Note>
   See [Verifying Configuration > Public nameservers](#public-nameservers) for equivalent macOS and Windows debugging steps.
 </Note>
 
 <Note>
-  You might notice that `netbird down` followed by `netbird up` doesn't clear the `Resolved IPs`:
+  You might notice that `openzro down` followed by `openzro up` doesn't clear the `Resolved IPs`:
 
   ```shell
-  kdn@brys-vm-nbt-ubuntu-01:~$ sudo netbird down
+  kdn@brys-vm-nbt-ubuntu-01:~$ sudo openzro down
   Disconnected
-  kdn@brys-vm-nbt-ubuntu-01:~$ sudo netbird up
+  kdn@brys-vm-nbt-ubuntu-01:~$ sudo openzro up
   Connected
-  kdn@brys-vm-nbt-ubuntu-01:~$ netbird networks ls
+  kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
   Available Networks:
 
     - ID: *.nb.test
@@ -778,12 +778,12 @@ After confirming everything works within NetBird's scope, restart NetBird and ch
   ```
 </Note>
 
-We'll start fresh by restarting the entire NetBird service to purge all caches, then proceed with testing:
+We'll start fresh by restarting the entire openZro service to purge all caches, then proceed with testing:
 
 ```shell
-kdn@brys-vm-nbt-ubuntu-01:~$ sudo netbird service restart
-NetBird service has been restarted
-kdn@brys-vm-nbt-ubuntu-01:~$ netbird networks ls
+kdn@brys-vm-nbt-ubuntu-01:~$ sudo openzro service restart
+openZro service has been restarted
+kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
 Available Networks:
 
   - ID: *.nb.test
@@ -799,7 +799,7 @@ srv.nb.test: 192.168.100.10                    -- link: wt0
 -- Data from: network
 kdn@brys-vm-nbt-ubuntu-01:~$ ip route show table all | grep 192.168.100
 192.168.100.10 dev wt0 table 7120
-kdn@brys-vm-nbt-ubuntu-01:~$ netbird networks ls
+kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
 Available Networks:
 
   - ID: *.nb.test
@@ -826,7 +826,7 @@ Avoid future DNS issues:
 - ✅ Test configuration on one peer before rolling out
 - ✅ Document your DNS architecture
 - ✅ Monitor DNS resolution performance
-- ✅ Keep NetBird client updated
+- ✅ Keep openZro client updated
 - ✅ Verify nameservers are reachable before configuring
 - ✅ Use fast, reliable public DNS for primary (Cloudflare, Google)
 - ✅ Set `search_domains_enabled: true` for internal domains

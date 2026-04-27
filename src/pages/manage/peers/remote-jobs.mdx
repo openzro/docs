@@ -5,7 +5,7 @@ import {Note} from "@/components/mdx";
 Remote Jobs allow administrators to trigger actions on connected peers without requiring direct CLI access. This is useful for troubleshooting remote machines, collecting diagnostic information from end-users, or automating peer-level operations from the Dashboard or API.
 
 <Note>
-    Remote Jobs require the target peer to be **online** and running **NetBird v0.64.0 or later**.
+    Remote Jobs require the target peer to be **online** and running **openZro v0.64.0 or later**.
 </Note>
 
 ## Overview
@@ -60,7 +60,7 @@ The Debug Bundle job remotely collects diagnostic information from a peer, inclu
 
 **Result:**
 
-On success, the job returns an **upload key** that can be used to retrieve the debug bundle. Share this key with NetBird support via GitHub Issues, Slack, or your support channel.
+On success, the job returns an **upload key** that can be used to retrieve the debug bundle. Share this key with openZro support via GitHub Issues, Slack, or your support channel.
 
 ## Using the Dashboard
 
@@ -105,7 +105,7 @@ Remote Jobs can be managed programmatically through the Management API. See the 
 **Create a debug bundle job:**
 
 ```bash
-curl -X POST https://api.netbird.io/api/peers/{peerId}/jobs \
+curl -X POST https://api.openzro.io/api/peers/{peerId}/jobs \
   -H "Authorization: Token <PAT>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -123,14 +123,14 @@ curl -X POST https://api.netbird.io/api/peers/{peerId}/jobs \
 **List jobs for a peer:**
 
 ```bash
-curl https://api.netbird.io/api/peers/{peerId}/jobs \
+curl https://api.openzro.io/api/peers/{peerId}/jobs \
   -H "Authorization: Token <PAT>"
 ```
 
 **Get a specific job:**
 
 ```bash
-curl https://api.netbird.io/api/peers/{peerId}/jobs/{jobId} \
+curl https://api.openzro.io/api/peers/{peerId}/jobs/{jobId} \
   -H "Authorization: Token <PAT>"
 ```
 
@@ -138,6 +138,6 @@ curl https://api.netbird.io/api/peers/{peerId}/jobs/{jobId} \
 
 - The target peer must be **online and connected** to the management server
 - Only **one pending job** per peer at a time
-- Peers must be running **NetBird v0.64.0 or later**
+- Peers must be running **openZro v0.64.0 or later**
 - Jobs time out after **5 minutes** if the peer does not respond
 - Upload keys for debug bundles expire after 30 days

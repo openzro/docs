@@ -1,11 +1,11 @@
 import {Note, Warning} from "@/components/mdx"
 
 export const description =
-    'Configure SSO, password, PIN, and header authentication methods, plus IP and country access restrictions, for NetBird Reverse Proxy services.'
+    'Configure SSO, password, PIN, and header authentication methods, plus IP and country access restrictions, for openZro Reverse Proxy services.'
 
 # Reverse Proxy Authentication and Access Restrictions
 
-NetBird Reverse Proxy supports multiple authentication methods and connection-level access restrictions to control who can access your exposed services. You can enable one or more methods on each service, or leave a service completely public. Authentication and access restrictions are configured per service in the **Authentication** tab when creating or editing a service.
+openZro Reverse Proxy supports multiple authentication methods and connection-level access restrictions to control who can access your exposed services. You can enable one or more methods on each service, or leave a service completely public. Authentication and access restrictions are configured per service in the **Authentication** tab when creating or editing a service.
 
 <p>
     <img src="/docs-static/img/manage/reverse-proxy/authentication/reverse-proxy-add-service-auth.png" alt="Authentication tab showing all available authentication methods" className="imagewrapper"/>
@@ -13,7 +13,7 @@ NetBird Reverse Proxy supports multiple authentication methods and connection-le
 
 ## Authentication methods
 
-NetBird offers four authentication methods, each suited to different access patterns. You can enable any combination of them on a single service.
+openZro offers four authentication methods, each suited to different access patterns. You can enable any combination of them on a single service.
 
 <Note>
     SSO, password, PIN, and header authentication all require HTTP (Layer 7) and are only available for HTTP services. For L4 services (TCP, UDP, TLS), use [access restrictions](#access-restrictions) to control access.
@@ -80,7 +80,7 @@ PIN code authentication works similarly to password authentication but is limite
 
 Header authentication validates a static header value on each request. This is designed for programmatic or machine-to-machine access where clients can include a custom HTTP header with their requests. The proxy checks the header before forwarding the request to your backend and strips the header so that authentication credentials are not leaked to the backend.
 
-NetBird supports three header presets to simplify configuration:
+openZro supports three header presets to simplify configuration:
 
 | Preset | Header | Value format | Example value |
 |--------|--------|-------------|---------------|
@@ -323,7 +323,7 @@ Authenticated sessions for reverse proxy services are managed using JWT (JSON We
 - [Reverse Proxy Overview](/manage/reverse-proxy) - learn how the reverse proxy feature works and create your first service
 - [Custom Domains](/manage/reverse-proxy/custom-domains) - configure your own domain names for reverse proxy services
 - [Access Logs](/manage/reverse-proxy/access-logs) - monitor and audit traffic to your reverse proxy services
-- [Single Sign-On](/manage/team/single-sign-on) - configure your identity provider for SSO across NetBird
+- [Single Sign-On](/manage/team/single-sign-on) - configure your identity provider for SSO across openZro
 - [Provision Users and Groups](/manage/team/idp-sync) - sync users and groups from your identity provider
 - [Geolocation Database](/selfhosted/geo-support) - configure MaxMind GeoLite2 for country-based access restrictions (self-hosted)
 - [CrowdSec Setup](/selfhosted/maintenance/crowdsec) - enable CrowdSec IP reputation on a self-hosted proxy

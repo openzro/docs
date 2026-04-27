@@ -9,8 +9,8 @@ import {
 } from 'react'
 
 const ANNOUNCEMENTS_URL =
-  'https://raw.githubusercontent.com/netbirdio/dashboard/main/announcements.json'
-const STORAGE_KEY = 'netbird-announcements'
+  'https://raw.githubusercontent.com/openzro/dashboard/main/announcements.json'
+const STORAGE_KEY = 'openzro-announcements'
 const CACHE_DURATION_MS = 30 * 60 * 1000
 const BANNER_HEIGHT = 33
 

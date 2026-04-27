@@ -6,22 +6,22 @@ import {Note} from "../../../components/mdx";
     <img src="/docs-static/img/selfhosted/identity-providers/idp-main.png" alt="Identity Providers List" className="imagewrapper-big"/>
 </p>
 
-NetBird's self-hosted implementation uses the OpenID Connect (OIDC) protocol for authentication, an industry-standard
+openZro's self-hosted implementation uses the OpenID Connect (OIDC) protocol for authentication, an industry-standard
 identity layer built on top of OAuth 2.0. OIDC is used both for user authentication to access the Management Service
 Dashboard and for user device authorization when accessing internal resources.
 
 <Note> 
-While we maintain a list of 'supported' (tested) IdPs, **any OIDC provider should work with NetBird's 'OIDC (Generic)' connector**.
+While we maintain a list of 'supported' (tested) IdPs, **any OIDC provider should work with openZro's 'OIDC (Generic)' connector**.
 </Note>
 
-## How Authentication Works in NetBird
+## How Authentication Works in openZro
 
-When a user attempts to access the NetBird dashboard from a web browser or an internal resource from their device,
+When a user attempts to access the openZro dashboard from a web browser or an internal resource from their device,
 authentication is handled by the configured identity provider. Upon successful authentication, the identity provider
 issues a [JSON Web Token (JWT)](https://en.wikipedia.org/wiki/JSON_Web_Token) containing the user's identity and claims. The Management Service validates this token to
 verify the user's identity and grant access.
 
-By default, NetBird does not require an external identity provider. New installations include a built-in authentication
+By default, openZro does not require an external identity provider. New installations include a built-in authentication
 system that lets you create and manage users directly through the Dashboard using local username and password authentication.
 External identity providers are entirely optional. Add them when you need SSO integration with Google, Microsoft, Okta, or
 self-hosted identity providers like Keycloak or Authentik, and more.
@@ -33,11 +33,11 @@ authentication.
 
 ## External Identity Providers
 
-NetBird supports connecting **multiple external identity providers** [alongside local user management](/selfhosted/identity-providers/local).
+openZro supports connecting **multiple external identity providers** [alongside local user management](/selfhosted/identity-providers/local).
 This allows users to sign in with their existing accounts from services like Google, Microsoft and your corporate or self-hosted identity
 provider, while still maintaining the option for local username/password authentication.
 
-NetBird supports any OIDC-compliant identity providers. Here are some popular providers and their setup instructions:
+openZro supports any OIDC-compliant identity providers. Here are some popular providers and their setup instructions:
 
 | Provider | Type | Best For |
 |----------|------|----------|
@@ -52,7 +52,7 @@ NetBird supports any OIDC-compliant identity providers. Here are some popular pr
 | [**Duo SSO**](/selfhosted/identity-providers/managed/duo) | `oidc` | Provides secure one-login access with MFA |
 
 <Note>
-    Any identity provider that supports OpenID Connect can be integrated with NetBird. If your provider isn't listed above,
+    Any identity provider that supports OpenID Connect can be integrated with openZro. If your provider isn't listed above,
     use the generic OIDC configuration.
 </Note>
 
@@ -64,7 +64,7 @@ NetBird supports any OIDC-compliant identity providers. Here are some popular pr
     <img src="/docs-static/img/selfhosted/identity-providers/idp-list.png" alt="Identity Providers List" className="imagewrapper-big"/>
 </p>
 
-1. Log in to your NetBird Dashboard
+1. Log in to your openZro Dashboard
 2. Navigate to **Settings** → **Identity Providers**
 3. Click **Add Identity Provider**
 4. Select your provider type from the dropdown
@@ -78,7 +78,7 @@ NetBird supports any OIDC-compliant identity providers. Here are some popular pr
 
 <Note>
     Make sure you are creating a confidential OIDC client in your identity provider. The secret will be stored privately in
-    your NetBird installation and will never be exposed to the public.
+    your openZro installation and will never be exposed to the public.
 </Note>
 
 <Note>
@@ -92,7 +92,7 @@ NetBird supports any OIDC-compliant identity providers. Here are some popular pr
 #### Via API
 
 ```bash
-curl -X POST "https://netbird.example.com/api/identity-providers" \
+curl -X POST "https://openzro.example.com/api/identity-providers" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -110,11 +110,11 @@ For instance setup endpoints, see [Accounts API](/api/resources/accounts). For u
 
 ```bash
 # List configured identity providers
-curl "https://netbird.example.com/api/identity-providers" \
+curl "https://openzro.example.com/api/identity-providers" \
   -H "Authorization: Bearer ${TOKEN}"
 
 # Update an identity provider
-curl -X PUT "https://netbird.example.com/api/identity-providers/{id}" \
+curl -X PUT "https://openzro.example.com/api/identity-providers/{id}" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -122,7 +122,7 @@ curl -X PUT "https://netbird.example.com/api/identity-providers/{id}" \
   }'
 
 # Delete an identity providers
-curl -X DELETE "https://netbird.example.com/api/identity-providers/{id}" \
+curl -X DELETE "https://openzro.example.com/api/identity-providers/{id}" \
   -H "Authorization: Bearer ${TOKEN}"
 ```
 
@@ -130,8 +130,8 @@ curl -X DELETE "https://netbird.example.com/api/identity-providers/{id}" \
 
 1. User clicks the provider button on the login page
 2. User is redirected to the identity provider to authenticate
-3. After successful authentication, user is redirected back to NetBird
-4. NetBird validates the token and creates/updates the user account
+3. After successful authentication, user is redirected back to openZro
+4. openZro validates the token and creates/updates the user account
 5. User is logged in and can access the Dashboard
 
 Users who authenticate via an external identity provider appear in your Users list with a badge showing their identity provider.
@@ -159,15 +159,15 @@ This allows you to support different authentication methods for different user g
 
 #### JWT Group Sync 
 
-If you've connected an external IdP, NetBird can optionally fetch a user's groups via JWT claim. These groups automatically obtain representations within NetBird and will be applied to the corresponding NetBird user. To enable JWT group sync, 
+If you've connected an external IdP, openZro can optionally fetch a user's groups via JWT claim. These groups automatically obtain representations within openZro and will be applied to the corresponding openZro user. To enable JWT group sync, 
 navigate to Settings > Groups and toggle 'Enable JWT group sync'. 
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/jwt-group-sync.png" alt="JWT Group Sync Settings" className="imagewrapper"/>
 </p>
 
-Specify the JWT claim to be used as the user's groups list (normally 'groups'). You can optionally specify a 'JWT allow groups' - this group will need to exist in your chosen claim for the user in order for that user to be granted access to NetBird. 
-Your IdP may require specific configuration in order to pass a groups claim to NetBird. For detailed per-IdP implementation steps, see below. If your IdP isn't on the list, refer to the project's documentation. 
+Specify the JWT claim to be used as the user's groups list (normally 'groups'). You can optionally specify a 'JWT allow groups' - this group will need to exist in your chosen claim for the user in order for that user to be granted access to openZro. 
+Your IdP may require specific configuration in order to pass a groups claim to openZro. For detailed per-IdP implementation steps, see below. If your IdP isn't on the list, refer to the project's documentation. 
 
 - [Google](/selfhosted/identity-providers/managed/google-workspace#configuring-jwt-groups-claim)
 - [Microsoft Entra ID](/selfhosted/identity-providers/managed/microsoft-entra-id#configuring-jwt-groups-claim)
@@ -179,11 +179,11 @@ Your IdP may require specific configuration in order to pass a groups claim to N
 - [Keycloak](/selfhosted/identity-providers/keycloak#configuring-jwt-groups-claim)
 
 <Note> 
-Groups with matching names in NetBird and your IdP will **not** sync. To import a group from your IdP, first delete the existing group with that name in NetBird.
+Groups with matching names in openZro and your IdP will **not** sync. To import a group from your IdP, first delete the existing group with that name in openZro.
 </Note>
 
 #### SCIM 
-NetBird supports provisioning users and groups through SCIM. However, this functionality is not available in the open source Community Edition. It is offered only in the cloud-managed version of NetBird or through a [Commercial License](https://netbird.io/pricing#on-prem) for enterprise self-hosted deployments.
+openZro supports provisioning users and groups through SCIM. However, this functionality is not available in the open source Community Edition. It is offered only in the cloud-managed version of openZro or through a [Commercial License](https://openzro.io/pricing#on-prem) for enterprise self-hosted deployments.
 
 ### Best Practices
 
@@ -202,7 +202,7 @@ NetBird supports provisioning users and groups through SCIM. However, this funct
 
 #### "Invalid redirect URI" error
 
-- Copy the exact Redirect URL from NetBird after creating the provider
+- Copy the exact Redirect URL from openZro after creating the provider
 - Ensure no trailing slashes or typos
 - Some providers are case-sensitive
 
@@ -222,7 +222,7 @@ For provider-specific troubleshooting, see the individual provider pages.
 
 ## Migration Guide and Backwards Compatibility
 
-If you have an existing NetBird deployment using a standalone IdP (like Zitadel from the previous quickstart), you have several options:
+If you have an existing openZro deployment using a standalone IdP (like Zitadel from the previous quickstart), you have several options:
 
 1. **Keep using your standalone IdP** - No changes required, your setup continues to work
 2. **Add your IdP as an external provider** - Keep your IdP but add it as an OIDC provider alongside local users.
@@ -230,5 +230,5 @@ This option requires a migration as user IDs have a different format. See below.
 
 <Note>
     We are working on a migration tool to automate the process of switching from standalone IdPs to external providers.
-    Please contact us at [](mailto:support@netbird.io) if you are interested in this feature.
+    Please contact us at [](mailto:support@openzro.io) if you are interested in this feature.
 </Note>

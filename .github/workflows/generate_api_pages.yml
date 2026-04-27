@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Netbird release tag version'
+        description: 'openZro release tag version'
         required: true
         default: "refs/tags/vX.Y.Z"
         type: string
@@ -27,7 +27,7 @@ jobs:
         run: mkdir -p generator/openapi
 
       - name: Download openapi.yml
-        run: curl -L -o generator/openapi/openapi.yml "https://raw.githubusercontent.com/netbirdio/netbird/v${{ steps.semver_parser.outputs.fullversion }}/shared/management/http/api/openapi.yml"
+        run: curl -L -o generator/openapi/openapi.yml "https://raw.githubusercontent.com/openzro/openzro/v${{ steps.semver_parser.outputs.fullversion }}/shared/management/http/api/openapi.yml"
 
       - name: Install Go
         uses: actions/setup-go@v6
@@ -46,7 +46,7 @@ jobs:
       - name: Npm install
         run: npm install
 
-      - name: Generate api pages for netbird main openapi definition
+      - name: Generate api pages for openzro main openapi definition
         run: npx ts-node generator/index.ts gen --input generator/openapi/expanded.yml --output src/pages/ipa/resources
 
       - name: Check git diff and untracked files
@@ -61,8 +61,8 @@ jobs:
       - name: Commit and push changes
         if: steps.git_diff.outputs.changed == 'true'
         run: |
-          git config --global user.email "dev@netbird.io"
-          git config --global user.name "netbirddev"
+          git config --global user.email "dev@openzro.io"
+          git config --global user.name "openzrodev"
 
           git add -A
           git commit -m "Update API pages with v${{ steps.semver_parser.outputs.fullversion }}"

@@ -1,6 +1,6 @@
 # Accessing restricted domain resources
 
-This guide shows how to access restricted websites or services using NetBird [Networks](/manage/networks) with [domain resources](/manage/networks#resources). Domain resources are useful when the target service is behind a load balancer with frequently changing IP addresses.
+This guide shows how to access restricted websites or services using openZro [Networks](/manage/networks) with [domain resources](/manage/networks#resources). Domain resources are useful when the target service is behind a load balancer with frequently changing IP addresses.
 
 ## Example scenario
 
@@ -13,12 +13,12 @@ The company wants to implement zero-trust access with role-based permissions:
 ### Prerequisites
 
 Before starting, ensure you have:
-- [NetBird clients](/get-started) installed on finance and support team devices
+- [openZro clients](/get-started) installed on finance and support team devices
 - [Routing peers](/manage/networks#routing-peers) configured in the AWS VPC using [setup keys](/manage/peers/access-infrastructure/setup-keys-add-servers-to-network)
 
 ## Create a network
 
-1. Navigate to `Networks` > `Networks` in the NetBird dashboard
+1. Navigate to `Networks` > `Networks` in the openZro dashboard
 2. Click `Add Network`
 3. Enter a name (e.g., `AWS EU Network`) and optional description
 4. Click `Add Network`
@@ -116,10 +116,10 @@ The completed network shows both resources with their access policies:
 
 ![AWS EU Network](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-restricted-domain-resources/13-restricted-domain.png)
 
-Use the NetBird CLI to verify access. From a finance team workstation:
+Use the openZro CLI to verify access. From a finance team workstation:
 
 ```bash
-$ netbird networks list
+$ openzro networks list
 Available Networks:
 
   - ID: Accounting restricted subdomain
@@ -136,7 +136,7 @@ Available Networks:
 From a support team workstation:
 
 ```bash
-$ netbird networks list
+$ openzro networks list
 Available Networks:
 
   - ID: Internal Web Services

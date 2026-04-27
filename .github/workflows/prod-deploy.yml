@@ -14,32 +14,32 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  SERVER: sites.netbird.selfhosted
+  SERVER: sites.openzro.selfhosted
   CONNECT_HOSTNAME: cicd-docs-prod
-  CONNECT_MANAGEMENT_URL: https://netbird.npeer.io
+  CONNECT_MANAGEMENT_URL: https://openzro.npeer.io
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Netbird Connect
-        id: netbird
-        uses: Alemiz112/netbird-connect@v1
+      - name: openZro Connect
+        id: openzro
+        uses: Alemiz112/openzro-connect@v1
         with:
           setup-key: ${{ secrets.NB_SETUP_KEY_PROD }}
           hostname: ${{ env.CONNECT_HOSTNAME }}
           management-url: ${{ env.CONNECT_MANAGEMENT_URL }}
 
-      - name: print netbird logs
-        run: sudo cat /var/log/netbird/client.log
+      - name: print openzro logs
+        run: sudo cat /var/log/openzro/client.log
 
-      - name: Wait for Netbird to connect to dashboard
+      - name: Wait for openZro to connect to dashboard
         shell: bash
         timeout-minutes: 1
         run: |
           while [ -z "$(ping -c 1 ${{ env.SERVER }} | grep '64 bytes from')" ]; do
-          echo "Waiting for Netbird to connect..."
-          netbird status --filter-by-names ${{ env.SERVER }}
+          echo "Waiting for openZro to connect..."
+          openzro status --filter-by-names ${{ env.SERVER }}
           sleep 1
           done
 
@@ -74,7 +74,7 @@ jobs:
 
       - name: run docker compose up
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        run: drone-ssh -H ${{ env.SERVER }} -u root -i ssh_key -s "cd /opt/app; docker compose up -d --pull always docs.netbird.io.1; docker system prune -a -f"
+        run: drone-ssh -H ${{ env.SERVER }} -u root -i ssh_key -s "cd /opt/app; docker compose up -d --pull always docs.openzro.io.1; docker system prune -a -f"
 
       - run: |
           echo '### Deployed tag' >> $GITHUB_STEP_SUMMARY

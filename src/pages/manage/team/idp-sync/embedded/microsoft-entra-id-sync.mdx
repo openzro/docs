@@ -5,7 +5,7 @@ formerly known as Azure Active Directory (Azure AD), is a cloud-based identity a
 organizations with secure authentication, single sign-on, and user management capabilities. In the context of network security,
 it can be effectively used to control network access based on organizational structure, such as groups and individual user accounts.
 
-NetBird's Microsoft Entra ID integration allows you to synchronize users and groups from Entra ID to NetBird.
+openZro's Microsoft Entra ID integration allows you to synchronize users and groups from Entra ID to openZro.
 You can then use these synchronized groups to configure your network, create network access policies, and automate
 onboarding and offboarding processes.
 
@@ -16,7 +16,7 @@ import {Note} from "@/components/mdx";
     If not, refer to the [Identity Providers](/selfhosted/identity-providers/managed/microsoft-entra-id) documentation to set it up.
 </Note>
 
-## Get Started with NetBird-Entra ID Integration
+## Get Started with openZro-Entra ID Integration
 
 Navigate to `Integrations` in the left menu to access the `Identity Provider` integration. Click the `Entra ID (Azure AD)` button.
 
@@ -26,9 +26,9 @@ Select your **Microsoft Entra ID** identity provider connector for this integrat
     <img src="/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/select-idp.png" alt="select-identity-provider" className="imagewrapper-big"/>
 </p>
 
-This will open a pop-up window featuring a user-friendly wizard, guiding you through the synchronization process between NetBird and Azure AD.
+This will open a pop-up window featuring a user-friendly wizard, guiding you through the synchronization process between openZro and Azure AD.
 
-![NetBird Get Started IdP](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/FkdC8BV.png)
+![openZro Get Started IdP](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/FkdC8BV.png)
 
 ## Prerequisites
 
@@ -48,11 +48,11 @@ To check your permissions:
 
 ![EntraID Roles](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/lDyaAeV.png)
 
-If you don't have the required permissions, contact your Azure AD administrator to grant you the appropriate role before proceeding with the NetBird integration.
+If you don't have the required permissions, contact your Azure AD administrator to grant you the appropriate role before proceeding with the openZro integration.
 
-## Create and Configure a Microsoft Entra ID Application for NetBird Integration
+## Create and Configure a Microsoft Entra ID Application for openZro Integration
 
-Now that you have the required permissions, return to the NetBird dashboard. Click on the `Get Started` button to initiate the integration process.
+Now that you have the required permissions, return to the openZro dashboard. Click on the `Get Started` button to initiate the integration process.
 
 A new wizard screen will appear, offering step-by-step instructions for creating and configuring your Microsoft Entra ID application. To simplify the process, the wizard also provides quick-copy buttons for essential information:
 
@@ -61,7 +61,7 @@ A new wizard screen will appear, offering step-by-step instructions for creating
 * Redirect Type
 * Redirect URI
 
-![NetBird Create Application](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/oI0Pjai.png)
+![openZro Create Application](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/oI0Pjai.png)
 
 For convenience, click on [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview) (step 1). That will open the Azure dashboard. Navigate to `App registrations` in the left menu and then click `+New registration` as indicated below:
 
@@ -79,11 +79,11 @@ Upon successful registration, you'll be redirected to a confirmation screen simi
 
 Copy and securely store the generated `Application (client) ID` and `Directory (tenant) ID` as you will need them shortly.
 
-## Configure API Permissions for NetBird-Entra ID Integration
+## Configure API Permissions for openZro-Entra ID Integration
 
-On the NetBird dashboard click the `Continue →` button. A new wizard screen will appear, this time, offering step-by-step instructions for setting up API permissions.
+On the openZro dashboard click the `Continue →` button. A new wizard screen will appear, this time, offering step-by-step instructions for setting up API permissions.
 
-![NetBird Add API Permissions](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/0A98Xm9.png)
+![openZro Add API Permissions](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/0A98Xm9.png)
 
 Back to Azure, in the `App registrations` screen, click on `Manage` in the left menu to expand it and then click on `API permissions`:
 
@@ -97,7 +97,7 @@ A new pop-up window will appear, asking you to select an API. Click on `Microsof
 
 ![EntraID Microsoft Graph](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/tP7WqXO.png)
 
-On the next screen, click on the `Application permissions` button, which will let you select the appropriate permissions for NetBird to function correctly with your Microsoft Entra ID environment.
+On the next screen, click on the `Application permissions` button, which will let you select the appropriate permissions for openZro to function correctly with your Microsoft Entra ID environment.
 
 ![EntraID Request API Permissions](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/zSkSGAm.png)
 
@@ -109,7 +109,7 @@ To assign user permissions:
 
 ![EntraID UserReadAll](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/KHGbhqe.png)
 
-The `User.Read.All` permission allows NetBird to read the full set of profile properties, group memberships, and reports of the signed-in user and other users in your organization.
+The `User.Read.All` permission allows openZro to read the full set of profile properties, group memberships, and reports of the signed-in user and other users in your organization.
 
 Next, repeat the procedure. This time, search for `Group.Read.All` and click on the checkbox to enable it as shown below:
 
@@ -127,11 +127,11 @@ Once finished, the status of the permissions should change to `Granted for [Your
 
 ![EntraID API Permissions Granted](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/bHb8HVZ.png)
 
-## Create a Client Secret for Secure NetBird-Entra ID Authentication
+## Create a Client Secret for Secure openZro-Entra ID Authentication
 
-Back to the NetBird dashboard, click the `Continue →` button. A new wizard screen will appear, showing instructions for generating a client secret in Entra ID.
+Back to the openZro dashboard, click the `Continue →` button. A new wizard screen will appear, showing instructions for generating a client secret in Entra ID.
 
-![NetBird Generate Client Secret](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/xvLskEg.png)
+![openZro Generate Client Secret](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/xvLskEg.png)
 
 On Azure, click on the `Certificates & secrets` button in the left menu to open the management page. Click on `+New client secret` as shown below. Choose an expiration time that suits your security needs and click the `Add` button.
 
@@ -141,24 +141,24 @@ A new client secret will be generated and displayed on the screen. Copy and secu
 
 ![EntraID Client Secret Value](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/LimVmGI.png)
 
-## Enter Application ID and Directory ID in NetBird
+## Enter Application ID and Directory ID in openZro
 
-Paste the secret `Value` from the previous step into NetBird and click the `Continue →` button. A new wizard screen will appear, asking for the `Application (client) ID` and the `Directory (tenant) ID` credentials generated previously.
+Paste the secret `Value` from the previous step into openZro and click the `Continue →` button. A new wizard screen will appear, asking for the `Application (client) ID` and the `Directory (tenant) ID` credentials generated previously.
 
 Paste the values and click the `Continue →` button.
 
-![NetBird Application ID and Directory](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/6yiGCtY.png)
+![openZro Application ID and Directory](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/6yiGCtY.png)
 
 ## Choose Groups to Synchronize from Entra ID
-At this stage, NetBird is set to synchronize all groups from your Microsoft Entra ID by default. You have two options:
+At this stage, openZro is set to synchronize all groups from your Microsoft Entra ID by default. You have two options:
 
 * If you want to synchronize all groups, simply click the `Continue →` button.
 * To synchronize only specific groups, click the `+ Add group filter` button, which will open a new panel where you can set criteria to include or exclude groups.
 
-![NetBird Group Sync](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/xyLPzxH.png)
+![openZro Group Sync](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/xyLPzxH.png)
 
 ## Choose Users to Synchronize from Entra ID
-After configuring group synchronization, you'll now set up user synchronization. Similar than before, NetBird is configured to synchronize all users from your Microsoft Entra ID by default.
+After configuring group synchronization, you'll now set up user synchronization. Similar than before, openZro is configured to synchronize all users from your Microsoft Entra ID by default.
 
 * If you want to synchronize all users, you don't need to take any action, simply click the `Continue →` button.
 * To synchronize only specific users, click the `+ Add user filter` button. This opens a new panel where you can set criteria to include or exclude users.
@@ -167,7 +167,7 @@ After configuring group synchronization, you'll now set up user synchronization.
     You can modify these synchronization settings later if necessary.
 </Note>
 
-![NetBird Users Sync](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/bpwW1Bn.png)
+![openZro Users Sync](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/bpwW1Bn.png)
 
 After configuring user and group synchronization, the setup wizard will finalize the process and you'll automatically return to the main Identity Provider screen.
 
@@ -178,22 +178,22 @@ On this screen, you'll see two key indicators of successful integration:
 
 These indicators confirm that:
 
-* The integration between NetBird and Microsoft Entra ID is active.
+* The integration between openZro and Microsoft Entra ID is active.
 * The initial synchronization has been completed successfully.
-* NetBird will now automatically sync with your Microsoft Entra ID at regular intervals.
+* openZro will now automatically sync with your Microsoft Entra ID at regular intervals.
 
 <Note>
     You can manually trigger a sync or adjust settings by clicking on the Microsoft Entra ID section in the Identity Provider screen
 </Note>
 
-![NetBird Identity Provider Synchronized](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/DH5hxFK.png)
+![openZro Identity Provider Synchronized](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/DH5hxFK.png)
 
 ## Verify the Integration
 
 To verify the synchronization, navigate to `Teams > Users` in the left menu.
-You should see all the users and groups from your Microsoft Entra ID environment listed in the NetBird dashboard.
+You should see all the users and groups from your Microsoft Entra ID environment listed in the openZro dashboard.
 
-![NetBird Checking Integration](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/qlNlfgV.png)
+![openZro Checking Integration](/docs-static/img/manage/team/idp-sync/microsoft-entra-id-sync/qlNlfgV.png)
 
 You can now proceed to configure [access control policies](/manage/access-control/manage-network-access#creating-policies) using the synchronized groups to allow or deny access to the
 synchronized users.

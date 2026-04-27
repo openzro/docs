@@ -15,7 +15,7 @@ server:
     dsn: "host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
 ```
 
-You can also pass the DSN as an `NB_` environment variable on the `netbird-server` container in your `docker-compose.yml`:
+You can also pass the DSN as an `NB_` environment variable on the `openzro-server` container in your `docker-compose.yml`:
 
 ```yaml
 environment:
@@ -24,8 +24,8 @@ environment:
 
 Restart the server and confirm:
 ```bash
-docker compose restart netbird-server
-docker compose logs netbird-server
+docker compose restart openzro-server
+docker compose logs openzro-server
 ```
 You should see:
 ```
@@ -33,7 +33,7 @@ INFO management/server/store.go:109: using Postgres store engine
 ```
 
 <Note>
-For a full list of available configuration options, see the [config.yaml.example](https://github.com/netbirdio/netbird/blob/main/combined/config.yaml.example) reference file.
+For a full list of available configuration options, see the [config.yaml.example](https://github.com/openzro/openzro/blob/main/combined/config.yaml.example) reference file.
 </Note>
 
 ### Older multi-container setup (management.json)
@@ -77,18 +77,18 @@ This migration process allows users to seamlessly transition between storage opt
     The following commands assume you use the latest docker version with the compose plugin. If you have docker-compose installed as a standalone, please use docker-compose as a command.
 </Note>
 
-1. Backup your data store (`store.db` in `datadir` - default `/var/lib/netbird/`)
+1. Backup your data store (`store.db` in `datadir` - default `/var/lib/openzro/`)
 
 For the combined setup:
 ```bash
 mkdir backup
-docker compose cp -a netbird-server:/var/lib/netbird/. backup/
+docker compose cp -a openzro-server:/var/lib/openzro/. backup/
 ```
 
 For the older multi-container setup:
 ```bash
 mkdir backup
-docker compose cp -a management:/var/lib/netbird/. backup/
+docker compose cp -a management:/var/lib/openzro/. backup/
 ```
 
 2. Import SQLite data to Postgres
@@ -103,7 +103,7 @@ pgloader --type sqlite backup/store.db "postgresql://<PG_USER>:<PG_PASSWORD>@<PG
 3. Resolve any compatibility issues that may arise due to the migration process.
 
 <Note>
-As of version 0.26.0, NetBird used SQLite as its default database store. However, SQLite lacked support for cascading deletions,
+As of version 0.26.0, openZro used SQLite as its default database store. However, SQLite lacked support for cascading deletions,
 which means that related entries were not automatically removed when their parent entries were deleted.
  With the migration to PostgreSQL, foreign key constraints are enforced, including cascading deletes, to ensure referential integrity.
 </Note>
@@ -148,8 +148,8 @@ And pass the DSN via environment variable as described in the [older multi-conta
 
 For the combined setup:
 ```bash
-docker compose restart netbird-server
-docker compose logs netbird-server
+docker compose restart openzro-server
+docker compose logs openzro-server
 ```
 
 For the older multi-container setup:
@@ -170,12 +170,12 @@ To rollback to the SQLite store, follow these steps:
 
 For the combined setup:
 ```bash
-docker compose cp backup/. netbird-server:/var/lib/netbird/
+docker compose cp backup/. openzro-server:/var/lib/openzro/
 ```
 
 For the older multi-container setup:
 ```bash
-docker compose cp backup/. management:/var/lib/netbird/
+docker compose cp backup/. management:/var/lib/openzro/
 ```
 
 2. Switch the store engine back to SQLite.
@@ -198,8 +198,8 @@ For the older multi-container setup, update `management.json`:
 
 For the combined setup:
 ```bash
-docker compose restart netbird-server
-docker compose logs netbird-server
+docker compose restart openzro-server
+docker compose logs openzro-server
 ```
 
 For the older multi-container setup:
@@ -215,7 +215,7 @@ INFO management/server/store.go:109: using SQLite file store engine
 
 ## Optional Rollback Postgres data to SQLite
 
-This is optional and should be used only if you want to rollback the data from Postgres to SQLite while running the same NetBird version.
+This is optional and should be used only if you want to rollback the data from Postgres to SQLite while running the same openZro version.
 For migrating the Postgres data, we rely on the `pg_dump`, `sed`, and `sqlite3` tools. Make sure these are installed before proceeding
 
 1. Export Postgres data
@@ -251,12 +251,12 @@ sqlite3 store.db '.read schema.sql' && sqlite3 store.db '.read data.sql'
 
 For the combined setup:
 ```bash
-docker compose cp store.db netbird-server:/var/lib/netbird/store.db
+docker compose cp store.db openzro-server:/var/lib/openzro/store.db
 ```
 
 For the older multi-container setup:
 ```bash
-docker compose cp store.db management:/var/lib/netbird/store.db
+docker compose cp store.db management:/var/lib/openzro/store.db
 ```
 
 6. Switch the store engine back to SQLite using the instructions in the [Rollback to SQLite store](#rollback-to-sqlite-store) section above.

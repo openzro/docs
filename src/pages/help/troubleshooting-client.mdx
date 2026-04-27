@@ -3,21 +3,21 @@
 This document offers practical tips and insights to help you debug various problems, ensuring a seamless user
 experience.
 
-## NetBird agent status
+## openZro agent status
 
-The netbird agent is a daemon service that runs in the background; it provides information about peers connected and
-about the NetBird control services. You can check the status of the agent with the following command:
+The openzro agent is a daemon service that runs in the background; it provides information about peers connected and
+about the openZro control services. You can check the status of the agent with the following command:
 
 ```shell
-netbird status --detail
+openzro status --detail
 ````
 
 This will output the following information:
 
 ```shell
 Peers detail:
- server-a.netbird.cloud:
-  NetBird IP: 100.75.232.118/32
+ server-a.openzro.cloud:
+  openZro IP: 100.75.232.118/32
   Public key: kndklnsakldvnsld+XeRF4CLr/lcNF+DSdkd/t0nZHDqmE=
   Status: Connected
   -- detail --
@@ -32,8 +32,8 @@ Peers detail:
   Routes: 10.0.0.0/24
   Latency: 37.503682ms
 
- server-b.netbird.cloud:
-  NetBird IP: 100.75.226.48/32
+ server-b.openzro.cloud:
+  openZro IP: 100.75.226.48/32
   Public key: Mi6jtrK5Tokndklnsakldvnsld+XeRF4CLr/lcNF+DSdkd=
   Status: Connected
   -- detail --
@@ -51,22 +51,22 @@ Peers detail:
 OS: darwin/amd64
 Daemon version: 0.27.4
 CLI version: 0.27.4
-Management: Connected to https://api.netbird.io:443
-Signal: Connected to https://signal.netbird.io:443
+Management: Connected to https://api.openzro.io:443
+Signal: Connected to https://signal.openzro.io:443
 Relays:
-  [stun:turn.netbird.io:5555] is Available
-  [turns:turn.netbird.io:443?transport=tcp] is Available
+  [stun:turn.openzro.io:5555] is Available
+  [turns:turn.openzro.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-FQDN: maycons-mbp-2.netbird.cloud
-NetBird IP: 100.75.143.239/16
+FQDN: maycons-mbp-2.openzro.cloud
+openZro IP: 100.75.143.239/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
 Peers count: 2/2 Connected
 ```
 
-As you can see, the output shows the peers connected, the NetBird IP address, the public key, the connection status, and
+As you can see, the output shows the peers connected, the openZro IP address, the public key, the connection status, and
 the connection type. The status will also report if there is an issue connecting to the relay servers,
 the management server, or the signal server.
 
@@ -88,11 +88,11 @@ See more details about the status command [here](/get-started/cli#status).
 
 ## Getting client logs
 
-By default, client logs are located in the `/var/log/netbird/client.log` file on macOS and Linux and in the
-`C:\ProgramData\netbird\client.log` file on Windows.
+By default, client logs are located in the `/var/log/openzro/client.log` file on macOS and Linux and in the
+`C:\ProgramData\openzro\client.log` file on Windows.
 
 You can analyze the logs to identify the root cause of the problem. If you need help, open
-a [github issue](https://github.com/netbirdio/netbird/issues/new/choose) and attach the logs.
+a [github issue](https://github.com/openzro/openzro/issues/new/choose) and attach the logs.
 
 ### Debug bundle
 
@@ -105,11 +105,11 @@ names. In case you have tunneling issues, omitting the `--anonymize` flag might 
 Adding the `--system-info (-S)` flag will add system information like network routes and interfaces
 
 ```shell
-netbird debug bundle --anonymize --system-info
+openzro debug bundle --anonymize --system-info
 ```
 
 This will output the path of the generated file. The output file is owned by and can only be accessed by the user
-NetBird is running as, by default it is: `Administrator` on Windows, `root` on MacOS/Linux or the operating system\'s
+openZro is running as, by default it is: `Administrator` on Windows, `root` on MacOS/Linux or the operating system\'s
 equivalent.
 
 ### Debug for a specific time
@@ -118,50 +118,50 @@ To capture logs for a specific time period, you can use the `debug for` command.
 the specified time has elapsed.
 
 ```shell
-netbird debug for 5m --system-info
+openzro debug for 5m --system-info
 ```
 
 <Note>
-  The flag `--anonymize (-A)` can be used to anonymize IP addresses and non-netbird.io domains in logs and status output when needed.
+  The flag `--anonymize (-A)` can be used to anonymize IP addresses and non-openzro.io domains in logs and status output when needed.
 </Note>
 
 To capture any issues arising during the `up` and `down` processes, this will set the log level to `TRACE` and bring
-netbird `up` and `down` up to a few times.
-After 5 minutes the netbird status will be restored to the previous state and the debug bundle will be generated.
+openzro `up` and `down` up to a few times.
+After 5 minutes the openzro status will be restored to the previous state and the debug bundle will be generated.
 
 ### Debug bundle uploads
 
-Since version `0.43.1`, you can share debug bundle with the NetBird development team without local administrative
+Since version `0.43.1`, you can share debug bundle with the openZro development team without local administrative
 privileges
 by using the `--upload-bundle (-U)` flag.
-It will securely generate and upload the debug bundle to our servers for access by the NetBird development team. See
+It will securely generate and upload the debug bundle to our servers for access by the openZro development team. See
 examples below:
 
 Run debug for a specific time and upload the bundle:
 
 ```shell
-netbird debug for 1m --system-info --upload-bundle
+openzro debug for 1m --system-info --upload-bundle
 ```
 
 To generate a bundle without restarting the client and then uploading:
 
 ```shell
-netbird debug bundle --system-info --upload-bundle
+openzro debug bundle --system-info --upload-bundle
 ```
 
 This will output an `Upload file key`, which is effectively a random filename in our internal storage system
 and can be safely shared with us through public channels such as GitHub Issues or Slack.
 
 ```shell
-netbird debug bundle --system-info --upload-bundle
+openzro debug bundle --system-info --upload-bundle
 Local file:     
-/tmp/netbird.debug.2611377582.zip
+/tmp/openzro.debug.2611377582.zip
 Upload file key:
 1234567890ab27fb37c88b3b4be7011e22aa2e5ca6f38ffa9c4481884941f726/12345678-90ab-cdef-1234-567890abcdef
 ```
 
 <Note>
-  The flag `--anonymize` can be used to anonymize IP addresses and non-netbird.io domains in logs and status output when needed.
+  The flag `--anonymize` can be used to anonymize IP addresses and non-openzro.io domains in logs and status output when needed.
 </Note>
 ### Debug bundle uploads with GUI
 Since version `0.43.2` users can upload their debug bundle via the GUI client.
@@ -173,7 +173,7 @@ the wizard to upload the bundle:
     <img src="/docs-static/img/help/troubleshooting-client/ui-settings.png" alt="service-user-overview" className="imagewrapper-big"/>
 </p>
 <Note>
-  If needed, you can update the upload URL and select to anonymize sensitive information like IP addresses and non-netbird.io domains in logs and status output.
+  If needed, you can update the upload URL and select to anonymize sensitive information like IP addresses and non-openzro.io domains in logs and status output.
 </Note>
 <p>
     <img src="/docs-static/img/help/troubleshooting-client/ui-bundle-wizard.png" alt="service-user-overview" className="imagewrapper-big"/>
@@ -185,7 +185,7 @@ issue that recovers when restarting the client.
 <p>
     <img src="/docs-static/img/help/troubleshooting-client/ui-bundle-success.png" alt="service-user-overview" className="imagewrapper-big"/>
 </p>
-Once the bundle generation is complete, you can click on `Copy Key` to get the uploaded key and share with NetBird\'s team.
+Once the bundle generation is complete, you can click on `Copy Key` to get the uploaded key and share with openZro\'s team.
 
 ### Remote debug bundle generation
 
@@ -211,7 +211,7 @@ See the [Peers API documentation](/ipa/resources/peers#create-peer-debug-bundle-
 
 #### Using the Dashboard
 
-You can trigger remote debug bundles directly from the NetBird Dashboard without requiring CLI access.
+You can trigger remote debug bundles directly from the openZro Dashboard without requiring CLI access.
 
 **To generate a remote debug bundle:**
 
@@ -231,7 +231,7 @@ Once triggered, the job appears in the **Remote Jobs** section on the peer detai
 - **Type**: The job type (Debug Bundle)
 - **Status**: Pending (yellow), Completed (green), or Failed (red)
 - **Created/Updated**: Timestamps for job lifecycle
-- **Output**: Once completed, displays the upload key that you can copy and share with NetBird support
+- **Output**: Once completed, displays the upload key that you can copy and share with openZro support
 
 The upload key is automatically copyable by clicking on it. Share this key through GitHub Issues, Slack, or support channels.
 
@@ -239,7 +239,7 @@ The upload key is automatically copyable by clicking on it. Share this key throu
 
 - The peer must be online and connected to the management server to receive the job
 - Debug bundle generation may take a few seconds to a few minutes depending on log size and system information
-- Bundles are automatically uploaded to NetBird's secure storage (or your configured upload endpoint for self-hosted deployments)
+- Bundles are automatically uploaded to openZro's secure storage (or your configured upload endpoint for self-hosted deployments)
 - Upload keys expire after 30 days for security
 
 ### Tracing firewall rules
@@ -247,7 +247,7 @@ The upload key is automatically copyable by clicking on it. Share this key throu
 If a connection is being blocked and you suspect a policy issue, the `debug trace` command lets you simulate a packet through the firewall rules without sending real traffic. See the [CLI reference](/get-started/cli#debug-trace) for full usage and examples.
 
 ```shell
-netbird debug trace in 100.64.1.1 self -p tcp --dport 80
+openzro debug trace in 100.64.1.1 self -p tcp --dport 80
 ```
 
 <Note>
@@ -263,18 +263,18 @@ The client has environment variables for tuning routing, firewall behavior, ICE 
 Logs can be temporarily set using the following command.
 
 ```shell
-netbird debug log level debug
+openzro debug log level debug
 ```
 
 or
 
 ```shell
-netbird debug log level trace
+openzro debug log level trace
 ```
 
 The next time the daemon is restarted, the log level will return to the configured level.
 
-Using `netbird down` and `netbird up` will not reset the log level.
+Using `openzro down` and `openzro up` will not reset the log level.
 
 To permanently set the log level, see the following sections.
 
@@ -284,22 +284,22 @@ To permanently set the log level, see the following sections.
 
 ### On Linux with systemd
 
-The default systemd unit file reads a set of environment variables from the path `/etc/sysconfig/netbird`.
+The default systemd unit file reads a set of environment variables from the path `/etc/sysconfig/openzro`.
 You can add the following line to the file to enable debug logs:
 
 ```shell
 sudo mkdir -p /etc/sysconfig
-echo 'NB_LOG_LEVEL=debug' | sudo tee -a /etc/sysconfig/netbird
-sudo systemctl restart netbird
+echo 'NB_LOG_LEVEL=debug' | sudo tee -a /etc/sysconfig/openzro
+sudo systemctl restart openzro
 ```
 
 ### On Other Linux and MacOS
 
 ```shell
-sudo netbird service stop
-sudo netbird service uninstall
-sudo netbird service install --log-level debug # or trace
-sudo netbird service start
+sudo openzro service stop
+sudo openzro service uninstall
+sudo openzro service install --log-level debug # or trace
+sudo openzro service start
 ```
 
 ### On Windows
@@ -308,7 +308,7 @@ You need to run the following commands with an elevated PowerShell or `cmd.exe` 
 
 ```powershell
 [Environment]::SetEnvironmentVariable("NB_LOG_LEVEL", "debug", "Machine")
-netbird service restart
+openzro service restart
 ```
 
 ### On Docker
@@ -317,7 +317,7 @@ You can set the environment variable `NB_LOG_LEVEL` to `debug` to enable debug l
 
 ```shell
 docker run --rm --name PEER_NAME --hostname PEER_NAME --cap-add=NET_ADMIN --cap-add=SYS_ADMIN --cap-add=SYS_RESOURCE -d \
--e NB_SETUP_KEY=<SETUP KEY> -e NB_LOG_LEVEL=debug -v netbird-client:/var/lib/netbird netbirdio/netbird:latest
+-e NB_SETUP_KEY=<SETUP KEY> -e NB_LOG_LEVEL=debug -v openzro-client:/var/lib/openzro openzro/openzro:latest
 ```
 
 ### On Android
@@ -340,8 +340,8 @@ agent.
 ### Linux and MacOS
 
 ```shell
-sudo netbird service stop
-sudo netbird up -F
+sudo openzro service stop
+sudo openzro up -F
 ```
 
 ### Windows
@@ -353,8 +353,8 @@ called [PSExec](https://learn.microsoft.com/en-us/sysinternals/downloads/psexec)
 Once you have downloaded and extracted `psexec` open an elevated Powershell window:
 
 ```shell
-netbird service stop
-.\PsExec64.exe -s cmd.exe /c "netbird up -F --log-level debug > c:\windows\temp\netbird.out.log 2>&1"
+openzro service stop
+.\PsExec64.exe -s cmd.exe /c "openzro up -F --log-level debug > c:\windows\temp\openzro.out.log 2>&1"
 ```
 
 In case you need to configure environment variables, you need to add them as system variables so they get picked up by
@@ -366,30 +366,30 @@ the agent on the next psexec run:
 
 ## Enabling WireGuard in user space
 
-Sometimes, you want to test NetBird running on userspace mode instead of a kernel module. That can be a check to see if
-there is a problem with NetBird's firewall management in kernel mode.
+Sometimes, you want to test openZro running on userspace mode instead of a kernel module. That can be a check to see if
+there is a problem with openZro's firewall management in kernel mode.
 
 You must run the agent in foreground mode and set the environment variable `NB_WG_KERNEL_DISABLED` to `true`.
 
 ```shell
-sudo netbird service stop
-sudo bash -c 'NB_WG_KERNEL_DISABLED=true netbird up -F'  > /tmp/netbird.log
+sudo openzro service stop
+sudo bash -c 'NB_WG_KERNEL_DISABLED=true openzro up -F'  > /tmp/openzro.log
 ```
 
 ## Debugging GRPC
 
-The NetBird agent communicates with the Management and Signal servers using the GRPC framework. With these parameters,
+The openZro agent communicates with the Management and Signal servers using the GRPC framework. With these parameters,
 you can
 set verbose logging for this service.
 
 ```shell
-sudo netbird service stop
-sudo bash -c 'GRPC_GO_LOG_VERBOSITY_LEVEL=99 GRPC_GO_LOG_SEVERITY_LEVEL=info netbird up -F' > /tmp/netbird.log
+sudo openzro service stop
+sudo bash -c 'GRPC_GO_LOG_VERBOSITY_LEVEL=99 GRPC_GO_LOG_SEVERITY_LEVEL=info openzro up -F' > /tmp/openzro.log
 ```
 
 ## Debugging ICE connections
 
-The Netbird agent communicates with other peers through the Interactive Connectivity Establishment (ICE) protocol
+The openZro agent communicates with other peers through the Interactive Connectivity Establishment (ICE) protocol
 described in the [RFC 8445](https://datatracker.ietf.org/doc/html/rfc8445). To debug the connection procedure,
 set verbose logging for the the [Pion/ICE](https://github.com/pion/ice) library with the `PIONS_LOG_DEBUG` or
 `PIONS_LOG_TRACE` variable.
@@ -400,47 +400,47 @@ NB_LOG_LEVEL=debug
 ```
 
 ```shell
-sudo netbird service stop
-sudo bash -c 'PIONS_LOG_DEBUG=all NB_LOG_LEVEL=debug netbird up -F' > /tmp/netbird.log
+sudo openzro service stop
+sudo bash -c 'PIONS_LOG_DEBUG=all NB_LOG_LEVEL=debug openzro up -F' > /tmp/openzro.log
 ```
 
 ## Host-based firewall issues
 
-NetBird automatically adds firewall rules on all platforms to allow traffic on the NetBird interface (`wt0`). 
+openZro automatically adds firewall rules on all platforms to allow traffic on the openZro interface (`wt0`). 
 However, conflicts can occur with other firewall management tools or security software.
 
 ### Symptoms
 
-- Peers show as "Connected" in `netbird status` but cannot ping or reach each other
+- Peers show as "Connected" in `openzro status` but cannot ping or reach each other
 - Connection works on some machines but not others with the same network configuration
 - Connection works after disabling the host firewall but fails when re-enabled
 - P2P connections work but routed traffic does not
 
 ### Understanding the issue
 
-NetBird manages firewall rules directly via iptables/nftables (Linux/macOS) or Windows Firewall APIs. 
+openZro manages firewall rules directly via iptables/nftables (Linux/macOS) or Windows Firewall APIs. 
 When another tool also manages firewall rules, conflicts can occur:
 
 | Tool | Conflict Type |
 |------|---------------|
-| UFW (Linux) | Chain ordering - UFW may evaluate its deny rules before NetBird's allow rules |
-| firewalld (Linux) | Zone conflicts - NetBird interface may be in wrong zone |
-| Windows Group Policy | Policy may override or remove NetBird's firewall rule |
+| UFW (Linux) | Chain ordering - UFW may evaluate its deny rules before openZro's allow rules |
+| firewalld (Linux) | Zone conflicts - openZro interface may be in wrong zone |
+| Windows Group Policy | Policy may override or remove openZro's firewall rule |
 | Third-party security software | May block traffic independently of OS firewall |
 
 ### UFW (Linux)
 
 UFW is a frontend for iptables commonly used on Ubuntu. Its default policy denies all incoming traffic, 
-which can block NetBird traffic before it reaches NetBird's iptables rules.
+which can block openZro traffic before it reaches openZro's iptables rules.
 
 **Check UFW status**:
 ```bash
 sudo ufw status verbose
 ```
 
-If UFW is active with a default deny incoming policy, add a rule for the NetBird interface:
+If UFW is active with a default deny incoming policy, add a rule for the openZro interface:
 
-**Allow NetBird interface**:
+**Allow openZro interface**:
 ```bash
 sudo ufw allow in on wt0
 ```
@@ -455,7 +455,7 @@ Expected output:
 Anywhere on wt0             ALLOW       Anywhere
 Anywhere (v6) on wt0        ALLOW       Anywhere (v6)
 ```
-**Alternative - Allow specific NetBird subnet**:
+**Alternative - Allow specific openZro subnet**:
 
 If you prefer a more restrictive rule:
 ```bash
@@ -479,22 +479,22 @@ sudo firewall-cmd --reload
 
 ### Windows Firewall
 
-NetBird creates a Windows Firewall rule automatically that allows traffic on the NetBird IP address 
+openZro creates a Windows Firewall rule automatically that allows traffic on the openZro IP address 
 (the `wt0` interface). This covers traffic after WireGuard decryption.
 
-**Check if the NetBird rule exists**:
+**Check if the openZro rule exists**:
 ```powershell
-Get-NetFirewallRule | Where-Object { $_.DisplayName -like "*NetBird*" } | Format-List DisplayName, Enabled, Direction, Action
+Get-NetFirewallRule | Where-Object { $_.DisplayName -like "*openZro*" } | Format-List DisplayName, Enabled, Direction, Action
 ```
 
 **Check if the rule is being applied**:
 ```powershell
-Get-NetFirewallRule | Where-Object { $_.DisplayName -like "*NetBird*" } | Get-NetFirewallAddressFilter
+Get-NetFirewallRule | Where-Object { $_.DisplayName -like "*openZro*" } | Get-NetFirewallAddressFilter
 ```
 
 **Manually create the rule if missing**:
 ```powershell
-New-NetFirewallRule -DisplayName "NetBird" -Direction Inbound -InterfaceAlias "wt0" -Action Allow
+New-NetFirewallRule -DisplayName "openZro" -Direction Inbound -InterfaceAlias "wt0" -Action Allow
 ```
 
 **Check for Group Policy overrides**:
@@ -515,22 +515,22 @@ masquerading), Windows Firewall may block incoming WireGuard P2P traffic because
 
 1. There is no NAT state tracking the "connection"
 2. Windows Firewall sees the incoming UDP packets as unsolicited inbound traffic
-3. The default NetBird rule only covers traffic on the `wt0` interface (after decryption), not the raw 
+3. The default openZro rule only covers traffic on the `wt0` interface (after decryption), not the raw 
    WireGuard packets arriving on the physical interface
 
 **Symptoms**:
 - P2P works when one peer is behind NAT but fails when both peers are on the same flat network
-- `netbird status -d` shows connection type as "Relayed" instead of "P2P" for local peers
+- `openzro status -d` shows connection type as "Relayed" instead of "P2P" for local peers
 - P2P works after disabling Windows Firewall
 
-**Solution**: Add a firewall rule to allow inbound UDP for WireGuard P2P traffic, scoped to the NetBird process:
+**Solution**: Add a firewall rule to allow inbound UDP for WireGuard P2P traffic, scoped to the openZro process:
 ```powershell
-New-NetFirewallRule -DisplayName "NetBird P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\Netbird\netbird.exe"
+New-NetFirewallRule -DisplayName "openZro P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\openZro\openzro.exe"
 ```
 
 This rule:
 - Allows inbound UDP on the ephemeral port range (used for WireGuard)
-- Is scoped to only the NetBird process for security
+- Is scoped to only the openZro process for security
 - Does not expose any other services
 
 **Note**: This is only needed in environments without NAT between peers. If your peers connect through 
@@ -544,7 +544,7 @@ a specific process like Windows can. A broader rule would be required:
 sudo ufw allow in proto udp to any port 49152:65535
 ```
 
-Consider whether this is acceptable for your security posture, or use NetBird's relay fallback instead.
+Consider whether this is acceptable for your security posture, or use openZro's relay fallback instead.
 
 ### Third-party security software
 
@@ -557,22 +557,22 @@ of the OS firewall. Common culprits include:
 - ESET
 - CrowdStrike Falcon
 
-If you suspect third-party software is blocking NetBird:
+If you suspect third-party software is blocking openZro:
 
 1. Temporarily disable the third-party firewall component (not the entire product)
-2. Test NetBird connectivity
-3. If it works, add an exception for the NetBird process or the `wt0` interface
+2. Test openZro connectivity
+3. If it works, add an exception for the openZro process or the `wt0` interface
 
-The NetBird process locations:
-- **Windows**: `C:\Program Files\NetBird\netbird.exe`
-- **Linux**: `/usr/bin/netbird`
-- **macOS**: `/usr/local/bin/netbird`
+The openZro process locations:
+- **Windows**: `C:\Program Files\openZro\openzro.exe`
+- **Linux**: `/usr/bin/openzro`
+- **macOS**: `/usr/local/bin/openzro`
 
 ### Collecting firewall diagnostics
 
 When reporting firewall-related issues, include a debug bundle with system information:
 ```bash
-netbird debug bundle --system-info
+openzro debug bundle --system-info
 ```
 
 The `--system-info` flag captures:
@@ -595,7 +595,7 @@ sudo ufw status verbose
 **Additional diagnostics for Windows** (run as Administrator):
 ```powershell
 # All firewall rules for wt0
-Get-NetFirewallRule | Where-Object { $_.DisplayName -like "*NetBird*" -or $_.DisplayName -like "*wt0*" }
+Get-NetFirewallRule | Where-Object { $_.DisplayName -like "*openZro*" -or $_.DisplayName -like "*wt0*" }
 
 # Firewall profile status
 Get-NetFirewallProfile
@@ -607,16 +607,16 @@ Get-NetFirewallProfile
 |----------|---------------|-------------|
 | UFW (Linux) | `sudo ufw status` | `sudo ufw allow in on wt0` |
 | firewalld (Linux) | `sudo firewall-cmd --get-zone-of-interface=wt0` | `sudo firewall-cmd --permanent --zone=trusted --add-interface=wt0 && sudo firewall-cmd --reload` |
-| Windows | `Get-NetFirewallRule \| Where-Object { $_.DisplayName -like "*NetBird*" }` | Check Group Policy or third-party software |
-| Windows (no NAT) | P2P shows as Relayed for local peers | `New-NetFirewallRule -DisplayName "NetBird P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\Netbird\netbird.exe"` |
+| Windows | `Get-NetFirewallRule \| Where-Object { $_.DisplayName -like "*openZro*" }` | Check Group Policy or third-party software |
+| Windows (no NAT) | P2P shows as Relayed for local peers | `New-NetFirewallRule -DisplayName "openZro P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\openZro\openzro.exe"` |
 
 ## Client login failures
 
-A single machine can only connect to one NetBird account as the same user/login method throughout the lifetime of
+A single machine can only connect to one openZro account as the same user/login method throughout the lifetime of
 the `config.json` file:
 
-- `/var/lib/netbird/default.json` for Linux/MacOS
-- `C:\ProgramData\netbird\default.json` for Windows
+- `/var/lib/openzro/default.json` for Linux/MacOS
+- `C:\ProgramData\openzro\default.json` for Windows
 
 You might get errors like below when trying to use Setup Key/different SSO user account during login:
 
@@ -644,15 +644,15 @@ If you know the exact previous Peer which was logged in, you can just delete it 
 else and attempt login again.
 
 Otherwise, to resolve the issue, you will need to remove the file manually to use the machine as a different user/Setup
-Key while the NetBird client daemon is stopped:
+Key while the openZro client daemon is stopped:
 
-1. `netbird service stop`
-2. `sudo rm /var/lib/netbird/default.json` (*nix) or `rm C:\ProgramData\netbird\config.json` (Windows)
-3. `netbird service start`
+1. `openzro service stop`
+2. `sudo rm /var/lib/openzro/default.json` (*nix) or `rm C:\ProgramData\openzro\config.json` (Windows)
+3. `openzro service start`
 
 ## Debugging access to network resources
 
-In this section we will be presenting methodology of troubleshooting access issues involving Netbird.
+In this section we will be presenting methodology of troubleshooting access issues involving openZro.
 
 We will start by presenting a glossary of all machines and services involved.
 A sub-section will describe a specific use case.
@@ -661,7 +661,7 @@ guides.
 
 ### Glossary
 
-We will be using the following names for resources outside the Netbird network:
+We will be using the following names for resources outside the openZro network:
 
 - `int-net1`: an internal network `10.123.45.0/24`,
 - `srv-c`: an internal HTTP server running at `10.123.45.17`,
@@ -669,20 +669,20 @@ We will be using the following names for resources outside the Netbird network:
 - `int-dns2`: an internal DNS server nunning at `10.7.8.9`,
 - `cf-dns`: an Internet-accessible CloudFlare DNS server at `1.1.1.1` and `1.0.0.1`,
 
-and following Netbird network resources:
+and following openZro network resources:
 
-- `peer-a`: end user's device running Netbird Client,
-- `peer-b`: a linux server inside the internal network running Netbird Client,
+- `peer-a`: end user's device running openZro Client,
+- `peer-b`: a linux server inside the internal network running openZro Client,
   - it has direct access to the whole `int-net1` IP range,
-- `users:employees`: a Netbird Group containing `peer-a`,
-- `routers:int-net1`: a Netbird Group containing `peer-b`,
-- `access:srv-c`: a Netbird Groups used as a target of ACL rules for `srv-c` only,
-- `access:int-net1`: a Netbird Groups used as a target of ACL rules for the whole subnet,
-- `net-a`: a Netbird Network
+- `users:employees`: a openZro Group containing `peer-a`,
+- `routers:int-net1`: a openZro Group containing `peer-b`,
+- `access:srv-c`: a openZro Groups used as a target of ACL rules for `srv-c` only,
+- `access:int-net1`: a openZro Groups used as a target of ACL rules for the whole subnet,
+- `net-a`: a openZro Network
   - `net-a:srv-c`: a Network Resource handling traffic to `10.123.45.17/32` (`srv-c`),
   - `net-a:int-net1`: a Network Resource handling traffic to `10.123.45.0/24` (`int-net1`),
-- `route:int-net1`: a Netbird Network Route handling traffic to `10.123.45.0/24` (`int-net1`),
-- `route:srv-c`: a Netbird Network Route handling traffic to `10.123.45.17/32` (`srv-c`),
+- `route:int-net1`: a openZro Network Route handling traffic to `10.123.45.0/24` (`int-net1`),
+- `route:srv-c`: a openZro Network Route handling traffic to `10.123.45.17/32` (`srv-c`),
 
 ### Access from `peer-a` to `srv-c`
 
@@ -690,8 +690,8 @@ In short:
 
 1. Does `peer-b` have direct access to `srv-c`'s port `80`?
 2. Can a routing peer `peer-b` forward traffic to `srv-c`?
-3. Are Netbird's network routing resources configured?
-4. Do Netbird's Access Control rules allow access from `peer-a` to the target's ACL Group?
+3. Are openZro's network routing resources configured?
+4. Do openZro's Access Control rules allow access from `peer-a` to the target's ACL Group?
 5. Is `peer-a`'s operating system configured to use the route?
 
 Access Control rule is not required for connectivity from `peer-a` to `peer-b`
@@ -724,7 +724,7 @@ Linux operating system:
 net.ipv4.ip_forward = 1
 ```
 
-It should be set up automatically by the Netbird client unless it runs inside a container (which would not be able
+It should be set up automatically by the openZro client unless it runs inside a container (which would not be able
 to modify `sysctl`), then it requires manual setup.
 
 For setting up the value persistently (across reboots) please consult your operating system's documentation.
@@ -736,9 +736,9 @@ Testing the functionality in practice involves:
 - adding a routing table entry to route `int-net1` (`10.123.45.0/24`) traffic through it,
 - trying to at least `ping 10.123.45.17` (`srv-c`)
 
-#### Are Netbird's network routing resources configured?
+#### Are openZro's network routing resources configured?
 
-For Netbird network routing resources configurations you can use either (new) _Networks_ or (old) _Network Routes_.
+For openZro network routing resources configurations you can use either (new) _Networks_ or (old) _Network Routes_.
 
 A Network `net-a` should have at minimum:
 
@@ -759,7 +759,7 @@ You can loosen the rules and replace following to grant access to the whole `int
 - _Address_: `10.123.45.17/32` -> `10.123.45.0/24`,
 - _Assigned Groups_ / _Access Control Groups_: `access:srv-c` -> `access:int-net1`
 
-#### Do Netbird's Access Control rules allow access from `peer-a` to the target's ACL Group?
+#### Do openZro's Access Control rules allow access from `peer-a` to the target's ACL Group?
 
 You can skip this check, when you are using (old) Network Route feature without filling in _Access Control Groups (
 optional)_ section.
@@ -772,9 +772,9 @@ Otherwise, there should be an _Access Control Policy_ present allowing traffic f
 You can confirm the _Policy_ is working by:
 
 1. logging in to `peer-a`,
-2. issuing `netbird status -d` command,
-3. finding `peer-b.netbird.cloud` under `Peers detail`,
-4. finding `10.123.45.0/24` or `10.123.45.17/32` under `peer-b.netbird.cloud`'s _Networks_ field,
+2. issuing `openzro status -d` command,
+3. finding `peer-b.openzro.cloud` under `Peers detail`,
+4. finding `10.123.45.0/24` or `10.123.45.17/32` under `peer-b.openzro.cloud`'s _Networks_ field,
 
 In the most specific setup it should have at:
 
@@ -796,15 +796,15 @@ Just like with the previous section you can loosen the above example by:
 
 #### Is `peer-a`'s operating system configured to use the route?
 
-After all resources are configured in the Netbird management you should check whether they are
+After all resources are configured in the openZro management you should check whether they are
 properly registered with your operating system.
 
-You can start by checking Netbird client's configuration with `netbird status -d` command:
+You can start by checking openZro client's configuration with `openzro status -d` command:
 
 ```shell
-% netbird status -d                                                                                                                    
+% openzro status -d                                                                                                                    
 Peers detail:
- brys-vm-nbt-ubuntu-isolated-01.netbird.cloud:
+ brys-vm-nbt-ubuntu-isolated-01.openzro.cloud:
 ...
   Status: Connected
   -- detail --
@@ -822,10 +822,10 @@ You should be primarily looking for _Networks_ section under each _Peers detail_
 - _Peer_'s _Connection type_: it can be either `P2P` (direct) or `Relayed` (over the Internet),
 - _Peers count_ near the end of the output,
 
-If it's missing you can search for clues with `netbird networks ls` command:
+If it's missing you can search for clues with `openzro networks ls` command:
 
 ```shell
-% netbird networks ls
+% openzro networks ls
 Available Networks:
 ...
   - ID: net-a:int-net1
@@ -834,8 +834,8 @@ Available Networks:
 ...
 ```
 
-The _Status_ could be `Not Selected`, which you can fix with `netbird networks select <ID>` or
-`netbird networks select all`
+The _Status_ could be `Not Selected`, which you can fix with `openzro networks select <ID>` or
+`openzro networks select all`
 
 ##### Verifying routing configuration on the Windows operating system
 
@@ -894,7 +894,7 @@ your specific subnet's clamped IP ranges (`10.123.45` in case of `int-net1`) and
 Depending on specifics of your Linux distribution (or even your configuration of it) you should be able to use either
 `iproute2` or `net-tools` family of network commands.
 
-Netbird client stores it's custom routes in the routing table `7120` (or `0x1BD0`) when it's available (through
+openZro client stores it's custom routes in the routing table `7120` (or `0x1BD0`) when it's available (through
 `iproute2` interface).
 
 For `iproute2`  (`ip`, `ss` tools):

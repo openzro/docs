@@ -37,10 +37,10 @@ export function CookieConsent() {
           to enhance your experience, analyze our traffic, and for security and
           marketing. View our{' '}
           <a
-            href="https://netbird.io/privacy"
+            href="https://openzro.io/privacy"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-white underline underline-offset-4 transition-colors hover:text-netbird"
+            className="text-white underline underline-offset-4 transition-colors hover:text-openzro"
           >
             Privacy Policy
           </a>{' '}
@@ -51,7 +51,7 @@ export function CookieConsent() {
           <button
             type="button"
             onClick={declineCookies}
-            className="cursor-pointer text-xs text-white/70 underline underline-offset-[6px] transition-colors duration-300 hover:text-netbird"
+            className="cursor-pointer text-xs text-white/70 underline underline-offset-[6px] transition-colors duration-300 hover:text-openzro"
           >
             Required only cookies
           </button>
@@ -59,7 +59,7 @@ export function CookieConsent() {
           <button
             type="button"
             onClick={acceptCookies}
-            className="rounded-md bg-netbird px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-netbird/90"
+            className="rounded-md bg-openzro px-5 py-2.5 text-sm font-medium text-black transition-colors hover:bg-openzro/90"
           >
             Accept all cookies
           </button>

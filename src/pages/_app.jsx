@@ -36,7 +36,7 @@ function AppInner({ Component, pageProps }) {
       <Head>
         <style>{dom.css()}</style>
         {router.route.startsWith('/ipa') ?
-            <title>{`${pageProps.title} - NetBird API`}</title> : <title>{`${pageProps.title} - NetBird Docs`}</title>
+            <title>{`${pageProps.title} - openZro API`}</title> : <title>{`${pageProps.title} - openZro Docs`}</title>
         }
         <meta name="description" content={pageProps.description} />
       </Head>

@@ -2,13 +2,13 @@ import {Note} from "@/components/mdx";
 
 # Linux Installation
 
-The NetBird client (agent) allows a peer to join a pre-existing NetBird deployment. If a NetBird deployment is not yet available, there are both managed and [self-hosted](https://docs.netbird.io/selfhosted/selfhosted-quickstart) options available.
+The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
 
 
 ## Linux Install Script
 
 ```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
 ```
 
 ### Ubuntu/Debian (APT)
@@ -17,8 +17,8 @@ curl -fsSL https://pkgs.netbird.io/install.sh | sh
  ```bash
  sudo apt-get update
  sudo apt-get install ca-certificates curl gnupg -y
- curl -sSL https://pkgs.netbird.io/debian/public.key | sudo gpg --dearmor --output /usr/share/keyrings/netbird-archive-keyring.gpg
- echo 'deb [signed-by=/usr/share/keyrings/netbird-archive-keyring.gpg] https://pkgs.netbird.io/debian stable main' | sudo tee /etc/apt/sources.list.d/netbird.list
+ curl -sSL https://pkgs.openzro.io/debian/public.key | sudo gpg --dearmor --output /usr/share/keyrings/openzro-archive-keyring.gpg
+ echo 'deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkgs.openzro.io/debian stable main' | sudo tee /etc/apt/sources.list.d/openzro.list
 ```
 2. Update APT's cache
 
@@ -29,60 +29,60 @@ curl -fsSL https://pkgs.netbird.io/install.sh | sh
 
 ```bash
  # for CLI only
- sudo apt-get install netbird
+ sudo apt-get install openzro
  # for GUI package
- sudo apt-get install netbird-ui
+ sudo apt-get install openzro-ui
 ```
 
 ### RHEL/Amazon Linux 2 (RPM)
 
 1. Add the repository:
 ```bash
-sudo tee /etc/yum.repos.d/netbird.repo <<EOF
-[netbird]
-name=netbird
-baseurl=https://pkgs.netbird.io/yum/
+sudo tee /etc/yum.repos.d/openzro.repo <<EOF
+[openzro]
+name=openzro
+baseurl=https://pkgs.openzro.io/yum/
 enabled=1
 gpgcheck=1
-gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
+gpgkey=https://pkgs.openzro.io/yum/repodata/repomd.xml.key
 repo_gpgcheck=1
 EOF
 ```
 2. Install the package
 ```bash
  # for CLI only
- sudo yum install netbird
+ sudo yum install openzro
  # for GUI package
- sudo yum install libappindicator-gtk3 libappindicator netbird-ui
+ sudo yum install libappindicator-gtk3 libappindicator openzro-ui
 ```
 
 ### Fedora/Amazon Linux 2023 (DNF)
 
 1. Create the repository file:
 ```bash
-sudo tee /etc/yum.repos.d/netbird.repo <<EOF
-[netbird]
-name=netbird
-baseurl=https://pkgs.netbird.io/yum/
+sudo tee /etc/yum.repos.d/openzro.repo <<EOF
+[openzro]
+name=openzro
+baseurl=https://pkgs.openzro.io/yum/
 enabled=1
 gpgcheck=1
-gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
+gpgkey=https://pkgs.openzro.io/yum/repodata/repomd.xml.key
 repo_gpgcheck=1
 EOF
 ```
 2. Import the file
 ```bash
 #Fedora 40 or earlier/Amazon Linux 2023** (DNF 4)
- sudo dnf config-manager --add-repo /etc/yum.repos.d/netbird.repo
+ sudo dnf config-manager --add-repo /etc/yum.repos.d/openzro.repo
 #Fedora 41 or later (DNF 5)
- sudo dnf config-manager addrepo --from-repofile=/etc/yum.repos.d/netbird.repo
+ sudo dnf config-manager addrepo --from-repofile=/etc/yum.repos.d/openzro.repo
 ```
 3. Install the package
 ```bash
  # for CLI only
- sudo dnf install netbird
+ sudo dnf install openzro
  # for GUI package
- sudo dnf install libappindicator-gtk3 libappindicator netbird-ui
+ sudo dnf install libappindicator-gtk3 libappindicator openzro-ui
 ```
 On some recent releases, the default behaviour for `libappindicator` was changed, so we need to install `gnome-shell-extension-appindicator` and enable it:
 ```
@@ -96,13 +96,13 @@ Under X11, you may need to restart GNOME Shell (Alt+F2, r, ⏎) after that. Unde
 
 1. Create the repository file:
 ```bash
-sudo tee /etc/yum.repos.d/netbird.repo <<EOF
-[netbird]
-name=netbird
-baseurl=https://pkgs.netbird.io/yum/
+sudo tee /etc/yum.repos.d/openzro.repo <<EOF
+[openzro]
+name=openzro
+baseurl=https://pkgs.openzro.io/yum/
 enabled=1
 gpgcheck=1
-gpgkey=https://pkgs.netbird.io/yum/repodata/repomd.xml.key
+gpgkey=https://pkgs.openzro.io/yum/repodata/repomd.xml.key
 repo_gpgcheck=1
 EOF
 ```
@@ -110,51 +110,51 @@ EOF
 3. Install the package
 ```bash
  # for CLI only
- rpm-ostree install netbird
+ rpm-ostree install openzro
  # for GUI package
- rpm-ostree install netbird-ui
+ rpm-ostree install openzro-ui
  # Don't forget to reboot to apply
 ```
 4. Start the service
 ```bash
-systemctl enable --now netbird
+systemctl enable --now openzro
 ```
 
 
 ### Fedora Universal Blue / SteamOS (DistroBox)
 1. Create a distrobox container
 ```bash
-distrobox create netbird --init --image debian:12 -a "--cap-add=NET_ADMIN" --additional-packages systemd --root
+distrobox create openzro --init --image debian:12 -a "--cap-add=NET_ADMIN" --additional-packages systemd --root
 ```
 2. Install inside the container
 ```bash
-distrobox enter --root netbird
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
+distrobox enter --root openzro
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
 ```
 3. Export the distrobird binary to the host
 ```bash
 #from inside the container
-distrobox-export -b /usr/bin/netbird
+distrobox-export -b /usr/bin/openzro
 ```
 
 ### openSUSE (zypper)
 
 1. Add the repository:
 ```
-sudo zypper addrepo https://pkgs.netbird.io/yum/ netbird
+sudo zypper addrepo https://pkgs.openzro.io/yum/ openzro
 ```
 2. Install the package / GPG key
 
 * Key Fingerprint: `AA9C 09AA 9DEA 2F58 112B 40DF DFFE AB2F D267 A61F`
 * Key ID: `DFFEAB2FD267A61F`
-* Email: `dev@netbird.io`
+* Email: `dev@openzro.io`
 ```
 # MicroOS (immutable OS with selinux)
-transactional-update pkg in netbird
+transactional-update pkg in openzro
 reboot
 
 # Tumbleweed / Leap
-zypper in netbird
+zypper in openzro
 ```
 
 ### NixOS 22.11+/unstable
@@ -164,8 +164,8 @@ zypper in netbird
 ```nix
  { config, pkgs, ... }:
  {
-   services.netbird.enable = true; # for netbird service & CLI
-   environment.systemPackages = [ pkgs.netbird-ui ]; # for GUI
+   services.openzro.enable = true; # for openzro service & CLI
+   environment.systemPackages = [ pkgs.openzro-ui ]; # for GUI
  }
 ```
 2. Build and apply new configuration
@@ -177,10 +177,10 @@ zypper in netbird
 ### Binary Install
 **Installation from binary (CLI only)**
 
-1. Checkout NetBird [releases](https://github.com/netbirdio/netbird/releases/latest)
+1. Checkout openZro [releases](https://github.com/openzro/openzro/releases/latest)
 2. Download the latest release:
 ```bash
-  curl -L -o ./netbird_<VERSION>.tar.gz https://github.com/netbirdio/netbird/releases/download/v<VERSION>/netbird_<VERSION>_<OS>_<Arch>.tar.gz
+  curl -L -o ./openzro_<VERSION>.tar.gz https://github.com/openzro/openzro/releases/download/v<VERSION>/openzro_<VERSION>_<OS>_<Arch>.tar.gz
 ```
 
 <Note>
@@ -195,10 +195,10 @@ zypper in netbird
 
 3. Decompress
 ```bash
-  tar xzf ./netbird_<VERSION>.tar.gz
-  sudo mv netbird /usr/bin/netbird
-  sudo chown root:root /usr/bin/netbird
-  sudo chmod +x /usr/bin/netbird
+  tar xzf ./openzro_<VERSION>.tar.gz
+  sudo mv openzro /usr/bin/openzro
+  sudo chown root:root /usr/bin/openzro
+  sudo chmod +x /usr/bin/openzro
 ```
 After that you may need to add /usr/bin in your PATH environment variable:
 ````bash
@@ -206,69 +206,69 @@ After that you may need to add /usr/bin in your PATH environment variable:
 ````
 4. Install and run the service
 ```bash
-  sudo netbird service install
-  sudo netbird service start
+  sudo openzro service install
+  sudo openzro service start
 ```
 
 ## Updating
 
-If your NetBird client was installed through a package manager, use that to update.
+If your openZro client was installed through a package manager, use that to update.
 If you used the one-command script to install, you can follow this to update:
 
 ```bash
-netbird down
-curl -fsSLO https://pkgs.netbird.io/install.sh
+openzro down
+curl -fsSLO https://pkgs.openzro.io/install.sh
 chmod +x install.sh
 ./install.sh --update
-netbird up
+openzro up
 ```
 
 
-## Running NetBird with SSO Login
+## Running openZro with SSO Login
 ### Desktop UI Application
 If you installed the Desktop UI client, you can launch it and click on Connect.
 > It will open your browser, and you will be prompt for email and password. Follow the instructions.
 
 <p>
-    <img src="/docs-static/img/get-started/netbird-sso-login-ui.gif" alt="high-level-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/get-started/openzro-sso-login-ui.gif" alt="high-level-dia" className="imagewrapper-big"/>
 </p>
 
 ### CLI
 Alternatively, you could use command line. Simply run
    ```bash
-  netbird up
+  openzro up
    ```
 > It will open your browser, and you will be prompt for email and password. Follow the instructions.
 
 <p>
-    <img src="/docs-static/img/get-started/netbird-sso-login-cmd.gif" alt="high-level-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/get-started/openzro-sso-login-cmd.gif" alt="high-level-dia" className="imagewrapper-big"/>
 </p>
 
 Check connection status:
 ```bash
-  netbird status
+  openzro status
 ```
 
-## Running NetBird with a Setup Key
+## Running openZro with a Setup Key
 In case you are activating a server peer, you can use a [setup key](/manage/peers/register-machines-using-setup-keys) as described in the steps below.
 > This is especially helpful when you are running multiple server instances with infrastructure-as-code tools like ansible and terraform.
 
 1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
 
 ```bash
-  netbird up --setup-key <SETUP KEY>
+  openzro up --setup-key <SETUP KEY>
 ```
 
 Alternatively, if you are hosting your own Management Service provide `--management-url` property pointing to your Management Service:
 ```bash
-  netbird up --setup-key <SETUP KEY> --management-url http://localhost:33073
+  openzro up --setup-key <SETUP KEY> --management-url http://localhost:33073
 ```
 
 > You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
 
 2. Check connection status:
 ```bash
-  netbird status
+  openzro status
 ```
 
 3. Check your IP:

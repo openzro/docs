@@ -15,7 +15,7 @@ naturally compliant in the EDR system.
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/peers/{peer-id}/edr/bypass">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/peers/{peer-id}/edr/bypass \
+curl -X POST https://api.openzro.io/api/peers/{peer-id}/edr/bypass \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -46,7 +46,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peer-id}/edr/bypass"
+url = "https://api.openzro.io/api/peers/{peer-id}/edr/bypass"
 
 headers = {     
   'Accept': 'application/json',
@@ -70,7 +70,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peer-id}/edr/bypass"
+  url := "https://api.openzro.io/api/peers/{peer-id}/edr/bypass"
   method := "POST"
   
   client := &http.Client {
@@ -106,7 +106,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peer-id}/edr/bypass")
+url = URI("https://api.openzro.io/api/peers/{peer-id}/edr/bypass")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -124,7 +124,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peer-id}/edr/bypass")
+  .url("https://api.openzro.io/api/peers/{peer-id}/edr/bypass")
   .method("POST")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -138,7 +138,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peer-id}/edr/bypass',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peer-id}/edr/bypass',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -191,7 +191,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/peers/{peer-id}/edr/bypass">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/peers/{peer-id}/edr/bypass \
+curl -X DELETE https://api.openzro.io/api/peers/{peer-id}/edr/bypass \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -220,7 +220,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peer-id}/edr/bypass"
+url = "https://api.openzro.io/api/peers/{peer-id}/edr/bypass"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -243,7 +243,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peer-id}/edr/bypass"
+  url := "https://api.openzro.io/api/peers/{peer-id}/edr/bypass"
   method := "DELETE"
   
   client := &http.Client {
@@ -278,7 +278,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peer-id}/edr/bypass")
+url = URI("https://api.openzro.io/api/peers/{peer-id}/edr/bypass")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -295,7 +295,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peer-id}/edr/bypass")
+  .url("https://api.openzro.io/api/peers/{peer-id}/edr/bypass")
   .method("DELETE")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -308,7 +308,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peer-id}/edr/bypass',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peer-id}/edr/bypass',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -347,7 +347,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/peers/edr/bypassed">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/peers/edr/bypassed \
+curl -X GET https://api.openzro.io/api/peers/edr/bypassed \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -378,7 +378,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/edr/bypassed"
+url = "https://api.openzro.io/api/peers/edr/bypassed"
 
 headers = {     
   'Accept': 'application/json',
@@ -402,7 +402,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/edr/bypassed"
+  url := "https://api.openzro.io/api/peers/edr/bypassed"
   method := "GET"
   
   client := &http.Client {
@@ -438,7 +438,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/edr/bypassed")
+url = URI("https://api.openzro.io/api/peers/edr/bypassed")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -456,7 +456,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/edr/bypassed")
+  .url("https://api.openzro.io/api/peers/edr/bypassed")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -470,7 +470,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/edr/bypassed',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/edr/bypassed',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

@@ -2,7 +2,7 @@ export const title = 'Ingress Ports'
 
 
 
-## List all Port Allocations  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'GET' , label: '/api/peers/{peerId}/ingress/ports' }}
+## List all Port Allocations  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'GET' , label: '/api/peers/{peerId}/ingress/ports' }}
 
 <Row>
   <Col>
@@ -28,7 +28,7 @@ export const title = 'Ingress Ports'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/peers/{peerId}/ingress/ports">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/peers/{peerId}/ingress/ports \
+curl -X GET https://api.openzro.io/api/peers/{peerId}/ingress/ports \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -59,7 +59,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peerId}/ingress/ports"
+url = "https://api.openzro.io/api/peers/{peerId}/ingress/ports"
 
 headers = {     
   'Accept': 'application/json',
@@ -83,7 +83,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peerId}/ingress/ports"
+  url := "https://api.openzro.io/api/peers/{peerId}/ingress/ports"
   method := "GET"
   
   client := &http.Client {
@@ -119,7 +119,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peerId}/ingress/ports")
+url = URI("https://api.openzro.io/api/peers/{peerId}/ingress/ports")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -137,7 +137,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peerId}/ingress/ports")
+  .url("https://api.openzro.io/api/peers/{peerId}/ingress/ports")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -151,7 +151,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peerId}/ingress/ports',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peerId}/ingress/ports',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -226,7 +226,7 @@ echo $response;
 ---
 
 
-## Create a Port Allocation  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'POST' , label: '/api/peers/{peerId}/ingress/ports' }}
+## Create a Port Allocation  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'POST' , label: '/api/peers/{peerId}/ingress/ports' }}
 
 <Row>
   <Col>
@@ -309,7 +309,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/peers/{peerId}/ingress/ports">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/peers/{peerId}/ingress/ports \
+curl -X POST https://api.openzro.io/api/peers/{peerId}/ingress/ports \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -372,7 +372,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peerId}/ingress/ports"
+url = "https://api.openzro.io/api/peers/{peerId}/ingress/ports"
 payload = json.dumps({
   "name": "Ingress Port Allocation 1",
   "enabled": true,
@@ -411,7 +411,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peerId}/ingress/ports"
+  url := "https://api.openzro.io/api/peers/{peerId}/ingress/ports"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -463,7 +463,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peerId}/ingress/ports")
+url = URI("https://api.openzro.io/api/peers/{peerId}/ingress/ports")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -512,7 +512,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   }
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peerId}/ingress/ports")
+  .url("https://api.openzro.io/api/peers/{peerId}/ingress/ports")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -527,7 +527,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peerId}/ingress/ports',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peerId}/ingress/ports',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -614,7 +614,7 @@ echo $response;
 ---
 
 
-## Retrieve a Port Allocation  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'GET' , label: '/api/peers/{peerId}/ingress/ports/{allocationId}' }}
+## Retrieve a Port Allocation  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'GET' , label: '/api/peers/{peerId}/ingress/ports/{allocationId}' }}
 
 <Row>
   <Col>
@@ -636,7 +636,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/peers/{peerId}/ingress/ports/{allocationId}">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId} \
+curl -X GET https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId} \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -667,7 +667,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}"
+url = "https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}"
 
 headers = {     
   'Accept': 'application/json',
@@ -691,7 +691,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}"
+  url := "https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}"
   method := "GET"
   
   client := &http.Client {
@@ -727,7 +727,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}")
+url = URI("https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -745,7 +745,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}")
+  .url("https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -759,7 +759,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -830,7 +830,7 @@ echo $response;
 ---
 
 
-## Update a Port Allocation  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'PUT' , label: '/api/peers/{peerId}/ingress/ports/{allocationId}' }}
+## Update a Port Allocation  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'PUT' , label: '/api/peers/{peerId}/ingress/ports/{allocationId}' }}
 
 <Row>
   <Col>
@@ -917,7 +917,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="PUT" label="/api/peers/{peerId}/ingress/ports/{allocationId}">
 ```bash {{ title: 'cURL' }}
-curl -X PUT https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId} \
+curl -X PUT https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId} \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -980,7 +980,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}"
+url = "https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}"
 payload = json.dumps({
   "name": "Ingress Port Allocation 1",
   "enabled": true,
@@ -1019,7 +1019,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}"
+  url := "https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}"
   method := "PUT"
   
   payload := strings.NewReader(`{
@@ -1071,7 +1071,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}")
+url = URI("https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1120,7 +1120,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   }
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}")
+  .url("https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}")
   .method("PUT", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -1135,7 +1135,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1222,7 +1222,7 @@ echo $response;
 ---
 
 
-## Delete a Port Allocation  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'DELETE' , label: '/api/peers/{peerId}/ingress/ports/{allocationId}' }}
+## Delete a Port Allocation  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'DELETE' , label: '/api/peers/{peerId}/ingress/ports/{allocationId}' }}
 
 <Row>
   <Col>
@@ -1244,7 +1244,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/peers/{peerId}/ingress/ports/{allocationId}">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId} \
+curl -X DELETE https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId} \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -1273,7 +1273,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}"
+url = "https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -1296,7 +1296,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}"
+  url := "https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}"
   method := "DELETE"
   
   client := &http.Client {
@@ -1331,7 +1331,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}")
+url = URI("https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1348,7 +1348,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}")
+  .url("https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}")
   .method("DELETE")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -1361,7 +1361,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peerId}/ingress/ports/{allocationId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peerId}/ingress/ports/{allocationId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1390,7 +1390,7 @@ echo $response;
 ---
 
 
-## List all Ingress Peers  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'GET' , label: '/api/ingress/peers' }}
+## List all Ingress Peers  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'GET' , label: '/api/ingress/peers' }}
 
 <Row>
   <Col>
@@ -1400,7 +1400,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/ingress/peers">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/ingress/peers \
+curl -X GET https://api.openzro.io/api/ingress/peers \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -1431,7 +1431,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/ingress/peers"
+url = "https://api.openzro.io/api/ingress/peers"
 
 headers = {     
   'Accept': 'application/json',
@@ -1455,7 +1455,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/ingress/peers"
+  url := "https://api.openzro.io/api/ingress/peers"
   method := "GET"
   
   client := &http.Client {
@@ -1491,7 +1491,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/ingress/peers")
+url = URI("https://api.openzro.io/api/ingress/peers")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1509,7 +1509,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/ingress/peers")
+  .url("https://api.openzro.io/api/ingress/peers")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -1523,7 +1523,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/ingress/peers',
+  CURLOPT_URL => 'https://api.openzro.io/api/ingress/peers',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1590,7 +1590,7 @@ echo $response;
 ---
 
 
-## Create a Ingress Peer  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'POST' , label: '/api/ingress/peers' }}
+## Create a Ingress Peer  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'POST' , label: '/api/ingress/peers' }}
 
 <Row>
   <Col>
@@ -1621,7 +1621,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/ingress/peers">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/ingress/peers \
+curl -X POST https://api.openzro.io/api/ingress/peers \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -1664,7 +1664,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/ingress/peers"
+url = "https://api.openzro.io/api/ingress/peers"
 payload = json.dumps({
   "peer_id": "ch8i4ug6lnn4g9hqv7m0",
   "enabled": true,
@@ -1693,7 +1693,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/ingress/peers"
+  url := "https://api.openzro.io/api/ingress/peers"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -1735,7 +1735,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/ingress/peers")
+url = URI("https://api.openzro.io/api/ingress/peers")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1764,7 +1764,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "fallback": true
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/ingress/peers")
+  .url("https://api.openzro.io/api/ingress/peers")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -1779,7 +1779,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/ingress/peers',
+  CURLOPT_URL => 'https://api.openzro.io/api/ingress/peers',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1848,7 +1848,7 @@ echo $response;
 ---
 
 
-## Retrieve a Ingress Peer  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'GET' , label: '/api/ingress/peers/{ingressPeerId}' }}
+## Retrieve a Ingress Peer  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'GET' , label: '/api/ingress/peers/{ingressPeerId}' }}
 
 <Row>
   <Col>
@@ -1866,7 +1866,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/ingress/peers/{ingressPeerId}">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/ingress/peers/{ingressPeerId} \
+curl -X GET https://api.openzro.io/api/ingress/peers/{ingressPeerId} \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -1897,7 +1897,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/ingress/peers/{ingressPeerId}"
+url = "https://api.openzro.io/api/ingress/peers/{ingressPeerId}"
 
 headers = {     
   'Accept': 'application/json',
@@ -1921,7 +1921,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/ingress/peers/{ingressPeerId}"
+  url := "https://api.openzro.io/api/ingress/peers/{ingressPeerId}"
   method := "GET"
   
   client := &http.Client {
@@ -1957,7 +1957,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/ingress/peers/{ingressPeerId}")
+url = URI("https://api.openzro.io/api/ingress/peers/{ingressPeerId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1975,7 +1975,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/ingress/peers/{ingressPeerId}")
+  .url("https://api.openzro.io/api/ingress/peers/{ingressPeerId}")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -1989,7 +1989,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/ingress/peers/{ingressPeerId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/ingress/peers/{ingressPeerId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -2052,7 +2052,7 @@ echo $response;
 ---
 
 
-## Update a Ingress Peer  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'PUT' , label: '/api/ingress/peers/{ingressPeerId}' }}
+## Update a Ingress Peer  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'PUT' , label: '/api/ingress/peers/{ingressPeerId}' }}
 
 <Row>
   <Col>
@@ -2086,7 +2086,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="PUT" label="/api/ingress/peers/{ingressPeerId}">
 ```bash {{ title: 'cURL' }}
-curl -X PUT https://api.netbird.io/api/ingress/peers/{ingressPeerId} \
+curl -X PUT https://api.openzro.io/api/ingress/peers/{ingressPeerId} \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -2127,7 +2127,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/ingress/peers/{ingressPeerId}"
+url = "https://api.openzro.io/api/ingress/peers/{ingressPeerId}"
 payload = json.dumps({
   "enabled": true,
   "fallback": true
@@ -2155,7 +2155,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/ingress/peers/{ingressPeerId}"
+  url := "https://api.openzro.io/api/ingress/peers/{ingressPeerId}"
   method := "PUT"
   
   payload := strings.NewReader(`{
@@ -2196,7 +2196,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/ingress/peers/{ingressPeerId}")
+url = URI("https://api.openzro.io/api/ingress/peers/{ingressPeerId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2223,7 +2223,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "fallback": true
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/ingress/peers/{ingressPeerId}")
+  .url("https://api.openzro.io/api/ingress/peers/{ingressPeerId}")
   .method("PUT", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -2238,7 +2238,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/ingress/peers/{ingressPeerId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/ingress/peers/{ingressPeerId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -2306,7 +2306,7 @@ echo $response;
 ---
 
 
-## Delete a Ingress Peer  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of NetBird." />  {{ tag: 'DELETE' , label: '/api/ingress/peers/{ingressPeerId}' }}
+## Delete a Ingress Peer  <Badge status="cloud-only" text="cloud-only" hoverText="This feature is only available in the cloud version of openZro." />  {{ tag: 'DELETE' , label: '/api/ingress/peers/{ingressPeerId}' }}
 
 <Row>
   <Col>
@@ -2324,7 +2324,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/ingress/peers/{ingressPeerId}">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/ingress/peers/{ingressPeerId} \
+curl -X DELETE https://api.openzro.io/api/ingress/peers/{ingressPeerId} \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -2353,7 +2353,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/ingress/peers/{ingressPeerId}"
+url = "https://api.openzro.io/api/ingress/peers/{ingressPeerId}"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -2376,7 +2376,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/ingress/peers/{ingressPeerId}"
+  url := "https://api.openzro.io/api/ingress/peers/{ingressPeerId}"
   method := "DELETE"
   
   client := &http.Client {
@@ -2411,7 +2411,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/ingress/peers/{ingressPeerId}")
+url = URI("https://api.openzro.io/api/ingress/peers/{ingressPeerId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2428,7 +2428,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/ingress/peers/{ingressPeerId}")
+  .url("https://api.openzro.io/api/ingress/peers/{ingressPeerId}")
   .method("DELETE")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -2441,7 +2441,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/ingress/peers/{ingressPeerId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/ingress/peers/{ingressPeerId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

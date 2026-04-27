@@ -4,15 +4,15 @@ export const description = 'Troubleshoot common reverse proxy issues like 502 er
 
 # Reverse Proxy Troubleshooting
 
-This guide helps you diagnose and resolve common reverse proxy issues in NetBird. Follow the structured approach below to identify and fix problems quickly.
+This guide helps you diagnose and resolve common reverse proxy issues in openZro. Follow the structured approach below to identify and fix problems quickly.
 
 ## Quick Diagnostics Checklist
 
 Before diving deep, run through this quick checklist:
 
 ```bash
-# 1. Is NetBird connected on the routing peer?
-netbird status -d
+# 1. Is openZro connected on the routing peer?
+openzro status -d
 
 # 2. Is the reverse proxy service showing in the dashboard?
 #    Check Dashboard -> Reverse Proxy -> Services
@@ -34,15 +34,15 @@ docker exec <routing-peer-container> wget -qO- http://<target-ip>:<port> --timeo
 # See Issue 1 below.
 
 # 6. Is the service listening on the right interface?
-# It must bind to 0.0.0.0 (or :: for IPv6), the NetBird IP,
+# It must bind to 0.0.0.0 (or :: for IPv6), the openZro IP,
 # or the destination IP, NOT 127.0.0.1/localhost.
 ss -tlnp | grep <port>
 # or on macOS:
 lsof -iTCP:<port> -sTCP:LISTEN
 
 # 7. Verify the target type matches your setup
-# Peer -> service runs on a machine with NetBird installed
-# Host/Subnet -> service runs on a device without NetBird, reached via routing peer
+# Peer -> service runs on a machine with openZro installed
+# Host/Subnet -> service runs on a device without openZro, reached via routing peer
 ```
 
 If any of these fail, continue to the relevant section below.
@@ -60,7 +60,7 @@ Enable the debug endpoint by setting the environment variable or passing the fla
 NB_PROXY_DEBUG_ENDPOINT=true
 
 # Or as a CLI flag
-netbird-proxy --debug-endpoint
+openzro-proxy --debug-endpoint
 ```
 
 The endpoint listens on `localhost:8444` by default. To change the address:
@@ -68,19 +68,19 @@ The endpoint listens on `localhost:8444` by default. To change the address:
 ```bash
 NB_PROXY_DEBUG_ENDPOINT_ADDRESS=localhost:9090
 # Or
-netbird-proxy --debug-endpoint --debug-endpoint-addr localhost:9090
+openzro-proxy --debug-endpoint --debug-endpoint-addr localhost:9090
 ```
 
 You can also access the debug endpoint directly in a browser at `http://localhost:8444/debug` for an overview of server uptime, connected clients, and service status.
 
 ### Debug CLI commands
 
-Once the debug endpoint is enabled, use the `netbird-proxy debug` CLI commands to inspect proxy state. All commands support a `--json` flag for machine-readable output and `--addr` to specify the debug endpoint address.
+Once the debug endpoint is enabled, use the `openzro-proxy debug` CLI commands to inspect proxy state. All commands support a `--json` flag for machine-readable output and `--addr` to specify the debug endpoint address.
 
 #### Check proxy health
 
 ```bash
-netbird-proxy debug health
+openzro-proxy debug health
 ```
 
 Returns management connection state and overall client health.
@@ -88,7 +88,7 @@ Returns management connection state and overall client health.
 #### List connected clients
 
 ```bash
-netbird-proxy debug clients
+openzro-proxy debug clients
 ```
 
 Shows all connected clients with their service counts and status.
@@ -96,39 +96,39 @@ Shows all connected clients with their service counts and status.
 #### Inspect a specific client
 
 ```bash
-netbird-proxy debug status <account-id>
+openzro-proxy debug status <account-id>
 ```
 
 Shows detailed status for a client. You can filter results:
 
 ```bash
 # Filter by peer IP
-netbird-proxy debug status <account-id> --filter-by-ips 10.0.0.10
+openzro-proxy debug status <account-id> --filter-by-ips 10.0.0.10
 
 # Filter by connection status
-netbird-proxy debug status <account-id> --filter-by-status connected
+openzro-proxy debug status <account-id> --filter-by-status connected
 
 # Filter by connection type
-netbird-proxy debug status <account-id> --filter-by-connection-type P2P
+openzro-proxy debug status <account-id> --filter-by-connection-type P2P
 ```
 
 #### TCP ping through a client
 
 ```bash
-netbird-proxy debug ping <account-id> <host> [port]
+openzro-proxy debug ping <account-id> <host> [port]
 ```
 
 Tests TCP connectivity from the proxy through a client's network to a target host. Port defaults to 80. This is useful for confirming whether the proxy can reach a target service through a specific routing peer:
 
 ```bash
 # Test if the proxy can reach a service at 10.0.0.10:32400 through the client
-netbird-proxy debug ping <account-id> 10.0.0.10 32400
+openzro-proxy debug ping <account-id> 10.0.0.10 32400
 ```
 
 #### Set client log level
 
 ```bash
-netbird-proxy debug log level <account-id> <level>
+openzro-proxy debug log level <account-id> <level>
 ```
 
 Temporarily change a client's log level for debugging. Valid levels: `trace`, `debug`, `info`, `warn`, `error`.
@@ -136,7 +136,7 @@ Temporarily change a client's log level for debugging. Valid levels: `trace`, `d
 #### View sync response
 
 ```bash
-netbird-proxy debug sync-response <account-id>
+openzro-proxy debug sync-response <account-id>
 ```
 
 Shows the latest sync response for a client, which includes the service and peer configuration the proxy has received from the management server.
@@ -171,7 +171,7 @@ If this returns a response (even a `401 Unauthorized`), the service is reachable
 
 Change the target type from **Subnet** (network resource) to **Peer** for any service running on the same machine as the routing peer.
 
-1. Open the reverse proxy service in the NetBird dashboard.
+1. Open the reverse proxy service in the openZro dashboard.
 2. Edit the target.
 3. Change the target type from **Host** or **Subnet** to **Peer**.
 4. Select the peer that corresponds to the machine running the service (this is the same machine as your routing peer).
@@ -187,7 +187,7 @@ When the target type is **Peer**, the proxy sends traffic directly to that peer 
 - The service works when accessed locally on the machine (e.g., `curl http://localhost:8080`) but fails through the reverse proxy
 - Proxy logs show connection refused or timeout errors
 
-This happens when the target service is configured to listen only on `127.0.0.1` (localhost) or `::1`. Traffic arriving through NetBird comes from the WireGuard tunnel interface, not the loopback interface, so a service bound to localhost will refuse the connection.
+This happens when the target service is configured to listen only on `127.0.0.1` (localhost) or `::1`. Traffic arriving through openZro comes from the WireGuard tunnel interface, not the loopback interface, so a service bound to localhost will refuse the connection.
 
 **How to check**:
 
@@ -210,7 +210,7 @@ If the `Local Address` column shows `127.0.0.1` or `::1`, the service is only re
 
 Reconfigure the service to listen on one of the following:
 - `0.0.0.0` (all IPv4 interfaces) or `::` (all IPv6 interfaces), the simplest option
-- The machine's NetBird IP (e.g., `100.x.y.z`) if you want to restrict access to NetBird traffic only
+- The machine's openZro IP (e.g., `100.x.y.z`) if you want to restrict access to openZro traffic only
 - The specific LAN IP used as the reverse proxy destination
 
 Where to change this depends on the service. Look for a `bind`, `listen`, `host`, or `address` setting in the service's configuration file. For example:
@@ -240,10 +240,10 @@ ERRO [err: failed to open connector: failed to create connector <id>: failed to 
 - The IdP is accessible from a browser and from the host machine, but not from inside the management server container
 - The instance setup status remains `false` in the dashboard
 
-This applies to self-hosted setups where an external identity provider (such as Authentik or PocketID) is exposed through the NetBird reverse proxy. For example, the architecture described in [Self-host NetBird with Authentik](https://netbird.io/knowledge-hub/selfhost-netbird-with-authentik). The management server (Dex) needs to reach the IdP's OIDC discovery endpoint through the reverse proxy to initialize the connector. However, traffic originating from inside the Docker network does not carry a valid geo-IP. The proxy sees an internal Docker IP instead of a public IP, which doesn't match any country, so the restriction rejects the request with a 403.
+This applies to self-hosted setups where an external identity provider (such as Authentik or PocketID) is exposed through the openZro reverse proxy. For example, the architecture described in [Self-host openZro with Authentik](https://openzro.io/knowledge-hub/selfhost-openzro-with-authentik). The management server (Dex) needs to reach the IdP's OIDC discovery endpoint through the reverse proxy to initialize the connector. However, traffic originating from inside the Docker network does not carry a valid geo-IP. The proxy sees an internal Docker IP instead of a public IP, which doesn't match any country, so the restriction rejects the request with a 403.
 
 <Note>
-This issue only applies to self-hosted deployments where the IdP is exposed through the NetBird reverse proxy and a restriction (such as geo-IP country filtering or access controls) is added to that service. If your IdP is hosted externally, accessible via a separate domain, or the reverse proxy service has no restrictions configured, this does not apply.
+This issue only applies to self-hosted deployments where the IdP is exposed through the openZro reverse proxy and a restriction (such as geo-IP country filtering or access controls) is added to that service. If your IdP is hosted externally, accessible via a separate domain, or the reverse proxy service has no restrictions configured, this does not apply.
 </Note>
 
 **How to confirm**:
@@ -251,7 +251,7 @@ This issue only applies to self-hosted deployments where the IdP is exposed thro
 Test connectivity to the IdP from inside the management server's network. Use a lightweight container attached to the same network namespace:
 
 ```
-docker run --rm --network container:netbird-server curlimages/curl -s https://<your-idp-domain>/.well-known/openid-configuration
+docker run --rm --network container:openzro-server curlimages/curl -s https://<your-idp-domain>/.well-known/openid-configuration
 ```
 
 If this returns `Forbidden` while the same URL works from the host:
@@ -264,28 +264,28 @@ Then geo-restrictions on the reverse proxy service are blocking internal traffic
 
 **Solution**:
 
-Remove or adjust the geo-restriction on the reverse proxy service that exposes your IdP. You can do this from the NetBird dashboard under **Reverse Proxy > Services**, then edit the service and remove the country restriction.
+Remove or adjust the geo-restriction on the reverse proxy service that exposes your IdP. You can do this from the openZro dashboard under **Reverse Proxy > Services**, then edit the service and remove the country restriction.
 
 If you are locked out of the dashboard because the IdP connector cannot initialize (e.g., you already removed local users), you can modify the restriction directly in the management database:
 
-1. Stop all NetBird containers:
+1. Stop all openZro containers:
 
 ```
-cd ~/netbird
+cd ~/openzro
 docker compose stop
 ```
 
 2. Identify the service ID for your IdP service:
 
 ```
-docker run --rm --user root -v <netbird_data_volume>:/data --entrypoint sqlite3 keinos/sqlite3 /data/store.db \
+docker run --rm --user root -v <openzro_data_volume>:/data --entrypoint sqlite3 keinos/sqlite3 /data/store.db \
   "SELECT id, domain, restrictions FROM services;"
 ```
 
 3. Clear the geo-restriction on the IdP service:
 
 ```
-docker run --rm --user root -v <netbird_data_volume>:/data --entrypoint sqlite3 keinos/sqlite3 /data/store.db \
+docker run --rm --user root -v <openzro_data_volume>:/data --entrypoint sqlite3 keinos/sqlite3 /data/store.db \
   "UPDATE services SET restrictions='{}' WHERE id='<service-id>';"
 ```
 
@@ -298,7 +298,7 @@ docker compose start
 5. Verify the connector initializes by checking the management server logs:
 
 ```
-docker logs netbird-server --tail 20
+docker logs openzro-server --tail 20
 ```
 
 Once you regain access to the dashboard, you can re-enable geo-restrictions on the service if needed. To prevent this issue in the future, consider one of the following:
@@ -315,7 +315,7 @@ If the checks above don't reveal the issue, you can use packet capture tools to 
 On the routing peer or target machine, capture traffic on the relevant interface:
 
 ```bash
-# Capture traffic on the WireGuard interface (wt0 is the default NetBird interface)
+# Capture traffic on the WireGuard interface (wt0 is the default openZro interface)
 sudo tcpdump -i wt0 -n port <target-port>
 
 # Capture on all interfaces to see where traffic arrives
@@ -330,14 +330,14 @@ If you see packets arriving on `wt0` but no response, the issue is on the target
 ### macOS (tcpdump)
 
 ```bash
-# NetBird uses utun interfaces on macOS. Find yours with ifconfig
+# openZro uses utun interfaces on macOS. Find yours with ifconfig
 sudo tcpdump -i utun4 -n port <target-port>
 ```
 
 ### Windows (pktmon)
 
 ```powershell
-# List network interfaces to find the WireGuard/NetBird adapter
+# List network interfaces to find the WireGuard/openZro adapter
 pktmon list
 
 # Start a capture filtered by port
@@ -361,8 +361,8 @@ ip.addr == <target-ip>
 
 | Target type | Use case |
 |---|---|
-| **Peer** | The service runs directly on a machine that has the NetBird client installed. |
-| **Host / Subnet** | The service runs on a device that does not have a NetBird client and relies on a routing peer to forward traffic to it on the local network. |
+| **Peer** | The service runs directly on a machine that has the openZro client installed. |
+| **Host / Subnet** | The service runs on a device that does not have a openZro client and relies on a routing peer to forward traffic to it on the local network. |
 
 ## Common mistakes
 

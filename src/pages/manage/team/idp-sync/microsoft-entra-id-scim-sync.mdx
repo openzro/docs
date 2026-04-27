@@ -5,14 +5,14 @@ formerly known as Azure Active Directory (Azure AD), is a cloud-based identity a
 organizations with secure authentication, single sign-on, and user management capabilities. In the context of network security,
 it can be effectively used to control network access based on organizational structure, such as groups and individual user accounts.
 
-NetBird's Microsoft Entra ID SCIM integration allows you to synchronize users and groups from Entra ID to NetBird.
+openZro's Microsoft Entra ID SCIM integration allows you to synchronize users and groups from Entra ID to openZro.
 You can then use these synchronized groups to configure your network, create network access policies, and automate
 onboarding and offboarding processes.
 
 import {Note} from "@/components/mdx";
 
 <Note>
-    If you are running a self-hosted deployment with a [Commercial License](https://netbird.io/pricing#on-prem) and the embedded IdP, see the [Embedded IdP version](/manage/team/idp-sync/embedded/microsoft-entra-id-scim-sync) of this guide instead.
+    If you are running a self-hosted deployment with a [Commercial License](https://openzro.io/pricing#on-prem) and the embedded IdP, see the [Embedded IdP version](/manage/team/idp-sync/embedded/microsoft-entra-id-scim-sync) of this guide instead.
 </Note>
 
 ## Prerequisites
@@ -23,9 +23,9 @@ Before you begin the integration process, ensure you have the necessary admin pe
 * Cloud Application Administrator
 * Global Administrator
 
-## Enabling Microsoft Entra ID SCIM in NetBird
+## Enabling Microsoft Entra ID SCIM in openZro
 
-To enable SCIM synchronization in NetBird, navigate to `Integrations > Identity Provider Sync` in your NetBird dashboard.
+To enable SCIM synchronization in openZro, navigate to `Integrations > Identity Provider Sync` in your openZro dashboard.
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-connect.png" alt="Microsoft Entra ID SCIM Integration Connection" className="imagewrapper-big"/>
 
@@ -35,7 +35,7 @@ To enable SCIM synchronization in NetBird, navigate to `Integrations > Identity 
 </Note>
 
 Click the `Connect Microsoft Entra ID` button to begin the configuration process.
-This action will trigger a pop-up window that will present you with a user-friendly wizard, guiding you through the synchronization process between NetBird and Entra ID.
+This action will trigger a pop-up window that will present you with a user-friendly wizard, guiding you through the synchronization process between openZro and Entra ID.
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-scim-getting-started.png" alt="Microsoft Entra ID SCIM Getting Started Wizard" className="imagewrapper-big"/>
 
@@ -60,7 +60,7 @@ Click `Create your own application`.
 
 Fill out the application form with the following details:
 
-* **What's the name of your app?**: `NetBird SCIM`
+* **What's the name of your app?**: `openZro SCIM`
 * **What are you looking to do with your application?**: Select `Integrate any other application you don't find in the gallery (Non-gallery)`
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-application-form.png" alt="Microsoft Entra ID Application Form" className="imagewrapper-big"/>
@@ -71,7 +71,7 @@ Click `Create`.
 
 ### Enable Provisioning
 
-On the NetBird dashboard click the Continue → button. A new wizard screen will appear, offering step-by-step instructions for enabling provisioning.
+On the openZro dashboard click the Continue → button. A new wizard screen will appear, offering step-by-step instructions for enabling provisioning.
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-enable-provisioning.png" alt="Microsoft Entra ID Enable Provisioning Setup" className="imagewrapper-big"/>
 
 Once the application is created, you'll be redirected to a getting started page. Click `Get started` in the `Provision User Accounts` section.
@@ -83,8 +83,8 @@ Under the `Create configuration` section, click `connect your application`.
 Fill out the `New provisioning configuration` form with the following details:
 
 * **Select authentication method**: `Bearer authentication`
-* **Tenant URL**: `https://api.netbird.io/api/scim/v2?aadOptscim062020`
-* **Secret token**: Paste the Token Key you copied from the Entra ID SCIM Setup process in the NetBird integration
+* **Tenant URL**: `https://api.openzro.io/api/scim/v2?aadOptscim062020`
+* **Secret token**: Paste the Token Key you copied from the Entra ID SCIM Setup process in the openZro integration
 
 <Note>
     The `?aadOptscim062020` flag appended to the Tenant URL is required to ensure Microsoft Entra ID sends SCIM 2.0 compliant requests.
@@ -100,7 +100,7 @@ Click `Test Connection` to verify the SCIM connection. If the connection is succ
 
 ### Configure Attribute Mapping
 
-On the NetBird dashboard click the Continue → button. A new wizard screen will appear, offering step-by-step instructions for configuring attribute mapping.
+On the openZro dashboard click the Continue → button. A new wizard screen will appear, offering step-by-step instructions for configuring attribute mapping.
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-configure-attribute-mapping.png" alt="Microsoft Entra ID Configure Attribute Mapping" className="imagewrapper-big"/>
 
@@ -154,25 +154,25 @@ Click `Ok` to save the change, then click `Save` to apply the final user attribu
 
 ## Assign Users and Groups
 
-On the NetBird dashboard click the Continue → button. A new wizard screen will appear, offering step-by-step instructions for assigning users and groups.
+On the openZro dashboard click the Continue → button. A new wizard screen will appear, offering step-by-step instructions for assigning users and groups.
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-assign-users-and-groups.png" alt="Microsoft Entra ID Assign Users and Groups" className="imagewrapper-big"/>
 
 
-To enable SCIM synchronization of users and groups to NetBird, you need to assign them to the NetBird enterprise application.
+To enable SCIM synchronization of users and groups to openZro, you need to assign them to the openZro enterprise application.
 
-In the Azure portal, navigate to your NetBird enterprise application:
+In the Azure portal, navigate to your openZro enterprise application:
 
 * Click on `Users and groups` in the left menu
 * Click `+ Add user/group`
-* Select the users and groups you want to synchronize to NetBird
+* Select the users and groups you want to synchronize to openZro
 * Click `Assign` to save the assignments
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-assign-users-groups.png" alt="Microsoft Entra ID Assign Users and Groups Interface" className="imagewrapper-big"/>
 
 ## Start Provisioning
 
-On the NetBird dashboard click the Continue → button. A new wizard screen will appear, offering step-by-step instructions for starting the provisioning.
+On the openZro dashboard click the Continue → button. A new wizard screen will appear, offering step-by-step instructions for starting the provisioning.
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-run-provisioning.png" alt="Microsoft Entra ID Run Provisioning" className="imagewrapper-big"/>
 
@@ -181,31 +181,31 @@ After assigning users and groups, navigate back to the provisioning configuratio
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-provisioning-started.png" alt="Microsoft Entra ID Provisioning Started" className="imagewrapper-big"/>
 
-Once started, Microsoft Entra ID will automatically synchronize the assigned users and groups to NetBird.
+Once started, Microsoft Entra ID will automatically synchronize the assigned users and groups to openZro.
 
 <Note>
     After the initial sync, Microsoft Entra ID runs provisioning cycles approximately every 40 minutes by default.
     If you need to synchronize changes immediately, you can use [Provisioning on demand](https://learn.microsoft.com/en-us/entra/identity/app-provisioning/provision-on-demand?pivots=app-provisioning) to provision individual users or groups without waiting for the next cycle.
 </Note>
 
-Click `Finish Setup` in the NetBird Dashboard to finalize the integration process.
+Click `Finish Setup` in the openZro Dashboard to finalize the integration process.
 
 ## Verify Synchronization
 
 After starting provisioning, the synchronization will begin automatically. You can verify that users and groups
-have been successfully synchronized by navigating to `Team > Users` in your NetBird dashboard.
+have been successfully synchronized by navigating to `Team > Users` in your openZro dashboard.
 
 <Note>
-    SCIM provisioning will manage only resources that are created through Microsoft Entra ID. Any resources created directly in NetBird will not be managed by SCIM.
+    SCIM provisioning will manage only resources that are created through Microsoft Entra ID. Any resources created directly in openZro will not be managed by SCIM.
 </Note>
 
 <Note>
-    Synced groups will only be available for membership and will not change the role of user in NetBird
+    Synced groups will only be available for membership and will not change the role of user in openZro
 </Note>
 
 ## Configuration Settings
 
-You can access some configuration settings inside the NetBird Dashboard. E.g. if you want to regenerate the authentication token or want to filter users and groups based on a specific prefix.
+You can access some configuration settings inside the openZro Dashboard. E.g. if you want to regenerate the authentication token or want to filter users and groups based on a specific prefix.
 Simply go to the Integrations page and click the settings icon of your integration.
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-configuration-options.png" alt="Microsoft Entra ID SCIM Configuration Options" className="imagewrapper-big"/>
@@ -219,7 +219,7 @@ If your authentication token has expired or you need to update it, click **Regen
 
 ### Groups to be synchronized
 
-By default, all groups assigned to the NetBird application in Entra will be synchronized. If you want to synchronize only assigned groups that start with a specific prefix, you can specify them in the filter. Keep in mind that the prefix matching is case-sensitive.
+By default, all groups assigned to the openZro application in Entra will be synchronized. If you want to synchronize only assigned groups that start with a specific prefix, you can specify them in the filter. Keep in mind that the prefix matching is case-sensitive.
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-group-prefix.png" alt="Microsoft Entra ID Group Prefix Filter" className="imagewrapper-big"/>
 
@@ -227,6 +227,6 @@ Click `Continue` to proceed to the next step.
 
 ### Users to be synchronized
 
-By default, all users from the groups assigned to the NetBird application in Entra will be synchronized. If you want to further filter and synchronize only users from specific assigned groups, you can specify those group names in the filter. The group name matching is case-sensitive.
+By default, all users from the groups assigned to the openZro application in Entra will be synchronized. If you want to further filter and synchronize only users from specific assigned groups, you can specify those group names in the filter. The group name matching is case-sensitive.
 
 <img src="/docs-static/img/manage/team/idp-sync/entra-id-scim-sync/entra-user-prefix.png" alt="Microsoft Entra ID User Prefix Filter" className="imagewrapper-big"/>

@@ -9,22 +9,22 @@ These guides show how to use [Network Routes](/manage/network-routes) for Site-t
 
 Network Routes enables two connectivity patterns that go beyond standard VPN-to-Site access:
 
-**Site-to-Site** connects two networks together, with neither end-device running NetBird. Each network has a routing peer that handles traffic forwarding.
+**Site-to-Site** connects two networks together, with neither end-device running openZro. Each network has a routing peer that handles traffic forwarding.
 
 ```
-Home NAS ──► Routing Peer ──► NetBird Tunnel ──► Routing Peer ──► Office Server
-(no NetBird)    (peer)                              (peer)         (no NetBird)
+Home NAS ──► Routing Peer ──► openZro Tunnel ──► Routing Peer ──► Office Server
+(no openZro)    (peer)                              (peer)         (no openZro)
 ```
 
-**Site-to-VPN** allows clientless devices to initiate connections to NetBird peers—the reverse of VPN-to-Site.
+**Site-to-VPN** allows clientless devices to initiate connections to openZro peers—the reverse of VPN-to-Site.
 
 ```
-Office Server ──────► Routing Peer ──────► NetBird Tunnel ──────► Your Laptop
- (no NetBird)           (peer)                                      (peer)
+Office Server ──────► Routing Peer ──────► openZro Tunnel ──────► Your Laptop
+ (no openZro)           (peer)                                      (peer)
 ```
 
 <Note>
-For VPN-to-Site (NetBird peers accessing clientless devices), you can use either [Networks](/manage/networks/use-cases) (recommended for simplicity) or Network Routes.
+For VPN-to-Site (openZro peers accessing clientless devices), you can use either [Networks](/manage/networks/use-cases) (recommended for simplicity) or Network Routes.
 </Note>
 
 ## Understanding Key Concepts
@@ -60,7 +60,7 @@ If an ACL Group is assigned but no policies grant access to it, all routed traff
 
 ### High Availability
 
-Deploy multiple routing peers for the same route to provide failover. NetBird clients automatically select the best available peer based on:
+Deploy multiple routing peers for the same route to provide failover. openZro clients automatically select the best available peer based on:
 - Connection type (direct vs relayed)
 - Defined metric priority (lower = higher priority)
 - Connection quality
@@ -133,4 +133,4 @@ For step-by-step instructions, choose your scenario above. For technical details
 
 ## Need Simpler VPN-to-Site Access?
 
-If you only need NetBird peers to access remote resources (not site-to-site or site-to-vpn), the [Networks](/manage/networks/use-cases) feature offers a simpler setup experience with per-resource access control.
+If you only need openZro peers to access remote resources (not site-to-site or site-to-vpn), the [Networks](/manage/networks/use-cases) feature offers a simpler setup experience with per-resource access control.

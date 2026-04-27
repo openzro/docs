@@ -1,9 +1,9 @@
 import {Note} from "@/components/mdx";
 
 # Lazy Connections
-NetBird now includes an experimental lazy connection feature designed to improve performance and reduce resource usage by connecting to peers only when needed. Instead of maintaining always-on connections, NetBird activates them on-demand based on activity or signaling.
+openZro now includes an experimental lazy connection feature designed to improve performance and reduce resource usage by connecting to peers only when needed. Instead of maintaining always-on connections, openZro activates them on-demand based on activity or signaling.
 
-This guide walks you through enabling and configuring this feature in your NetBird client.
+This guide walks you through enabling and configuring this feature in your openZro client.
 
 <Note>
     Minimum supported agent version: <strong>v0.50.1</strong>.
@@ -11,8 +11,8 @@ This guide walks you through enabling and configuring this feature in your NetBi
 </Note>
 
 <Note>
-    This feature also requires an upgraded NetBird Management and Signal server.
-    If you're self-hosting NetBird, ensure your server is updated to version <strong>v0.50.1</strong>, which adds support for lazy connections.
+    This feature also requires an upgraded openZro Management and Signal server.
+    If you're self-hosting openZro, ensure your server is updated to version <strong>v0.50.1</strong>, which adds support for lazy connections.
 </Note>
 
 <Note>
@@ -21,7 +21,7 @@ This guide walks you through enabling and configuring this feature in your NetBi
 
 ## What Are Lazy Connections?
 
-When enabled, lazy connections allow the NetBird agent to:
+When enabled, lazy connections allow the openZro agent to:
 
 - Establish peer-to-peer connections **only when needed** (e.g., when pinging a remote peer).
 - Monitor peer activity and **automatically disconnect peers** that remain inactive **and unreachable** for a specified time.
@@ -44,9 +44,9 @@ The default inactivity threshold is <strong>60 minutes</strong>, and can be conf
 
 ## Enabling via the system tray
 
-You can toggle Lazy Connections directly from the NetBird system tray:
+You can toggle Lazy Connections directly from the openZro system tray:
 
-1. Click the NetBird icon in the system tray.
+1. Click the openZro icon in the system tray.
 2. Go to **Settings**.
 3. Click **Enable Lazy Connections** to toggle the setting.
 
@@ -61,15 +61,15 @@ export NB_ENABLE_EXPERIMENTAL_LAZY_CONN=true
 Or pass the flag directly via the CLI when running the agent:
 
 ```bash
-netbird up --enable-lazy-connection
+openzro up --enable-lazy-connection
 ```
 <Note>
     This configuration is <strong>not persistent</strong>. You must reapply the flag or environment variable after each restart unless it is built into your service definition (e.g., systemd or Docker).
 </Note>
 
-## Enabling Lazy Connections in the NetBird Dashboard
+## Enabling Lazy Connections in the openZro Dashboard
 
-The lazy connection feature can also be configured through the NetBird Dashboard. Here’s how it works once the setting is updated:
+The lazy connection feature can also be configured through the openZro Dashboard. Here’s how it works once the setting is updated:
 
 Setting enabled:
 * The client’s lazy connection manager is now active. Existing peer connections and ongoing connection attempts will remain unchanged for one hour.
@@ -80,10 +80,10 @@ Setting disabled:
 
 ## Get started
 <p float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://netbird.io/pricing")}>Use NetBird</Button>
+    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
 </p>
 
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

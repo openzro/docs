@@ -12,7 +12,7 @@ export const title = 'Invoice'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/integrations/billing/invoices">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/integrations/billing/invoices \
+curl -X GET https://api.openzro.io/api/integrations/billing/invoices \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -43,7 +43,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/billing/invoices"
+url = "https://api.openzro.io/api/integrations/billing/invoices"
 
 headers = {     
   'Accept': 'application/json',
@@ -67,7 +67,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/billing/invoices"
+  url := "https://api.openzro.io/api/integrations/billing/invoices"
   method := "GET"
   
   client := &http.Client {
@@ -103,7 +103,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/billing/invoices")
+url = URI("https://api.openzro.io/api/integrations/billing/invoices")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -121,7 +121,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/billing/invoices")
+  .url("https://api.openzro.io/api/integrations/billing/invoices")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -135,7 +135,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/billing/invoices',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/billing/invoices',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -213,7 +213,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/integrations/billing/invoices/{id}/pdf">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/integrations/billing/invoices/{id}/pdf \
+curl -X GET https://api.openzro.io/api/integrations/billing/invoices/{id}/pdf \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -244,7 +244,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/billing/invoices/{id}/pdf"
+url = "https://api.openzro.io/api/integrations/billing/invoices/{id}/pdf"
 
 headers = {     
   'Accept': 'application/json',
@@ -268,7 +268,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/billing/invoices/{id}/pdf"
+  url := "https://api.openzro.io/api/integrations/billing/invoices/{id}/pdf"
   method := "GET"
   
   client := &http.Client {
@@ -304,7 +304,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/billing/invoices/{id}/pdf")
+url = URI("https://api.openzro.io/api/integrations/billing/invoices/{id}/pdf")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -322,7 +322,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/billing/invoices/{id}/pdf")
+  .url("https://api.openzro.io/api/integrations/billing/invoices/{id}/pdf")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -336,7 +336,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/billing/invoices/{id}/pdf',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/billing/invoices/{id}/pdf',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -397,7 +397,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/integrations/billing/invoices/{id}/csv">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/integrations/billing/invoices/{id}/csv \
+curl -X GET https://api.openzro.io/api/integrations/billing/invoices/{id}/csv \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -426,7 +426,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/billing/invoices/{id}/csv"
+url = "https://api.openzro.io/api/integrations/billing/invoices/{id}/csv"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -449,7 +449,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/billing/invoices/{id}/csv"
+  url := "https://api.openzro.io/api/integrations/billing/invoices/{id}/csv"
   method := "GET"
   
   client := &http.Client {
@@ -484,7 +484,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/billing/invoices/{id}/csv")
+url = URI("https://api.openzro.io/api/integrations/billing/invoices/{id}/csv")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -501,7 +501,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/billing/invoices/{id}/csv")
+  .url("https://api.openzro.io/api/integrations/billing/invoices/{id}/csv")
   .method("GET")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -514,7 +514,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/billing/invoices/{id}/csv',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/billing/invoices/{id}/csv',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

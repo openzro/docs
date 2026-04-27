@@ -1,20 +1,20 @@
 import {Note} from "@/components/mdx";
 
-# PocketID with NetBird Self-Hosted
+# PocketID with openZro Self-Hosted
 
 [PocketID](https://pocket-id.org/) is a simplified identity management solution designed for self-hosted environments, offering a lightweight and easy-to-deploy option for authentication.
 
 <Note>
-PocketID is secure and effective but makes some tradeoffs in terms of features. Notably, it does not allow scoping the access of API Tokens. Keep careful track of the token used by NetBird for management.
+PocketID is secure and effective but makes some tradeoffs in terms of features. Notably, it does not allow scoping the access of API Tokens. Keep careful track of the token used by openZro for management.
 </Note>
 
 ## Management Setup (Recommended)
 
-Add PocketID as an external IdP directly in the NetBird Management Dashboard. This is the simplest approach and recommended for most deployments.
+Add PocketID as an external IdP directly in the openZro Management Dashboard. This is the simplest approach and recommended for most deployments.
 
 ### Prerequisites
 
-- NetBird self-hosted with embedded IdP enabled
+- openZro self-hosted with embedded IdP enabled
 - PocketID instance with admin access
 
 ### Step 1: Create OIDC Client in PocketID
@@ -29,7 +29,7 @@ Add PocketID as an external IdP directly in the NetBird Management Dashboard. Th
 </p>
 
 5. Fill in the form:
-   - **Name**: `NetBird`
+   - **Name**: `openZro`
    - **Public Client**: Off (for confidential client)
    - **PKCE**: Off
 6. Click **Save**
@@ -44,9 +44,9 @@ Add PocketID as an external IdP directly in the NetBird Management Dashboard. Th
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/3_note-client-id-pocketid.png" alt="Note client ID" className="imagewrapper-big"/>
 </p>
 
-### Step 2: Add Identity Provider in NetBird
+### Step 2: Add Identity Provider in openZro
 
-1. Log in to your NetBird Dashboard
+1. Log in to your openZro Dashboard
 2. Navigate to **Settings** → **Identity Providers**
 3. Click **Add Identity Provider**
 4. Fill in the fields:
@@ -66,19 +66,19 @@ Add PocketID as an external IdP directly in the NetBird Management Dashboard. Th
 5. Click **Save**
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/4_netbird-config-pocketid.png" alt="NetBird configuration" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/4_openzro-config-pocketid.png" alt="openZro configuration" className="imagewrapper-big"/>
 </p>
 
 ### Step 3: Configure Redirect URI
 
-After saving, NetBird displays the **Redirect URL**. Copy this URL and add it to your PocketID client:
+After saving, openZro displays the **Redirect URL**. Copy this URL and add it to your PocketID client:
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/5_copy-redirect-netbird-pocketid.png" alt="Copy redirect URL from NetBird" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/5_copy-redirect-openzro-pocketid.png" alt="Copy redirect URL from openZro" className="imagewrapper-big"/>
 </p>
 
 1. Return to PocketID console → **OIDC Clients**
-2. Edit your NetBird client
+2. Edit your openZro client
 3. Add the redirect URL to **Callback URLs**
 
 <p>
@@ -92,26 +92,26 @@ After saving, NetBird displays the **Redirect URL**. Copy this URL and add it to
 1. Return to PocketID console → **User Groups**
 2. Click **Add** to create a new group
 3. Fill in:
-   - **Name**: `NetBird`
+   - **Name**: `openZro`
 4. Click **Save**
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/7_add-user-group-pocketid.png" alt="Add user group" className="imagewrapper-big"/>
 </p>
 
-5. Add users to the NetBird group:
-   - Click on the **NetBird** group
+5. Add users to the openZro group:
+   - Click on the **openZro** group
    - Click **Add Users**
-   - Select the users who should have access to NetBird
+   - Select the users who should have access to openZro
    - Click **Save** or **Add**
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/8_add-group-to-user-pocketid.png" alt="Add users to group" className="imagewrapper-big"/>
 </p>
 
-6. Go to **OIDC Clients** → **NetBird** (the client you created earlier)
+6. Go to **OIDC Clients** → **openZro** (the client you created earlier)
 7. Find the **Groups** or **User Groups** section
-8. Add the **NetBird** group to the client
+8. Add the **openZro** group to the client
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/9_add-group-to-oidc-pocketid.png" alt="Add group to OIDC client" className="imagewrapper-big"/>
@@ -121,10 +121,10 @@ After saving, NetBird displays the **Redirect URL**. Copy this URL and add it to
 
 ### Step 5: Test the Connection
 
-1. Log out of NetBird Dashboard
+1. Log out of openZro Dashboard
 2. On the login page, you should see a "PocketID" button
 3. Click it and authenticate with your PocketID credentials
-4. You should be redirected back to NetBird and logged in
+4. You should be redirected back to openZro and logged in
 
 ### Configuring JWT 'groups' Claim
 
@@ -134,11 +134,11 @@ PocketID includes user groups in the ID token by default when you've assigned gr
 
 1. Ensure you've created a User Group in PocketID (Step 4)
 2. Ensure users are assigned to the group
-3. Ensure the group is linked to your NetBird OIDC client
+3. Ensure the group is linked to your openZro OIDC client
 
-#### Enable JWT Group Sync in NetBird
+#### Enable JWT Group Sync in openZro
 
-1. In NetBird Dashboard, go to **Settings** → **Groups**
+1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to `groups`
 4. Optionally configure **JWT allow groups** to restrict access to users in specific PocketID groups
@@ -151,11 +151,11 @@ PocketID restricts OIDC client access based on group membership. Only users in g
 
 ## Standalone Setup (Advanced)
 
-Use PocketID as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced PocketID administrators as it also requires additional setup and ongoing maintenance.
+Use PocketID as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced PocketID administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
-For detailed instructions on the standalone setup, see the [PocketID SSO with NetBird Self-Hosted (Advanced)](/selfhosted/identity-providers/advanced/pocketid) documentation.
+For detailed instructions on the standalone setup, see the [PocketID SSO with openZro Self-Hosted (Advanced)](/selfhosted/identity-providers/advanced/pocketid) documentation.
 
 ---
 

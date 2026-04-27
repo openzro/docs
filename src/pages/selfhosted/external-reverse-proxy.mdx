@@ -1,14 +1,14 @@
-# External Reverse Proxy Setup for Self-Hosted NetBird
+# External Reverse Proxy Setup for Self-Hosted openZro
 
-NetBird includes a built-in Traefik reverse proxy that handles TLS certificates automatically via Let's Encrypt. However, if you already have an existing reverse proxy (Nginx, Caddy, etc.), you can configure NetBird to work with it instead.
+openZro includes a built-in Traefik reverse proxy that handles TLS certificates automatically via Let's Encrypt. However, if you already have an existing reverse proxy (Nginx, Caddy, etc.), you can configure openZro to work with it instead.
 
 <Note>
-This is not to be confused with the NetBird reverse proxy service that launched with v0.65.0. The NetBird reverse proxy feature is only compatible with Traefik because it requires TLS passthrough, which Traefik supports natively. To learn more about using NetBird as a reverse proxy, see the [NetBird Proxy documentation](/manage/reverse-proxy).
+This is not to be confused with the openZro reverse proxy service that launched with v0.65.0. The openZro reverse proxy feature is only compatible with Traefik because it requires TLS passthrough, which Traefik supports natively. To learn more about using openZro as a reverse proxy, see the [openZro Proxy documentation](/manage/reverse-proxy).
 </Note>
 
-Not all reverse proxies are supported as NetBird uses *gRPC* for various components. Your reverse proxy must support HTTP/2 and gRPC proxying.
+Not all reverse proxies are supported as openZro uses *gRPC* for various components. Your reverse proxy must support HTTP/2 and gRPC proxying.
 
-Starting with **v0.65.0**, new NetBird installations use a **combined container** (`netbirdio/netbird-server`) that merges management, signal, and relay into a single service. This simplifies reverse proxy configuration because all traffic routes to one backend. The templates on this page cover both setups:
+Starting with **v0.65.0**, new openZro installations use a **combined container** (`openzro/openzro-server`) that merges management, signal, and relay into a single service. This simplifies reverse proxy configuration because all traffic routes to one backend. The templates on this page cover both setups:
 
 - **[Combined container (v0.65.0+)](#combined-container-setup-v0-65-0)** -- the default for new installations. All backend services run in a single container on one port.
 - **[Multi-container (legacy)](#multi-container-setup-legacy)** -- for installations that predate v0.65.0, where management, signal, and relay run as separate containers.
@@ -37,13 +37,13 @@ This option is only available during initial setup with `getting-started.sh`. Fo
 
 ### Existing Deployments
 
-For existing NetBird installations, use the configuration templates in the sections below to manually configure your reverse proxy.
+For existing openZro installations, use the configuration templates in the sections below to manually configure your reverse proxy.
 
 ---
 
 ## Combined Container Setup (v0.65.0+)
 
-Starting with v0.65.0, new NetBird deployments use the `netbirdio/netbird-server` image, which combines management, signal, and relay into a single container. All backend traffic routes to one service on a single port, which simplifies reverse proxy configuration significantly.
+Starting with v0.65.0, new openZro deployments use the `openzro/openzro-server` image, which combines management, signal, and relay into a single container. All backend traffic routes to one service on a single port, which simplifies reverse proxy configuration significantly.
 
 <Warning>
 UDP port **3478** (STUN) must be publicly accessible and **cannot** be proxied through your reverse proxy. HTTP reverse proxies only handle TCP traffic; STUN requires direct UDP access. Ensure your firewall allows inbound UDP on port 3478 and that this port is published directly from the container (e.g. `3478:3478/udp`), bypassing the reverse proxy entirely.
@@ -51,17 +51,17 @@ UDP port **3478** (STUN) must be publicly accessible and **cannot** be proxied t
 
 ### Required Routing Endpoints (Combined)
 
-All reverse proxy configurations for the combined container must route the following endpoints to the single `netbird-server` container:
+All reverse proxy configurations for the combined container must route the following endpoints to the single `openzro-server` container:
 
 | Path | Protocol | Target | Notes |
 |------|----------|--------|-------|
-| `/relay*` | WebSocket | netbird-server:80 | WebSocket upgrade required |
-| `/ws-proxy/signal*` | WebSocket | netbird-server:80 | WebSocket upgrade required |
-| `/ws-proxy/management*` | WebSocket | netbird-server:80 | WebSocket upgrade required |
-| `/signalexchange.SignalExchange/*` | gRPC | netbird-server:80 | HTTP/2 (h2c) required |
-| `/management.ManagementService/*` | gRPC | netbird-server:80 | HTTP/2 (h2c) required |
-| `/api/*` | HTTP | netbird-server:80 | REST API |
-| `/oauth2/*` | HTTP | netbird-server:80 | Embedded IdP |
+| `/relay*` | WebSocket | openzro-server:80 | WebSocket upgrade required |
+| `/ws-proxy/signal*` | WebSocket | openzro-server:80 | WebSocket upgrade required |
+| `/ws-proxy/management*` | WebSocket | openzro-server:80 | WebSocket upgrade required |
+| `/signalexchange.SignalExchange/*` | gRPC | openzro-server:80 | HTTP/2 (h2c) required |
+| `/management.ManagementService/*` | gRPC | openzro-server:80 | HTTP/2 (h2c) required |
+| `/api/*` | HTTP | openzro-server:80 | REST API |
+| `/oauth2/*` | HTTP | openzro-server:80 | Embedded IdP |
 | `/*` | HTTP | dashboard:80 | Catch-all for dashboard |
 
 <Note>
@@ -75,20 +75,20 @@ When using an external reverse proxy with the combined container, expose the fol
 ```yaml
 services:
   dashboard:
-    image: netbirdio/dashboard:latest
+    image: openzro/dashboard:latest
     ports:
       - '127.0.0.1:8080:80'
     # ... other config
 
-  netbird-server:
-    image: netbirdio/netbird-server:latest
+  openzro-server:
+    image: openzro/openzro-server:latest
     ports:
       - '127.0.0.1:8081:80'
       - '3478:3478/udp'
     volumes:
-      - netbird_data:/var/lib/netbird
-      - ./config.yaml:/etc/netbird/config.yaml
-    command: ["--config", "/etc/netbird/config.yaml"]
+      - openzro_data:/var/lib/openzro
+      - ./config.yaml:/etc/openzro/config.yaml
+    command: ["--config", "/etc/openzro/config.yaml"]
     # ... other config
 ```
 
@@ -101,7 +101,7 @@ Binding to `127.0.0.1` is recommended when your reverse proxy runs on the same h
 | Service | Host Port | Container Port | Protocol |
 |---------|-----------|----------------|----------|
 | Dashboard | 8080 | 80 | HTTP |
-| NetBird Server | 8081 | 80 | HTTP/gRPC/WebSocket |
+| openZro Server | 8081 | 80 | HTTP/gRPC/WebSocket |
 | STUN (UDP) | 3478 | 3478 | UDP |
 
 ---
@@ -112,62 +112,62 @@ Binding to `127.0.0.1` is recommended when your reverse proxy runs on the same h
 
 For Traefik with the combined container, you only need two routers: one for gRPC (which requires an `h2c` backend) and one for everything else (WebSocket, REST API, OAuth2). The dashboard uses a separate low-priority catch-all router.
 
-Replace `netbird.example.com` with your domain, `websecure` with your HTTPS entrypoint, and `letsencrypt` with your certificate resolver name.
+Replace `openzro.example.com` with your domain, `websecure` with your HTTPS entrypoint, and `letsencrypt` with your certificate resolver name.
 
 ```yaml
 services:
   dashboard:
-    image: netbirdio/dashboard:latest
+    image: openzro/dashboard:latest
     networks: [traefik-network]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.netbird-dashboard.rule=Host(`netbird.example.com`)
-      - traefik.http.routers.netbird-dashboard.entrypoints=websecure
-      - traefik.http.routers.netbird-dashboard.tls=true
-      - traefik.http.routers.netbird-dashboard.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-dashboard.priority=1
-      - traefik.http.services.netbird-dashboard.loadbalancer.server.port=80
+      - traefik.http.routers.openzro-dashboard.rule=Host(`openzro.example.com`)
+      - traefik.http.routers.openzro-dashboard.entrypoints=websecure
+      - traefik.http.routers.openzro-dashboard.tls=true
+      - traefik.http.routers.openzro-dashboard.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-dashboard.priority=1
+      - traefik.http.services.openzro-dashboard.loadbalancer.server.port=80
 
-  netbird-server:
-    image: netbirdio/netbird-server:latest
+  openzro-server:
+    image: openzro/openzro-server:latest
     networks: [traefik-network]
     ports:
       - '3478:3478/udp'
     volumes:
-      - netbird_data:/var/lib/netbird
-      - ./config.yaml:/etc/netbird/config.yaml
-    command: ["--config", "/etc/netbird/config.yaml"]
+      - openzro_data:/var/lib/openzro
+      - ./config.yaml:/etc/openzro/config.yaml
+    command: ["--config", "/etc/openzro/config.yaml"]
     labels:
       - traefik.enable=true
       # gRPC router (needs h2c backend for HTTP/2 cleartext)
-      - traefik.http.routers.netbird-grpc.rule=Host(`netbird.example.com`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`))
-      - traefik.http.routers.netbird-grpc.entrypoints=websecure
-      - traefik.http.routers.netbird-grpc.tls=true
-      - traefik.http.routers.netbird-grpc.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-grpc.service=netbird-server-h2c
-      - traefik.http.routers.netbird-grpc.priority=100
+      - traefik.http.routers.openzro-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`))
+      - traefik.http.routers.openzro-grpc.entrypoints=websecure
+      - traefik.http.routers.openzro-grpc.tls=true
+      - traefik.http.routers.openzro-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-grpc.service=openzro-server-h2c
+      - traefik.http.routers.openzro-grpc.priority=100
       # Backend router (relay, WebSocket, API, OAuth2)
-      - traefik.http.routers.netbird-backend.rule=Host(`netbird.example.com`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))
-      - traefik.http.routers.netbird-backend.entrypoints=websecure
-      - traefik.http.routers.netbird-backend.tls=true
-      - traefik.http.routers.netbird-backend.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-backend.service=netbird-server
-      - traefik.http.routers.netbird-backend.priority=100
+      - traefik.http.routers.openzro-backend.rule=Host(`openzro.example.com`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))
+      - traefik.http.routers.openzro-backend.entrypoints=websecure
+      - traefik.http.routers.openzro-backend.tls=true
+      - traefik.http.routers.openzro-backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-backend.service=openzro-server
+      - traefik.http.routers.openzro-backend.priority=100
       # Services
-      - traefik.http.services.netbird-server.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.port=80
-      - traefik.http.services.netbird-server-h2c.loadbalancer.server.scheme=h2c
+      - traefik.http.services.openzro-server.loadbalancer.server.port=80
+      - traefik.http.services.openzro-server-h2c.loadbalancer.server.port=80
+      - traefik.http.services.openzro-server-h2c.loadbalancer.server.scheme=h2c
 
 networks:
   traefik-network:
     external: true
 
 volumes:
-  netbird_data:
+  openzro_data:
 ```
 
 <Note>
-The combined container requires two Traefik service definitions pointing to the same port: `netbird-server` for standard HTTP/WebSocket traffic and `netbird-server-h2c` with `scheme=h2c` for gRPC traffic.
+The combined container requires two Traefik service definitions pointing to the same port: `openzro-server` for standard HTTP/WebSocket traffic and `openzro-server-h2c` with `scheme=h2c` for gRPC traffic.
 </Note>
 
 ---
@@ -176,22 +176,22 @@ The combined container requires two Traefik service definitions pointing to the 
 
 ##### Nginx running in Docker (Combined)
 
-If Nginx runs in Docker on the same network as the NetBird containers, use the container names directly:
+If Nginx runs in Docker on the same network as the openZro containers, use the container names directly:
 
 ```nginx
-# NetBird Nginx Configuration (Combined Container - Docker network)
+# openZro Nginx Configuration (Combined Container - Docker network)
 
-upstream netbird_dashboard {
-    server netbird-dashboard:80;
+upstream openzro_dashboard {
+    server openzro-dashboard:80;
     keepalive 10;
 }
-upstream netbird_server {
-    server netbird-server:80;
+upstream openzro_server {
+    server openzro-server:80;
 }
 
 server {
     listen 80;
-    server_name netbird.example.com;
+    server_name openzro.example.com;
     location / {
         return 301 https://$host$request_uri;
     }
@@ -199,7 +199,7 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name netbird.example.com;
+    server_name openzro.example.com;
 
     ssl_certificate /path/to/fullchain.pem;
     ssl_certificate_key /path/to/privkey.pem;
@@ -218,7 +218,7 @@ server {
 
     # WebSocket connections (relay, signal, management)
     location ~ ^/(relay|ws-proxy/) {
-        proxy_pass http://netbird_server;
+        proxy_pass http://openzro_server;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -228,7 +228,7 @@ server {
 
     # Native gRPC (signal + management)
     location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
-        grpc_pass grpc://netbird_server;
+        grpc_pass grpc://openzro_server;
         grpc_read_timeout 1d;
         grpc_send_timeout 1d;
         grpc_socket_keepalive on;
@@ -236,13 +236,13 @@ server {
 
     # HTTP routes (API + OAuth2)
     location ~ ^/(api|oauth2)/ {
-        proxy_pass http://netbird_server;
+        proxy_pass http://openzro_server;
         proxy_set_header Host $host;
     }
 
     # Dashboard (catch-all)
     location / {
-        proxy_pass http://netbird_dashboard;
+        proxy_pass http://openzro_dashboard;
     }
 }
 ```
@@ -252,19 +252,19 @@ server {
 If Nginx is installed directly on the host, use localhost addresses:
 
 ```nginx
-# NetBird Nginx Configuration (Combined Container - Host)
+# openZro Nginx Configuration (Combined Container - Host)
 
-upstream netbird_dashboard {
+upstream openzro_dashboard {
     server 127.0.0.1:8080;
     keepalive 10;
 }
-upstream netbird_server {
+upstream openzro_server {
     server 127.0.0.1:8081;
 }
 
 server {
     listen 80;
-    server_name netbird.example.com;
+    server_name openzro.example.com;
     location / {
         return 301 https://$host$request_uri;
     }
@@ -272,7 +272,7 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name netbird.example.com;
+    server_name openzro.example.com;
 
     ssl_certificate /path/to/fullchain.pem;
     ssl_certificate_key /path/to/privkey.pem;
@@ -291,7 +291,7 @@ server {
 
     # WebSocket connections (relay, signal, management)
     location ~ ^/(relay|ws-proxy/) {
-        proxy_pass http://netbird_server;
+        proxy_pass http://openzro_server;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -301,7 +301,7 @@ server {
 
     # Native gRPC (signal + management)
     location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
-        grpc_pass grpc://netbird_server;
+        grpc_pass grpc://openzro_server;
         grpc_read_timeout 1d;
         grpc_send_timeout 1d;
         grpc_socket_keepalive on;
@@ -309,13 +309,13 @@ server {
 
     # HTTP routes (API + OAuth2)
     location ~ ^/(api|oauth2)/ {
-        proxy_pass http://netbird_server;
+        proxy_pass http://openzro_server;
         proxy_set_header Host $host;
     }
 
     # Dashboard (catch-all)
     location / {
-        proxy_pass http://netbird_dashboard;
+        proxy_pass http://openzro_dashboard;
     }
 }
 ```
@@ -326,20 +326,20 @@ server {
 
 ##### Caddy running in Docker (Combined)
 
-If Caddy runs in Docker on the same network as NetBird, use container names:
+If Caddy runs in Docker on the same network as openZro, use container names:
 
 ```
-netbird.example.com {
+openzro.example.com {
     # Native gRPC (needs HTTP/2 cleartext to backend)
     @grpc header Content-Type application/grpc*
-    reverse_proxy @grpc h2c://netbird-server:80
+    reverse_proxy @grpc h2c://openzro-server:80
 
     # Combined server paths (relay, signal, management, OAuth2)
     @backend path /relay* /ws-proxy/* /api/* /oauth2/*
-    reverse_proxy @backend netbird-server:80
+    reverse_proxy @backend openzro-server:80
 
     # Dashboard (everything else)
-    reverse_proxy /* netbird-dashboard:80
+    reverse_proxy /* openzro-dashboard:80
 }
 ```
 
@@ -348,7 +348,7 @@ netbird.example.com {
 If Caddy is installed directly on the host, use localhost addresses:
 
 ```
-netbird.example.com {
+openzro.example.com {
     # Native gRPC (needs HTTP/2 cleartext to backend)
     @grpc header Content-Type application/grpc*
     reverse_proxy @grpc h2c://127.0.0.1:8081
@@ -369,14 +369,14 @@ netbird.example.com {
 With the combined container, NPM configuration is simpler because all backend traffic routes to the same service.
 
 <Note>
-NPM requires backend services to be running before you can create proxy hosts. Start the NetBird containers first, then configure NPM.
+NPM requires backend services to be running before you can create proxy hosts. Start the openZro containers first, then configure NPM.
 </Note>
 
 ##### NPM running in Docker (Combined)
 
 **1. Create a Proxy Host in NPM:**
-- Domain: `netbird.example.com`
-- Forward Hostname/IP: `netbird-dashboard`
+- Domain: `openzro.example.com`
+- Forward Hostname/IP: `openzro-dashboard`
 - Forward Port: `80`
 - Block Common Exploits: enabled
 
@@ -393,7 +393,7 @@ client_body_timeout 1d;
 
 # WebSocket connections (relay, signal, management)
 location ~ ^/(relay|ws-proxy/) {
-    proxy_pass http://netbird-server:80;
+    proxy_pass http://openzro-server:80;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
@@ -406,7 +406,7 @@ location ~ ^/(relay|ws-proxy/) {
 
 # Native gRPC (signal + management)
 location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
-    grpc_pass grpc://netbird-server:80;
+    grpc_pass grpc://openzro-server:80;
     grpc_read_timeout 1d;
     grpc_send_timeout 1d;
     grpc_socket_keepalive on;
@@ -414,7 +414,7 @@ location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
 
 # HTTP routes (API + OAuth2)
 location ~ ^/(api|oauth2)/ {
-    proxy_pass http://netbird-server:80;
+    proxy_pass http://openzro-server:80;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -425,7 +425,7 @@ location ~ ^/(api|oauth2)/ {
 ##### NPM running on host (Combined)
 
 **1. Create a Proxy Host in NPM:**
-- Domain: `netbird.example.com`
+- Domain: `openzro.example.com`
 - Forward Hostname/IP: `127.0.0.1`
 - Forward Port: `8080`
 - Block Common Exploits: enabled
@@ -476,7 +476,7 @@ location ~ ^/(api|oauth2)/ {
 
 ## Multi-Container Setup (Legacy)
 
-The following sections apply to NetBird installations from before v0.65.0 that use separate containers for management, signal, and relay. If you are running a new installation, use the [combined container templates above](#combined-container-setup-v0650).
+The following sections apply to openZro installations from before v0.65.0 that use separate containers for management, signal, and relay. If you are running a new installation, use the [combined container templates above](#combined-container-setup-v0650).
 
 <Warning>
 UDP port **3478** (STUN/TURN via coturn) must be publicly accessible and **cannot** be proxied through your reverse proxy. HTTP reverse proxies only handle TCP traffic; STUN/TURN requires direct UDP access. Ensure your firewall allows inbound UDP on port 3478 and that the coturn container publishes this port directly, bypassing the reverse proxy entirely.
@@ -504,31 +504,31 @@ The `coturn` service still needs to be directly accessible on UDP port 3478 as i
 
 ### Docker Compose for External Proxy (Multi-Container)
 
-When using an external reverse proxy, expose the NetBird container ports to the host:
+When using an external reverse proxy, expose the openZro container ports to the host:
 
 ```yaml
 services:
   dashboard:
-    image: netbirdio/dashboard:latest
+    image: openzro/dashboard:latest
     ports:
       - '127.0.0.1:8080:80'
     # ... other config
 
   signal:
-    image: netbirdio/signal:latest
+    image: openzro/signal:latest
     ports:
       - '127.0.0.1:8083:80'
       - '127.0.0.1:10000:10000'
     # ... other config
 
   relay:
-    image: netbirdio/relay:latest
+    image: openzro/relay:latest
     ports:
       - '127.0.0.1:8084:80'
     # ... other config
 
   management:
-    image: netbirdio/management:latest
+    image: openzro/management:latest
     ports:
       - '127.0.0.1:8081:80'
     # ... other config
@@ -554,7 +554,7 @@ Binding to `127.0.0.1` is recommended when your reverse proxy runs on the same h
 
 #### Traefik (Multi-Container)
 
-For Traefik, NetBird containers are configured with Docker labels for automatic service discovery. The `getting-started.sh` script will prompt for your Traefik configuration:
+For Traefik, openZro containers are configured with Docker labels for automatic service discovery. The `getting-started.sh` script will prompt for your Traefik configuration:
 
 - **External network**: The Docker network your Traefik container uses
 - **HTTPS entrypoint**: Your Traefik entrypoint for HTTPS traffic (commonly `websecure`)
@@ -562,91 +562,91 @@ For Traefik, NetBird containers are configured with Docker labels for automatic 
 
 ##### Complete Docker Compose with Traefik Labels
 
-Add the following labels to your NetBird services in `docker-compose.yml`. Replace:
-- `netbird.example.com` with your domain
+Add the following labels to your openZro services in `docker-compose.yml`. Replace:
+- `openzro.example.com` with your domain
 - `websecure` with your HTTPS entrypoint name
 - `letsencrypt` with your certificate resolver name (or remove the certresolver lines if handling TLS externally)
 
 ```yaml
 services:
   dashboard:
-    image: netbirdio/dashboard:latest
+    image: openzro/dashboard:latest
     networks: [traefik-network]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.netbird-dashboard.rule=Host(`netbird.example.com`)
-      - traefik.http.routers.netbird-dashboard.entrypoints=websecure
-      - traefik.http.routers.netbird-dashboard.tls=true
-      - traefik.http.routers.netbird-dashboard.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-dashboard.priority=1
-      - traefik.http.services.netbird-dashboard.loadbalancer.server.port=80
+      - traefik.http.routers.openzro-dashboard.rule=Host(`openzro.example.com`)
+      - traefik.http.routers.openzro-dashboard.entrypoints=websecure
+      - traefik.http.routers.openzro-dashboard.tls=true
+      - traefik.http.routers.openzro-dashboard.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-dashboard.priority=1
+      - traefik.http.services.openzro-dashboard.loadbalancer.server.port=80
 
   signal:
-    image: netbirdio/signal:latest
+    image: openzro/signal:latest
     networks: [traefik-network]
     labels:
       - traefik.enable=true
       # WebSocket router
-      - traefik.http.routers.netbird-signal-ws.rule=Host(`netbird.example.com`) && PathPrefix(`/ws-proxy/signal`)
-      - traefik.http.routers.netbird-signal-ws.entrypoints=websecure
-      - traefik.http.routers.netbird-signal-ws.tls=true
-      - traefik.http.routers.netbird-signal-ws.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-signal-ws.service=netbird-signal-ws
-      - traefik.http.services.netbird-signal-ws.loadbalancer.server.port=80
+      - traefik.http.routers.openzro-signal-ws.rule=Host(`openzro.example.com`) && PathPrefix(`/ws-proxy/signal`)
+      - traefik.http.routers.openzro-signal-ws.entrypoints=websecure
+      - traefik.http.routers.openzro-signal-ws.tls=true
+      - traefik.http.routers.openzro-signal-ws.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-signal-ws.service=openzro-signal-ws
+      - traefik.http.services.openzro-signal-ws.loadbalancer.server.port=80
       # gRPC router
-      - traefik.http.routers.netbird-signal-grpc.rule=Host(`netbird.example.com`) && PathPrefix(`/signalexchange.SignalExchange/`)
-      - traefik.http.routers.netbird-signal-grpc.entrypoints=websecure
-      - traefik.http.routers.netbird-signal-grpc.tls=true
-      - traefik.http.routers.netbird-signal-grpc.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-signal-grpc.service=netbird-signal-grpc
-      - traefik.http.services.netbird-signal-grpc.loadbalancer.server.port=10000
-      - traefik.http.services.netbird-signal-grpc.loadbalancer.server.scheme=h2c
+      - traefik.http.routers.openzro-signal-grpc.rule=Host(`openzro.example.com`) && PathPrefix(`/signalexchange.SignalExchange/`)
+      - traefik.http.routers.openzro-signal-grpc.entrypoints=websecure
+      - traefik.http.routers.openzro-signal-grpc.tls=true
+      - traefik.http.routers.openzro-signal-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-signal-grpc.service=openzro-signal-grpc
+      - traefik.http.services.openzro-signal-grpc.loadbalancer.server.port=10000
+      - traefik.http.services.openzro-signal-grpc.loadbalancer.server.scheme=h2c
 
   relay:
-    image: netbirdio/relay:latest
+    image: openzro/relay:latest
     networks: [traefik-network]
     labels:
       - traefik.enable=true
-      - traefik.http.routers.netbird-relay.rule=Host(`netbird.example.com`) && PathPrefix(`/relay`)
-      - traefik.http.routers.netbird-relay.entrypoints=websecure
-      - traefik.http.routers.netbird-relay.tls=true
-      - traefik.http.routers.netbird-relay.tls.certresolver=letsencrypt
-      - traefik.http.services.netbird-relay.loadbalancer.server.port=80
+      - traefik.http.routers.openzro-relay.rule=Host(`openzro.example.com`) && PathPrefix(`/relay`)
+      - traefik.http.routers.openzro-relay.entrypoints=websecure
+      - traefik.http.routers.openzro-relay.tls=true
+      - traefik.http.routers.openzro-relay.tls.certresolver=letsencrypt
+      - traefik.http.services.openzro-relay.loadbalancer.server.port=80
 
   management:
-    image: netbirdio/management:latest
+    image: openzro/management:latest
     networks: [traefik-network]
     labels:
       - traefik.enable=true
       # API router
-      - traefik.http.routers.netbird-api.rule=Host(`netbird.example.com`) && PathPrefix(`/api`)
-      - traefik.http.routers.netbird-api.entrypoints=websecure
-      - traefik.http.routers.netbird-api.tls=true
-      - traefik.http.routers.netbird-api.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-api.service=netbird-api
-      - traefik.http.services.netbird-api.loadbalancer.server.port=80
+      - traefik.http.routers.openzro-api.rule=Host(`openzro.example.com`) && PathPrefix(`/api`)
+      - traefik.http.routers.openzro-api.entrypoints=websecure
+      - traefik.http.routers.openzro-api.tls=true
+      - traefik.http.routers.openzro-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-api.service=openzro-api
+      - traefik.http.services.openzro-api.loadbalancer.server.port=80
       # Management WebSocket router
-      - traefik.http.routers.netbird-mgmt-ws.rule=Host(`netbird.example.com`) && PathPrefix(`/ws-proxy/management`)
-      - traefik.http.routers.netbird-mgmt-ws.entrypoints=websecure
-      - traefik.http.routers.netbird-mgmt-ws.tls=true
-      - traefik.http.routers.netbird-mgmt-ws.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-mgmt-ws.service=netbird-mgmt-ws
-      - traefik.http.services.netbird-mgmt-ws.loadbalancer.server.port=80
+      - traefik.http.routers.openzro-mgmt-ws.rule=Host(`openzro.example.com`) && PathPrefix(`/ws-proxy/management`)
+      - traefik.http.routers.openzro-mgmt-ws.entrypoints=websecure
+      - traefik.http.routers.openzro-mgmt-ws.tls=true
+      - traefik.http.routers.openzro-mgmt-ws.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-mgmt-ws.service=openzro-mgmt-ws
+      - traefik.http.services.openzro-mgmt-ws.loadbalancer.server.port=80
       # Management gRPC router
-      - traefik.http.routers.netbird-mgmt-grpc.rule=Host(`netbird.example.com`) && (PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
-      - traefik.http.routers.netbird-mgmt-grpc.entrypoints=websecure
-      - traefik.http.routers.netbird-mgmt-grpc.tls=true
-      - traefik.http.routers.netbird-mgmt-grpc.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-mgmt-grpc.service=netbird-mgmt-grpc
-      - traefik.http.services.netbird-mgmt-grpc.loadbalancer.server.port=80
-      - traefik.http.services.netbird-mgmt-grpc.loadbalancer.server.scheme=h2c
+      - traefik.http.routers.openzro-mgmt-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
+      - traefik.http.routers.openzro-mgmt-grpc.entrypoints=websecure
+      - traefik.http.routers.openzro-mgmt-grpc.tls=true
+      - traefik.http.routers.openzro-mgmt-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-mgmt-grpc.service=openzro-mgmt-grpc
+      - traefik.http.services.openzro-mgmt-grpc.loadbalancer.server.port=80
+      - traefik.http.services.openzro-mgmt-grpc.loadbalancer.server.scheme=h2c
       # OAuth2 router (embedded IdP)
-      - traefik.http.routers.netbird-oauth2.rule=Host(`netbird.example.com`) && PathPrefix(`/oauth2`)
-      - traefik.http.routers.netbird-oauth2.entrypoints=websecure
-      - traefik.http.routers.netbird-oauth2.tls=true
-      - traefik.http.routers.netbird-oauth2.tls.certresolver=letsencrypt
-      - traefik.http.routers.netbird-oauth2.service=netbird-oauth2
-      - traefik.http.services.netbird-oauth2.loadbalancer.server.port=80
+      - traefik.http.routers.openzro-oauth2.rule=Host(`openzro.example.com`) && PathPrefix(`/oauth2`)
+      - traefik.http.routers.openzro-oauth2.entrypoints=websecure
+      - traefik.http.routers.openzro-oauth2.tls=true
+      - traefik.http.routers.openzro-oauth2.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-oauth2.service=openzro-oauth2
+      - traefik.http.services.openzro-oauth2.loadbalancer.server.port=80
 
 networks:
   traefik-network:
@@ -739,32 +739,32 @@ When using `getting-started.sh` with Traefik, the script will ask for your netwo
 
 ##### Nginx running in Docker (Multi-Container)
 
-If Nginx is running in Docker, the easiest approach is to have NetBird join the same Docker network. The `getting-started.sh` script will ask for your Nginx network name and configure everything automatically.
+If Nginx is running in Docker, the easiest approach is to have openZro join the same Docker network. The `getting-started.sh` script will ask for your Nginx network name and configure everything automatically.
 
 ```nginx
-# NetBird Nginx Configuration (Docker network)
+# openZro Nginx Configuration (Docker network)
 # Uses container names for upstream servers
 
-upstream netbird_dashboard {
-    server netbird-dashboard:80;
+upstream openzro_dashboard {
+    server openzro-dashboard:80;
     keepalive 10;
 }
-upstream netbird_signal {
-    server netbird-signal:10000;
+upstream openzro_signal {
+    server openzro-signal:10000;
 }
-upstream netbird_signal_ws {
-    server netbird-signal:80;
+upstream openzro_signal_ws {
+    server openzro-signal:80;
 }
-upstream netbird_management {
-    server netbird-management:80;
+upstream openzro_management {
+    server openzro-management:80;
 }
-upstream netbird_relay {
-    server netbird-relay:80;
+upstream openzro_relay {
+    server openzro-relay:80;
 }
 
 server {
     listen 80;
-    server_name netbird.example.com;
+    server_name openzro.example.com;
     location / {
         return 301 https://$host$request_uri;
     }
@@ -772,7 +772,7 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name netbird.example.com;
+    server_name openzro.example.com;
 
     ssl_certificate /path/to/fullchain.pem;
     ssl_certificate_key /path/to/privkey.pem;
@@ -791,7 +791,7 @@ server {
 
     # Relay (WebSocket)
     location /relay {
-        proxy_pass http://netbird_relay;
+        proxy_pass http://openzro_relay;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -801,7 +801,7 @@ server {
 
     # Signal WebSocket
     location /ws-proxy/signal {
-        proxy_pass http://netbird_signal_ws;
+        proxy_pass http://openzro_signal_ws;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -811,7 +811,7 @@ server {
 
     # Signal gRPC
     location /signalexchange.SignalExchange/ {
-        grpc_pass grpc://netbird_signal;
+        grpc_pass grpc://openzro_signal;
         grpc_read_timeout 1d;
         grpc_send_timeout 1d;
         grpc_socket_keepalive on;
@@ -819,13 +819,13 @@ server {
 
     # Management API
     location /api/ {
-        proxy_pass http://netbird_management;
+        proxy_pass http://openzro_management;
         proxy_set_header Host $host;
     }
 
     # Management WebSocket
     location /ws-proxy/management {
-        proxy_pass http://netbird_management;
+        proxy_pass http://openzro_management;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -835,7 +835,7 @@ server {
 
     # Management gRPC
     location /management.ManagementService/ {
-        grpc_pass grpc://netbird_management;
+        grpc_pass grpc://openzro_management;
         grpc_read_timeout 1d;
         grpc_send_timeout 1d;
         grpc_socket_keepalive on;
@@ -843,13 +843,13 @@ server {
 
     # Embedded IdP OAuth2
     location /oauth2/ {
-        proxy_pass http://netbird_management;
+        proxy_pass http://openzro_management;
         proxy_set_header Host $host;
     }
 
     # Dashboard (catch-all)
     location / {
-        proxy_pass http://netbird_dashboard;
+        proxy_pass http://openzro_dashboard;
     }
 }
 ```
@@ -859,30 +859,30 @@ server {
 If Nginx is installed directly on the host, use localhost addresses:
 
 ```nginx
-# NetBird Nginx Configuration
-# Replace netbird.example.com with your domain
+# openZro Nginx Configuration
+# Replace openzro.example.com with your domain
 # Update SSL certificate paths
 
-upstream netbird_dashboard {
+upstream openzro_dashboard {
     server 127.0.0.1:8080;
     keepalive 10;
 }
-upstream netbird_signal {
+upstream openzro_signal {
     server 127.0.0.1:10000;
 }
-upstream netbird_signal_ws {
+upstream openzro_signal_ws {
     server 127.0.0.1:8083;
 }
-upstream netbird_management {
+upstream openzro_management {
     server 127.0.0.1:8081;
 }
-upstream netbird_relay {
+upstream openzro_relay {
     server 127.0.0.1:8084;
 }
 
 server {
     listen 80;
-    server_name netbird.example.com;
+    server_name openzro.example.com;
     location / {
         return 301 https://$host$request_uri;
     }
@@ -890,7 +890,7 @@ server {
 
 server {
     listen 443 ssl http2;
-    server_name netbird.example.com;
+    server_name openzro.example.com;
 
     ssl_certificate /path/to/fullchain.pem;
     ssl_certificate_key /path/to/privkey.pem;
@@ -909,7 +909,7 @@ server {
 
     # Relay (WebSocket)
     location /relay {
-        proxy_pass http://netbird_relay;
+        proxy_pass http://openzro_relay;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -919,7 +919,7 @@ server {
 
     # Signal WebSocket
     location /ws-proxy/signal {
-        proxy_pass http://netbird_signal_ws;
+        proxy_pass http://openzro_signal_ws;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -929,7 +929,7 @@ server {
 
     # Signal gRPC
     location /signalexchange.SignalExchange/ {
-        grpc_pass grpc://netbird_signal;
+        grpc_pass grpc://openzro_signal;
         grpc_read_timeout 1d;
         grpc_send_timeout 1d;
         grpc_socket_keepalive on;
@@ -937,13 +937,13 @@ server {
 
     # Management API
     location /api/ {
-        proxy_pass http://netbird_management;
+        proxy_pass http://openzro_management;
         proxy_set_header Host $host;
     }
 
     # Management WebSocket
     location /ws-proxy/management {
-        proxy_pass http://netbird_management;
+        proxy_pass http://openzro_management;
         proxy_http_version 1.1;
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "Upgrade";
@@ -953,7 +953,7 @@ server {
 
     # Management gRPC
     location /management.ManagementService/ {
-        grpc_pass grpc://netbird_management;
+        grpc_pass grpc://openzro_management;
         grpc_read_timeout 1d;
         grpc_send_timeout 1d;
         grpc_socket_keepalive on;
@@ -961,13 +961,13 @@ server {
 
     # Embedded IdP OAuth2
     location /oauth2/ {
-        proxy_pass http://netbird_management;
+        proxy_pass http://openzro_management;
         proxy_set_header Host $host;
     }
 
     # Dashboard (catch-all)
     location / {
-        proxy_pass http://netbird_dashboard;
+        proxy_pass http://openzro_dashboard;
     }
 }
 ```
@@ -976,14 +976,14 @@ server {
 
 Debian/Ubuntu:
 ```bash
-sudo ln -s /path/to/netbird.conf /etc/nginx/sites-available/netbird
-sudo ln -s /etc/nginx/sites-available/netbird /etc/nginx/sites-enabled/
+sudo ln -s /path/to/openzro.conf /etc/nginx/sites-available/openzro
+sudo ln -s /etc/nginx/sites-available/openzro /etc/nginx/sites-enabled/
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
 RHEL/CentOS:
 ```bash
-sudo cp /path/to/netbird.conf /etc/nginx/conf.d/netbird.conf
+sudo cp /path/to/openzro.conf /etc/nginx/conf.d/openzro.conf
 sudo nginx -t && sudo systemctl reload nginx
 ```
 
@@ -1011,16 +1011,16 @@ sudo yum install certbot python3-certbot-nginx
 2. Obtain certificate:
 ```bash
 # If Nginx is already running
-sudo certbot certonly --nginx -d netbird.example.com
+sudo certbot certonly --nginx -d openzro.example.com
 
 # If Nginx isn't running yet (standalone mode)
-sudo certbot certonly --standalone -d netbird.example.com
+sudo certbot certonly --standalone -d openzro.example.com
 ```
 
 3. Update your Nginx config with the certificate paths:
 ```nginx
-ssl_certificate /etc/letsencrypt/live/netbird.example.com/fullchain.pem;
-ssl_certificate_key /etc/letsencrypt/live/netbird.example.com/privkey.pem;
+ssl_certificate /etc/letsencrypt/live/openzro.example.com/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/openzro.example.com/privkey.pem;
 ```
 
 4. Set up automatic renewal:
@@ -1046,11 +1046,11 @@ sudo certbot renew --dry-run
 curl https://get.acme.sh | sh
 
 # Issue certificate
-~/.acme.sh/acme.sh --issue -d netbird.example.com --nginx
+~/.acme.sh/acme.sh --issue -d openzro.example.com --nginx
 
 # Update Nginx config with paths:
-# ssl_certificate /root/.acme.sh/netbird.example.com/fullchain.cer;
-# ssl_certificate_key /root/.acme.sh/netbird.example.com/netbird.example.com.key;
+# ssl_certificate /root/.acme.sh/openzro.example.com/fullchain.cer;
+# ssl_certificate_key /root/.acme.sh/openzro.example.com/openzro.example.com.key;
 ```
 
 **Option 3: Custom/Commercial Certificates**
@@ -1059,15 +1059,15 @@ If you have certificates from another provider:
 
 1. Place your certificate files on the server:
 ```bash
-sudo cp fullchain.pem /etc/ssl/certs/netbird.crt
-sudo cp privkey.pem /etc/ssl/private/netbird.key
-sudo chmod 600 /etc/ssl/private/netbird.key
+sudo cp fullchain.pem /etc/ssl/certs/openzro.crt
+sudo cp privkey.pem /etc/ssl/private/openzro.key
+sudo chmod 600 /etc/ssl/private/openzro.key
 ```
 
 2. Update your Nginx config:
 ```nginx
-ssl_certificate /etc/ssl/certs/netbird.crt;
-ssl_certificate_key /etc/ssl/private/netbird.key;
+ssl_certificate /etc/ssl/certs/openzro.crt;
+ssl_certificate_key /etc/ssl/private/openzro.key;
 ```
 
 **TLS Best Practices**
@@ -1088,7 +1088,7 @@ ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDS
 These settings ensure:
 - Only TLS 1.2 and 1.3 are allowed (older protocols like TLS 1.0/1.1 are disabled)
 - Modern cipher suites that support forward secrecy
-- Compatibility with all modern browsers and NetBird clients
+- Compatibility with all modern browsers and openZro clients
 
 ---
 
@@ -1096,33 +1096,33 @@ These settings ensure:
 
 ##### Caddy running in Docker (Multi-Container)
 
-If Caddy is running in Docker, the easiest approach is to have NetBird join the same Docker network. The `getting-started.sh` script will ask for your Caddy network name and configure everything automatically.
+If Caddy is running in Docker, the easiest approach is to have openZro join the same Docker network. The `getting-started.sh` script will ask for your Caddy network name and configure everything automatically.
 
 ```
-netbird.example.com {
+openzro.example.com {
     # Relay (WebSocket)
-    reverse_proxy /relay* netbird-relay:80
+    reverse_proxy /relay* openzro-relay:80
 
     # Signal WebSocket
-    reverse_proxy /ws-proxy/signal* netbird-signal:80
+    reverse_proxy /ws-proxy/signal* openzro-signal:80
 
     # Signal gRPC (h2c for plaintext HTTP/2)
-    reverse_proxy /signalexchange.SignalExchange/* h2c://netbird-signal:10000
+    reverse_proxy /signalexchange.SignalExchange/* h2c://openzro-signal:10000
 
     # Management API
-    reverse_proxy /api/* netbird-management:80
+    reverse_proxy /api/* openzro-management:80
 
     # Management WebSocket
-    reverse_proxy /ws-proxy/management* netbird-management:80
+    reverse_proxy /ws-proxy/management* openzro-management:80
 
     # Management gRPC
-    reverse_proxy /management.ManagementService/* h2c://netbird-management:80
+    reverse_proxy /management.ManagementService/* h2c://openzro-management:80
 
     # Embedded IdP OAuth2
-    reverse_proxy /oauth2/* netbird-management:80
+    reverse_proxy /oauth2/* openzro-management:80
 
     # Dashboard (catch-all)
-    reverse_proxy /* netbird-dashboard:80
+    reverse_proxy /* openzro-dashboard:80
 }
 ```
 
@@ -1131,7 +1131,7 @@ netbird.example.com {
 If Caddy is installed directly on the host, use localhost addresses:
 
 ```
-netbird.example.com {
+openzro.example.com {
     # Relay (WebSocket)
     reverse_proxy /relay* 127.0.0.1:8084
 
@@ -1167,19 +1167,19 @@ sudo systemctl reload caddy
 
 #### Nginx Proxy Manager (Multi-Container)
 
-Nginx Proxy Manager requires all NetBird routing to be configured via the "Advanced" tab. The Custom Locations feature doesn't properly handle path prefixes.
+Nginx Proxy Manager requires all openZro routing to be configured via the "Advanced" tab. The Custom Locations feature doesn't properly handle path prefixes.
 
 <Note>
-NPM requires backend services to be running before you can create proxy hosts. The `getting-started.sh` script will start NetBird containers first, then display the configuration instructions.
+NPM requires backend services to be running before you can create proxy hosts. The `getting-started.sh` script will start openZro containers first, then display the configuration instructions.
 </Note>
 
 ##### NPM running in Docker (Multi-Container)
 
-If NPM is running in Docker, the easiest approach is to have NetBird join the same Docker network. The script will ask for your NPM network name and configure everything automatically.
+If NPM is running in Docker, the easiest approach is to have openZro join the same Docker network. The script will ask for your NPM network name and configure everything automatically.
 
 **1. Create a Proxy Host in NPM:**
-- Domain: `netbird.example.com`
-- Forward Hostname/IP: `netbird-dashboard`
+- Domain: `openzro.example.com`
+- Forward Hostname/IP: `openzro-dashboard`
 - Forward Port: `80`
 - Block Common Exploits: enabled
 
@@ -1196,7 +1196,7 @@ client_body_timeout 1d;
 
 # Relay WebSocket
 location /relay {
-    proxy_pass http://netbird-relay:80;
+    proxy_pass http://openzro-relay:80;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
@@ -1209,7 +1209,7 @@ location /relay {
 
 # Signal WebSocket
 location /ws-proxy/signal {
-    proxy_pass http://netbird-signal:80;
+    proxy_pass http://openzro-signal:80;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
@@ -1222,7 +1222,7 @@ location /ws-proxy/signal {
 
 # Management WebSocket
 location /ws-proxy/management {
-    proxy_pass http://netbird-management:80;
+    proxy_pass http://openzro-management:80;
     proxy_http_version 1.1;
     proxy_set_header Upgrade $http_upgrade;
     proxy_set_header Connection "upgrade";
@@ -1235,7 +1235,7 @@ location /ws-proxy/management {
 
 # API routes
 location /api/ {
-    proxy_pass http://netbird-management:80;
+    proxy_pass http://openzro-management:80;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -1244,7 +1244,7 @@ location /api/ {
 
 # OAuth2/IdP routes
 location /oauth2/ {
-    proxy_pass http://netbird-management:80;
+    proxy_pass http://openzro-management:80;
     proxy_set_header Host $host;
     proxy_set_header X-Real-IP $remote_addr;
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
@@ -1253,7 +1253,7 @@ location /oauth2/ {
 
 # gRPC for Signal service
 location /signalexchange.SignalExchange/ {
-    grpc_pass grpc://netbird-signal:10000;
+    grpc_pass grpc://openzro-signal:10000;
     grpc_read_timeout 1d;
     grpc_send_timeout 1d;
     grpc_socket_keepalive on;
@@ -1261,7 +1261,7 @@ location /signalexchange.SignalExchange/ {
 
 # gRPC for Management service
 location /management.ManagementService/ {
-    grpc_pass grpc://netbird-management:80;
+    grpc_pass grpc://openzro-management:80;
     grpc_read_timeout 1d;
     grpc_send_timeout 1d;
     grpc_socket_keepalive on;
@@ -1274,7 +1274,7 @@ location /management.ManagementService/ {
 If NPM is installed directly on the host, use localhost addresses:
 
 **1. Create a Proxy Host in NPM:**
-- Domain: `netbird.example.com`
+- Domain: `openzro.example.com`
 - Forward Hostname/IP: `127.0.0.1`
 - Forward Port: `8080`
 - Block Common Exploits: enabled

@@ -12,7 +12,7 @@ export const title = 'Posture Checks'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/posture-checks">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/posture-checks \
+curl -X GET https://api.openzro.io/api/posture-checks \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -43,7 +43,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/posture-checks"
+url = "https://api.openzro.io/api/posture-checks"
 
 headers = {     
   'Accept': 'application/json',
@@ -67,7 +67,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/posture-checks"
+  url := "https://api.openzro.io/api/posture-checks"
   method := "GET"
   
   client := &http.Client {
@@ -103,7 +103,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/posture-checks")
+url = URI("https://api.openzro.io/api/posture-checks")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -121,7 +121,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/posture-checks")
+  .url("https://api.openzro.io/api/posture-checks")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -135,7 +135,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/posture-checks',
+  CURLOPT_URL => 'https://api.openzro.io/api/posture-checks',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -164,7 +164,7 @@ echo $response;
   {
     "id": "ch8i4ug6lnn4g9hqv7mg",
     "name": "Default",
-    "description": "This checks if the peer is running required NetBird's version",
+    "description": "This checks if the peer is running required openZro's version",
     "checks": {
       "nb_version_check": {
         "min_version": "14.3"
@@ -206,9 +206,9 @@ echo $response;
       "process_check": {
         "processes": [
           {
-            "linux_path": "/usr/local/bin/netbird",
-            "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-            "windows_path": "C: rogramDataetBird\netbird.exe"
+            "linux_path": "/usr/local/bin/openzro",
+            "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+            "windows_path": "C: rogramDataetBird\openzro.exe"
           }
         ]
       }
@@ -532,13 +532,13 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/posture-checks">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/posture-checks \
+curl -X POST https://api.openzro.io/api/posture-checks \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
 --data-raw '{
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -580,9 +580,9 @@ curl -X POST https://api.netbird.io/api/posture-checks \
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -594,7 +594,7 @@ curl -X POST https://api.netbird.io/api/posture-checks \
 const axios = require('axios');
 let data = JSON.stringify({
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -636,9 +636,9 @@ let data = JSON.stringify({
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -669,10 +669,10 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/posture-checks"
+url = "https://api.openzro.io/api/posture-checks"
 payload = json.dumps({
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -714,9 +714,9 @@ payload = json.dumps({
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -745,12 +745,12 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/posture-checks"
+  url := "https://api.openzro.io/api/posture-checks"
   method := "POST"
   
   payload := strings.NewReader(`{
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -792,9 +792,9 @@ func main() {
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -834,7 +834,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/posture-checks")
+url = URI("https://api.openzro.io/api/posture-checks")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -846,7 +846,7 @@ request["Authorization"] = "Token <TOKEN>"
 
 request.body = JSON.dump({
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -888,9 +888,9 @@ request.body = JSON.dump({
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -906,7 +906,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
 MediaType mediaType = MediaType.parse("application/json");
 RequestBody body = RequestBody.create(mediaType, '{
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -948,16 +948,16 @@ RequestBody body = RequestBody.create(mediaType, '{
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
   }
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/posture-checks")
+  .url("https://api.openzro.io/api/posture-checks")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -972,7 +972,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/posture-checks',
+  CURLOPT_URL => 'https://api.openzro.io/api/posture-checks',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -982,7 +982,7 @@ curl_setopt_array($curl, array(
   CURLOPT_CUSTOMREQUEST => 'POST',  
   CURLOPT_POSTFIELDS => '{
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -1024,9 +1024,9 @@ curl_setopt_array($curl, array(
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -1053,7 +1053,7 @@ echo $response;
 {
   "id": "ch8i4ug6lnn4g9hqv7mg",
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -1095,9 +1095,9 @@ echo $response;
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -1184,7 +1184,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/posture-checks/{postureCheckId}">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/posture-checks/{postureCheckId} \
+curl -X GET https://api.openzro.io/api/posture-checks/{postureCheckId} \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -1215,7 +1215,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/posture-checks/{postureCheckId}"
+url = "https://api.openzro.io/api/posture-checks/{postureCheckId}"
 
 headers = {     
   'Accept': 'application/json',
@@ -1239,7 +1239,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/posture-checks/{postureCheckId}"
+  url := "https://api.openzro.io/api/posture-checks/{postureCheckId}"
   method := "GET"
   
   client := &http.Client {
@@ -1275,7 +1275,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/posture-checks/{postureCheckId}")
+url = URI("https://api.openzro.io/api/posture-checks/{postureCheckId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1293,7 +1293,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/posture-checks/{postureCheckId}")
+  .url("https://api.openzro.io/api/posture-checks/{postureCheckId}")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -1307,7 +1307,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/posture-checks/{postureCheckId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/posture-checks/{postureCheckId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1335,7 +1335,7 @@ echo $response;
 {
   "id": "ch8i4ug6lnn4g9hqv7mg",
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -1377,9 +1377,9 @@ echo $response;
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -1708,13 +1708,13 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="PUT" label="/api/posture-checks/{postureCheckId}">
 ```bash {{ title: 'cURL' }}
-curl -X PUT https://api.netbird.io/api/posture-checks/{postureCheckId} \
+curl -X PUT https://api.openzro.io/api/posture-checks/{postureCheckId} \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
 --data-raw '{
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -1756,9 +1756,9 @@ curl -X PUT https://api.netbird.io/api/posture-checks/{postureCheckId} \
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -1770,7 +1770,7 @@ curl -X PUT https://api.netbird.io/api/posture-checks/{postureCheckId} \
 const axios = require('axios');
 let data = JSON.stringify({
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -1812,9 +1812,9 @@ let data = JSON.stringify({
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -1845,10 +1845,10 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/posture-checks/{postureCheckId}"
+url = "https://api.openzro.io/api/posture-checks/{postureCheckId}"
 payload = json.dumps({
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -1890,9 +1890,9 @@ payload = json.dumps({
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -1921,12 +1921,12 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/posture-checks/{postureCheckId}"
+  url := "https://api.openzro.io/api/posture-checks/{postureCheckId}"
   method := "PUT"
   
   payload := strings.NewReader(`{
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -1968,9 +1968,9 @@ func main() {
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -2010,7 +2010,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/posture-checks/{postureCheckId}")
+url = URI("https://api.openzro.io/api/posture-checks/{postureCheckId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2022,7 +2022,7 @@ request["Authorization"] = "Token <TOKEN>"
 
 request.body = JSON.dump({
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -2064,9 +2064,9 @@ request.body = JSON.dump({
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -2082,7 +2082,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
 MediaType mediaType = MediaType.parse("application/json");
 RequestBody body = RequestBody.create(mediaType, '{
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -2124,16 +2124,16 @@ RequestBody body = RequestBody.create(mediaType, '{
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
   }
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/posture-checks/{postureCheckId}")
+  .url("https://api.openzro.io/api/posture-checks/{postureCheckId}")
   .method("PUT", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -2148,7 +2148,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/posture-checks/{postureCheckId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/posture-checks/{postureCheckId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -2158,7 +2158,7 @@ curl_setopt_array($curl, array(
   CURLOPT_CUSTOMREQUEST => 'PUT',  
   CURLOPT_POSTFIELDS => '{
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -2200,9 +2200,9 @@ curl_setopt_array($curl, array(
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -2229,7 +2229,7 @@ echo $response;
 {
   "id": "ch8i4ug6lnn4g9hqv7mg",
   "name": "Default",
-  "description": "This checks if the peer is running required NetBird's version",
+  "description": "This checks if the peer is running required openZro's version",
   "checks": {
     "nb_version_check": {
       "min_version": "14.3"
@@ -2271,9 +2271,9 @@ echo $response;
     "process_check": {
       "processes": [
         {
-          "linux_path": "/usr/local/bin/netbird",
-          "mac_path": "/Applications/NetBird.app/Contents/MacOS/netbird",
-          "windows_path": "C: rogramDataetBird\netbird.exe"
+          "linux_path": "/usr/local/bin/openzro",
+          "mac_path": "/Applications/openZro.app/Contents/MacOS/openzro",
+          "windows_path": "C: rogramDataetBird\openzro.exe"
         }
       ]
     }
@@ -2360,7 +2360,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/posture-checks/{postureCheckId}">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/posture-checks/{postureCheckId} \
+curl -X DELETE https://api.openzro.io/api/posture-checks/{postureCheckId} \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -2389,7 +2389,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/posture-checks/{postureCheckId}"
+url = "https://api.openzro.io/api/posture-checks/{postureCheckId}"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -2412,7 +2412,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/posture-checks/{postureCheckId}"
+  url := "https://api.openzro.io/api/posture-checks/{postureCheckId}"
   method := "DELETE"
   
   client := &http.Client {
@@ -2447,7 +2447,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/posture-checks/{postureCheckId}")
+url = URI("https://api.openzro.io/api/posture-checks/{postureCheckId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2464,7 +2464,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/posture-checks/{postureCheckId}")
+  .url("https://api.openzro.io/api/posture-checks/{postureCheckId}")
   .method("DELETE")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -2477,7 +2477,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/posture-checks/{postureCheckId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/posture-checks/{postureCheckId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

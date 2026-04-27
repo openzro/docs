@@ -229,7 +229,7 @@ export function Layout({ children, title, tableOfContents }) {
             </li>
             <li key="edit-on-github">
               <Link
-                  href={"https://github.com/netbirdio/docs/tree/main/src/pages" + (EDIT_ON_GITHUB_INDEX_ROUTES.has(router.pathname) ? router.pathname + "/index.mdx" : router.pathname + ".mdx")}
+                  href={"https://github.com/openzro/docs/tree/main/src/pages" + (EDIT_ON_GITHUB_INDEX_ROUTES.has(router.pathname) ? router.pathname + "/index.mdx" : router.pathname + ".mdx")}
                   className="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal'"
                   style={{display: "flex", alignItems: 'center'}}
               >

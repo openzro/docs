@@ -1,8 +1,8 @@
 import {Note} from "@/components/mdx";
 
-# Generic OIDC Provider with NetBird Self-Hosted
+# Generic OIDC Provider with openZro Self-Hosted
 
-NetBird supports any OpenID Connect (OIDC) compliant identity provider through its generic OIDC connector. This guide covers the requirements and configuration for connecting a non-supported or custom OIDC provider to your NetBird self-hosted deployment.
+openZro supports any OpenID Connect (OIDC) compliant identity provider through its generic OIDC connector. This guide covers the requirements and configuration for connecting a non-supported or custom OIDC provider to your openZro self-hosted deployment.
 
 ## Required OIDC Claims
 
@@ -16,7 +16,7 @@ Your identity provider must include the following claims in the ID token or User
 | `preferred_username` | Optional | Fallback display name if `name` is not present. |
 
 <Note>
-While `email` and `name` are technically optional, they are strongly recommended. Without them, users will appear with only their `sub` identifier in the NetBird dashboard.
+While `email` and `name` are technically optional, they are strongly recommended. Without them, users will appear with only their `sub` identifier in the openZro dashboard.
 </Note>
 
 ### Minimal Viable Token
@@ -47,13 +47,13 @@ Your identity provider must expose standard OIDC endpoints:
 | JWKS endpoint | Token signature verification |
 | UserInfo endpoint | Fetch additional user claims (recommended) |
 
-NetBird automatically discovers these endpoints from the OIDC discovery document at `{issuer}/.well-known/openid-configuration`.
+openZro automatically discovers these endpoints from the OIDC discovery document at `{issuer}/.well-known/openid-configuration`.
 
 ## Groups and Roles
 
-NetBird does **not require** specific roles or group memberships by default. However, you can optionally configure JWT group synchronization to:
+openZro does **not require** specific roles or group memberships by default. However, you can optionally configure JWT group synchronization to:
 
-- Automatically create NetBird groups based on IdP groups
+- Automatically create openZro groups based on IdP groups
 - Restrict access to users in specific groups
 - Sync group membership changes on each login
 
@@ -75,11 +75,11 @@ The claim name is configurable (default: `groups`). Some providers use `roles`, 
 
 ## Management Setup (Recommended)
 
-Add your OIDC provider directly in the NetBird Management Dashboard. This is the simplest approach and works with any OIDC-compliant provider.
+Add your OIDC provider directly in the openZro Management Dashboard. This is the simplest approach and works with any OIDC-compliant provider.
 
 ### Prerequisites
 
-- NetBird self-hosted with embedded IdP enabled
+- openZro self-hosted with embedded IdP enabled
 - An OIDC-compliant identity provider with admin access
 
 ### Step 1: Create OIDC Client in Your Identity Provider
@@ -94,11 +94,11 @@ Add your OIDC provider directly in the NetBird Management Dashboard. This is the
 | Grant Type | Authorization Code |
 | Token Endpoint Auth | Client Secret (Basic or Post) |
 
-4. Note the **Client ID** and **Client Secret** - you'll need these for NetBird
+4. Note the **Client ID** and **Client Secret** - you'll need these for openZro
 5. Note the **Issuer URL** (typically the base URL of your IdP)
 
 <Note>
-**Important:** Create a confidential client (not a public client). NetBird requires a client secret for secure token exchange. The secret is stored securely and never exposed to end users.
+**Important:** Create a confidential client (not a public client). openZro requires a client secret for secure token exchange. The secret is stored securely and never exposed to end users.
 </Note>
 
 ### Step 2: Configure Scopes
@@ -116,9 +116,9 @@ Ensure your OIDC client requests the following scopes:
 Some providers include profile and email claims by default. Others require explicit scope requests. Check your provider's documentation.
 </Note>
 
-### Step 3: Add Identity Provider in NetBird
+### Step 3: Add Identity Provider in openZro
 
-1. Log in to your NetBird Dashboard
+1. Log in to your openZro Dashboard
 2. Navigate to **Settings** → **Identity Providers**
 3. Click **Add Identity Provider**
 4. Select **Generic OIDC** from the type dropdown
@@ -136,11 +136,11 @@ Some providers include profile and email claims by default. Others require expli
 
 ### Step 4: Configure Redirect URI
 
-After saving, NetBird displays the **Redirect URL**. Copy this URL and add it to your identity provider's allowed redirect URIs / callback URLs.
+After saving, openZro displays the **Redirect URL**. Copy this URL and add it to your identity provider's allowed redirect URIs / callback URLs.
 
 The redirect URL format is typically:
 ```
-https://your-netbird-domain.com/oauth2/callback/{connector-id}
+https://your-openzro-domain.com/oauth2/callback/{connector-id}
 ```
 
 <Note>
@@ -149,16 +149,16 @@ https://your-netbird-domain.com/oauth2/callback/{connector-id}
 
 ### Step 5: Test the Connection
 
-1. Log out of NetBird Dashboard
+1. Log out of openZro Dashboard
 2. On the login page, you should see a button with your provider's name
 3. Click it and authenticate with your identity provider
-4. You should be redirected back to NetBird and logged in
+4. You should be redirected back to openZro and logged in
 
 ---
 
 ## Configuring JWT 'groups' Claim
 
-To sync groups from your identity provider to NetBird:
+To sync groups from your identity provider to openZro:
 
 ### Step 1: Configure Your IdP to Include Groups
 
@@ -170,9 +170,9 @@ Most identity providers require explicit configuration to include groups in toke
 
 Refer to your identity provider's documentation for specific instructions.
 
-### Step 2: Enable JWT Group Sync in NetBird
+### Step 2: Enable JWT Group Sync in openZro
 
-1. In NetBird Dashboard, go to **Settings** → **Groups**
+1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to the claim name your IdP uses (commonly `groups`, `roles`, or `memberOf`)
 4. Optionally configure **JWT allow groups** to restrict access to specific groups
@@ -184,13 +184,13 @@ If your IdP returns groups like this:
 ```json
 {
   "sub": "user-123",
-  "groups": ["developers", "netbird-users"]
+  "groups": ["developers", "openzro-users"]
 }
 ```
 
-Configure NetBird with:
+Configure openZro with:
 - **JWT claim**: `groups`
-- **JWT allow groups**: `netbird-users` (optional - restricts access to this group)
+- **JWT allow groups**: `openzro-users` (optional - restricts access to this group)
 
 <Note>
 Groups created via JWT sync are managed by your IdP. Users are added/removed from these groups automatically on each login based on their IdP group membership.
@@ -202,7 +202,7 @@ Groups created via JWT sync are managed by your IdP. Users are added/removed fro
 
 ### Claims in ID Token vs UserInfo
 
-Some providers only include basic claims in the ID token and require a UserInfo request for `email` and `name`. NetBird's embedded DEX connector automatically fetches UserInfo when configured with `getUserInfo: true` (the default for generic OIDC connectors).
+Some providers only include basic claims in the ID token and require a UserInfo request for `email` and `name`. openZro's embedded DEX connector automatically fetches UserInfo when configured with `getUserInfo: true` (the default for generic OIDC connectors).
 
 If users appear without email or name:
 1. Check if your IdP includes these claims in the ID token
@@ -222,8 +222,8 @@ The issuer URL must exactly match the `iss` claim in tokens issued by your provi
 
 ### Token Signature Verification
 
-NetBird validates tokens using public keys from your IdP's JWKS endpoint. Ensure:
-- The JWKS endpoint is accessible from your NetBird server
+openZro validates tokens using public keys from your IdP's JWKS endpoint. Ensure:
+- The JWKS endpoint is accessible from your openZro server
 - Tokens are signed with a supported algorithm (RS256, ES256, etc.)
 - Key rotation is properly configured
 
@@ -233,14 +233,14 @@ NetBird validates tokens using public keys from your IdP's JWKS endpoint. Ensure
 
 ### "Invalid redirect URI" error
 
-- Copy the exact Redirect URL from NetBird after adding the provider
+- Copy the exact Redirect URL from openZro after adding the provider
 - Ensure no trailing slashes or protocol mismatches
 - Some providers are case-sensitive
 
 ### "Invalid token" or "Token validation failed"
 
 - Verify the issuer URL matches exactly (including trailing slashes)
-- Check clock synchronization between NetBird server and IdP
+- Check clock synchronization between openZro server and IdP
 - Ensure the client ID matches what's configured in the IdP
 - Verify JWKS endpoint is accessible
 
@@ -259,7 +259,7 @@ NetBird validates tokens using public keys from your IdP's JWKS endpoint. Ensure
 ### Groups not syncing
 
 - Verify your IdP includes groups in the token (check with a JWT decoder)
-- Ensure the claim name in NetBird matches your IdP's claim name
+- Ensure the claim name in openZro matches your IdP's claim name
 - Check that groups are in array format: `["group1", "group2"]`
 
 ---
@@ -269,7 +269,7 @@ NetBird validates tokens using public keys from your IdP's JWKS endpoint. Ensure
 You can also configure generic OIDC providers via the API:
 
 ```bash
-curl -X POST "https://netbird.example.com/api/identity-providers" \
+curl -X POST "https://openzro.example.com/api/identity-providers" \
   -H "Authorization: Bearer ${TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{

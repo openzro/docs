@@ -20,7 +20,7 @@ export const title = 'Users'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/users">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/users \
+curl -X GET https://api.openzro.io/api/users \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -51,7 +51,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users"
+url = "https://api.openzro.io/api/users"
 
 headers = {     
   'Accept': 'application/json',
@@ -75,7 +75,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users"
+  url := "https://api.openzro.io/api/users"
   method := "GET"
   
   client := &http.Client {
@@ -111,7 +111,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users")
+url = URI("https://api.openzro.io/api/users")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -129,7 +129,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users")
+  .url("https://api.openzro.io/api/users")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -143,7 +143,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users',
+  CURLOPT_URL => 'https://api.openzro.io/api/users',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -171,7 +171,7 @@ echo $response;
 [
   {
     "id": "google-oauth2|277474792786460067937",
-    "email": "demo@netbird.io",
+    "email": "demo@openzro.io",
     "password": "super_secure_password",
     "name": "Tom Schulz",
     "role": "admin",
@@ -286,7 +286,7 @@ echo $response;
         </Property>
     <Property name="role" type="string" required={true}>
         
-            User's NetBird account role
+            User's openZro account role
         
         </Property>
     <Property name="auto_groups" type="string[]" required={true}>
@@ -307,12 +307,12 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/users">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/users \
+curl -X POST https://api.openzro.io/api/users \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
 --data-raw '{
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "name": "Tom Schulz",
   "role": "admin",
   "auto_groups": [
@@ -325,7 +325,7 @@ curl -X POST https://api.netbird.io/api/users \
 ```js
 const axios = require('axios');
 let data = JSON.stringify({
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "name": "Tom Schulz",
   "role": "admin",
   "auto_groups": [
@@ -358,9 +358,9 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users"
+url = "https://api.openzro.io/api/users"
 payload = json.dumps({
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "name": "Tom Schulz",
   "role": "admin",
   "auto_groups": [
@@ -391,11 +391,11 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users"
+  url := "https://api.openzro.io/api/users"
   method := "POST"
   
   payload := strings.NewReader(`{
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "name": "Tom Schulz",
   "role": "admin",
   "auto_groups": [
@@ -437,7 +437,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users")
+url = URI("https://api.openzro.io/api/users")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -448,7 +448,7 @@ request["Accept"] = "application/json"
 request["Authorization"] = "Token <TOKEN>"
 
 request.body = JSON.dump({
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "name": "Tom Schulz",
   "role": "admin",
   "auto_groups": [
@@ -465,7 +465,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 MediaType mediaType = MediaType.parse("application/json");
 RequestBody body = RequestBody.create(mediaType, '{
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "name": "Tom Schulz",
   "role": "admin",
   "auto_groups": [
@@ -474,7 +474,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "is_service_user": false
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users")
+  .url("https://api.openzro.io/api/users")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -489,7 +489,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users',
+  CURLOPT_URL => 'https://api.openzro.io/api/users',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -498,7 +498,7 @@ curl_setopt_array($curl, array(
   CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
   CURLOPT_CUSTOMREQUEST => 'POST',  
   CURLOPT_POSTFIELDS => '{
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "name": "Tom Schulz",
   "role": "admin",
   "auto_groups": [
@@ -526,7 +526,7 @@ echo $response;
 ```json {{ title: 'Example' }}
 {
   "id": "google-oauth2|277474792786460067937",
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "password": "super_secure_password",
   "name": "Tom Schulz",
   "role": "admin",
@@ -636,7 +636,7 @@ echo $response;
     
     <Properties><Property name="role" type="string" required={true}>
         
-            User's NetBird account role
+            User's openZro account role
         
         </Property>
     <Property name="auto_groups" type="string[]" required={true}>
@@ -657,7 +657,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="PUT" label="/api/users/{userId}">
 ```bash {{ title: 'cURL' }}
-curl -X PUT https://api.netbird.io/api/users/{userId} \
+curl -X PUT https://api.openzro.io/api/users/{userId} \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -704,7 +704,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/{userId}"
+url = "https://api.openzro.io/api/users/{userId}"
 payload = json.dumps({
   "role": "admin",
   "auto_groups": [
@@ -735,7 +735,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/{userId}"
+  url := "https://api.openzro.io/api/users/{userId}"
   method := "PUT"
   
   payload := strings.NewReader(`{
@@ -779,7 +779,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/{userId}")
+url = URI("https://api.openzro.io/api/users/{userId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -812,7 +812,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "is_blocked": false
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/{userId}")
+  .url("https://api.openzro.io/api/users/{userId}")
   .method("PUT", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -827,7 +827,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/{userId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/{userId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -862,7 +862,7 @@ echo $response;
 ```json {{ title: 'Example' }}
 {
   "id": "google-oauth2|277474792786460067937",
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "password": "super_secure_password",
   "name": "Tom Schulz",
   "role": "admin",
@@ -972,7 +972,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/users/{userId}">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/users/{userId} \
+curl -X DELETE https://api.openzro.io/api/users/{userId} \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -1001,7 +1001,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/{userId}"
+url = "https://api.openzro.io/api/users/{userId}"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -1024,7 +1024,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/{userId}"
+  url := "https://api.openzro.io/api/users/{userId}"
   method := "DELETE"
   
   client := &http.Client {
@@ -1059,7 +1059,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/{userId}")
+url = URI("https://api.openzro.io/api/users/{userId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1076,7 +1076,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/{userId}")
+  .url("https://api.openzro.io/api/users/{userId}")
   .method("DELETE")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -1089,7 +1089,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/{userId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/{userId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1136,7 +1136,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/users/{userId}/invite">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/users/{userId}/invite \
+curl -X POST https://api.openzro.io/api/users/{userId}/invite \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -1165,7 +1165,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/{userId}/invite"
+url = "https://api.openzro.io/api/users/{userId}/invite"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -1188,7 +1188,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/{userId}/invite"
+  url := "https://api.openzro.io/api/users/{userId}/invite"
   method := "POST"
   
   client := &http.Client {
@@ -1223,7 +1223,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/{userId}/invite")
+url = URI("https://api.openzro.io/api/users/{userId}/invite")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1240,7 +1240,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/{userId}/invite")
+  .url("https://api.openzro.io/api/users/{userId}/invite")
   .method("POST")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -1253,7 +1253,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/{userId}/invite',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/{userId}/invite',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1300,7 +1300,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/users/{userId}/approve">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/users/{userId}/approve \
+curl -X POST https://api.openzro.io/api/users/{userId}/approve \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -1331,7 +1331,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/{userId}/approve"
+url = "https://api.openzro.io/api/users/{userId}/approve"
 
 headers = {     
   'Accept': 'application/json',
@@ -1355,7 +1355,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/{userId}/approve"
+  url := "https://api.openzro.io/api/users/{userId}/approve"
   method := "POST"
   
   client := &http.Client {
@@ -1391,7 +1391,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/{userId}/approve")
+url = URI("https://api.openzro.io/api/users/{userId}/approve")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1409,7 +1409,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/{userId}/approve")
+  .url("https://api.openzro.io/api/users/{userId}/approve")
   .method("POST")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -1423,7 +1423,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/{userId}/approve',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/{userId}/approve',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1450,7 +1450,7 @@ echo $response;
 ```json {{ title: 'Example' }}
 {
   "id": "google-oauth2|277474792786460067937",
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "password": "super_secure_password",
   "name": "Tom Schulz",
   "role": "admin",
@@ -1560,7 +1560,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/users/{userId}/reject">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/users/{userId}/reject \
+curl -X DELETE https://api.openzro.io/api/users/{userId}/reject \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -1589,7 +1589,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/{userId}/reject"
+url = "https://api.openzro.io/api/users/{userId}/reject"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -1612,7 +1612,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/{userId}/reject"
+  url := "https://api.openzro.io/api/users/{userId}/reject"
   method := "DELETE"
   
   client := &http.Client {
@@ -1647,7 +1647,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/{userId}/reject")
+url = URI("https://api.openzro.io/api/users/{userId}/reject")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1664,7 +1664,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/{userId}/reject")
+  .url("https://api.openzro.io/api/users/{userId}/reject")
   .method("DELETE")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -1677,7 +1677,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/{userId}/reject',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/{userId}/reject',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1740,7 +1740,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="PUT" label="/api/users/{userId}/password">
 ```bash {{ title: 'cURL' }}
-curl -X PUT https://api.netbird.io/api/users/{userId}/password \
+curl -X PUT https://api.openzro.io/api/users/{userId}/password \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
 --data-raw '{
@@ -1779,7 +1779,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/{userId}/password"
+url = "https://api.openzro.io/api/users/{userId}/password"
 payload = json.dumps({
   "old_password": "currentPassword123",
   "new_password": "newSecurePassword456"
@@ -1806,7 +1806,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/{userId}/password"
+  url := "https://api.openzro.io/api/users/{userId}/password"
   method := "PUT"
   
   payload := strings.NewReader(`{
@@ -1846,7 +1846,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/{userId}/password")
+url = URI("https://api.openzro.io/api/users/{userId}/password")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1872,7 +1872,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "new_password": "newSecurePassword456"
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/{userId}/password")
+  .url("https://api.openzro.io/api/users/{userId}/password")
   .method("PUT", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Authorization: Token <TOKEN>")
@@ -1886,7 +1886,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/{userId}/password',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/{userId}/password',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1930,7 +1930,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/users/current">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/users/current \
+curl -X GET https://api.openzro.io/api/users/current \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -1961,7 +1961,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/current"
+url = "https://api.openzro.io/api/users/current"
 
 headers = {     
   'Accept': 'application/json',
@@ -1985,7 +1985,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/current"
+  url := "https://api.openzro.io/api/users/current"
   method := "GET"
   
   client := &http.Client {
@@ -2021,7 +2021,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/current")
+url = URI("https://api.openzro.io/api/users/current")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2039,7 +2039,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/current")
+  .url("https://api.openzro.io/api/users/current")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -2053,7 +2053,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/current',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/current',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -2080,7 +2080,7 @@ echo $response;
 ```json {{ title: 'Example' }}
 {
   "id": "google-oauth2|277474792786460067937",
-  "email": "demo@netbird.io",
+  "email": "demo@openzro.io",
   "password": "super_secure_password",
   "name": "Tom Schulz",
   "role": "admin",
@@ -2182,7 +2182,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/users/invites">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/users/invites \
+curl -X GET https://api.openzro.io/api/users/invites \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -2213,7 +2213,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/invites"
+url = "https://api.openzro.io/api/users/invites"
 
 headers = {     
   'Accept': 'application/json',
@@ -2237,7 +2237,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/invites"
+  url := "https://api.openzro.io/api/users/invites"
   method := "GET"
   
   client := &http.Client {
@@ -2273,7 +2273,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/invites")
+url = URI("https://api.openzro.io/api/users/invites")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2291,7 +2291,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/invites")
+  .url("https://api.openzro.io/api/users/invites")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -2305,7 +2305,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/invites',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/invites',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -2392,7 +2392,7 @@ echo $response;
         </Property>
     <Property name="role" type="string" required={true}>
         
-            User's NetBird account role
+            User's openZro account role
         
         </Property>
     <Property name="auto_groups" type="string[]" required={true}>
@@ -2413,7 +2413,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/users/invites">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/users/invites \
+curl -X POST https://api.openzro.io/api/users/invites \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -2464,7 +2464,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/invites"
+url = "https://api.openzro.io/api/users/invites"
 payload = json.dumps({
   "email": "user@example.com",
   "name": "John Doe",
@@ -2497,7 +2497,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/invites"
+  url := "https://api.openzro.io/api/users/invites"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -2543,7 +2543,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/invites")
+url = URI("https://api.openzro.io/api/users/invites")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2580,7 +2580,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "expires_in": 259200
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/invites")
+  .url("https://api.openzro.io/api/users/invites")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -2595,7 +2595,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/invites',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/invites',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -2686,7 +2686,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/users/invites/{inviteId}">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/users/invites/{inviteId} \
+curl -X DELETE https://api.openzro.io/api/users/invites/{inviteId} \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -2715,7 +2715,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/invites/{inviteId}"
+url = "https://api.openzro.io/api/users/invites/{inviteId}"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -2738,7 +2738,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/invites/{inviteId}"
+  url := "https://api.openzro.io/api/users/invites/{inviteId}"
   method := "DELETE"
   
   client := &http.Client {
@@ -2773,7 +2773,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/invites/{inviteId}")
+url = URI("https://api.openzro.io/api/users/invites/{inviteId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2790,7 +2790,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/invites/{inviteId}")
+  .url("https://api.openzro.io/api/users/invites/{inviteId}")
   .method("DELETE")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -2803,7 +2803,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/invites/{inviteId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/invites/{inviteId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -2861,7 +2861,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/users/invites/{inviteId}/regenerate">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/users/invites/{inviteId}/regenerate \
+curl -X POST https://api.openzro.io/api/users/invites/{inviteId}/regenerate \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -2900,7 +2900,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/invites/{inviteId}/regenerate"
+url = "https://api.openzro.io/api/users/invites/{inviteId}/regenerate"
 payload = json.dumps({
   "expires_in": 259200
 })
@@ -2927,7 +2927,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/invites/{inviteId}/regenerate"
+  url := "https://api.openzro.io/api/users/invites/{inviteId}/regenerate"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -2967,7 +2967,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/invites/{inviteId}/regenerate")
+url = URI("https://api.openzro.io/api/users/invites/{inviteId}/regenerate")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2992,7 +2992,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "expires_in": 259200
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/invites/{inviteId}/regenerate")
+  .url("https://api.openzro.io/api/users/invites/{inviteId}/regenerate")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -3007,7 +3007,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/invites/{inviteId}/regenerate',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/invites/{inviteId}/regenerate',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -3074,7 +3074,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/users/invites/{token}">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/users/invites/{token} \
+curl -X GET https://api.openzro.io/api/users/invites/{token} \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -3105,7 +3105,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/invites/{token}"
+url = "https://api.openzro.io/api/users/invites/{token}"
 
 headers = {     
   'Accept': 'application/json',
@@ -3129,7 +3129,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/invites/{token}"
+  url := "https://api.openzro.io/api/users/invites/{token}"
   method := "GET"
   
   client := &http.Client {
@@ -3165,7 +3165,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/invites/{token}")
+url = URI("https://api.openzro.io/api/users/invites/{token}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -3183,7 +3183,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/invites/{token}")
+  .url("https://api.openzro.io/api/users/invites/{token}")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -3197,7 +3197,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/invites/{token}',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/invites/{token}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -3277,7 +3277,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/users/invites/{token}/accept">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/users/invites/{token}/accept \
+curl -X POST https://api.openzro.io/api/users/invites/{token}/accept \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -3316,7 +3316,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/users/invites/{token}/accept"
+url = "https://api.openzro.io/api/users/invites/{token}/accept"
 payload = json.dumps({
   "password": "SecurePass123!"
 })
@@ -3343,7 +3343,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/users/invites/{token}/accept"
+  url := "https://api.openzro.io/api/users/invites/{token}/accept"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -3383,7 +3383,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/users/invites/{token}/accept")
+url = URI("https://api.openzro.io/api/users/invites/{token}/accept")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -3408,7 +3408,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   "password": "SecurePass123!"
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/users/invites/{token}/accept")
+  .url("https://api.openzro.io/api/users/invites/{token}/accept")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -3423,7 +3423,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/users/invites/{token}/accept',
+  CURLOPT_URL => 'https://api.openzro.io/api/users/invites/{token}/accept',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

@@ -1,22 +1,22 @@
 import {Note} from "@/components/mdx";
 
-# Microsoft and Entra ID SSO with NetBird Self-Hosted (Legacy)
+# Microsoft and Entra ID SSO with openZro Self-Hosted (Legacy)
 
-Use Microsoft accounts for authentication with NetBird. This supports both personal Microsoft accounts and Microsoft Entra ID (formerly Azure AD) for work and school accounts.
+Use Microsoft accounts for authentication with openZro. This supports both personal Microsoft accounts and Microsoft Entra ID (formerly Azure AD) for work and school accounts.
 
 ## Standalone Setup (Advanced)
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds Microsoft as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/microsoft-entra-id#management-setup-recommended) section in the main Microsoft Entra ID documentation.
+We highly recommend using the simpler setup that adds Microsoft as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/microsoft-entra-id#management-setup-recommended) section in the main Microsoft Entra ID documentation.
 
 The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Microsoft Entra ID administrators who need full control over authentication and user management.
 </Note>
 
-Use Microsoft Entra ID as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Microsoft Entra ID administrators as it also requires additional setup and ongoing maintenance.
+Use Microsoft Entra ID as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Microsoft Entra ID administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 <Note>
 If you prefer to have full control over authentication, consider self-hosted alternatives like [PocketID](/selfhosted/identity-providers/pocketid).
@@ -25,16 +25,16 @@ If you prefer to have full control over authentication, consider self-hosted alt
 ### Prerequisites
 
 - An Azure account with appropriate permissions
-- Docker and Docker Compose for NetBird
+- Docker and Docker Compose for openZro
 
 ### Step 1: Create and Configure Azure AD Application
 
 1. Navigate to [Azure Active Directory](https://portal.azure.com/#view/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/~/Overview)
 2. Click **App Registrations** → **+ New registration**
 3. Fill in:
-   - **Name**: `Netbird`
+   - **Name**: `openZro`
    - **Supported account types**: `Accounts in this organizational directory only (Default Directory only - Single tenant)`
-   - **Redirect URI**: Select `Single-page application (SPA)` and enter `https://<yournetbirddomain.com>/silent-auth`
+   - **Redirect URI**: Select `Single-page application (SPA)` and enter `https://<youropenzrodomain.com>/silent-auth`
 4. Click **Register**
 5. After registration, note the **Application (client) ID** from the Overview page (you'll need this in Step 3)
 
@@ -45,7 +45,7 @@ If you prefer to have full control over authentication, consider self-hosted alt
 ### Step 2: Configure Platform Settings
 
 1. Click **Authentication** on the left menu
-2. Under **Single-page application**, add another URI: `https://<yournetbirddomain.com>/auth`
+2. Under **Single-page application**, add another URI: `https://<youropenzrodomain.com>/auth`
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/microsoft-entra-id/azure/azure-spa-uri-setup.png" alt="SPA URI setup" className="imagewrapper-big"/>
@@ -86,10 +86,10 @@ If you prefer to have full control over authentication, consider self-hosted alt
 
 1. Click **API permissions** on the left menu
 2. Click **Add a permission**
-3. Select **My APIs** tab → **Netbird** → check `api` permission → **Add permissions**
+3. Select **My APIs** tab → **openZro** → check `api` permission → **Add permissions**
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/microsoft-entra-id/azure/azure-netbird-api-permisssions.png" alt="NetBird API permissions" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/managed/microsoft-entra-id/azure/azure-openzro-api-permisssions.png" alt="openZro API permissions" className="imagewrapper-big"/>
 </p>
 
 4. Click **Add a permission** again
@@ -118,7 +118,7 @@ If you prefer to have full control over authentication, consider self-hosted alt
 1. Click **Certificates & secrets** on the left menu
 2. Click **New client secret**
 3. Fill in:
-   - **Description**: `Netbird`
+   - **Description**: `openZro`
 4. Click **Add**
 5. Copy the **Value** immediately
 
@@ -131,7 +131,7 @@ If you prefer to have full control over authentication, consider self-hosted alt
    - **Object ID**
    - **Directory (tenant) ID**
 
-### Step 7: Configure NetBird
+### Step 7: Configure openZro
 
 Your authority OIDC configuration will be available at:
 
@@ -166,9 +166,9 @@ NETBIRD_IDP_MGMT_EXTRA_OBJECT_ID="<Object ID>"
 NETBIRD_IDP_MGMT_EXTRA_GRAPH_API_ENDPOINT="https://graph.microsoft.com/v1.0"
 ```
 
-### Step 8: Continue with NetBird Setup
+### Step 8: Continue with openZro Setup
 
-You've configured all required resources in Azure AD. Continue with the [NetBird Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
+You've configured all required resources in Azure AD. Continue with the [openZro Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
 
 ---
 
@@ -176,7 +176,7 @@ You've configured all required resources in Azure AD. Continue with the [NetBird
 
 ### "AADSTS50011: The redirect URI specified in the request does not match"
 
-- Ensure the redirect URI in Azure exactly matches what NetBird provides
+- Ensure the redirect URI in Azure exactly matches what openZro provides
 - Check platform type (SPA vs Mobile/Desktop)
 - Verify no trailing slashes
 
@@ -200,9 +200,9 @@ You've configured all required resources in Azure AD. Continue with the [NetBird
 ---
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds Microsoft as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/microsoft-entra-id#management-setup-recommended) section in the main Microsoft Entra ID documentation.
+We highly recommend using the simpler setup that adds Microsoft as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/microsoft-entra-id#management-setup-recommended) section in the main Microsoft Entra ID documentation.
 </Note>
 
 ## Related Resources

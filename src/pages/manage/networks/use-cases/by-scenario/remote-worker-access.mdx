@@ -9,24 +9,24 @@ This guide shows how to enable remote workers to securely access office resource
 After following this guide, employees will be able to access office servers, applications, and services while working remotely—without exposing those resources to the internet.
 
 ```
-Remote Laptop ──────► NetBird Tunnel ──────► Routing Peer ──────► Office Server
-   (peer)                                    (at office)          (no NetBird)
+Remote Laptop ──────► openZro Tunnel ──────► Routing Peer ──────► Office Server
+   (peer)                                    (at office)          (no openZro)
 ```
 
 ## Prerequisites
 
-- A [NetBird cloud account](https://app.netbird.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - Admin access to office network infrastructure
 - A server or VM at the office to serve as the routing peer
 
-## Step 1: Connect a Remote Worker Device to NetBird
+## Step 1: Connect a Remote Worker Device to openZro
 
-If you haven't already, install NetBird on a remote worker's laptop and connect:
+If you haven't already, install openZro on a remote worker's laptop and connect:
 
-1. Download NetBird from [app.netbird.io/install](https://app.netbird.io/install)
+1. Download openZro from [app.openzro.io/install](https://app.openzro.io/install)
 2. Run the application and click **Connect** in the system tray
 3. Complete the sign-up process in your browser
-4. Verify the device appears in the [NetBird dashboard](https://app.netbird.io/) under **Peers**
+4. Verify the device appears in the [openZro dashboard](https://app.openzro.io/) under **Peers**
 
 ## Step 2: Add the Remote Worker to a User Group
 
@@ -39,7 +39,7 @@ If you haven't already, install NetBird on a remote worker's laptop and connect:
 
 ## Step 3: Find Your Office Subnet
 
-Before configuring NetBird, identify your office network's subnet.
+Before configuring openZro, identify your office network's subnet.
 
 **On your routing peer device, run:**
 
@@ -55,7 +55,7 @@ Look for your local subnet, typically something like `10.0.0.0/24` or `192.168.1
 
 ## Step 4: Create a Network for Office Resources
 
-1. Go to **Networks** in the NetBird dashboard
+1. Go to **Networks** in the openZro dashboard
 2. Click **Add Network**
 3. Name it "Office LAN" and click **Save**
 
@@ -94,14 +94,14 @@ For more granular access, add specific server IPs instead of the entire subnet. 
 
 ## Step 7: Set Up the Routing Peer
 
-The routing peer forwards traffic from NetBird to your office network. Choose an always-on server at your office:
+The routing peer forwards traffic from openZro to your office network. Choose an always-on server at your office:
 - A dedicated Linux VM
 - A Windows Server
 - A Docker container on an existing server
 
-**Install NetBird on your routing peer:**
+**Install openZro on your routing peer:**
 
-1. In the NetBird dashboard, go to **Setup Keys**
+1. In the openZro dashboard, go to **Setup Keys**
 2. Create a new setup key (one-time use recommended). Add `office-lan` to **Auto-assigned groups** and click **Create Setup Key**.
 
 <p>
@@ -116,12 +116,12 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 
 ```bash
 # Linux
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-sudo netbird up --setup-key YOUR_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+sudo openzro up --setup-key YOUR_SETUP_KEY
 
 # Windows (PowerShell as Administrator)
-Invoke-WebRequest -Uri "https://pkgs.netbird.io/install.ps1" -OutFile "install.ps1"; .\install.ps1
-netbird up --setup-key YOUR_SETUP_KEY
+Invoke-WebRequest -Uri "https://pkgs.openzro.io/install.ps1" -OutFile "install.ps1"; .\install.ps1
+openzro up --setup-key YOUR_SETUP_KEY
 ```
 
 4. In the Networks view, click **Add Routing Peer** on your Office LAN network
@@ -142,7 +142,7 @@ Remote workers can now access office resources from any location.
 
 For additional remote workers:
 
-1. Have employees install NetBird from [app.netbird.io/install](https://app.netbird.io/install)
+1. Have employees install openZro from [app.openzro.io/install](https://app.openzro.io/install)
 2. After they connect, go to **Peers** and select their device
 3. Under **Assigned Groups**, add them to the "`remote-workers`" group
 

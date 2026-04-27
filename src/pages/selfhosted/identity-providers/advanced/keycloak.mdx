@@ -1,22 +1,22 @@
 import {Note} from "@/components/mdx";
 
-# Keycloak SSO with NetBird Self-Hosted (Advanced)
+# Keycloak SSO with openZro Self-Hosted (Advanced)
 
 [Keycloak](https://www.keycloak.org/) is an open-source Identity and Access Management solution maintained by Red Hat. It provides single sign-on, social login, user federation, fine-grained authorization, and supports OpenID Connect, OAuth 2.0, and SAML 2.0 protocols.
 
 ## Standalone Setup (Advanced)
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds Keycloak as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/keycloak#management-setup-recommended) section in the main Keycloak documentation.
+We highly recommend using the simpler setup that adds Keycloak as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/keycloak#management-setup-recommended) section in the main Keycloak documentation.
 
 The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Keycloak administrators who need full control over authentication and user management.
 </Note>
 
-Use Keycloak as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Keycloak administrators as it also requires additional setup and ongoing maintenance.
+Use Keycloak as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Keycloak administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 <Note>
 If you prefer not to self-host an Identity and Access Management solution, you could use a managed alternative like [Auth0](/selfhosted/identity-providers/managed/auth0).
@@ -24,7 +24,7 @@ If you prefer not to self-host an Identity and Access Management solution, you c
 
 ### Expected Result
 
-After completing this guide, you can log in to your self-hosted NetBird Dashboard and add machines to your network using the [Interactive SSO Login feature](/get-started/install#running-net-bird-with-sso-login) over Keycloak.
+After completing this guide, you can log in to your self-hosted openZro Dashboard and add machines to your network using the [Interactive SSO Login feature](/get-started/install#running-net-bird-with-sso-login) over Keycloak.
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/keycloak-auth-grant.gif" alt="Keycloak auth flow" className="imagewrapper-big"/>
@@ -33,7 +33,7 @@ After completing this guide, you can log in to your self-hosted NetBird Dashboar
 ### Prerequisites
 
 - Keycloak instance running with SSL
-- Docker and Docker Compose for NetBird
+- Docker and Docker Compose for openZro
 
 ### Step 1: Check Your Keycloak Instance
 
@@ -45,7 +45,7 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
 2. Hover over the dropdown in the top-left corner where it says `Master`
 3. Click **Create Realm**
 4. Fill in:
-   - **Realm name**: `netbird`
+   - **Realm name**: `openzro`
 5. Click **Create**
 
 <p>
@@ -54,11 +54,11 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
 
 ### Step 3: Create a User
 
-1. Make sure the selected realm is `netbird`
+1. Make sure the selected realm is `openzro`
 2. Click **Users** (left-hand menu)
 3. Click **Create new user**
 4. Fill in:
-   - **Username**: `netbird`
+   - **Username**: `openzro`
 5. Click **Create**
 
 <p>
@@ -74,12 +74,12 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/keycloak-set-password.png" alt="Set password" className="imagewrapper-big"/>
 </p>
 
-### Step 4: Create NetBird Client
+### Step 4: Create openZro Client
 
 1. Click **Clients** → **Create client**
 2. Fill in:
    - **Client Type**: `OpenID Connect`
-   - **Client ID**: `netbird-client`
+   - **Client ID**: `openzro-client`
 3. Click **Next**
 
 <p>
@@ -96,7 +96,7 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
 
 ### Step 5: Configure Client Access Settings
 
-1. Go to **Clients** → **netbird-client**
+1. Go to **Clients** → **openzro-client**
 2. In **Access Settings**, fill in:
    - **Root URL**: `https://YOUR_DOMAIN/`
    - **Valid redirect URIs**: `https://YOUR_DOMAIN/*` and `http://localhost:53000`
@@ -131,8 +131,8 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
 </p>
 
 8. Fill in:
-   - **Name**: `Audience for NetBird Management API`
-   - **Included Client Audience**: `netbird-client`
+   - **Name**: `Audience for openZro Management API`
+   - **Included Client Audience**: `openzro-client`
    - **Add to access token**: `On`
 9. Click **Save**
 
@@ -140,9 +140,9 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/keycloak-configure-audience-mapper-2.png" alt="Audience mapper config" className="imagewrapper-big"/>
 </p>
 
-### Step 7: Add Client Scope to NetBird Client
+### Step 7: Add Client Scope to openZro Client
 
-1. Go to **Clients** → **netbird-client**
+1. Go to **Clients** → **openzro-client**
 2. Switch to **Client scopes** tab
 3. Click **Add client scope**
 4. Choose `api`
@@ -152,12 +152,12 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/keycloak-add-client-scope.png" alt="Add client scope" className="imagewrapper-big"/>
 </p>
 
-### Step 8: Create NetBird-Backend Client
+### Step 8: Create openZro-Backend Client
 
 1. Click **Clients** → **Create client**
 2. Fill in:
    - **Client Type**: `OpenID Connect`
-   - **Client ID**: `netbird-backend`
+   - **Client ID**: `openzro-backend`
 3. Click **Next**
 
 <p>
@@ -180,7 +180,7 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
 
 ### Step 9: Add View-Users Role
 
-1. Go to **Clients** → **netbird-backend**
+1. Go to **Clients** → **openzro-backend**
 2. Switch to **Service accounts roles** tab
 3. Click **Assign roles**
 4. Select **Filter by clients** and search for `view-users`
@@ -196,15 +196,15 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
 </p>
 
 <Note>
-**Optional**: To enable automatic user deletion from Keycloak when deleted from NetBird, add the `--user-delete-from-idp` flag to the management startup command and assign the `manage-users` role instead.
+**Optional**: To enable automatic user deletion from Keycloak when deleted from openZro, add the `--user-delete-from-idp` flag to the management startup command and assign the `manage-users` role instead.
 </Note>
 
-### Step 10: Configure NetBird
+### Step 10: Configure openZro
 
 Your authority OIDC configuration will be available at:
 
 ```bash
-https://<YOUR_KEYCLOAK_HOST_AND_PORT>/realms/netbird/.well-known/openid-configuration
+https://<YOUR_KEYCLOAK_HOST_AND_PORT>/realms/openzro/.well-known/openid-configuration
 ```
 
 <Note>
@@ -214,28 +214,28 @@ Double-check if the endpoint returns a JSON response by calling it from your bro
 Set properties in the `setup.env` file:
 
 ```shell
-NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<YOUR_KEYCLOAK_HOST_AND_PORT>/realms/netbird/.well-known/openid-configuration"
+NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<YOUR_KEYCLOAK_HOST_AND_PORT>/realms/openzro/.well-known/openid-configuration"
 NETBIRD_USE_AUTH0=false
-NETBIRD_AUTH_CLIENT_ID="netbird-client"
+NETBIRD_AUTH_CLIENT_ID="openzro-client"
 NETBIRD_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api"
-NETBIRD_AUTH_AUDIENCE="netbird-client"
+NETBIRD_AUTH_AUDIENCE="openzro-client"
 
-NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID="netbird-client"
-NETBIRD_AUTH_DEVICE_AUTH_AUDIENCE="netbird-client"
+NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID="openzro-client"
+NETBIRD_AUTH_DEVICE_AUTH_AUDIENCE="openzro-client"
 
 NETBIRD_MGMT_IDP="keycloak"
-NETBIRD_IDP_MGMT_CLIENT_ID="netbird-backend"
+NETBIRD_IDP_MGMT_CLIENT_ID="openzro-backend"
 NETBIRD_IDP_MGMT_CLIENT_SECRET="<NETBIRD_BACKEND_CLIENT_SECRET>"
-NETBIRD_IDP_MGMT_EXTRA_ADMIN_ENDPOINT="https://<YOUR_KEYCLOAK_HOST_AND_PORT>/admin/realms/netbird"
+NETBIRD_IDP_MGMT_EXTRA_ADMIN_ENDPOINT="https://<YOUR_KEYCLOAK_HOST_AND_PORT>/admin/realms/openzro"
 ```
 
 <Note>
 Make sure your Keycloak instance uses HTTPS. Otherwise, the setup won't work.
 </Note>
 
-### Step 11: Continue with NetBird Setup
+### Step 11: Continue with openZro Setup
 
-You've configured all required resources in Keycloak. Continue with the [NetBird Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
+You've configured all required resources in Keycloak. Continue with the [openZro Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
 
 ---
 
@@ -244,10 +244,10 @@ You've configured all required resources in Keycloak. Continue with the [NetBird
 ### "Invalid token" errors
 
 - Verify the issuer URL includes `/realms/your-realm`
-- Ensure the client ID matches in both Keycloak and NetBird
+- Ensure the client ID matches in both Keycloak and openZro
 - Check clock synchronization between servers
 
-### Users not appearing in NetBird
+### Users not appearing in openZro
 
 - Verify the backend client has `view-users` role
 

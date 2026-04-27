@@ -6,16 +6,16 @@ collects, and analyzes endpoint data to detect and respond to threats in real-ti
 it collects can be utilized to enforce access policies and limit network access according to the "health" status of the
 endpoints.
 
-The integration of NetBird with CrowdStrike Falcon provides organizations with network security controls that allow
+The integration of openZro with CrowdStrike Falcon provides organizations with network security controls that allow
 only IT-managed devices running CrowdStrike to access the network. Additionally, the integration uses [CrowdStrike's Zero Trust Assessment (ZTA) score](https://www.crowdstrike.com/press-releases/crowdstrike-extends-zero-trust-to-endpoint-devices/),
 enabling administrators to further limit network access based on the security posture of each device.
 
 CrowdStrike's Zero Trust Assessment (ZTA) score is a numerical representation of the security posture of a device with
 a value ranging from 0 to 100. The score is calculated based on various factors, including the device's security configuration,
 software vulnerabilities, and CrowdStrike's threat intelligence data. By integrating with CrowdStrike Falcon,
-NetBird can ensure that only devices with a high security posture can access the network.
+openZro can ensure that only devices with a high security posture can access the network.
 
-In this guide, we will walk you through the configuration steps to integrate CrowdStrike Falcon with NetBird and use ZTA score
+In this guide, we will walk you through the configuration steps to integrate CrowdStrike Falcon with openZro and use ZTA score
 to allow network access to devices that meet a specified ZTA threshold.
 
 ## Prerequisites
@@ -31,11 +31,11 @@ Before you start creating and configuring a CrowdStrike integration, ensure that
 - Set Hosts - Read permission
 - Set Zero Trust Assessment - Read permission
 - Click `Create`
-- Copy the credentials. You will need these credentials when configuring an integration in NetBird.
+- Copy the credentials. You will need these credentials when configuring an integration in openZro.
 
-## Configure a CrowdStrike Integration in NetBird
+## Configure a CrowdStrike Integration in openZro
 
-- Navigate to the [Integrations &raquo; EDR](https://app.netbird.io/integrations?tab=edr) tab in the NetBird dashboard
+- Navigate to the [Integrations &raquo; EDR](https://app.openzro.io/integrations?tab=edr) tab in the openZro dashboard
 - Click `Connect CrowdStrike` to start the configuration wizard
 <p>
     <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/crowdstrike-edr/crowdstrike-integration.png" alt="event-streaming-integration" className="imagewrapper-big"/>
@@ -74,11 +74,11 @@ with a `Approval required` mark in the peers list and won't be able to access th
     - Select a host you want to hide
     - Click `Actions` and then `Hide`
     - The host will be moved to Trash (you can restore it later)
-    - After about a minute, the peer will be disconnected from the network and marked as `Approval required` in the NetBird dashboard.
+    - After about a minute, the peer will be disconnected from the network and marked as `Approval required` in the openZro dashboard.
     - To restore the host in CrowdStrike, navigate to the Trash and click `Restore`
 
 <Note>
-    NetBird synchronizes the list of devices managed by the EDR platform via the API about every minute.
+    openZro synchronizes the list of devices managed by the EDR platform via the API about every minute.
     The changes might not be visible immediately.
 </Note>
 

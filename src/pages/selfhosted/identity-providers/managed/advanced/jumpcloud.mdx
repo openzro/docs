@@ -1,27 +1,27 @@
 import {Note} from "@/components/mdx";
 
-# JumpCloud SSO with NetBird Self-Hosted (Legacy)
+# JumpCloud SSO with openZro Self-Hosted (Legacy)
 
 [JumpCloud](https://jumpcloud.com/) is a cloud-based directory platform that provides identity, access, and device management. It offers single sign-on (SSO), multi-factor authentication (MFA), and centralized user management.
 
 ## Standalone Setup (Advanced)
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds JumpCloud as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended) section in the main JumpCloud documentation.
+We highly recommend using the simpler setup that adds JumpCloud as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended) section in the main JumpCloud documentation.
 
 The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced JumpCloud administrators who need full control over authentication and user management.
 </Note>
 
-Use JumpCloud as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced JumpCloud administrators as it also requires additional setup and ongoing maintenance.
+Use JumpCloud as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced JumpCloud administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 ### Prerequisites
 
 - JumpCloud account with admin permissions (sign up at https://jumpcloud.com/)
-- Docker and Docker Compose for NetBird
+- Docker and Docker Compose for openZro
 
 ### Step 1: Create and Configure SSO Application
 
@@ -46,7 +46,7 @@ For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) i
     <img src="/docs-static/img/selfhosted/identity-providers/managed/jumpcloud/advanced/jumpcloud-new-sso-app-features.png" alt="SSO features" className="imagewrapper-big"/>
 </p>
 
-7. Enter **Display Label**: `NetBird`
+7. Enter **Display Label**: `openZro`
 8. Click **Next**
 
 <p>
@@ -94,7 +94,7 @@ For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) i
 
 ### Step 2: Create Administrator for Integration
 
-The NetBird management system requires an API token to get user information from JumpCloud.
+The openZro management system requires an API token to get user information from JumpCloud.
 
 <Note>
 If you already have an integration user, confirm it has the required role and skip to Step 3.
@@ -103,9 +103,9 @@ If you already have an integration user, confirm it has the required role and sk
 1. Navigate to [Admin Portal](https://console.jumpcloud.com/)
 2. Go to **Settings** and click the add button (+)
 3. Fill in:
-   - **First Name**: `NetBird`
+   - **First Name**: `openZro`
    - **Last Name**: `Integration`
-   - **Administrator Email**: `netbird-user@<yourdomain>`
+   - **Administrator Email**: `openzro-user@<yourdomain>`
    - **Role**: `Read Only`
 4. Click **Save**
 
@@ -114,7 +114,7 @@ If you already have an integration user, confirm it has the required role and sk
 </p>
 
 <Note>
-**Optional**: To enable automatic user deletion from JumpCloud when deleted from NetBird, add the `--user-delete-from-idp` flag to the management startup command and assign the `Help Desk` role instead.
+**Optional**: To enable automatic user deletion from JumpCloud when deleted from openZro, add the `--user-delete-from-idp` flag to the management startup command and assign the `Help Desk` role instead.
 </Note>
 
 5. Check email for login instructions and set a password
@@ -135,7 +135,7 @@ If you already have an integration user, confirm it has the required role and sk
     <img src="/docs-static/img/selfhosted/identity-providers/managed/jumpcloud/advanced/jumpcloud-api-key-generation.png" alt="API key generation" className="imagewrapper-big"/>
 </p>
 
-### Step 4: Configure NetBird
+### Step 4: Configure openZro
 
 Set properties in the `setup.env` file:
 
@@ -157,9 +157,9 @@ NETBIRD_MGMT_IDP="jumpcloud"
 NETBIRD_IDP_MGMT_EXTRA_API_TOKEN="<API_TOKEN>"
 ```
 
-### Step 5: Continue with NetBird Setup
+### Step 5: Continue with openZro Setup
 
-You've configured all required resources in JumpCloud. Continue with the [NetBird Self-hosting Guide](/selfhosted/selfhosted-guide#step-5-run-configuration-script).
+You've configured all required resources in JumpCloud. Continue with the [openZro Self-hosting Guide](/selfhosted/selfhosted-guide#step-5-run-configuration-script).
 
 ---
 
@@ -176,31 +176,31 @@ FATL ... oidc: issuer did not match the issuer returned by provider, expected "h
 This means there's a trailing slash mismatch in the Issuer URL. OIDC validation is strictly character-for-character.
 
 **The Cause:**
-- **Configured in NetBird:** `https://oauth.id.jumpcloud.com` (missing trailing slash)
+- **Configured in openZro:** `https://oauth.id.jumpcloud.com` (missing trailing slash)
 - **Returned by JumpCloud:** `https://oauth.id.jumpcloud.com/` (has trailing slash)
 
 Because the service fails to initialize the IDP manager, the Management container will often crash or restart loop, making it impossible to fix this via the Web UI.
 
 **Resolution:**
 
-If you can still access NetBird Dashboard:
+If you can still access openZro Dashboard:
 1. Navigate to **Settings** → **Identity Providers**
 2. Edit the JumpCloud identity provider
 3. Change the **Issuer** field to exactly `https://oauth.id.jumpcloud.com/` (with trailing slash)
 4. Click **Save**
-5. Restart the management container: `docker restart netbird-management`
+5. Restart the management container: `docker restart openzro-management`
 
 If you cannot access the dashboard (locked out), you must fix it directly in the SQLite database:
 
 1. **Locate the Volume:**
    ```bash
-   docker volume inspect root_netbird_management
-   # Look for "Mountpoint", e.g., /var/lib/docker/volumes/root_netbird_management/_data
+   docker volume inspect root_openzro_management
+   # Look for "Mountpoint", e.g., /var/lib/docker/volumes/root_openzro_management/_data
    ```
 
 2. **Access the Database:**
    ```bash
-   cd /var/lib/docker/volumes/root_netbird_management/_data
+   cd /var/lib/docker/volumes/root_openzro_management/_data
    
    # Backup the database first!
    cp idp.db idp.db.bak
@@ -229,7 +229,7 @@ If you cannot access the dashboard (locked out), you must fix it directly in the
 
 4. **Restart Service:**
    ```bash
-   docker restart netbird-management
+   docker restart openzro-management
    ```
 
 The service should now start successfully, and the error should be resolved.
@@ -239,9 +239,9 @@ The service should now start successfully, and the error should be resolved.
 
 - Ensure **Attribute Mapping** has both **Email** and **Profile** scopes enabled
 - Verify at least one **User Group** is assigned to the application before activation
-- Check that **Redirect URIs** exactly matches the URL from NetBird (no trailing slashes)
+- Check that **Redirect URIs** exactly matches the URL from openZro (no trailing slashes)
 - Ensure **Client Authentication Type** is set to `Client Secret POST`
-- Verify **Login URL** matches your NetBird domain exactly
+- Verify **Login URL** matches your openZro domain exactly
 - Make sure the application is **Activated** and you have the correct **Client ID** and **Client Secret**
 - Remove any duplicate attributes in **Attribute Mapping** (e.g., `email` and `email_verified`)
 
@@ -251,10 +251,10 @@ The service should now start successfully, and the error should be resolved.
 - Check for trailing slashes
 - Verify URLs match exactly
 
-### Users can't access NetBird
+### Users can't access openZro
 
 - Verify the user belongs to an assigned user group
-- Check that the user group is assigned to the NetBird application
+- Check that the user group is assigned to the openZro application
 
 ### API token not working
 
@@ -269,9 +269,9 @@ The service should now start successfully, and the error should be resolved.
 ---
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds JumpCloud as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended) section in the main JumpCloud documentation.
+We highly recommend using the simpler setup that adds JumpCloud as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended) section in the main JumpCloud documentation.
 </Note>
 
 ## Related Resources

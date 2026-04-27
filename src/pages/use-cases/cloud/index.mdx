@@ -2,15 +2,15 @@ import { Tiles } from '@/components/Tiles'
 
 # Cloud Use Cases
 
-Deploy NetBird across cloud environments to securely connect workloads, enable hybrid cloud connectivity, and simplify multi-cloud networking.
+Deploy openZro across cloud environments to securely connect workloads, enable hybrid cloud connectivity, and simplify multi-cloud networking.
 
 ## Common Scenarios
 
 - **Hybrid Cloud**: Connect cloud workloads to on-premise databases and services
 - **Multi-Cloud**: Bridge AWS, GCP, and Azure environments without exposing traffic to the internet
 - **Kubernetes**: Enable secure communication between clusters and external resources
-- **Serverless**: Run NetBird on FaaS platforms for ephemeral, secure connectivity
-- **Container Orchestration**: Deploy NetBird as a daemon set on ECS, EKS, or other container platforms
+- **Serverless**: Run openZro on FaaS platforms for ephemeral, secure connectivity
+- **Container Orchestration**: Deploy openZro as a daemon set on ECS, EKS, or other container platforms
 
 ## Getting Started
 
@@ -21,13 +21,13 @@ For connecting cloud VPCs to on-premise networks, see the [Site-to-Site Connecti
     items={[
         {
             href: '/use-cases/cloud/aws-ecs-terraform',
-            name: 'NetBird on AWS ECS',
-            description: 'Deploy NetBird as an ECS daemon set using Terraform',
+            name: 'openZro on AWS ECS',
+            description: 'Deploy openZro as an ECS daemon set using Terraform',
         },
         {
-            href: '/use-cases/cloud/netbird-on-faas',
-            name: 'NetBird on Serverless (FaaS)',
-            description: 'Run NetBird on serverless platforms for ephemeral connectivity',
+            href: '/use-cases/cloud/openzro-on-faas',
+            name: 'openZro on Serverless (FaaS)',
+            description: 'Run openZro on serverless platforms for ephemeral connectivity',
         },
         {
             href: '/use-cases/cloud/routing-peers-and-kubernetes',
@@ -56,7 +56,7 @@ For connecting cloud VPCs to on-premise networks, see the [Site-to-Site Connecti
 
 ### AWS
 - Use VPC endpoints where possible for AWS services
-- Security groups must allow traffic from NetBird routing peers
+- Security groups must allow traffic from openZro routing peers
 - Consider Auto Scaling groups with static ENIs for high availability
 
 ### GCP

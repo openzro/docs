@@ -30,8 +30,8 @@ Save this secret - you'll need it for both the relay servers and your main serve
 On your relay server, create a directory and configuration:
 
 ```bash
-mkdir -p ~/netbird-relay
-cd ~/netbird-relay
+mkdir -p ~/openzro-relay
+cd ~/openzro-relay
 ```
 
 Create `relay.env` with your relay settings. The relay server can automatically obtain and renew TLS certificates via Let's Encrypt:
@@ -61,8 +61,8 @@ Create `docker-compose.yml`:
 ```yaml
 services:
   relay:
-    image: netbirdio/relay:latest
-    container_name: netbird-relay
+    image: openzro/relay:latest
+    container_name: openzro-relay
     restart: unless-stopped
     ports:
       - '443:443'
@@ -139,14 +139,14 @@ If deploying multiple relays (e.g., for different regions), repeat the steps abo
 
 ## Update Main Server Configuration
 
-Now update your main NetBird server to use the external relays instead of the embedded one.
+Now update your main openZro server to use the external relays instead of the embedded one.
 
 ### Edit config.yaml
 
 On your main server, edit the `config.yaml` file:
 
 ```bash
-cd ~/netbird  # or wherever your deployment is
+cd ~/openzro  # or wherever your deployment is
 nano config.yaml
 ```
 
@@ -155,7 +155,7 @@ Remove the `authSecret` from the `server` section and add `relays` and `stuns` s
 ```yaml
 server:
   listenAddress: ":80"
-  exposedAddress: "https://netbird.example.com:443"
+  exposedAddress: "https://openzro.example.com:443"
   # Remove authSecret to disable the embedded relay
   # authSecret: ...
   # Remove or comment out stunPorts since we're using external STUN
@@ -165,7 +165,7 @@ server:
   healthcheckAddress: ":9000"
   logLevel: "info"
   logFile: "console"
-  dataDir: "/var/lib/netbird"
+  dataDir: "/var/lib/openzro"
 
   # External STUN servers (your relay servers)
   stuns:
@@ -183,7 +183,7 @@ server:
     credentialsTTL: "24h"
 
   auth:
-    issuer: "https://netbird.example.com/oauth2"
+    issuer: "https://openzro.example.com/oauth2"
     # ... rest of auth config
 ```
 
@@ -196,18 +196,18 @@ The `secret` under `relays` and the `NB_AUTH_SECRET` on all relay servers **must
 If your main server was exposing STUN port 3478, you can remove it since STUN is now handled by external relays:
 
 ```yaml
-  netbird-server:
-    image: netbirdio/netbird-server:latest
-    container_name: netbird-server
+  openzro-server:
+    image: openzro/openzro-server:latest
+    container_name: openzro-server
     restart: unless-stopped
-    networks: [netbird]
+    networks: [openzro]
     # Remove the STUN port - no longer needed
     # ports:
     #   - '3478:3478/udp'
     volumes:
-      - netbird_data:/var/lib/netbird
-      - ./config.yaml:/etc/netbird/config.yaml
-    command: ["--config", "/etc/netbird/config.yaml"]
+      - openzro_data:/var/lib/openzro
+      - ./config.yaml:/etc/openzro/config.yaml
+    command: ["--config", "/etc/openzro/config.yaml"]
 ```
 
 ### Restart the Main Server
@@ -222,7 +222,7 @@ docker compose up -d
 ### Check Main Server Logs
 
 ```bash
-docker compose logs netbird-server
+docker compose logs openzro-server
 ```
 
 Verify that the embedded relay is disabled and your external relay addresses are listed:
@@ -239,10 +239,10 @@ Relay addresses: [rels://relay-us.example.com:443 rels://relay-eu.example.com:44
 
 ### Check Peer Status
 
-Connect a NetBird client and verify that both STUN and relay services are available:
+Connect a openZro client and verify that both STUN and relay services are available:
 
 ```bash
-netbird status -d
+openzro status -d
 ```
 
 The output should list your external STUN and relay servers. All configured STUN servers will appear, but only one randomly chosen relay is used per client:
@@ -268,7 +268,7 @@ Relays:
 You can force all peer connections through relay to verify it works end-to-end. On a client, run:
 
 ```bash
-sudo netbird service reconfigure --service-env NB_FORCE_RELAY=true
+sudo openzro service reconfigure --service-env NB_FORCE_RELAY=true
 ```
 
 Then test connectivity to another peer (e.g., with `ping`).
@@ -276,5 +276,5 @@ Then test connectivity to another peer (e.g., with `ping`).
 Once confirmed, switch back to normal mode. The client will attempt peer-to-peer connections first and fall back to relay only when direct connectivity isn't possible:
 
 ```bash
-sudo netbird service reconfigure --service-env NB_FORCE_RELAY=false
+sudo openzro service reconfigure --service-env NB_FORCE_RELAY=false
 ```

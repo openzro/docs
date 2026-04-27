@@ -12,7 +12,7 @@ export const title = 'Usage'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/integrations/billing/usage">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/integrations/billing/usage \
+curl -X GET https://api.openzro.io/api/integrations/billing/usage \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -43,7 +43,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/integrations/billing/usage"
+url = "https://api.openzro.io/api/integrations/billing/usage"
 
 headers = {     
   'Accept': 'application/json',
@@ -67,7 +67,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/integrations/billing/usage"
+  url := "https://api.openzro.io/api/integrations/billing/usage"
   method := "GET"
   
   client := &http.Client {
@@ -103,7 +103,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/integrations/billing/usage")
+url = URI("https://api.openzro.io/api/integrations/billing/usage")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -121,7 +121,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/integrations/billing/usage")
+  .url("https://api.openzro.io/api/integrations/billing/usage")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -135,7 +135,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/integrations/billing/usage',
+  CURLOPT_URL => 'https://api.openzro.io/api/integrations/billing/usage',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

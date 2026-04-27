@@ -9,19 +9,19 @@ This guide shows how to connect cloud workloads to on-premise databases and serv
 After following this guide, your cloud applications will be able to securely access on-premise databases, APIs, and services without exposing them to the public internet.
 
 ```
-Cloud VM ────► NetBird Tunnel ────► Routing Peer ────► Database Server
-(peer)                               (on-prem)         (no NetBird)
+Cloud VM ────► openZro Tunnel ────► Routing Peer ────► Database Server
+(peer)                               (on-prem)         (no openZro)
 ```
 
 ## Prerequisites
 
-- A [NetBird cloud account](https://app.netbird.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - Access to deploy VMs or containers in your cloud environment
 - Network configuration permissions in your cloud VPC
 
 ## Step 1: Find Your On-Premise Subnet
 
-Before configuring NetBird, identify your data center network's subnet.
+Before configuring openZro, identify your data center network's subnet.
 
 **On your routing peer device, run:**
 
@@ -34,7 +34,7 @@ Look for your local subnet, typically something like `10.100.0.0/24`.
 
 ## Step 2: Create a Network for On-Premise Resources
 
-1. Go to **Networks** in the NetBird dashboard
+1. Go to **Networks** in the openZro dashboard
 2. Click **Add Network**
 3. Name it "On-Premise Data Center" and click **Save**
 
@@ -74,9 +74,9 @@ For more granular access, add specific database IPs instead of the entire subnet
 
 ## Step 5: Set Up the Routing Peer On-Premise
 
-The routing peer forwards traffic from NetBird to your data center network. Install NetBird on a server that can reach the database:
+The routing peer forwards traffic from openZro to your data center network. Install openZro on a server that can reach the database:
 
-1. In the NetBird dashboard, go to **Setup Keys**
+1. In the openZro dashboard, go to **Setup Keys**
 2. Create a new setup key (one-time use recommended). Add `on-prem-databases` to **Auto-assigned groups** and click **Create Setup Key**.
 
 <p>
@@ -90,55 +90,55 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 3. On your on-premise server, run:
 
 ```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-sudo netbird up --setup-key YOUR_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+sudo openzro up --setup-key YOUR_SETUP_KEY
 ```
 
 4. In the Networks view, click **Add Routing Peer** on your On-Premise Data Center network
 5. Select your new peer and click **Add Routing Peer**
 
-## Step 6: Deploy NetBird on `cloud-workloads`
+## Step 6: Deploy openZro on `cloud-workloads`
 
 Create a setup key for your cloud workloads:
 
-1. In the NetBird dashboard, go to **Setup Keys**
+1. In the openZro dashboard, go to **Setup Keys**
 2. Create a new setup key. Add "`cloud-workloads`" to **Auto-assigned groups** and click **Create Setup Key**.
 
 **For VMs:**
 
 ```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-sudo netbird up --setup-key YOUR_CLOUD_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+sudo openzro up --setup-key YOUR_CLOUD_SETUP_KEY
 ```
 
 **For containers (Docker Compose):**
 
 ```yaml
 services:
-  netbird:
-    image: netbirdio/netbird:latest
+  openzro:
+    image: openzro/openzro:latest
     network_mode: host
     cap_add:
       - NET_ADMIN
     environment:
       - NB_SETUP_KEY=YOUR_SETUP_KEY
     volumes:
-      - netbird-config:/etc/netbird
+      - openzro-config:/etc/openzro
     restart: unless-stopped
 
 volumes:
-  netbird-config:
+  openzro-config:
 ```
 
 **For Kubernetes:**
 
-Use the [NetBird Kubernetes Operator](/manage/integrations/kubernetes) for production deployments.
+Use the [openZro Kubernetes Operator](/manage/integrations/kubernetes) for production deployments.
 
 ## Step 7: Verify Cloud Workload Group Assignment
 
-After deploying NetBird on your cloud workloads:
+After deploying openZro on your cloud workloads:
 
-1. Go to **Peers** in the NetBird dashboard
+1. Go to **Peers** in the openZro dashboard
 2. Verify your cloud workloads appear and are assigned to the "`cloud-workloads`" group
 3. If using a setup key with auto-assigned groups, this happens automatically
 
@@ -163,7 +163,7 @@ Your cloud application can now securely access the on-premise database.
 ### AWS
 
 - Use VPC endpoints where possible for AWS services
-- Security groups must allow traffic from the NetBird routing peer
+- Security groups must allow traffic from the openZro routing peer
 - Consider using an Auto Scaling group for the routing peer with a static ENI
 
 ### GCP
@@ -195,13 +195,13 @@ Your cloud application can now securely access the on-premise database.
 ### Performance
 
 - Place routing peers close to the resources they serve
-- Use direct peering where possible (NetBird will automatically optimize paths)
+- Use direct peering where possible (openZro will automatically optimize paths)
 - Monitor latency and throughput between environments
 
 ## Troubleshooting
 
 **Cloud workload can't reach on-premise:**
-1. Verify the routing peer is online: `netbird status`
+1. Verify the routing peer is online: `openzro status`
 2. Check the routing peer can reach the target: `ping 10.100.0.50`
 3. Verify access policies are configured correctly
 

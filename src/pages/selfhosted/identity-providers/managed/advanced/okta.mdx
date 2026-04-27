@@ -1,22 +1,22 @@
 import {Note} from "@/components/mdx";
 
-# Okta SSO with NetBird Self-Hosted (Legacy)
+# Okta SSO with openZro Self-Hosted (Legacy)
 
 [Okta](https://www.okta.com/) is a cloud-based identity and access management service for enterprise use, providing single sign-on, multi-factor authentication, and lifecycle management.
 
 ## Standalone Setup (Advanced)
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds Okta as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/okta#management-setup-recommended) section in the main Okta documentation.
+We highly recommend using the simpler setup that adds Okta as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/okta#management-setup-recommended) section in the main Okta documentation.
 
 The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Okta administrators who need full control over authentication and user management.
 </Note>
 
-Use Okta as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Okta administrators as it also requires additional setup and ongoing maintenance.
+Use Okta as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Okta administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 <Note>
 If you prefer to have full control over authentication, consider self-hosted alternatives like [PocketID](/selfhosted/identity-providers/pocketid).
@@ -25,7 +25,7 @@ If you prefer to have full control over authentication, consider self-hosted alt
 ### Prerequisites
 
 - Okta Workforce Identity Cloud account (sign up at https://www.okta.com/free-trial/)
-- Docker and Docker Compose for NetBird
+- Docker and Docker Compose for openZro
 
 ### Step 1: Create Single-Page Application
 
@@ -42,13 +42,13 @@ If you prefer to have full control over authentication, consider self-hosted alt
 </p>
 
 6. Fill in:
-   - **App integration name**: `Netbird`
+   - **App integration name**: `openZro`
    - **Grant type**: `Authorization Code` and `Refresh Token`
    - **Sign-in redirect URIs**: 
-     - `https://<yournetbirddomain.com>/auth`
-     - `https://<yournetbirddomain.com>/silent-auth`
+     - `https://<youropenzrodomain.com>/auth`
+     - `https://<youropenzrodomain.com>/silent-auth`
      - `http://localhost:53000`
-   - **Sign-out redirect URIs**: `https://<yournetbirddomain.com>/`
+   - **Sign-out redirect URIs**: `https://<youropenzrodomain.com>/`
 7. Click **Save**
 
 <p>
@@ -78,7 +78,7 @@ If you prefer to have full control over authentication, consider self-hosted alt
 </p>
 
 5. Fill in:
-   - **App integration name**: `Netbird Native App`
+   - **App integration name**: `openZro Native App`
    - **Grant type**: `Device Authorization`
 6. Click **Save**
 
@@ -101,7 +101,7 @@ If you prefer to have full control over authentication, consider self-hosted alt
 2. Click **Tokens** tab
 3. Click **Create token**
 4. Enter:
-   - **Name**: `Netbird`
+   - **Name**: `openZro`
 5. Click **Create token**
 6. Copy the token value and click **OK, got it**
 
@@ -109,7 +109,7 @@ If you prefer to have full control over authentication, consider self-hosted alt
     <img src="/docs-static/img/selfhosted/identity-providers/managed/okta/advanced/okta-generate-token.png" alt="Generate token" className="imagewrapper-big"/>
 </p>
 
-### Step 4: Configure NetBird
+### Step 4: Configure openZro
 
 Your authority OIDC configuration will be available at:
 
@@ -144,9 +144,9 @@ NETBIRD_MGMT_IDP="okta"
 NETBIRD_IDP_MGMT_EXTRA_API_TOKEN="<API_TOKEN>"
 ```
 
-### Step 5: Continue with NetBird Setup
+### Step 5: Continue with openZro Setup
 
-You've configured all required resources in Okta. Continue with the [NetBird Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
+You've configured all required resources in Okta. Continue with the [openZro Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
 
 ---
 
@@ -176,9 +176,9 @@ You've configured all required resources in Okta. Continue with the [NetBird Sel
 ---
 
 <Note>
-NetBird includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
-We highly recommend using the simpler setup that adds Okta as an external IdP directly in the NetBird Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/okta#management-setup-recommended) section in the main Okta documentation.
+We highly recommend using the simpler setup that adds Okta as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/okta#management-setup-recommended) section in the main Okta documentation.
 </Note>
 
 ## Related Resources

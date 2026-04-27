@@ -2,7 +2,7 @@ import { Note } from '@/components/mdx'
 
 # Site-to-Site: Office Networks
 
-This guide shows how to connect multiple office locations so all devices can communicate—including those without NetBird installed.
+This guide shows how to connect multiple office locations so all devices can communicate—including those without openZro installed.
 
 ## What You'll Achieve
 
@@ -12,8 +12,8 @@ After following this guide, devices at different office locations can communicat
 - Legacy systems can communicate across sites
 
 ```
-HQ Server ──► Routing Peer ──► NetBird Tunnel ──► Routing Peer ──► Branch Server
-(no NetBird)    (peer)                              (peer)         (no NetBird)
+HQ Server ──► Routing Peer ──► openZro Tunnel ──► Routing Peer ──► Branch Server
+(no openZro)    (peer)                              (peer)         (no openZro)
 ```
 
 <Note>
@@ -22,7 +22,7 @@ Site-to-Site requires Network Routes because the Networks feature doesn't yet su
 
 ## Prerequisites
 
-- A [NetBird cloud account](https://app.netbird.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - Admin access to network infrastructure at each location
 - A server or VM at each location to serve as routing peers
 
@@ -33,9 +33,9 @@ Site-to-Site requires Network Routes because the Networks feature doesn't yet su
 
 ## Step 1: Create Setup Keys with Groups
 
-Before installing NetBird on your routing peers, create setup keys with auto-assigned groups:
+Before installing openZro on your routing peers, create setup keys with auto-assigned groups:
 
-1. Go to **Setup Keys** in the NetBird dashboard
+1. Go to **Setup Keys** in the openZro dashboard
 2. Click **Create Setup Key**
 3. For headquarters:
    - Name: "HQ Routing Peer"
@@ -51,20 +51,20 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 
 ## Step 2: Deploy Routing Peers
 
-Install NetBird on a server at each location:
+Install openZro on a server at each location:
 
 **At headquarters:**
 
 ```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-sudo netbird up --setup-key YOUR_HQ_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+sudo openzro up --setup-key YOUR_HQ_SETUP_KEY
 ```
 
 **At branch office:**
 
 ```bash
-curl -fsSL https://pkgs.netbird.io/install.sh | sh
-sudo netbird up --setup-key YOUR_BRANCH_SETUP_KEY
+curl -fsSL https://pkgs.openzro.io/install.sh | sh
+sudo openzro up --setup-key YOUR_BRANCH_SETUP_KEY
 ```
 
 ## Step 3: Create Network Routes
@@ -183,10 +183,10 @@ Some scenarios require office systems to initiate connections to remote workers 
 ### Configuration
 
 1. Create a network route for the office network (as above)
-2. On the office system that needs to reach remote workers, add a route to the NetBird network:
+2. On the office system that needs to reach remote workers, add a route to the openZro network:
 
 ```bash
-# Route to NetBird network through the routing peer
+# Route to openZro network through the routing peer
 sudo ip route add 100.64.0.0/10 via 10.0.0.50
 ```
 

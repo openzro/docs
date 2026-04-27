@@ -8,14 +8,14 @@ This page lists the all project ideas for [Google Summer of Code 2022](https://s
 
 We require all applicants to complete a [task](#task).
 
-Join our [Slack channel](https://join.slack.com/t/wiretrustee/shared_invite/zt-vrahf41g-ik1v7fV8du6t0RwxSrJ96A) and talk to your potential mentors!
+Open a [GitHub Discussion](https://github.com/openzro/openzro/discussions) to talk to potential mentors.
 
 ### Task
 
-The goal of the task is to get familiar with the system by setting up a self-hosted version of Netbird.
+The goal of the task is to get familiar with the system by setting up a self-hosted version of openZro.
 
 1. Carefully review projects' documentation.
-2. Deploy a self-hosted version of NetBird.
+2. Deploy a self-hosted version of openZro.
 3. Register at least 2 peers in the system (can be a laptop, server or even Raspberry PI).
 <Note>
 It is possible to set up multiple peers on the same machine. Find out how!
@@ -26,27 +26,27 @@ It is possible to set up multiple peers on the same machine. Find out how!
 Please reach out to us with any questions. We believe you will have some! :)
 
 In case this task seems to be difficult, no worries!
-You could skip #1 and #2 starting with #3 using managed version of NetBird (https://app.netbird.io).
+You could skip #1 and #2 starting with #3 using managed version of openZro (https://app.openzro.io).
 
 ### Project Ideas
 
 There are a few categories that our ideas fall into:
-* **UI** - mostly around our Management service Dashboard ([Github repo](https://github.com/netbirdio/dashboard))
-* **Client** - our client application ([Github Repo](https://github.com/netbirdio/netbird/tree/main/client))
-* **Server** - our Management and Signal server applications ([Management Github Repo](https://github.com/netbirdio/netbird/tree/main/management) and [Signal Github Repo](https://github.com/netbirdio/netbird/tree/main/signal))
+* **UI** - mostly around our Management service Dashboard ([Github repo](https://github.com/openzro/dashboard))
+* **Client** - our client application ([Github Repo](https://github.com/openzro/openzro/tree/main/client))
+* **Server** - our Management and Signal server applications ([Management Github Repo](https://github.com/openzro/openzro/tree/main/management) and [Signal Github Repo](https://github.com/openzro/openzro/tree/main/signal))
 * **Portability** - ability to run client and server applications on different platforms (e.g. OpenWRT)
 * **Infrastructure** - deployment, CI/CD, scaling, infrastructure as code improvements, etc.
 * **Integrations** - integration between the project and different platforms, like CI/CD, Kubernetes or specific cloud providers.
 
 
-### Idea: Make NetBird run on routers
+### Idea: Make openZro run on routers
 <Note>
 OpenWrt is an open-source project for embedded operating systems based on Linux, primarily used on embedded devices to route network traffic.
 
 https://openwrt.org/
 </Note>
 
-NetBird runs on different platforms and can also be compiled to run on routers. For that, we are thinking to work on this support for the popular wireless router OpenWRT.
+openZro runs on different platforms and can also be compiled to run on routers. For that, we are thinking to work on this support for the popular wireless router OpenWRT.
 
 We are already building, but we lack packaging and repository for distribution and this is the main goal of this task.
 
@@ -72,10 +72,10 @@ eBPF is a revolutionary technology with origins in the Linux kernel that can run
 
 https://ebpf.io/
 </Note>
-When running on machines NetBird client application tries to be as efficient as possible.
-On Linux machines NetBird can use kernel modules like Wireguard and features like eBPF to be the most efficient.
+When running on machines openZro client application tries to be as efficient as possible.
+On Linux machines openZro can use kernel modules like Wireguard and features like eBPF to be the most efficient.
 
-Besides connectivity, NetBird can control access. Right now it is achieved on a connection level -
+Besides connectivity, openZro can control access. Right now it is achieved on a connection level -
 if a peer is in the allowed list, it can connect. If not, the connection is rejected.
 
 It is more advantageous to work on a finer level - defining what packets to allow/block and on which ports.
@@ -97,7 +97,7 @@ The flow could be the following: client receives rules from the Management servi
 >
 > **Reference:** https://ebpf.io/
 
-### Idea: NetBird client running in the browser
+### Idea: openZro client running in the browser
 
 <Note>
 WebAssembly (abbreviated Wasm) is a binary instruction format for a stack-based virtual machine.
@@ -105,17 +105,17 @@ Wasm is designed as a portable compilation target for programming languages, ena
 and server applications.
 </Note>
 
-NetBird requires a client application installed to connect machines to each other.
+openZro requires a client application installed to connect machines to each other.
 In some environments it might not be possible or forbidden to install applications.
 But there always might be an option to run a browser!
 
-The idea of this project is to make NetBird run in the browser using WASM and WebRTC.
+The idea of this project is to make openZro run in the browser using WASM and WebRTC.
 A user would log in to the Management Dashboard and open a virtual terminal (e.g. https://xtermjs.org/).
 Browser will then establish a connection to the network and user would be able to access remote servers.
 
 > **Category:** UI/Client/Server
 >
-> **Goal:**  Interactive console running in the browser establishing connection to the NetBird network.
+> **Goal:**  Interactive console running in the browser establishing connection to the openZro network.
 >
 > **Skills:** Golang, Linux, Javascript
 >
@@ -131,7 +131,7 @@ Browser will then establish a connection to the network and user would be able t
 >
 > **Reference:** https://xtermjs.org/
 
-### Idea: Integrate NetBird with Kubernetes
+### Idea: Integrate openZro with Kubernetes
 
 <Note>
 Kubernetes, also known as K8s, is an open-source system for automating deployment, scaling, and management of containerized applications.
@@ -141,14 +141,14 @@ Having a private Kubernetes cluster is a best practices that come with some conn
 especially to operators and developers that need to access  resources running within the cluster like services,
 pods and the Kubernetes API.
 
-The idea of this project is to integrate NetBird with Kubernetes by creating a controller that would add an agent
+The idea of this project is to integrate openZro with Kubernetes by creating a controller that would add an agent
 per cluster node and would handle the login process of the agent and store the states in form of Kubernetes secrets.
 As Kubernetes is a cloud-native platform, you can imagine that are some caveats that we will have to deal with, like nodes being removed and added all the time,
 different network controllers, and different cloud environments.
 
 > **Category:** Client/Infrastructure/Integrations
 >
-> **Goal:**  Integrate NetBird with Kubernetes for automatic provision of agents.
+> **Goal:**  Integrate openZro with Kubernetes for automatic provision of agents.
 >
 > **Skills:** Golang, Linux, Kubernetes API
 >
@@ -165,7 +165,7 @@ different network controllers, and different cloud environments.
 > **Reference:** https://kubernetes.io/blog/2021/06/21/writing-a-controller-for-pod-labels/
 
 
-### Idea: NetBird Github Action
+### Idea: openZro Github Action
 
 <Note>
 GitHub Actions makes it easy to automate all your software workflows, now with world-class CI/CD. Build, test, and deploy your code right from GitHub.
@@ -175,12 +175,12 @@ Make code reviews, branch management, and issue triaging work the way you want.
 We love Github Actions, because of its primary concept, Actions. They allow us to automate complex workflows and provide a simple interface
 to be configured and executed before building or testing our code.
 
-The idea of this project is to create a NetBird agent action, that would download and run an ephemeral agent on Github Actions workflows. The benefits of this
+The idea of this project is to create a openZro agent action, that would download and run an ephemeral agent on Github Actions workflows. The benefits of this
 could be great as it would allow many users that rely on the public runners to access private resources, in a secure and dynamic way.
 
 > **Category:**  Server/Client/Integrations
 >
-> **Goal:**  Create a NetBird Github Action.
+> **Goal:**  Create a openZro Github Action.
 >
 > **Skills:** Golang, Bash, Javascript
 >
@@ -192,7 +192,7 @@ could be great as it would allow many users that rely on the public runners to a
 >
 > **Reference:** https://docs.github.com/en/actions
 >
-> **Reference:** https://docs.netbird.io/getting-started/quickstart
+> **Reference:** https://docs.openzro.io/getting-started/quickstart
 >
 > **Reference:** https://docs.github.com/en/actions/creating-actions/about-custom-actions
 
@@ -200,12 +200,12 @@ could be great as it would allow many users that rely on the public runners to a
 
 Nowadays people are always connected with mobile phones and very often they need to access remote resources with them.
 
-The idea of this project is to create a NetBird mobile app for either Android or iOS that would follow one of the principles of our product, simplicity.
+The idea of this project is to create a openZro mobile app for either Android or iOS that would follow one of the principles of our product, simplicity.
 Initially we think to export our Go APIs using GoMobile that would help with a good chuck of the heavy lifting.
 
 > **Category:**  UI/Client/Portability
 >
-> **Goal:**  Create a NetBird Mobile Client App.
+> **Goal:**  Create a openZro Mobile Client App.
 >
 > **Skills:** Golang, Java/Kotlin, XCode, Flutter+Dart
 >

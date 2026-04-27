@@ -1,14 +1,14 @@
 
-# NetBird Agent command line interface (CLI)
+# openZro Agent command line interface (CLI)
 
-The NetBird client installation adds a binary called `netbird` to your system. This binary runs as a daemon service to connect
-your computer or server to the NetBird network as a peer. But it can also be used as a client to control the daemon service.
+The openZro client installation adds a binary called `openzro` to your system. This binary runs as a daemon service to connect
+your computer or server to the openZro network as a peer. But it can also be used as a client to control the daemon service.
 
-This section will explore the commands available in `netbird`.
+This section will explore the commands available in `openzro`.
 ## Syntax
-Use the following syntax to run `netbird` commands from your terminal window:
+Use the following syntax to run `openzro` commands from your terminal window:
 ```shell
-netbird [command] [subcommand] [flags]
+openzro [command] [subcommand] [flags]
 ```
 * `command`: Specifies the operation that you want to perform or a top-level command: `up`, `login`, `down`, `status`, `ssh`, `expose`, `networks`, `profile`, `debug`, `service`, and `version`
 * `subcommand`: Specifies the operation to be executed for a top-level command like `service`: `install`, `uninstall`, `start`, and `stop`
@@ -35,36 +35,36 @@ This is the CLI configuration precedence (highest to lowest priority):
 We are preserving the unusual priority of environment variables for backwards compatibility with existing deployments.
 
 ## Global flags
-`netbird` has a set of global flags that are available in every command. They specify settings that are core or shared between two or more commands, e.g. `--setup-key` is used by `login` and `up` to authenticate the client against a management service.
+`openzro` has a set of global flags that are available in every command. They specify settings that are core or shared between two or more commands, e.g. `--setup-key` is used by `login` and `up` to authenticate the client against a management service.
 
 Below is the list of global flags:
 ```shell
-      --admin-url string        Admin Panel URL [http|https]://[host]:[port] (default "https://app.netbird.io:443")
-  -A, --anonymize               anonymize IP addresses and non-netbird.io domains in logs and status output
+      --admin-url string        Admin Panel URL [http|https]://[host]:[port] (default "https://app.openzro.io:443")
+  -A, --anonymize               anonymize IP addresses and non-openzro.io domains in logs and status output
   -c, --config string           Overrides the default profile file location. Deprecated on `up` and `login`; use `--service-env NB_CONFIG=<path>` instead.
-      --daemon-addr string      Daemon service address to serve CLI requests [unix|tcp]://[path|host:port] (default "unix:///var/run/netbird.sock")
+      --daemon-addr string      Daemon service address to serve CLI requests [unix|tcp]://[path|host:port] (default "unix:///var/run/openzro.sock")
   -n, --hostname string         Sets a custom hostname for the device
-      --log-file console        Sets NetBird log paths written to simultaneously. If "console" is specified the log will be output to stdout. If "syslog" is specified the log will be sent to the syslog daemon. You can pass the flag multiple times or separate entries by comma (default [/var/log/netbird/client.log])
-  -l, --log-level string        Sets NetBird log level (default "info")
-  -m, --management-url string   Management Service URL [http|https]://[host]:[port] (default "https://api.netbird.io:443")
+      --log-file console        Sets openZro log paths written to simultaneously. If "console" is specified the log will be output to stdout. If "syslog" is specified the log will be sent to the syslog daemon. You can pass the flag multiple times or separate entries by comma (default [/var/log/openzro/client.log])
+  -l, --log-level string        Sets openZro log level (default "info")
+  -m, --management-url string   Management Service URL [http|https]://[host]:[port] (default "https://api.openzro.io:443")
       --preshared-key string    Sets WireGuard PreSharedKey property. If set, then only peers that have the same key can communicate.
-  -s, --service string          NetBird system service name (default "netbird")
+  -s, --service string          openZro system service name (default "openzro")
   -k, --setup-key string        Setup key obtained from the Management Service Dashboard (used to register peer)
       --setup-key-file string   Path to a file containing a setup key (used to register peer). Ignored if --setup-key is provided.
 ```
 ### Environment Variables
-Every flag of a `netbird` command can be passed as an environment variable. We are using the following rule for the environment variables composition:
+Every flag of a `openzro` command can be passed as an environment variable. We are using the following rule for the environment variables composition:
 * `PREFIX_FLAGNAME` and for flags with multiple parts: `PREFIX_FLAGNAMEPART1_FLAGNAMEPART2`
 * The prefix is always **NB**
 * The flag parts are separated by a dash ("-") when passing as flags and with an underscore ("_") when passing as an environment variable
 
 For example, let's check how we can pass `--config` and `--management-url` as environment variables:
 ```shell
-export NB_CONFIG="/opt/netbird/config.json"
+export NB_CONFIG="/opt/openzro/config.json"
 export NB_MANAGEMENT_URL="https://api.self-hosted.com:443"
-netbird up
+openzro up
 ```
-The `up` command would process the variables, read the configuration file on `/opt/netbird/config.json` and attempt to connect to the management service running at `https://api.self-hosted.com:443`.
+The `up` command would process the variables, read the configuration file on `/opt/openzro/config.json` and attempt to connect to the management service running at `https://api.self-hosted.com:443`.
 
 Here are some additional examples of environment variables:
 ```shell
@@ -85,7 +85,7 @@ Beyond flag-derived variables, the client also supports a number of advanced env
 
 ## Commands
 ### up
-Single command to log in and start the NetBird client. It can send a signal to the daemon service or run in the foreground with the flag `--foreground-mode`.
+Single command to log in and start the openZro client. It can send a signal to the daemon service or run in the foreground with the flag `--foreground-mode`.
 
 The command will check if the peer is logged in and connect to the management service. If the peer is not logged in, by default, it will attempt to initiate an SSO login flow.
 #### Flags
@@ -100,7 +100,7 @@ The command will check if the peer is logged in and connect to the management se
       --disable-ipv6                        Disable IPv6 overlay. If enabled, the client won't request or use an IPv6 overlay address.
       --disable-server-routes               Disable server routes. If enabled, the client won't act as a router for server routes received from the management service.
       --disable-ssh-auth                    Disable SSH JWT authentication. If enabled, any peer with network access can connect without user authentication.
-      --dns-resolver-address string         Sets a custom address for NetBird's local DNS resolver. If set, the agent won't attempt to discover the best IP and port to listen on. An empty string "" clears the previous configuration. E.g. --dns-resolver-address 127.0.0.1:5053 or --dns-resolver-address ""
+      --dns-resolver-address string         Sets a custom address for openZro's local DNS resolver. If set, the agent won't attempt to discover the best IP and port to listen on. An empty string "" clears the previous configuration. E.g. --dns-resolver-address 127.0.0.1:5053 or --dns-resolver-address ""
       --dns-router-interval duration        DNS route update interval (default 1m0s)
       --enable-lazy-connection              [Experimental] Enable the lazy connection feature. If enabled, the client will establish connections on-demand. Note: this setting may be overridden by management configuration.
       --enable-rosenpass                    [Experimental] Enable Rosenpass feature. If enabled, the connection will be post-quantum secured via Rosenpass.
@@ -124,33 +124,33 @@ The command will check if the peer is logged in and connect to the management se
 #### Usage
 The minimal form of running the command is:
 ```shell
-netbird up
+openzro up
 ```
 If you are running on a self-hosted environment, you can pass your management url by running the following:
 ```shell
-netbird up --management-url https://api.self-hosted.com:443
+openzro up --management-url https://api.self-hosted.com:443
 ```
 if you want to run in the foreground, you can use "console" as the value for `--log-file` and run the command with sudo:
 ```shell
-sudo netbird up --log-file console
+sudo openzro up --log-file console
 ```
 <Note>
     On Windows, you may need to run the command from an elevated terminal session.
 </Note>
 In case you need to use a setup key, use the `--setup-key` flag :
 ```shell
-netbird up --setup-key AAAA-BBB-CCC-DDDDDD
+openzro up --setup-key AAAA-BBB-CCC-DDDDDD
 ```
 You can set extra DNS labels with the `--extra-dns-labels` flag:
 ```shell
-netbird up --setup-key AAAA-BBB-CCC-DDDDDD --extra-dns-labels vpc1,mgmt1
+openzro up --setup-key AAAA-BBB-CCC-DDDDDD --extra-dns-labels vpc1,mgmt1
 ```
 <Note>
     This feature requires a setup key with the **Allow Extra DNS Labels** option enabled. See [Extra DNS Labels](/manage/dns/extra-dns-labels) for full details, including wildcard labels and round-robin load balancing.
 </Note>
 
 ### login
-Command to authenticate the NetBird client to a management service. If the peer is not logged in, by default, it will attempt to initiate an SSO login flow.
+Command to authenticate the openZro client to a management service. If the peer is not logged in, by default, it will attempt to initiate an SSO login flow.
 #### Flags
 ```shell
       --no-browser       Do not open the browser for SSO login
@@ -159,27 +159,27 @@ Command to authenticate the NetBird client to a management service. If the peer 
 #### Usage
 The minimal form of running the command is:
 ```shell
-netbird login
+openzro login
 ```
 If you are running on a self-hosted environment, you can pass your management url by running the following:
 ```shell
-netbird login --management-url https://api.self-hosted.com:443
+openzro login --management-url https://api.self-hosted.com:443
 ```
 In case you need to use a setup key, use the `--setup-key` flag:
 ```shell
-netbird login --setup-key AAAA-BBB-CCC-DDDDDD
+openzro login --setup-key AAAA-BBB-CCC-DDDDDD
 ```
 Passing a management url and a setup key:
 ```shell
-netbird login --setup-key AAAA-BBB-CCC-DDDDDD --management-url https://api.self-hosted.com:443
+openzro login --setup-key AAAA-BBB-CCC-DDDDDD --management-url https://api.self-hosted.com:443
 ```
 
 ### down
-Command to stop a connection with the management service and other peers in a NetBird network. After running this command, the daemon service will enter an `Idle` state.
+Command to stop a connection with the management service and other peers in a openZro network. After running this command, the daemon service will enter an `Idle` state.
 #### Usage
 The minimal form of running the command is:
 ```shell
-netbird down
+openzro down
 ```
 
 ### status
@@ -190,17 +190,17 @@ Retrieves the peer status from the daemon service.
   -d, --detail                             Display detailed status information in human-readable format
       --filter-by-connection-type string   Filter the detailed output by connection type (P2P|Relayed), e.g., --filter-by-connection-type P2P
       --filter-by-ips strings              Filter the detailed output by a list of one or more IPs (v4 or v6), e.g., --filter-by-ips 100.64.0.100,fd00::1
-      --filter-by-names strings            Filter the detailed output by a list of one or more peer FQDN or hostnames, e.g., --filter-by-names peer-a,peer-b.netbird.cloud
+      --filter-by-names strings            Filter the detailed output by a list of one or more peer FQDN or hostnames, e.g., --filter-by-names peer-a,peer-b.openzro.cloud
       --filter-by-status string            Filter the detailed output by connection status (idle|connecting|connected), e.g., --filter-by-status connected
-      --ipv4                               Display only NetBird IPv4 of this peer, e.g., --ipv4 will output 100.64.0.33
-      --ipv6                               Display only NetBird IPv6 of this peer
+      --ipv4                               Display only openZro IPv4 of this peer, e.g., --ipv4 will output 100.64.0.33
+      --ipv6                               Display only openZro IPv6 of this peer
       --json                               Display detailed status information in JSON format
       --yaml                               Display detailed status information in YAML format
 ```
 #### Usage
 The minimal form of running the command is:
 ```shell
-netbird status
+openzro status
 ```
 This will output:
 ```shell
@@ -211,7 +211,7 @@ Management: Connected
 Signal: Connected
 Relays: 2/2 Available
 Nameservers: 1/1 Available
-NetBird IP: 100.119.62.6/16
+openZro IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -220,13 +220,13 @@ Peers count: 2/3 Connected
 
 If you want to see more details about the peer connections, you can use the `--detail` or `-d` flag:
 ```shell
-netbird status -d
+openzro status -d
 ```
 This will output:
 ```shell
 Peers detail:
  Peer:
-  NetBird IP: 100.119.85.4
+  openZro IP: 100.119.85.4
   Public key: 2lI3F+fDUWh58g5oRN+y7lPHpNcEVWhiDv/wr1/jiF8=
   Status: Disconnected
   -- detail --
@@ -242,7 +242,7 @@ Peers detail:
   Latency: 10.74ms
 
  Peer:
-  NetBird IP: 100.119.201.225
+  openZro IP: 100.119.201.225
   Public key: +jkH8cs/Fo83qdB6dWG16+kAQmGTKYoBYSAdLtSOV10=
   Status: Connected
   -- detail --
@@ -258,7 +258,7 @@ Peers detail:
   Latency: 20.14ms
 
  Peer:
-  NetBird IP: 100.119.230.104
+  openZro IP: 100.119.230.104
   Public key: R7olj0S8jiYMLfOWK+wDto+j3pE4vR54tLGrEQKgBSw=
   Status: Connected
   -- detail --
@@ -276,14 +276,14 @@ Peers detail:
 OS: linux/amd64
 Daemon version: 0.27.4
 CLI version: 0.27.4
-Management: Connected to https://api.netbird.io:443
-Signal:  Connected to https://signal.netbird.io:443
+Management: Connected to https://api.openzro.io:443
+Signal:  Connected to https://signal.openzro.io:443
 Relays:
-  [stun:stun.netbird.io:5555] is Available
-  [turns:turn.netbird.io:443?transport=tcp] is Available
+  [stun:stun.openzro.io:5555] is Available
+  [turns:turn.openzro.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-NetBird IP: 100.119.62.6/16
+openZro IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -291,13 +291,13 @@ Peers count: 2/3 Connected
 ```
 To filter the peers' output by connection status, you can use the `--filter-by-status` flag with either "connected" or "disconnected" as value:
 ```shell
-netbird status -d --filter-by-status connected
+openzro status -d --filter-by-status connected
 ```
 This will output:
 ```shell
 Peers detail:
  Peer:
-  NetBird IP: 100.119.201.225
+  openZro IP: 100.119.201.225
   Public key: +jkH8cs/Fo83qdB6dWG16+kAQmGTKYoBYSAdLtSOV10=
   Status: Connected
   -- detail --
@@ -313,7 +313,7 @@ Peers detail:
   Latency: 20.14ms
 
  Peer:
-  NetBird IP: 100.119.230.104
+  openZro IP: 100.119.230.104
   Public key: R7olj0S8jiYMLfOWK+wDto+j3pE4vR54tLGrEQKgBSw=
   Status: Connected
   -- detail --
@@ -331,14 +331,14 @@ Peers detail:
 OS: linux/amd64
 Daemon version: 0.27.4
 CLI version: 0.27.4
-Management: Connected to https://api.netbird.io:443
-Signal:  Connected to https://signal.netbird.io:443
+Management: Connected to https://api.openzro.io:443
+Signal:  Connected to https://signal.openzro.io:443
 Relays:
-  [stun:stun.netbird.io:5555] is Available
-  [turns:turn.netbird.io:443?transport=tcp] is Available
+  [stun:stun.openzro.io:5555] is Available
+  [turns:turn.openzro.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-NetBird IP: 100.119.62.6/16
+openZro IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -346,13 +346,13 @@ Peers count: 2/3 Connected
 ```
 To filter the peers' output by peer IP addresses, you can use the `--filter-by-ips` flag with one or more IPs separated by a comma as a value:
 ```shell
-netbird status -d --filter-by-ips 100.119.201.225
+openzro status -d --filter-by-ips 100.119.201.225
 ```
 This will output:
 ```shell
 Peers detail:
  Peer:
-  NetBird IP: 100.119.201.225
+  openZro IP: 100.119.201.225
   Public key: +jkH8cs/Fo83qdB6dWG16+kAQmGTKYoBYSAdLtSOV10=
   Status: Connected
   -- detail --
@@ -370,14 +370,14 @@ Peers detail:
 OS: linux/amd64
 Daemon version: 0.27.4
 CLI version: 0.27.4
-Management: Connected to https://api.netbird.io:443
-Signal:  Connected to https://signal.netbird.io:443
+Management: Connected to https://api.openzro.io:443
+Signal:  Connected to https://signal.openzro.io:443
 Relays:
-  [stun:stun.netbird.io:5555] is Available
-  [turns:turn.netbird.io:443?transport=tcp] is Available
+  [stun:stun.openzro.io:5555] is Available
+  [turns:turn.openzro.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-NetBird IP: 100.119.62.6/16
+openZro IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -385,14 +385,14 @@ Peers count: 2/3 Connected
 ```
 You can combine both filters and get the peers that are both connected and with specific IPs:
 ```shell
-netbird status -d --filter-by-status connected --filter-by-ips 100.119.85.4,100.119.230.104
+openzro status -d --filter-by-status connected --filter-by-ips 100.119.85.4,100.119.230.104
 ```
 This will output:
 ```shell
 Peers detail:
 
  Peer:
-  NetBird IP: 100.119.230.104
+  openZro IP: 100.119.230.104
   Public key: R7olj0S8jiYMLfOWK+wDto+j3pE4vR54tLGrEQKgBSw=
   Status: Connected
   -- detail --
@@ -410,14 +410,14 @@ Peers detail:
 OS: linux/amd64
 Daemon version: 0.27.4
 CLI version: 0.27.4
-Management: Connected to https://api.netbird.io:443
-Signal:  Connected to https://signal.netbird.io:443
+Management: Connected to https://api.openzro.io:443
+Signal:  Connected to https://signal.openzro.io:443
 Relays:
-  [stun:stun.netbird.io:5555] is Available
-  [turns:turn.netbird.io:443?transport=tcp] is Available
+  [stun:stun.openzro.io:5555] is Available
+  [turns:turn.openzro.io:443?transport=tcp] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-NetBird IP: 100.119.62.6/16
+openZro IP: 100.119.62.6/16
 Interface type: Kernel
 Quantum resistance: false
 Routes: -
@@ -428,10 +428,10 @@ Peers count: 2/3 Connected
 </Note>
 
 ### ssh
-Command to connect via SSH to a remote peer in your NetBird network. The `ssh` command has several subcommands for different operations.
+Command to connect via SSH to a remote peer in your openZro network. The `ssh` command has several subcommands for different operations.
 
 <Note>
-    Before using this command, make sure that SSH Access is enabled both on the target peer and in the NetBird Dashboard. Learn more about [enabling SSH access](/manage/peers/ssh).
+    Before using this command, make sure that SSH Access is enabled both on the target peer and in the openZro Dashboard. Learn more about [enabling SSH access](/manage/peers/ssh).
 </Note>
 
 #### ssh (connect)
@@ -452,29 +452,29 @@ Connect to a remote peer via SSH with an interactive shell or execute a command.
 ```
 
 **Arguments:**
-* `[user@]host`: The remote user and NetBird peer hostname or IP address
+* `[user@]host`: The remote user and openZro peer hostname or IP address
 * `[command]`: Optional command to execute on the remote peer
 
 **Usage:**
 
 Interactive shell:
 ```shell
-netbird ssh user@100.119.230.104
+openzro ssh user@100.119.230.104
 ```
 
 Execute a single command:
 ```shell
-netbird ssh user@100.119.230.104 "uptime"
+openzro ssh user@100.119.230.104 "uptime"
 ```
 
 Local port forwarding (forward local port 8080 to remote port 80):
 ```shell
-netbird ssh -L 8080:localhost:80 user@100.119.230.104
+openzro ssh -L 8080:localhost:80 user@100.119.230.104
 ```
 
 Remote port forwarding (forward remote port 8080 to local port 3000):
 ```shell
-netbird ssh -R 8080:localhost:3000 user@100.119.230.104
+openzro ssh -R 8080:localhost:3000 user@100.119.230.104
 ```
 
 <Note>
@@ -482,7 +482,7 @@ Port forwarding must be enabled on the SSH server using `--enable-ssh-local-port
 </Note>
 
 <Note>
-For SFTP and SCP, use native clients (`sftp` and `scp` commands) which work with NetBird SSH automatically.
+For SFTP and SCP, use native clients (`sftp` and `scp` commands) which work with openZro SSH automatically.
 </Note>
 
 #### Troubleshooting
@@ -491,7 +491,7 @@ For SFTP and SCP, use native clients (`sftp` and `scp` commands) which work with
 
 - Ensure SSH is enabled on the target peer:
   ```shell
-  netbird up --allow-server-ssh
+  openzro up --allow-server-ssh
   ```
 - Verify SSH Access is enabled in the dashboard (Peers > your_peer > SSH Access)
 - Check that an ACL policy allows TCP port 22022
@@ -500,27 +500,27 @@ For SFTP and SCP, use native clients (`sftp` and `scp` commands) which work with
 
 - Complete the OIDC flow when prompted (browser window will open)
 - Verify your IdP is properly configured
-- To disable JWT authentication: `netbird up --allow-server-ssh --disable-ssh-auth`
+- To disable JWT authentication: `openzro up --allow-server-ssh --disable-ssh-auth`
 
 **Port forwarding not working:**
 
 - Ensure the server has the appropriate flags:
   ```shell
-  netbird up --allow-server-ssh \
+  openzro up --allow-server-ssh \
     --enable-ssh-local-port-forwarding \
     --enable-ssh-remote-port-forwarding
   ```
 
 <p>
-    <img src="/docs-static/img/manage/peers/ssh/ssh-dashboard.png" alt="netbird ssh dashboard" className="imagewrapper-big" />
+    <img src="/docs-static/img/manage/peers/ssh/ssh-dashboard.png" alt="openzro ssh dashboard" className="imagewrapper-big" />
 </p>
 
 
 ### expose
-Command to expose a local port to the public internet via the NetBird reverse proxy. The service remains active as long as the command is running and is automatically removed when you stop it.
+Command to expose a local port to the public internet via the openZro reverse proxy. The service remains active as long as the command is running and is automatically removed when you stop it.
 
 <Note>
-    Before using this command, make sure the NetBird client is connected (`netbird up`), and that the **Peer Expose** feature is enabled by your account administrator in **Settings** > **Clients**. See [Expose from CLI](/manage/reverse-proxy/expose-from-cli) for the complete guide.
+    Before using this command, make sure the openZro client is connected (`openzro up`), and that the **Peer Expose** feature is enabled by your account administrator in **Settings** > **Clients**. See [Expose from CLI](/manage/reverse-proxy/expose-from-cli) for the complete guide.
 </Note>
 
 #### Flags
@@ -536,7 +536,7 @@ Command to expose a local port to the public internet via the NetBird reverse pr
 #### Usage
 Expose a local service running on port 8080 (defaults to HTTP):
 ```shell
-netbird expose 8080
+openzro expose 8080
 ```
 This will output:
 ```shell
@@ -551,27 +551,27 @@ Press Ctrl+C to stop exposing.
 ```
 Expose with PIN protection (must be exactly 6 digits):
 ```shell
-netbird expose 3000 --with-pin 123456
+openzro expose 3000 --with-pin 123456
 ```
 Expose with password protection and a custom name prefix:
 ```shell
-netbird expose 8080 --with-password my-secret --with-name-prefix my-app
+openzro expose 8080 --with-password my-secret --with-name-prefix my-app
 ```
 Expose with SSO user group restriction:
 ```shell
-netbird expose 8080 --with-user-groups engineering,devops
+openzro expose 8080 --with-user-groups engineering,devops
 ```
 Expose a raw TCP service (e.g. a database or game server):
 ```shell
-netbird expose 5432 --protocol tcp
+openzro expose 5432 --protocol tcp
 ```
 Expose a TLS-terminated service:
 ```shell
-netbird expose 8443 --protocol tls
+openzro expose 8443 --protocol tls
 ```
 Expose using a custom domain (must be pre-configured in your account):
 ```shell
-netbird expose 8080 --with-custom-domain app.example.com
+openzro expose 8080 --with-custom-domain app.example.com
 ```
 Press `Ctrl+C` to stop exposing the service. The service is automatically removed from the reverse proxy when the command exits.
 
@@ -584,7 +584,7 @@ Commands to list, select, or deselect networks. This replaces the older `routes`
 
 #### Usage
 ```shell
-netbird networks [command]
+openzro networks [command]
 ```
 
 #### Subcommands
@@ -597,7 +597,7 @@ Select a list of networks by identifiers, or `all` to clear all selections and a
 Default mode is replace; use `-a` to append to the current selection.
 
 ```shell
-netbird networks select network...|all [flags]
+openzro networks select network...|all [flags]
 ```
 
 **Flags:**
@@ -607,16 +607,16 @@ netbird networks select network...|all [flags]
 
 **Examples:**
 ```shell
-netbird networks select all
-netbird networks select route1 route2
-netbird networks select -a route3
+openzro networks select all
+openzro networks select route1 route2
+openzro networks select -a route3
 ```
 
 #### networks deselect
 Deselect a list of networks by identifiers, or `all` to deselect all.
 
 ```shell
-netbird networks deselect network...|all
+openzro networks deselect network...|all
 ```
 
 ### profile
@@ -624,7 +624,7 @@ Commands to list, add, remove, and switch profiles. Profiles allow you to mainta
 
 #### Usage
 ```shell
-netbird profile [command]
+openzro profile [command]
 ```
 
 #### Subcommands
@@ -634,11 +634,11 @@ netbird profile [command]
 - `select`: Select a profile to use.
 
 ### version
-Outputs the `netbird` command version.
+Outputs the `openzro` command version.
 #### Usage
 The minimal form of running the command is:
 ```shell
-netbird version
+openzro version
 ```
 This will output:
 ```shell
@@ -655,15 +655,15 @@ The install installs the daemon service on the system.
 #### Usage
 The minimal form of running the command is:
 ```shell
-sudo netbird service install
+sudo openzro service install
 ```
 You can use the global flags to configure the daemon service. For instance, you can set a debug log level with the flag `--log-level`
 ```shell
-sudo netbird service install --log-level debug
+sudo openzro service install --log-level debug
 ```
 You can set a custom configuration path with the flag `--config`
 ```shell
-sudo netbird service install --config /opt/netbird/config.json
+sudo openzro service install --config /opt/openzro/config.json
 ```
 
 #### Service-specific flags
@@ -678,17 +678,17 @@ These flags are intended for managed or shared machines where non-admin users sh
 - `--disable-profiles` prevents users from adding, removing, or switching profiles. The client stays locked to the profile that was active at install time. Any attempt to switch profiles via CLI or UI is rejected.
 - `--disable-update-settings` prevents users from changing daemon settings (management URL, log level, DNS resolver address, etc.) via CLI or UI. The configuration can only be changed by an administrator who reinstalls the service or uses `service reconfigure`.
 
-Typical use: an IT admin deploys NetBird with a setup key and locks the configuration so end users cannot disconnect from the corporate account or point the client at a different management server.
+Typical use: an IT admin deploys openZro with a setup key and locks the configuration so end users cannot disconnect from the corporate account or point the client at a different management server.
 
 ```shell
-sudo netbird service install \
+sudo openzro service install \
   --setup-key AAAA-BBB-CCC-DDDDDD \
   --disable-profiles \
   --disable-update-settings
 ```
 
 <Note>
-    Install parameters (including `--disable-profiles`, `--disable-update-settings`, and `--service-env`) are persisted to a `service.json` file and survive uninstall/reinstall cycles. To clear saved parameters and revert to defaults, run `netbird service reset-params` followed by `netbird service reconfigure`.
+    Install parameters (including `--disable-profiles`, `--disable-update-settings`, and `--service-env`) are persisted to a `service.json` file and survive uninstall/reinstall cycles. To clear saved parameters and revert to defaults, run `openzro service reset-params` followed by `openzro service reconfigure`.
 </Note>
 
 <Note>
@@ -700,7 +700,7 @@ The uninstall uninstalls the daemon service from the system.
 #### Usage
 The minimal form of running the command is:
 ```shell
-sudo netbird service uninstall
+sudo openzro service uninstall
 ```
 
 ### service start
@@ -708,7 +708,7 @@ Starts the daemon service
 #### Usage
 The minimal form of running the command is:
 ```shell
-sudo netbird service start
+sudo openzro service start
 ```
 
 <Note>
@@ -720,7 +720,7 @@ Stops the daemon service
 #### Usage
 The minimal form of running the command is:
 ```shell
-sudo netbird service stop
+sudo openzro service stop
 ```
 
 ### service restart
@@ -728,7 +728,7 @@ Restarts the daemon service
 #### Usage
 The minimal form of running the command is:
 ```shell
-sudo netbird service restart
+sudo openzro service restart
 ```
 
 ### service status
@@ -736,7 +736,7 @@ Shows the status of the daemon service
 #### Usage
 The minimal form of running the command is:
 ```shell
-sudo netbird service status
+sudo openzro service status
 ```
 
 ### service reconfigure
@@ -747,28 +747,28 @@ Reconfigures the daemon service with new settings without manual uninstall/insta
 ```
 #### Usage
 ```shell
-sudo netbird service reconfigure --service-env NB_LOG_LEVEL=debug
+sudo openzro service reconfigure --service-env NB_LOG_LEVEL=debug
 ```
 
 ### service reset-params
 Removes the saved `service.json` file so the next install uses default parameters.
 #### Usage
 ```shell
-sudo netbird service reset-params
+sudo openzro service reset-params
 ```
 
 ### debug
-The `debug` command provides tools for diagnosing and understanding the internal operations of the NetBird daemon.
+The `debug` command provides tools for diagnosing and understanding the internal operations of the openZro daemon.
 
 #### Usage
 To access debugging options:
 ```shell
-netbird debug [command]
+openzro debug [command]
 ```
 #### Subcommands
 - `bundle`: Create a debug bundle that includes logs and system information for troubleshooting.
 - `for`: Run the daemon with trace logging for a specified duration and create a debug bundle.
-- `log`: Manage logging levels for the NetBird daemon.
+- `log`: Manage logging levels for the openZro daemon.
 - `trace`: Trace a packet through the firewall.
 
 #### Flags
@@ -784,27 +784,27 @@ The file is only accessible as root/Administrator.
 #### Usage
 To create a debug bundle:
 ```shell
-netbird debug bundle [-A] [-S] [-U] [-C <count>]
+openzro debug bundle [-A] [-S] [-U] [-C <count>]
 ```
 
 #### Examples
 Create a debug bundle:
 ```shell
-netbird debug bundle
+openzro debug bundle
 ```
 
 This will output:
 ```
-/tmp/netbird.debug.676945815.zip
+/tmp/openzro.debug.676945815.zip
 ```
 
 #### Flags
 ```shell
-  -A, --anonymize                  Anonymize IP addresses and non-netbird.io domains in the debug output
+  -A, --anonymize                  Anonymize IP addresses and non-openzro.io domains in the debug output
   -C, --log-file-count uint32      Number of rotated log files to include in debug bundle (default 1)
   -S, --system-info                Adds system information to the debug bundle (default true)
   -U, --upload-bundle              Uploads the debug bundle to a server
-      --upload-bundle-url string   Service URL to get an upload URL for the debug bundle (default "https://upload.debug.netbird.io/upload-url")
+      --upload-bundle-url string   Service URL to get an upload URL for the debug bundle (default "https://upload.debug.openzro.io/upload-url")
 ```
 
 ### debug for
@@ -814,46 +814,46 @@ This is useful for capturing detailed logs over a period where issues are occurr
 #### Usage
 To run debugging for a specific time period:
 ```shell
-netbird debug for <time> [-A] [-S] [-U] [-C <count>]
+openzro debug for <time> [-A] [-S] [-U] [-C <count>]
 ```
 
 #### Examples
 Run debugging for 5 minutes and generate an anonymized debug bundle:
 ```shell
-netbird debug for 5m
+openzro debug for 5m
 ```
 
 This will output something similar to:
 ```
-Netbird up
+openZro up
 Log level set to trace.
-Netbird down
-Netbird up
+openZro down
+openZro up
 Remaining time: 00:00:01
 Duration completed
 Creating debug bundle...
-Netbird down
+openZro down
 Log level restored to INFO
-/tmp/netbird.debug.3162242909.zip
+/tmp/openzro.debug.3162242909.zip
 ```
 
 #### Flags
 ```shell
-  -A, --anonymize                  Anonymize IP addresses and non-netbird.io domains in the debug output
+  -A, --anonymize                  Anonymize IP addresses and non-openzro.io domains in the debug output
   -C, --log-file-count uint32      Number of rotated log files to include in debug bundle (default 1)
   -S, --system-info                Adds system information to the debug bundle (default true)
   -U, --upload-bundle              Uploads the debug bundle to a server
-      --upload-bundle-url string   Service URL to get an upload URL for the debug bundle (default "https://upload.debug.netbird.io/upload-url")
+      --upload-bundle-url string   Service URL to get an upload URL for the debug bundle (default "https://upload.debug.openzro.io/upload-url")
 ```
 
 ### debug log
-This subcommand manages the logging level for the NetBird daemon during the current session.
+This subcommand manages the logging level for the openZro daemon during the current session.
 The change in logging level is temporary and will revert back to the configured default upon daemon restart.
 
 #### Usage
-Adjust the logging level of the NetBird daemon:
+Adjust the logging level of the openZro daemon:
 ```shell
-netbird debug log level <level>
+openzro debug log level <level>
 ```
 
 #### Available Levels
@@ -868,7 +868,7 @@ netbird debug log level <level>
 #### Examples
 Set the logging level to debug:
 ```shell
-netbird debug log level debug
+openzro debug log level debug
 ```
 
 This will output:
@@ -885,7 +885,7 @@ Traces a packet through the firewall rules to diagnose policy issues. You specif
 
 #### Usage
 ```shell
-netbird debug trace <direction> <source-ip> <dest-ip> [flags]
+openzro debug trace <direction> <source-ip> <dest-ip> [flags]
 ```
 
 #### Flags
@@ -908,7 +908,7 @@ netbird debug trace <direction> <source-ip> <dest-ip> [flags]
 The trace walks the packet through each processing stage of the firewall. Each line shows the stage name and its result. Here is an example of an allowed inbound SSH connection:
 
 ```
-$ netbird debug trace in 100.64.1.1 self -p tcp --dport 22 --syn
+$ openzro debug trace in 100.64.1.1 self -p tcp --dport 22 --syn
 
 Packet trace 100.64.1.1:54728 → self:22 (TCP)
 
@@ -926,7 +926,7 @@ Final disposition: ALLOWED
 The stages in order:
 
 1. **Received**: The raw packet as it enters the filter.
-2. **Inbound Port DNAT**: Port-level destination NAT (e.g. SSH port 22 is rewritten to 22022 where the NetBird SSH server listens).
+2. **Inbound Port DNAT**: Port-level destination NAT (e.g. SSH port 22 is rewritten to 22022 where the openZro SSH server listens).
 3. **Inbound 1:1 NAT**: Full address rewrite if 1:1 NAT is configured for this peer.
 4. **Connection Tracking**: Checks if this packet belongs to an already-established connection. If it does, it is allowed immediately and later stages are skipped.
 5. **Routing**: Determines whether the packet is destined for local delivery or needs to be forwarded to another network.
@@ -937,7 +937,7 @@ The stages in order:
 Here is a denied packet (no matching ACL rule):
 
 ```
-$ netbird debug trace in 100.64.2.1 self -p tcp --dport 80 --syn
+$ openzro debug trace in 100.64.2.1 self -p tcp --dport 80 --syn
 
 Packet trace 100.64.2.1:58026 → self:80 (TCP)
 
@@ -955,7 +955,7 @@ Final disposition: DENIED
 And a routed packet that is allowed and forwarded:
 
 ```
-$ netbird debug trace in 100.64.1.1 10.10.0.1 -p tcp --dport 443 --syn
+$ openzro debug trace in 100.64.1.1 10.10.0.1 -p tcp --dport 443 --syn
 
 Packet trace 100.64.1.1:49659 → 10.10.0.1:443 (TCP)
 
@@ -975,15 +975,15 @@ Final disposition: ALLOWED
 
 Trace an inbound TCP SYN to SSH:
 ```shell
-netbird debug trace in 100.64.1.1 self -p tcp --dport 22 --syn
+openzro debug trace in 100.64.1.1 self -p tcp --dport 22 --syn
 ```
 
 Trace an outbound UDP packet to port 53:
 ```shell
-netbird debug trace out self 100.64.1.2 -p udp --dport 53
+openzro debug trace out self 100.64.1.2 -p udp --dport 53
 ```
 
 Trace an inbound ICMP echo request:
 ```shell
-netbird debug trace in 100.64.1.2 self -p icmp --icmp-type 8 --icmp-code 0
+openzro debug trace in 100.64.1.2 self -p icmp --icmp-type 8 --icmp-code 0
 ```

@@ -1,6 +1,6 @@
 ---
-id: using-netbird-with-zitadel
-title: Using NetBird with Zitadel
+id: using-openzro-with-zitadel
+title: Using openZro with Zitadel
 sidebar_position: 5
 tags:
 - integrations
@@ -10,16 +10,16 @@ tags:
 - how-to
 ---
 
-This guide is a part of the [NetBird Self-hosting Guide](/getting-started/self-hosting) and explains how to integrate 
-**self-hosted** NetBird with [Zitadel](https://zitadel.com).
+This guide is a part of the [openZro Self-hosting Guide](/getting-started/self-hosting) and explains how to integrate 
+**self-hosted** openZro with [Zitadel](https://zitadel.com).
 
 :::tip managed idp
 If you prefer not to self-host an Identity and Access Management solution, then you could use a managed alternative like
-[Auth0](/integrations/identity-providers/self-hosted/using-netbird-with-auth0).
+[Auth0](/integrations/identity-providers/self-hosted/using-openzro-with-auth0).
 :::
 
 ### 1. Create and configure Zitadel application
-In this step, we will create and configure Netbird application in zitadel.
+In this step, we will create and configure openZro application in zitadel.
 
 Create new zitadel project
 - Navigate to zitadel console
@@ -33,7 +33,7 @@ Create new zitadel application
 - Click `Projects` in the top menu and select `NETBIRD` project from the list
 - Click `New` in `APPLICATIONS` section to create a new application
 - Fill in the form with the following values and click `Continue`
-    - Name: `netbird`
+    - Name: `openzro`
     - TYPE OF APPLICATION: `User Agent`
 
 ![](/img/integrations/identity-providers/self-hosted/zitadel-new-application.png)
@@ -58,10 +58,10 @@ Create new zitadel application
 
 ### Step 2: Application Token Configuration
 
-To configure `netbird` application token you need to:
+To configure `openzro` application token you need to:
 
 - Click `Projects` in the top menu and select `NETBIRD` project from the list
-- Select `netbird` application from `APPLICATIONS` section
+- Select `openzro` application from `APPLICATIONS` section
 - Click `Token Settings` in the left menu
 - Fill in the form with the following values:
   - Auth Token Type: `JWT`
@@ -76,10 +76,10 @@ To configure `netbird` application token you need to:
 This step is intended for setup running in development mode with no SSL
 :::
 
-To configure `netbird` application redirect you need to:
+To configure `openzro` application redirect you need to:
 
 - Click `Projects` in the top menu and select `NETBIRD` project from the list
-- Select `netbird` application from `APPLICATIONS` section
+- Select `openzro` application from `APPLICATIONS` section
 - Click `Redirect Settings` in the left menu
 - Fill in the form with the following values:
   - Toggle `Development Mode`
@@ -89,34 +89,34 @@ To configure `netbird` application redirect you need to:
 
 ### Step 4: Create a Service User
 
-In this step we will create a `netbird` service user.
+In this step we will create a `openzro` service user.
 
 - Click `Users` in the top menu
 - Select `Service Users` tab
 - Click `New`
 - Fill in the form with the following values:
-  - User Name: `netbird`
-  - Name: `netbird`
-  - Description: `Netbird Service User`
+  - User Name: `openzro`
+  - Name: `openzro`
+  - Description: `openZro Service User`
   - Access Token Type: `JWT`
 - Click `Create`
 
 ![](/img/integrations/identity-providers/self-hosted/zitadel-create-user.png)
 
-In this step we will generate `ClientSecret` for the `netbird` service user.
+In this step we will generate `ClientSecret` for the `openzro` service user.
 
 - Click `Actions` in the top right corner and click `Generate Client Secret`
 - Copy `ClientSecret` from the dialog will be used later to set `ClientSecret` in the `management.json`
 
 ![](/img/integrations/identity-providers/self-hosted/zitadel-service-user-secret.png)
 
-### Step 5: Grant manage-users role to netbird service user
+### Step 5: Grant manage-users role to openzro service user
 
-In this step we will grant `Org User Manager` role to `netbird` service user.
+In this step we will grant `Org User Manager` role to `openzro` service user.
 
 - Click `Organization` in the top menu
 - Click `+` in the top right corner
-- Search for `netbird` service user
+- Search for `openzro` service user
 - Check `Org User Manager` checkbox
 - Click `Add`
 
@@ -142,7 +142,7 @@ NETBIRD_AUTH_REDIRECT_URI="/auth"
 NETBIRD_AUTH_SILENT_REDIRECT_URI="/silent-auth"
 ```
 
-- You can now continue with the [NetBird Self-hosting Guide](/getting-started/self-hosting#step-3-configure-identity-provider).
+- You can now continue with the [openZro Self-hosting Guide](/getting-started/self-hosting#step-3-configure-identity-provider).
 
 - Set property `IdpManagerConfig` in the `management.json` file with:
   :::caution
@@ -153,7 +153,7 @@ NETBIRD_AUTH_SILENT_REDIRECT_URI="/silent-auth"
   {
     "ManagerType":  "zitadel",
     "ZitadelClientCredentials": {
-        "ClientID": "netbird",
+        "ClientID": "openzro",
         "ClientSecret": "<CLIENT SECRET>",
         "GrantType": "client_credentials",
         "TokenEndpoint": "https://<YOUR-ZITADEL-HOST-AND-PORT>/oauth/v2/token",

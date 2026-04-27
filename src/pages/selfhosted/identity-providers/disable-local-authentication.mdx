@@ -1,17 +1,17 @@
 import {Note, Warning} from "@/components/mdx"
 
-export const description = 'Disable local email/password authentication in your self-hosted NetBird deployment so that all users must sign in through an external identity provider.'
+export const description = 'Disable local email/password authentication in your self-hosted openZro deployment so that all users must sign in through an external identity provider.'
 
 # Disable Local Authentication
 
-If you prefer to delegate all credential storage and authentication to your IdP while still utilizing NetBird's new,
+If you prefer to delegate all credential storage and authentication to your IdP while still utilizing openZro's new,
 simplified IdP connection flow, you can completely disable local (email/password) authentication.
 
 This is useful when you want to:
 
 - Enforce that all users authenticate via external identity providers only
-- Simplify end user login by directing users to your external IdP when logging in to NetBird
-- Prevent local password-based logins while still using NetBird's simplified IdP connection flow
+- Simplify end user login by directing users to your external IdP when logging in to openZro
+- Prevent local password-based logins while still using openZro's simplified IdP connection flow
 - Maintain a single source of truth for user credentials in your external IdP
 
 <Note>
@@ -24,8 +24,8 @@ If you re-enable local authentication later, those users will be able to log in 
 Before disabling local authentication:
 
 1. Configure an external IdP connector following the [Authentication Guide](/selfhosted/identity-providers).
-2. Log out and log in with your new admin account via the external IdP. NetBird will notify you that the user requires approval.
-3. Log back in as your original NetBird-local admin and navigate to **Team > Users**. You should see the new IdP user pending approval:
+2. Log out and log in with your new admin account via the external IdP. openZro will notify you that the user requires approval.
+3. Log back in as your original openZro-local admin and navigate to **Team > Users**. You should see the new IdP user pending approval:
 
 <img src="/docs-static/img/selfhosted/identity-providers/approve_user.png" alt="Approve User" className="imagewrapper-big"/>
 
@@ -41,7 +41,7 @@ promoting an external IdP user to Owner, you will lose administrative access to 
 </Warning>
 
 <Note>
-NetBird will refuse to disable local authentication if no external identity provider connectors are configured.
+openZro will refuse to disable local authentication if no external identity provider connectors are configured.
     This prevents you from being locked out of your instance.
 </Note>
 
@@ -60,19 +60,19 @@ Set `localAuthDisabled` to `true` under the `server.auth` section of your `confi
 ```yaml
 server:
   auth:
-    issuer: "https://netbird.example.com/oauth2"
+    issuer: "https://openzro.example.com/oauth2"
     localAuthDisabled: true
     signKeyRefreshEnabled: true
     dashboardRedirectURIs:
-      - "https://netbird.example.com/nb-auth"
-      - "https://netbird.example.com/nb-silent-auth"
+      - "https://openzro.example.com/nb-auth"
+      - "https://openzro.example.com/nb-silent-auth"
     cliRedirectURIs:
       - "http://localhost:53000/"
 ```
 
 Restart the server to apply the change:
 ```bash
-docker compose restart netbird-server
+docker compose restart openzro-server
 ```
 
 ### Older multi-container setup (management.json)
@@ -108,7 +108,7 @@ After updating the configuration, the local login option will no longer appear o
 
 To restore local authentication, reverse the configuration change and restart the server:
 
-- **Combined setup:** set `localAuthDisabled` back to `false` in `config.yaml` and run `docker compose restart netbird-server`.
+- **Combined setup:** set `localAuthDisabled` back to `false` in `config.yaml` and run `docker compose restart openzro-server`.
 - **Older multi-container setup:** set `LocalAuthDisabled` to `false` in `management.json` and run `docker compose restart management`.
 
 All previously created local users will be able to log in again with their existing passwords.

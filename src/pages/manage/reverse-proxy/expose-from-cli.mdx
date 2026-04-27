@@ -1,29 +1,29 @@
 import {Note, Warning} from "@/components/mdx"
 
 export const description =
-    'Expose local HTTP and L4 services to the public internet directly from the command line using `netbird expose`, with optional authentication, custom domains, and automatic session management.'
+    'Expose local HTTP and L4 services to the public internet directly from the command line using `openzro expose`, with optional authentication, custom domains, and automatic session management.'
 
 # Expose from CLI
 
-The `netbird expose` command lets peers expose local services to the public internet through the NetBird reverse proxy without using the dashboard. Services created this way are **ephemeral**: they exist only while the command is running and are automatically removed when you stop the command or the session expires.
+The `openzro expose` command lets peers expose local services to the public internet through the openZro reverse proxy without using the dashboard. Services created this way are **ephemeral**: they exist only while the command is running and are automatically removed when you stop the command or the session expires.
 
 This supports both HTTP and L4 (TCP, UDP, TLS) protocols, making it useful for quick demos, temporary access to development servers, webhook receivers, database tunnels, or sharing local work with teammates.
 
 ## Prerequisites
 
-Before using `netbird expose`, make sure:
+Before using `openzro expose`, make sure:
 
-- The NetBird client is connected — run `netbird up` first.
+- The openZro client is connected — run `openzro up` first.
 - The **Peer Expose** feature is enabled by your account administrator (see [Enable peer expose](#enable-peer-expose) below).
 - If peer group restrictions are configured, your peer must be in one of the allowed groups.
 
 ## Enable peer expose
 
-An account administrator must enable peer expose before any peer can use the `netbird expose` command.
+An account administrator must enable peer expose before any peer can use the `openzro expose` command.
 
 ### From the dashboard
 
-1. Navigate to **Settings** > **Clients** in the NetBird dashboard.
+1. Navigate to **Settings** > **Clients** in the openZro dashboard.
 2. Scroll to the **Peer Expose** section.
 3. Toggle **Enable Peer Expose** on.
 4. Select specific **peer groups** that are allowed to expose services. Groups without proper permission will get a `PermissionDenied` error. 
@@ -34,7 +34,7 @@ An account administrator must enable peer expose before any peer can use the `ne
 Set `peer_expose_enabled` to `true` in the account settings:
 
 ```bash
-curl -X PUT "https://api.netbird.io/api/accounts/{account_id}" \
+curl -X PUT "https://api.openzro.io/api/accounts/{account_id}" \
   -H "Authorization: Token {api_token}" \
   -H "Content-Type: application/json" \
   -d '{
@@ -52,7 +52,7 @@ Set `peer_expose_groups` to an array of peer group IDs to restrict which peers c
 Expose a local HTTP server running on a specific port:
 
 ```shell
-netbird expose 8080
+openzro expose 8080
 ```
 
 On success, the command outputs the public URL and keeps the session alive:
@@ -75,7 +75,7 @@ The service is now accessible at the displayed URL. Press `Ctrl+C` to stop expos
 To expose a TCP, UDP, or TLS service, use the `--protocol` flag:
 
 ```shell
-netbird expose --protocol tcp 5432
+openzro expose --protocol tcp 5432
 ```
 
 For L4 services, the output includes the external port on the proxy cluster:
@@ -94,10 +94,10 @@ Press Ctrl+C to stop exposing.
 By default, the external port matches the target port. Use `--with-external-port` to specify a different one:
 
 ```shell
-netbird expose --protocol tcp --with-external-port 15432 5432
+openzro expose --protocol tcp --with-external-port 15432 5432
 ```
 
-If the proxy cluster does not support custom ports (e.g., NetBird shared cloud clusters), the port is auto-assigned. When you explicitly specify `--with-external-port` but the cluster overrides your choice, the output indicates the reassignment:
+If the proxy cluster does not support custom ports (e.g., openZro shared cloud clusters), the port is auto-assigned. When you explicitly specify `--with-external-port` but the cluster overrides your choice, the output indicates the reassignment:
 
 ```
   External: 38721
@@ -110,7 +110,7 @@ If you do not specify `--with-external-port`, the assigned port is shown without
 ## Command reference
 
 ```shell
-netbird expose <port> [flags]
+openzro expose <port> [flags]
 ```
 
 ### Arguments
@@ -144,7 +144,7 @@ By default, exposed services are publicly accessible to anyone who knows the URL
 Protect the service with a 6-digit PIN that users must enter before accessing it:
 
 ```shell
-netbird expose 8080 --with-pin 123456
+openzro expose 8080 --with-pin 123456
 ```
 
 ### Password protection
@@ -152,7 +152,7 @@ netbird expose 8080 --with-pin 123456
 Protect the service with a password:
 
 ```shell
-netbird expose 8080 --with-password mysecretpassword
+openzro expose 8080 --with-password mysecretpassword
 ```
 
 ### SSO user group restriction
@@ -160,7 +160,7 @@ netbird expose 8080 --with-password mysecretpassword
 Restrict access to users in specific groups from your identity provider:
 
 ```shell
-netbird expose 8080 --with-user-groups engineering,devops
+openzro expose 8080 --with-user-groups engineering,devops
 ```
 
 Users must authenticate through your configured IdP (OIDC) and belong to one of the specified groups to access the service.
@@ -170,7 +170,7 @@ Users must authenticate through your configured IdP (OIDC) and belong to one of 
 You can combine multiple authentication methods. When multiple methods are enabled, users can choose which one to use:
 
 ```shell
-netbird expose 8080 --with-pin 123456 --with-password backup-password --with-user-groups admin
+openzro expose 8080 --with-pin 123456 --with-password backup-password --with-user-groups admin
 ```
 
 <Note>
@@ -181,14 +181,14 @@ For more details on how each authentication method works, see [Reverse Proxy Aut
 
 ## Custom domains
 
-By default, `netbird expose` generates a random subdomain on your proxy cluster domain (e.g., `a1b2c3d4e5f6.proxy.example.com`). You can customize this in two ways.
+By default, `openzro expose` generates a random subdomain on your proxy cluster domain (e.g., `a1b2c3d4e5f6.proxy.example.com`). You can customize this in two ways.
 
 ### Name prefix
 
 Use `--with-name-prefix` to add a readable prefix to the generated subdomain:
 
 ```shell
-netbird expose 8080 --with-name-prefix myapp
+openzro expose 8080 --with-name-prefix myapp
 ```
 
 This produces a domain like `myapp-a1b2c3.proxy.example.com` instead of a fully random one.
@@ -203,7 +203,7 @@ The prefix must follow these rules:
 Use `--with-custom-domain` to expose the service on a domain you own:
 
 ```shell
-netbird expose 8080 --with-custom-domain app.example.com
+openzro expose 8080 --with-custom-domain app.example.com
 ```
 
 <Warning>
@@ -216,9 +216,9 @@ Understanding how expose sessions work helps you manage them effectively and tro
 
 ### How sessions work
 
-When you run `netbird expose`, the following happens:
+When you run `openzro expose`, the following happens:
 
-1. The CLI sends the request to the local NetBird daemon.
+1. The CLI sends the request to the local openZro daemon.
 2. The daemon connects to the management server and creates an ephemeral reverse proxy service.
 3. The management server provisions a TLS certificate and domain for the service.
 4. The daemon receives the public URL and displays it to you.
@@ -264,7 +264,7 @@ peer has reached the maximum number of active expose sessions (10)
 
 ## Permissions
 
-The `netbird expose` command requires permission at two levels:
+The `openzro expose` command requires permission at two levels:
 
 1. **Account level** — The Peer Expose feature must be enabled in account settings.
 2. **Group level** — If `peer_expose_groups` is configured, the peer must belong to at least one of the specified groups.
@@ -275,7 +275,7 @@ If the peer does not have permission, the command returns a "permission denied" 
 
 | Property | Dashboard services | CLI expose services |
 |----------|-------------------|---------------------|
-| **Created via** | Dashboard or API | `netbird expose` command |
+| **Created via** | Dashboard or API | `openzro expose` command |
 | **Lifecycle** | Permanent until manually deleted | Ephemeral: removed when command exits or session expires |
 | **TTL** | None | 90 seconds, auto-renewed every 30 seconds |
 | **Service modes** | HTTP, TCP, UDP, TLS | HTTP, HTTPS, TCP, UDP, TLS |
@@ -299,12 +299,12 @@ All peer expose actions are recorded in the activity log and visible in the dash
 
 ## Troubleshooting
 
-### "client is not running, run 'netbird up' first"
+### "client is not running, run 'openzro up' first"
 
-The NetBird daemon is not connected. Start it with:
+The openZro daemon is not connected. Start it with:
 
 ```shell
-netbird up
+openzro up
 ```
 
 ### "permission denied"
@@ -349,7 +349,7 @@ Expose a local development server for a quick demo:
 npm run dev  # Runs on port 3000
 
 # In another terminal, expose it
-netbird expose 3000 --with-name-prefix demo
+openzro expose 3000 --with-name-prefix demo
 ```
 
 ### Protected staging environment
@@ -357,7 +357,7 @@ netbird expose 3000 --with-name-prefix demo
 Expose a staging server with password protection:
 
 ```shell
-netbird expose 8080 --with-password staging-review --with-name-prefix staging
+openzro expose 8080 --with-password staging-review --with-name-prefix staging
 ```
 
 ### Team-only access
@@ -365,7 +365,7 @@ netbird expose 8080 --with-password staging-review --with-name-prefix staging
 Expose a service restricted to your engineering team via SSO:
 
 ```shell
-netbird expose 8080 --with-user-groups engineering --with-name-prefix internal-api
+openzro expose 8080 --with-user-groups engineering --with-name-prefix internal-api
 ```
 
 ### Webhook receiver
@@ -373,7 +373,7 @@ netbird expose 8080 --with-user-groups engineering --with-name-prefix internal-a
 Temporarily expose a local webhook endpoint for testing:
 
 ```shell
-netbird expose 9000 --with-name-prefix webhooks
+openzro expose 9000 --with-name-prefix webhooks
 ```
 
 ### Database tunnel
@@ -381,7 +381,7 @@ netbird expose 9000 --with-name-prefix webhooks
 Expose a local PostgreSQL instance over TCP:
 
 ```shell
-netbird expose --protocol tcp 5432
+openzro expose --protocol tcp 5432
 ```
 
 ### Game server
@@ -389,7 +389,7 @@ netbird expose --protocol tcp 5432
 Expose a local UDP game server on a specific external port:
 
 ```shell
-netbird expose --protocol udp --with-external-port 27015 27015
+openzro expose --protocol udp --with-external-port 27015 27015
 ```
 
 ### TLS passthrough
@@ -397,7 +397,7 @@ netbird expose --protocol udp --with-external-port 27015 27015
 Expose a service that handles its own TLS termination:
 
 ```shell
-netbird expose --protocol tls --with-custom-domain tls.example.com 4443
+openzro expose --protocol tls --with-custom-domain tls.example.com 4443
 ```
 
 ## Related pages
@@ -406,4 +406,4 @@ netbird expose --protocol tls --with-custom-domain tls.example.com 4443
 - [Authentication](/manage/reverse-proxy/authentication) - SSO, password, PIN, and header authentication, plus access restrictions
 - [Custom Domains](/manage/reverse-proxy/custom-domains) - configure your own domain names
 - [Access Logs](/manage/reverse-proxy/access-logs) - monitor traffic to your reverse proxy services
-- [CLI Reference](/get-started/cli#expose) - `netbird expose` command reference
+- [CLI Reference](/get-started/cli#expose) - `openzro expose` command reference

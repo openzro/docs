@@ -1,17 +1,17 @@
 import {Note} from "../../../components/mdx";
 export const description =
-  'In this guide, we’ll look at how authentication works. NetBird offers two ways to authenticate your API requests: OAuth2 and personal access tokens.'
+  'In this guide, we’ll look at how authentication works. openZro offers two ways to authenticate your API requests: OAuth2 and personal access tokens.'
 
 # Authentication
 
-You'll need to authenticate your requests to access any of the endpoints in the NetBird API. In this guide, we'll look at how authentication works. NetBird offers two ways to authenticate your API requests: OAuth2 and personal access tokens (PAT). {{ className: 'lead' }}
+You'll need to authenticate your requests to access any of the endpoints in the openZro API. In this guide, we'll look at how authentication works. openZro offers two ways to authenticate your API requests: OAuth2 and personal access tokens (PAT). {{ className: 'lead' }}
 
 ## OAuth2 with bearer token
 
 When establishing a connection using OAuth2, you will need your access token — you can retrieve one from your IDP manager. Here's how to add the token to the request header using cURL:
 
 ```bash {{ title: 'Example request with bearer token' }}
-curl https://api.netbird.io/api/users \
+curl https://api.openzro.io/api/users \
   -H "Authorization: Bearer {token}"
 ```
 
@@ -19,14 +19,14 @@ Always keep your token safe and reset it if you suspect it has been compromised.
 
 ## Using personal access tokens
 
-When establishing a connection using [PATs](/manage/public-api), you will need your access token — you can create one in the [NetBird dashboard](https://app.netbird.io/users) under User settings. It is recommended to use [service users](/manage/public-api) for all organization wide flows calling the API.  Here's how to add the token to the request header using cURL:
+When establishing a connection using [PATs](/manage/public-api), you will need your access token — you can create one in the [openZro dashboard](https://app.openzro.io/users) under User settings. It is recommended to use [service users](/manage/public-api) for all organization wide flows calling the API.  Here's how to add the token to the request header using cURL:
 
 <Note>
-    For the cloud solution we are limiting the usage to 120 requests per minute with burst of 1200 requests. If your workload requires more requests, please contact us at [support@netbird.io](mailto:support@netbird.io).
+    For the cloud solution we are limiting the usage to 120 requests per minute with burst of 1200 requests. If your workload requires more requests, please contact us at [support@openzro.io](mailto:support@openzro.io).
 </Note>
 
 ```bash {{ title: 'Example request with personal access token' }}
-curl https://api.netbird.io/api/users \
+curl https://api.openzro.io/api/users \
   -H "Authorization: Token {token}"
 ```
 

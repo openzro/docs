@@ -1,7 +1,7 @@
 # pfSense Installation
 
-The NetBird client (agent) allows a peer to join a pre-existing NetBird deployment. If a NetBird deployment is not yet available,
-there are both managed and [self-hosted](https://docs.netbird.io/selfhosted/selfhosted-quickstart) options available.
+The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available,
+there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
 
 <Note>
 This installation is intended for early adopters while the pfSense package is under review and not yet available in the pfSense package manager.
@@ -12,7 +12,7 @@ This installation is intended for early adopters while the pfSense package is un
 ## Prerequisites
 - Shell/SSH access to pfSense (via Web UI shell or remote SSH)
 - A [setup key](/manage/peers/register-machines-using-setup-keys#types-of-setup-keys) to authenticate and register the pfSense device
-- The latest NetBird `.pkg` binary from the [GitHub Releases](https://github.com/netbirdio/pfsense-netbird/releases)
+- The latest openZro `.pkg` binary from the [GitHub Releases](https://github.com/openzro/pfsense-openzro/releases)
 
 ## Installation
 
@@ -22,29 +22,29 @@ This installation is intended for early adopters while the pfSense package is un
    ```
    If remote SSH is enabled or use the built-in shell via the pfSense Web UI (`Diagnostics` > `Command Prompt`).
 
-3. **Download the NetBird client(agent)**
+3. **Download the openZro client(agent)**
 
    From a shell on your pfSense system, run:
    ```sh
-   fetch https://github.com/netbirdio/pfsense-netbird/releases/download/v0.1.2/netbird-0.55.1.pkg
+   fetch https://github.com/openzro/pfsense-openzro/releases/download/v0.1.2/openzro-0.55.1.pkg
    ```
-3. **Download the NetBird pfSense package**
+3. **Download the openZro pfSense package**
 
    From a shell on your pfSense system, run:
    ```sh
-   fetch https://github.com/netbirdio/pfsense-netbird/releases/download/v0.1.2/pfSense-pkg-NetBird-0.1.0.pkg
+   fetch https://github.com/openzro/pfsense-openzro/releases/download/v0.1.2/pfSense-pkg-openZro-0.1.0.pkg
    ```
 
 4. **Install the packages**
 
    ```sh
-   pkg add -f netbird-0.55.1.pkg
-   pkg add -f pfSense-pkg-NetBird-0.1.0.pkg
+   pkg add -f openzro-0.55.1.pkg
+   pkg add -f pfSense-pkg-openZro-0.1.0.pkg
    ```
 
 5. **Verify the installation**
 
-   The NetBird GUI should now appear under `VPN` > `NetBird` in the pfSense menu.
+   The openZro GUI should now appear under `VPN` > `openZro` in the pfSense menu.
 
 ## Configuration
 
@@ -52,8 +52,8 @@ This installation is intended for early adopters while the pfSense package is un
 
 Fill out the authentication form with the following values and click `Save`:
 
-- **Management URL**: Default is `https://app.netbird.io:443`. If self-hosting, enter your custom management server URL.
-- **Setup Key**: Paste the setup key from your NetBird account. .
+- **Management URL**: Default is `https://app.openzro.io:443`. If self-hosting, enter your custom management server URL.
+- **Setup Key**: Paste the setup key from your openZro account. .
 
 <p>
     <img src="/docs-static/img/get-started/pfSense/authentication.png" alt="authentication" className="imagewrapper-big"/>
@@ -62,7 +62,7 @@ Fill out the authentication form with the following values and click `Save`:
 ### Verify Connection Status
 
 The Status page shows detailed information about connected peers and control services, helping you monitor your deployment.
-Access it via `Status` > `NetBird` in the pfSense menu.
+Access it via `Status` > `openZro` in the pfSense menu.
 
 Use this section for diagnostics and troubleshooting common connection or setup issues.
 
@@ -70,32 +70,32 @@ Use this section for diagnostics and troubleshooting common connection or setup 
     <img src="/docs-static/img/get-started/pfSense/status.png" alt="connection status" className="imagewrapper-big"/>
 </p>
 
-### Assign NetBird interface
+### Assign openZro interface
 After authentication, a new interface named `wt0(wt0)` will be available but unassigned. To assign it go to
-`Interfaces` > `Assignments`. Under `Available network ports`, select the NetBird interface `wt0(wt0)` and click `Add`.
+`Interfaces` > `Assignments`. Under `Available network ports`, select the openZro interface `wt0(wt0)` and click `Add`.
 
 <p>
     <img src="/docs-static/img/get-started/pfSense/new_interface.png" alt="NewInterface" className="imagewrapper-big"/>
 </p>
 
-### Enable the NetBird interface
+### Enable the openZro interface
 
-Now that the NetBird interface has been added, you need to enable it. Go to `Interfaces` > `OPT1`, then configure
+Now that the openZro interface has been added, you need to enable it. Go to `Interfaces` > `OPT1`, then configure
 the following options and click `Save`, then `Apply changes` to activate the interface:
 
 - **Enable**: `✓ Enable Interface`
-- **Description**: `NetBird`
+- **Description**: `openZro`
 
 <p> <img src="/docs-static/img/get-started/pfSense/enable_interface.png" alt="enableInterface" className="imagewrapper-big"/> </p>
 
-### Configure Firewall Rules for the NetBird interface
+### Configure Firewall Rules for the openZro interface
 
-To allow NetBird to handle all access control, permit all traffic on the NetBird interface in pfSense. This ensures traffic
-flows freely, while NetBird’s own policies (ACLs) govern the access restrictions.
+To allow openZro to handle all access control, permit all traffic on the openZro interface in pfSense. This ensures traffic
+flows freely, while openZro’s own policies (ACLs) govern the access restrictions.
 
-Create rules to control traffic coming from your NetBird network into pfSense and your local networks:
+Create rules to control traffic coming from your openZro network into pfSense and your local networks:
 
-1. Go to `Firewall` > `Rules` and select the `NetBird` (interface) tab and click `Add` to create rules
+1. Go to `Firewall` > `Rules` and select the `openZro` (interface) tab and click `Add` to create rules
 2. Configure the rule:
     - **Action**: `Pass`
     - **Interface**: `NETBIRD`
@@ -103,14 +103,14 @@ Create rules to control traffic coming from your NetBird network into pfSense an
     - **Protocol**: `Any`
     - **Source**: `Any`
     - **Destination**: `Any`
-    - **Description**: `Allow all on NetBird (managed by NetBird)`
+    - **Description**: `Allow all on openZro (managed by openZro)`
 3. Click `Save`, then `Apply Changes`
 
 <p><img src="/docs-static/img/get-started/pfSense/firewall_rules.png" alt="firewallRules" className="imagewrapper-big"/></p>
 
 ### Config for Troubleshooting Relayed Connections
 
-By default, pfSense uses automatic outbound NAT which randomizes source ports. This can cause issues with NetBird's NAT traversal (hole punching). To ensure reliable direct connections, you must configure a Static Port mapping.
+By default, pfSense uses automatic outbound NAT which randomizes source ports. This can cause issues with openZro's NAT traversal (hole punching). To ensure reliable direct connections, you must configure a Static Port mapping.
 
 1.  **Change Outbound NAT Mode**:
     -   Navigate to `Firewall` > `NAT` > `Outbound`.
@@ -122,27 +122,27 @@ By default, pfSense uses automatic outbound NAT which randomizes source ports. T
     -   **Interface**: `WAN`
     -   **Address Family**: `IPv4`
     -   **Protocol**: `UDP`
-    -   **Source**: `Network` (enter the IP address of your NetBird host)
+    -   **Source**: `Network` (enter the IP address of your openZro host)
     -   **Destination**: `Any`
     -   **Translation / Static Port**: Check `Static Port` box
-    -   **Description**: `NetBird Static Port`
+    -   **Description**: `openZro Static Port`
     -   Click `Save` and then `Apply Changes`.
 
 3.  **Reset States**:
     -   Go to `Diagnostics` > `States`.
-    -   Filter by the NetBird host IP.
+    -   Filter by the openZro host IP.
     -   Click `Kill`.
 
-4.  **Restart NetBird**:
-    -   Run `netbird service restart` on the device.
-    -   Run `netbird status -d` to verify the connection.
+4.  **Restart openZro**:
+    -   Run `openzro service restart` on the device.
+    -   Run `openzro status -d` to verify the connection.
 
 ## Uninstallation
 
 From a shell on your pfSense system, run:
 <p>
 ```sh
-pkg delete netbird-0.55.1 pfSense-pkg-NetBird-0.1.0
+pkg delete openzro-0.55.1 pfSense-pkg-openZro-0.1.0
 ```
 </p>
 
@@ -151,10 +151,10 @@ pkg delete netbird-0.55.1 pfSense-pkg-NetBird-0.1.0
 
 ## Get started
 <p float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://netbird.io/pricing")}>Use NetBird</Button>
+    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
 </p>
 
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

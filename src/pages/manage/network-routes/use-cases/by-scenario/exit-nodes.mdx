@@ -3,7 +3,7 @@
 Exit nodes route all internet-bound traffic from your devices through a designated routing peer. This guide explains how to configure default routes for internet traffic.
 
 <Note>
-    This feature requires NetBird version 0.27.0 or later.
+    This feature requires openZro version 0.27.0 or later.
 </Note>
 
 ## Concepts
@@ -40,7 +40,7 @@ Administrators configure exit nodes from the dashboard and can enable **Auto App
 </Note>
 
 <Note>
-    Auto Apply requires NetBird client version 0.55.0 or later.
+    Auto Apply requires openZro client version 0.55.0 or later.
 </Note>
 
 ### Existing Exit Node Routes
@@ -53,10 +53,10 @@ Clients running v0.55.0 or later auto-apply these routes unless the user has exp
 
 ### 1. Open the Peers Tab
 
-Navigate to the NetBird dashboard and select the **Peers** tab.
+Navigate to the openZro dashboard and select the **Peers** tab.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/exit-nodes/netbird-peers.png" alt="Dashboard peers view" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/exit-nodes/openzro-peers.png" alt="Dashboard peers view" className="imagewrapper-big"/>
 </p>
 
 ### 2. Select the Routing Peer
@@ -64,7 +64,7 @@ Navigate to the NetBird dashboard and select the **Peers** tab.
 Choose the peer that will serve as your exit node.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/exit-nodes/netbird-peers-routing-peer.png" alt="Routing peer selection" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/exit-nodes/openzro-peers-routing-peer.png" alt="Routing peer selection" className="imagewrapper-big"/>
 </p>
 
 ### 3. Configure the Exit Node
@@ -72,7 +72,7 @@ Choose the peer that will serve as your exit node.
 Click **Add Exit Node**. In the dialog, assign one or more distribution groups to specify which peers should use this exit node.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/exit-nodes/netbird-peers-add-exit-node.png" alt="Add exit node dialog" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/exit-nodes/openzro-peers-add-exit-node.png" alt="Add exit node dialog" className="imagewrapper-big"/>
 </p>
 
 To make the exit node available without automatic activation, disable **Auto Apply**. Users can then enable it manually.
@@ -88,7 +88,7 @@ Click **Add Exit Node** to complete the configuration. Masquerading is enabled b
 Check the peer view to confirm the routing peer is marked as an exit node.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/exit-nodes/netbird-peers-routing-peer-exit-node.png" alt="Exit node confirmation" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/exit-nodes/openzro-peers-routing-peer-exit-node.png" alt="Exit node confirmation" className="imagewrapper-big"/>
 </p>
 
 ### 5. Configure DNS

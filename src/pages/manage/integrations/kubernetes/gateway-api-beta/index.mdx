@@ -1,11 +1,11 @@
 # Kubernetes Gateway API Integration <Badge status="experimental" text="Beta" />
 
-The NetBird Kubernetes operator supports the [Gateway API](https://gateway-api.sigs.k8s.io/) as an alternative to annotation-based service exposure. Using standard Gateway API resources, you can:
+The openZro Kubernetes operator supports the [Gateway API](https://gateway-api.sigs.k8s.io/) as an alternative to annotation-based service exposure. Using standard Gateway API resources, you can:
 
 - **Expose services publicly** via reverse proxy using `HTTPRoute` resources with the public gateway class
-- **Expose services privately** to your NetBird network using `TCPRoute` resources with the private gateway class
+- **Expose services privately** to your openZro network using `TCPRoute` resources with the private gateway class
 
-The operator watches for these Gateway API resources and automatically creates the corresponding [Networks and Resources](/manage/networks) in your NetBird account.
+The operator watches for these Gateway API resources and automatically creates the corresponding [Networks and Resources](/manage/networks) in your openZro account.
 
 ## Prerequisites
 
@@ -15,19 +15,19 @@ Before you begin, ensure you have the following:
 - **kubectl** version v1.11.3+
 - Access to a **Kubernetes** v1.11.3+ cluster
 - **Cert Manager** (recommended) — for secure communication between the k8s API and the operator
-- A **NetBird API token** — you can create a PAT by following the steps [here](/manage/public-api#creating-a-service-user)
+- A **openZro API token** — you can create a PAT by following the steps [here](/manage/public-api#creating-a-service-user)
 
 ## Installation
 
 ### Step 1: Add the Helm repository
 
 ```shell
-helm repo add netbirdio https://netbirdio.github.io/helms
+helm repo add openzro https://openzro.github.io/helms
 ```
 
 ### Step 2: Install Cert Manager
 
-This is recommended for the k8s API to communicate securely with the NetBird operator.
+This is recommended for the k8s API to communicate securely with the openZro operator.
 
 ```shell
 kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml
@@ -41,17 +41,17 @@ The operator requires the experimental Gateway API CRDs to be installed in your 
 kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/experimental-install.yaml
 ```
 
-### Step 4: Create the NetBird API secret
+### Step 4: Create the openZro API secret
 
 Create a namespace for the operator and store your API token as a Kubernetes secret.
 
 ```shell
-kubectl create namespace netbird
-kubectl -n netbird create secret generic netbird-mgmt-api-key --from-literal=NB_API_KEY=$(cat ~/nb-pat.secret)
+kubectl create namespace openzro
+kubectl -n openzro create secret generic openzro-mgmt-api-key --from-literal=NB_API_KEY=$(cat ~/nb-pat.secret)
 ```
 
 <Note>
-  Replace `~/nb-pat.secret` with the path to your NetBird API key.
+  Replace `~/nb-pat.secret` with the path to your openZro API key.
 </Note>
 
 ### Step 5: Install the operator
@@ -61,8 +61,8 @@ kubectl -n netbird create secret generic netbird-mgmt-api-key --from-literal=NB_
 </Warning>
 
 ```shell
-helm upgrade --install kubernetes-operator netbirdio/kubernetes-operator \
-  --namespace netbird \
+helm upgrade --install kubernetes-operator openzro/kubernetes-operator \
+  --namespace openzro \
   --create-namespace \
   --version 0.3.0-rc.2 \
   -f - <<EOF
@@ -73,9 +73,9 @@ gatewayAPI:
 webhook:
   enableCertManager: false
 
-netbirdAPI:
+openzroAPI:
   keyFromSecret:
-    name: "netbird-mgmt-api-key"
+    name: "openzro-mgmt-api-key"
     key: "NB_API_KEY"
 
 EOF
@@ -84,49 +84,49 @@ EOF
 ### Step 6: Verify the installation
 
 ```bash
-kubectl -n netbird get pods
-# Expected: netbird-operator-kubernetes-operator-xxxxx  1/1  Running
+kubectl -n openzro get pods
+# Expected: openzro-operator-kubernetes-operator-xxxxx  1/1  Running
 ```
 
 ## Configure Routing Peers and Gateways
 
 Once the operator is running, deploy the routing peers and gateway resources. The operator supports two gateway classes:
 
-- **`netbird-public`** — exposes services through a reverse proxy, making them accessible via a public hostname using `HTTPRoute` resources
-- **`netbird-private`** — exposes services as private network resources, accessible only to peers within your NetBird network using `TCPRoute` resources
+- **`openzro-public`** — exposes services through a reverse proxy, making them accessible via a public hostname using `HTTPRoute` resources
+- **`openzro-private`** — exposes services as private network resources, accessible only to peers within your openZro network using `TCPRoute` resources
 
 ```bash
 cat <<EOF | kubectl apply -f -
 
-apiVersion: netbird.io/v1
+apiVersion: openzro.io/v1
 kind: NBRoutingPeer
 metadata:
-  name: netbird
-  namespace: netbird
+  name: openzro
+  namespace: openzro
 spec: {}
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: private
-  namespace: netbird
+  namespace: openzro
 spec:
-  gatewayClassName: netbird-private
+  gatewayClassName: openzro-private
   listeners:
-  - protocol: gateway.netbird.io/NBRoutingPeer
-    name: netbird
+  - protocol: gateway.openzro.io/NBRoutingPeer
+    name: openzro
     port: 1
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: Gateway
 metadata:
   name: public
-  namespace: netbird
+  namespace: openzro
 spec:
-  gatewayClassName: netbird-public
+  gatewayClassName: openzro-public
   listeners:
-  - protocol: gateway.netbird.io/NBRoutingPeer
-    name: netbird
+  - protocol: gateway.openzro.io/NBRoutingPeer
+    name: openzro
     port: 1
 
 EOF
@@ -143,7 +143,7 @@ Use `HTTPRoute` resources with the **public** gateway to expose Kubernetes servi
 The following example deploys a demo application and creates an `HTTPRoute` with a custom hostname pointing to the public gateway:
 
 ```bash
-export DEPLOYMENT_NAME=demo-nb-k8s; export DEPLOYMENT_IMAGE=ghcr.io/netbirdio/kubernetes-demo; cat <<EOF | kubectl apply -f -
+export DEPLOYMENT_NAME=demo-nb-k8s; export DEPLOYMENT_IMAGE=ghcr.io/openzro/kubernetes-demo; cat <<EOF | kubectl apply -f -
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
@@ -154,10 +154,10 @@ metadata:
 spec:
   hostnames:
     # Optional: omit this field if you don't want to expose this through the reverse proxy
-    - demo-nb-k8s.eu1.netbird.services
+    - demo-nb-k8s.eu1.openzro.services
   parentRefs:
   - name: public
-    namespace: netbird
+    namespace: openzro
   rules:
   - backendRefs:
     - name: $DEPLOYMENT_NAME
@@ -212,9 +212,9 @@ EOF
 
 ## Expose Private Resources (Private Gateway)
 
-Use `TCPRoute` resources with the **private** gateway to expose services as private network resources, accessible only to peers within your NetBird network.
+Use `TCPRoute` resources with the **private** gateway to expose services as private network resources, accessible only to peers within your openZro network.
 
-The following example exposes the Kubernetes API server to your NetBird peers:
+The following example exposes the Kubernetes API server to your openZro peers:
 
 ```bash
 cat <<EOF | kubectl apply -f -
@@ -226,7 +226,7 @@ metadata:
 spec:
   parentRefs:
   - name: private
-    namespace: netbird
+    namespace: openzro
   rules:
   - backendRefs:
     - name: kubernetes
@@ -244,10 +244,10 @@ We know the operator is not yet feature complete, but we thought you would like 
 
 ## Get started
 <div style={{textAlign: "center"}}>
-    <Button name="button" className="button-5" onClick={() => window.open("https://netbird.io/pricing")}>Use NetBird</Button>
+    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
 </div>
 
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

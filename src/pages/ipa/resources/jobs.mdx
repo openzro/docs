@@ -20,7 +20,7 @@ export const title = 'Jobs'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/peers/{peerId}/jobs">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/peers/{peerId}/jobs \
+curl -X GET https://api.openzro.io/api/peers/{peerId}/jobs \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -51,7 +51,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peerId}/jobs"
+url = "https://api.openzro.io/api/peers/{peerId}/jobs"
 
 headers = {     
   'Accept': 'application/json',
@@ -75,7 +75,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peerId}/jobs"
+  url := "https://api.openzro.io/api/peers/{peerId}/jobs"
   method := "GET"
   
   client := &http.Client {
@@ -111,7 +111,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peerId}/jobs")
+url = URI("https://api.openzro.io/api/peers/{peerId}/jobs")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -129,7 +129,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peerId}/jobs")
+  .url("https://api.openzro.io/api/peers/{peerId}/jobs")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -143,7 +143,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peerId}/jobs',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peerId}/jobs',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -294,7 +294,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/peers/{peerId}/jobs">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/peers/{peerId}/jobs \
+curl -X POST https://api.openzro.io/api/peers/{peerId}/jobs \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -369,7 +369,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peerId}/jobs"
+url = "https://api.openzro.io/api/peers/{peerId}/jobs"
 payload = json.dumps({
   "workload": {
     "oneOf": [
@@ -414,7 +414,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peerId}/jobs"
+  url := "https://api.openzro.io/api/peers/{peerId}/jobs"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -472,7 +472,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peerId}/jobs")
+url = URI("https://api.openzro.io/api/peers/{peerId}/jobs")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -533,7 +533,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   }
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peerId}/jobs")
+  .url("https://api.openzro.io/api/peers/{peerId}/jobs")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -548,7 +548,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peerId}/jobs',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peerId}/jobs',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -622,7 +622,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/peers/{peerId}/jobs/{jobId}">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/peers/{peerId}/jobs/{jobId} \
+curl -X GET https://api.openzro.io/api/peers/{peerId}/jobs/{jobId} \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -653,7 +653,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/peers/{peerId}/jobs/{jobId}"
+url = "https://api.openzro.io/api/peers/{peerId}/jobs/{jobId}"
 
 headers = {     
   'Accept': 'application/json',
@@ -677,7 +677,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/peers/{peerId}/jobs/{jobId}"
+  url := "https://api.openzro.io/api/peers/{peerId}/jobs/{jobId}"
   method := "GET"
   
   client := &http.Client {
@@ -713,7 +713,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/peers/{peerId}/jobs/{jobId}")
+url = URI("https://api.openzro.io/api/peers/{peerId}/jobs/{jobId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -731,7 +731,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/peers/{peerId}/jobs/{jobId}")
+  .url("https://api.openzro.io/api/peers/{peerId}/jobs/{jobId}")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -745,7 +745,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/peers/{peerId}/jobs/{jobId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/peers/{peerId}/jobs/{jobId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

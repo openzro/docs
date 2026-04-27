@@ -1,6 +1,6 @@
 # Troubleshooting
 
-This page will help with various issues when self-hosting NetBird.
+This page will help with various issues when self-hosting openZro.
 
 ## Embedded IdP Issues
 
@@ -36,14 +36,14 @@ This page will help with various issues when self-hosting NetBird.
 1. Verify the connector was saved: Go to **Settings** → **Identity Providers**
 2. Check that the redirect URL is correctly configured in your IdP
 3. Review Management service logs for configuration errors: `docker compose logs management`
-4. Ensure the IdP application has the correct redirect URI from NetBird
+4. Ensure the IdP application has the correct redirect URI from openZro
 
 ### "Invalid redirect URI" error from IdP
 
 **Problem**: When clicking an SSO button, the IdP returns an invalid redirect URI error.
 
 **Solutions**:
-1. Copy the exact redirect URL from NetBird (shown after saving the connector)
+1. Copy the exact redirect URL from openZro (shown after saving the connector)
 2. Add it to your IdP's allowed redirect URIs
 3. Check for trailing slashes or typos
 4. Some IdPs are case-sensitive
@@ -75,7 +75,7 @@ To test your TURN configuration you can access the [online tester](https://webrt
 There you will find a ICE servers input box, where you can select and remove the existing server, then add your turn server
 configuration as follows:
 
-Please replace <b>netbird.DOMAIN.com</b> and <b>PASSWORD</b> with your STUN/TURN server details from your configuration (<b>config.yaml</b> for the combined setup, or the <b>TURNConfig</b> section in <b>management.json</b> for older multi-container setups), then click on <b>Add server</b>.
+Please replace <b>openzro.DOMAIN.com</b> and <b>PASSWORD</b> with your STUN/TURN server details from your configuration (<b>config.yaml</b> for the combined setup, or the <b>TURNConfig</b> section in <b>management.json</b> for older multi-container setups), then click on <b>Add server</b>.
 
 <p>
     <img src="/docs-static/img/selfhosted/troubleshooting/turn.png" alt="turn" width="700" className="imagewrapper"/>
@@ -120,7 +120,7 @@ Where you have the following types: `host` (local address), `srflx` (STUN reflex
 1. Ensure port 80 is accessible for ACME challenge
 2. Check Caddy logs: `docker compose logs caddy`
 3. Verify the domain points to the correct IP
-4. Manually trigger renewal: `docker exec -it netbird-caddy caddy reload`
+4. Manually trigger renewal: `docker exec -it openzro-caddy caddy reload`
 
 ### Certificate errors with custom reverse proxy
 
@@ -142,7 +142,7 @@ Where you have the following types: `host` (local address), `srflx` (STUN reflex
 1. Check that UDP port 3478 is accessible (STUN/TURN)
 2. Verify the TURN server is working (see [TURN debugging](#debugging-turn-connections))
 3. Check firewall rules on both peers
-4. Review peer logs: `netbird status -d`
+4. Review peer logs: `openzro status -d`
 
 ### Management service unreachable
 
@@ -181,6 +181,6 @@ Where you have the following types: `host` (local address), `srflx` (STUN reflex
 If you're still experiencing issues:
 
 1. **Check logs**: `docker compose logs` for all services
-2. **Search existing issues**: [GitHub Issues](https://github.com/netbirdio/netbird/issues)
+2. **Search existing issues**: [GitHub Issues](https://github.com/openzro/openzro/issues)
 3. **Join our community**: [Slack Channel](/slack-url)
 4. **Open an issue**: Include logs, configuration (without secrets), and steps to reproduce

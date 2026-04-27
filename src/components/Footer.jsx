@@ -233,10 +233,10 @@ function SmallPrint() {
         &copy; Copyright {new Date().getFullYear()}. All rights reserved.
       </p>
       <div className="flex gap-4">
-        <SocialLink href="https://x.com/netbird" icon={TwitterIcon}>
+        <SocialLink href="https://x.com/openzro" icon={TwitterIcon}>
           Follow us on X
         </SocialLink>
-        <SocialLink href="https://github.com/netbirdio/netbird" icon={GitHubIcon}>
+        <SocialLink href="https://github.com/openzro/openzro" icon={GitHubIcon}>
           Follow us on GitHub
         </SocialLink>
         <SocialLink href="/slack-url" icon={SlackIcon}>

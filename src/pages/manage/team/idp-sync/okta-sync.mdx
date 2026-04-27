@@ -8,20 +8,20 @@ Okta is a cloud-based identity and access management (IAM) platform that central
 security and streamline access. It offers features like multifactor authentication, single sign-on, and lifecycle
 management to help organizations manage user identities effectively.
 
-NetBird's Okta integration enhances user management by allowing you to utilize Okta as your identity provider.
+openZro's Okta integration enhances user management by allowing you to utilize Okta as your identity provider.
 This integration automates user authentication in your network, adds SSO and MFA support, and simplifies network access management
 to your applications and resources.
 
 The integration process consists of two stages: first, you’ll set up OpenID Connect (OIDC) to enable Single Sign-On (SSO)
-from NetBird's login page using Okta credentials. Next, you’ll configure SCIM (System for Cross-domain Identity Management)
+from openZro's login page using Okta credentials. Next, you’ll configure SCIM (System for Cross-domain Identity Management)
 to synchronize users and groups smoothly.
 
-## Get Started with NetBird-Okta Integration
+## Get Started with openZro-Okta Integration
 
-To set up SSO, go to `Integrations` in the NetBird admin console's left menu to access the Identity Provider integration page. Click the `Connect Okta` button to get started with the Okta-NetBird integration. This will open a pop-up window with detailed instructions on synchronizing NetBird and Okta.
+To set up SSO, go to `Integrations` in the openZro admin console's left menu to access the Identity Provider integration page. Click the `Connect Okta` button to get started with the Okta-openZro integration. This will open a pop-up window with detailed instructions on synchronizing openZro and Okta.
 
 
-![NetBird Okta Integration](/docs-static/img/manage/team/idp-sync/okta-sync/nwutb3Z.png)
+![openZro Okta Integration](/docs-static/img/manage/team/idp-sync/okta-sync/nwutb3Z.png)
 
 ## Prerequisites
 
@@ -43,12 +43,12 @@ Confirm that you have one of the required roles before proceeding with the integ
 
 ![Okta Check User Permissions](/docs-static/img/manage/team/idp-sync/okta-sync/AGPXpZN.png)
 
-## Installing the NetBird Integration
+## Installing the openZro Integration
 
-Once you have the necessary permissions, you can set up the NetBird application. First, on NetBird, click `Continue →` to show a summary of the necessary steps.
+Once you have the necessary permissions, you can set up the openZro application. First, on openZro, click `Continue →` to show a summary of the necessary steps.
 
 
-![NetBird Connect NetBird with Okta](/docs-static/img/manage/team/idp-sync/okta-sync/dlgCUXo.png)
+![openZro Connect openZro with Okta](/docs-static/img/manage/team/idp-sync/okta-sync/dlgCUXo.png)
 
 Let's go through them one by one:
 
@@ -59,34 +59,34 @@ Let's go through them one by one:
 
 ![Okta Browse App Catalog](/docs-static/img/manage/team/idp-sync/okta-sync/fkSaYnn.png)
 
-In the app catalog, enter "NetBird" in the search bar. Then, click the `Add Integration` button.
+In the app catalog, enter "openZro" in the search bar. Then, click the `Add Integration` button.
 
 
-![Okta NetBird App](/docs-static/img/manage/team/idp-sync/okta-sync/dgxJ916.png)
+![Okta openZro App](/docs-static/img/manage/team/idp-sync/okta-sync/dgxJ916.png)
 
 Accept the default application name and click the `Done` button. On the next screen, click the `Assign` dropdown and select `Assign to People`.
 
 
-![Okta Assign People To NetBird App](/docs-static/img/manage/team/idp-sync/okta-sync/WQ8O1l7.png)
+![Okta Assign People To openZro App](/docs-static/img/manage/team/idp-sync/okta-sync/WQ8O1l7.png)
 
-You will see a list of users. Find your user account, click `Assign`, and save the changes. Verify your user is assigned to the NetBird app and click `Done`.
-
-
-![Okta Verify User Added To NetBird](/docs-static/img/manage/team/idp-sync/okta-sync/bteoM6j.png)
-
-After that, you will see your user listed in the NetBird application.
+You will see a list of users. Find your user account, click `Assign`, and save the changes. Verify your user is assigned to the openZro app and click `Done`.
 
 
-![Okta User Added To NetBird App](/docs-static/img/manage/team/idp-sync/okta-sync/IwaqFvj.png)
+![Okta Verify User Added To openZro](/docs-static/img/manage/team/idp-sync/okta-sync/bteoM6j.png)
+
+After that, you will see your user listed in the openZro application.
+
+
+![Okta User Added To openZro App](/docs-static/img/manage/team/idp-sync/okta-sync/IwaqFvj.png)
 
 ## Configuring SSO in Okta
 
-The next step is to configure Okta-NetBird SSO integration.
+The next step is to configure Okta-openZro SSO integration.
 
-In NetBird, click the `Continue →` button. A new wizard screen will appear, offering the instructions for retrieving Okta’s OpenID Connect credentials. You can click `Close` and navigate to Okta.
+In openZro, click the `Continue →` button. A new wizard screen will appear, offering the instructions for retrieving Okta’s OpenID Connect credentials. You can click `Close` and navigate to Okta.
 
 
-![NetBird Connect NetBird with Okta Sharing Credentials](/docs-static/img/manage/team/idp-sync/okta-sync/AYVAbEy.png)
+![openZro Connect openZro with Okta Sharing Credentials](/docs-static/img/manage/team/idp-sync/okta-sync/AYVAbEy.png)
 
 * Click on the `Sign On` tab on Okta. Look for `OpenID Connect` under `Sign on methods` in the `Settings` section.
 * Copy the `Client ID` value.
@@ -108,62 +108,62 @@ Store these credentials securely, as you will need them soon.
 
 ![Okta Copy Domain](/docs-static/img/manage/team/idp-sync/okta-sync/eITyobI.png)
 
-The final step is to [send an email to the NetBird team](support@netbird.io) with the authentication information you just retrieved:
+The final step is to [send an email to the openZro team](support@openzro.io) with the authentication information you just retrieved:
 
 * Okta `Client ID`
 * Okta `Client secret`
 * Okta account domain
 * Okta primary email domain (usually your username)
 
-You will receive an email once the NetBird team enables authentication for your account.
+You will receive an email once the openZro team enables authentication for your account.
 
-This completes the first stage, enabling Single Sign-On (SSO) from NetBird's login page using Okta credentials. Now, you can navigate to [app.netbird.io](app.netbird.io) and log in using [Okta Verify](https://help.okta.com/eu/en-us/content/topics/end-user/ov-overview.htm).
+This completes the first stage, enabling Single Sign-On (SSO) from openZro's login page using Okta credentials. Now, you can navigate to [app.openzro.io](app.openzro.io) and log in using [Okta Verify](https://help.okta.com/eu/en-us/content/topics/end-user/ov-overview.htm).
 
-## Enabling Okta SCIM in NetBird
+## Enabling Okta SCIM in openZro
 
-In NetBird, go to `Integrations > Identity Provider` and click on the `Connect to Okta` button.
+In openZro, go to `Integrations > Identity Provider` and click on the `Connect to Okta` button.
 
-![NetBird Connect to Okta](/docs-static/img/manage/team/idp-sync/okta-sync/QbzudIU.png)
+![openZro Connect to Okta](/docs-static/img/manage/team/idp-sync/okta-sync/QbzudIU.png)
 
 You will see a reminder of the permissions your user will require in Okta. Click the `Get Started →` button to continue.
 
-![NetBird User Permissions](/docs-static/img/manage/team/idp-sync/okta-sync/RBsJlzu.png)
+![openZro User Permissions](/docs-static/img/manage/team/idp-sync/okta-sync/RBsJlzu.png)
 
 If you haven't already, you'll need to set up SSO in Okta. If you've completed the previous section, skip this step and click the `Continue →` button.
 
-![NetBird SSO in Okta](/docs-static/img/manage/team/idp-sync/okta-sync/XYpJYW3.png)
+![openZro SSO in Okta](/docs-static/img/manage/team/idp-sync/okta-sync/XYpJYW3.png)
 
-The next screen will show you how to enable NetBird API credentials in Okta. Copy the value of the `Authorization (Bearer)` token.
+The next screen will show you how to enable openZro API credentials in Okta. Copy the value of the `Authorization (Bearer)` token.
 
-![NetBird Enable Okta SCIM](/docs-static/img/manage/team/idp-sync/okta-sync/aoPqKJR.png)
+![openZro Enable Okta SCIM](/docs-static/img/manage/team/idp-sync/okta-sync/aoPqKJR.png)
 
-Navigate to the NetBird app in your Okta admin dashboard. Click the `Provisioning` tab, then select `Configure API Integration`.
+Navigate to the openZro app in your Okta admin dashboard. Click the `Provisioning` tab, then select `Configure API Integration`.
 
 ![Okta Provisioning](/docs-static/img/manage/team/idp-sync/okta-sync/m27djab.png)
 
 Follow these steps:
 
 * Check the box to enable API Integration.
-* Enter your NetBird API Token.
+* Enter your openZro API Token.
 * Click `Test API Credentials` to verify the SCIM connection.
 
-![Okta Entering NetBird Bearer Token](/docs-static/img/manage/team/idp-sync/okta-sync/Wn6f9Pj.png)
+![Okta Entering openZro Bearer Token](/docs-static/img/manage/team/idp-sync/okta-sync/Wn6f9Pj.png)
 
-If everything works as expected, you'll see the message: "NetBird was verified successfully!" as shown below. Click `Save` to continue.
+If everything works as expected, you'll see the message: "openZro was verified successfully!" as shown below. Click `Save` to continue.
 
 ![Okta Token Accepted](/docs-static/img/manage/team/idp-sync/okta-sync/7ELQBIA.png)
 
-## Configuring SCIM Provisioning to NetBird
+## Configuring SCIM Provisioning to openZro
 
-On NetBird, click `Continue →`. You'll see instructions for configuring SCIM provisioning to NetBird.
+On openZro, click `Continue →`. You'll see instructions for configuring SCIM provisioning to openZro.
 
-![NetBird Configure SCIM provisioning to NetBird](/docs-static/img/manage/team/idp-sync/okta-scim-provisioning.png)
+![openZro Configure SCIM provisioning to openZro](/docs-static/img/manage/team/idp-sync/okta-scim-provisioning.png)
 
 Back to Okta, click `Edit` as shown below.
 
-![Okta Edit NetBird App](/docs-static/img/manage/team/idp-sync/okta-sync/AcuWP2G.png)
+![Okta Edit openZro App](/docs-static/img/manage/team/idp-sync/okta-sync/AcuWP2G.png)
 
-Enable Okta to create, update, and deactivate NetBird users by checking the corresponding boxes:
+Enable Okta to create, update, and deactivate openZro users by checking the corresponding boxes:
 
 * Create Users
 * Update User Attributes
@@ -173,48 +173,48 @@ When done, click `Save`.
 
 ![Okta Enable Create Users and More](/docs-static/img/manage/team/idp-sync/okta-sync/JD0EHVI.png)
 
-## Assigning NetBird Application to Okta Groups
+## Assigning openZro Application to Okta Groups
 
-In NetBird, click `Continue →`, you'll see the steps for assigning the NetBird integration to Okta groups.
+In openZro, click `Continue →`, you'll see the steps for assigning the openZro integration to Okta groups.
 
-![NetBird Sync Groups to NetBird](/docs-static/img/manage/team/idp-sync/okta-sync/fLHSNsd.png)
+![openZro Sync Groups to openZro](/docs-static/img/manage/team/idp-sync/okta-sync/fLHSNsd.png)
 
 * Navigate to the `Assignments` tab.
-* Similar than before when you assigned your user to NetBird app, click the `Assign` button
+* Similar than before when you assigned your user to openZro app, click the `Assign` button
 * This time, select `Assign to Groups`.
-* Select Okta groups that you want to assign to the NetBird app.
+* Select Okta groups that you want to assign to the openZro app.
 
-![Okta Assign NetBird to Groups](/docs-static/img/manage/team/idp-sync/okta-sync/yGV0u5Y.png)
+![Okta Assign openZro to Groups](/docs-static/img/manage/team/idp-sync/okta-sync/yGV0u5Y.png)
 
 Once you assign the desired groups, click `Done`. You'll see the selected groups listed in Okta.
 
-![Okta NetBird Groups](/docs-static/img/manage/team/idp-sync/okta-sync/mxkdWc0.png)
+![Okta openZro Groups](/docs-static/img/manage/team/idp-sync/okta-sync/mxkdWc0.png)
 
-## Push Okta Groups to NetBird
+## Push Okta Groups to openZro
 
-One more time, go to NetBird and click `Continue →`. You'll see the final instructions to push Okta groups to NetBird.
+One more time, go to openZro and click `Continue →`. You'll see the final instructions to push Okta groups to openZro.
 
-![NetBird Sync Groups to NetBird](/docs-static/img/manage/team/idp-sync/okta-sync/8TAvguS.png)
+![openZro Sync Groups to openZro](/docs-static/img/manage/team/idp-sync/okta-sync/8TAvguS.png)
 
 * In Okta, navigate to `Push Groups` tab
 * Click the `Push Groups` button
 * Select `Find groups by name`
-* Search for specific groups to push to NetBird.
+* Search for specific groups to push to openZro.
 
 ![XX](/docs-static/img/manage/team/idp-sync/okta-sync/uqUiTtg.png)
 
-Once you finish, go back to NetBird and click `Finish Setup`. You can verify the synchronization by navigating to `Team > Users`
+Once you finish, go back to openZro and click `Finish Setup`. You can verify the synchronization by navigating to `Team > Users`
 
 ![XX](/docs-static/img/manage/team/idp-sync/okta-sync/GPTzvut.png)
 
-The users listed in NetBird should match those you created in Okta.
+The users listed in openZro should match those you created in Okta.
 
 ![XX](/docs-static/img/manage/team/idp-sync/okta-sync/O1aoILr.png)
 
 <Note>
-    SCIM provisioning will manage only resources that are created through Okta. Any resources created directly in NetBird will not be managed by SCIM.
+    SCIM provisioning will manage only resources that are created through Okta. Any resources created directly in openZro will not be managed by SCIM.
 </Note>
 
 <Note>
-    Synced groups will only be available for membership and will not change the role of user in NetBird
+    Synced groups will only be available for membership and will not change the role of user in openZro
 </Note>

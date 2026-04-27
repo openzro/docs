@@ -1,11 +1,11 @@
 # Networks
 
-NetBird creates a secure peer-to-peer mesh network where devices running the NetBird agent connect directly with end-to-end encryption. This enables precise network segmentation and secure remote access without exposing resources to the internet.
+openZro creates a secure peer-to-peer mesh network where devices running the openZro agent connect directly with end-to-end encryption. This enables precise network segmentation and secure remote access without exposing resources to the internet.
 
-However, installing the agent on every machine is not always feasible. Networks solve this by letting you route traffic to entire LANs, office networks, or cloud VPCs without requiring the NetBird agent on each device.
+However, installing the agent on every machine is not always feasible. Networks solve this by letting you route traffic to entire LANs, office networks, or cloud VPCs without requiring the openZro agent on each device.
 
 <p>
-    <img src="/docs-static/img/manage/networks/netbird-network-routes.png" alt="high-level-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/networks/openzro-network-routes.png" alt="high-level-dia" className="imagewrapper-big"/>
 </p>
 
 ## Networks vs. Network Routes
@@ -26,7 +26,7 @@ A Network is a configuration container that maps your on-premise or cloud infras
 
 ### Routing Peers
 
-Routing peers are machines that bridge your NetBird peers to your internal networks. They forward traffic from NetBird clients to resources that do not have the NetBird agent installed.
+Routing peers are machines that bridge your openZro peers to your internal networks. They forward traffic from openZro clients to resources that do not have the openZro agent installed.
 
 You can add multiple routing peers using individual peers or groups to ensure high availability and load balancing. Each routing peer can be configured with masquerading and priority settings.
 
@@ -57,7 +57,7 @@ Resources are the machines, services, or subnets you want to access within your 
 
 ### Domain Resources
 
-In addition to IP-based resources, NetBird supports routing domain names. In the Dashboard, you can enter a domain name (e.g., `example.com`) or wildcard domain (e.g., `*.example.com`) instead of an IP range. NetBird clients will then resolve and route traffic to that domain.
+In addition to IP-based resources, openZro supports routing domain names. In the Dashboard, you can enter a domain name (e.g., `example.com`) or wildcard domain (e.g., `*.example.com`) instead of an IP range. openZro clients will then resolve and route traffic to that domain.
 
 For troubleshooting, see [Debugging access to Domain Resources](/help/troubleshooting-client#debugging-access-to-domain-resources).
 
@@ -69,21 +69,21 @@ For troubleshooting, see [Debugging access to Domain Resources](/help/troublesho
 
 #### How Domain Resolution Works
 
-1. When NetBird connects, it configures the operating system to use NetBird for resolving the specified domains. No routing rules are set up yet.
+1. When openZro connects, it configures the operating system to use openZro for resolving the specified domains. No routing rules are set up yet.
 2. When an application requests a domain (e.g., `example.com`):
-   - The OS sends the DNS query to NetBird's Local DNS Forwarder, which runs on:
-     - **macOS and Windows**: The highest available IP in your NetBird range (typically `100.xxx.255.254:53`)
-     - **Other systems**: Your local NetBird client IP (e.g., `100.xxx.123.45:53`)
+   - The OS sends the DNS query to openZro's Local DNS Forwarder, which runs on:
+     - **macOS and Windows**: The highest available IP in your openZro range (typically `100.xxx.255.254:53`)
+     - **Other systems**: Your local openZro client IP (e.g., `100.xxx.123.45:53`)
    - The Local DNS Forwarder sends the query to the Remote DNS Resolver on the routing peer using:
-     - Port `22054` for NetBird client versions `0.59.0` and newer
-     - Port `5353` for NetBird client versions `0.58.x` and older
+     - Port `22054` for openZro client versions `0.59.0` and newer
+     - Port `5353` for openZro client versions `0.58.x` and older
    - The routing peer resolves the domain using its local DNS configuration and returns the result.
    - The Local DNS Forwarder creates routing rules for the returned IP addresses before sending them to the applicatioxn. See [Trigger the Domain Resource](/help/troubleshooting-client#trigger-the-domain-resource) to observe this behavior.
 3. The application receives the response normally, with a slight delay on the first request.
 4. Subsequent requests are served instantly from the Local DNS Forwarder's cache.
 
 <Note>
-  NetBird attempts to automatically open DNS forwarder ports on routing peer firewalls, but this may fail on some systems. If you experience issues, manually open the required ports.
+  openZro attempts to automatically open DNS forwarder ports on routing peer firewalls, but this may fail on some systems. If you experience issues, manually open the required ports.
 
   To verify firewall access, run this command from the client device:
   `nslookup -port=22054 <routed-domain> <routing-peer-ip>` (e.g., `nslookup -port=22054 example.com 100.123.45.67`).
@@ -141,7 +141,7 @@ If you need to reach services hosted on the routing peer machine (for example, P
 - **Source**: the group containing the peers and users that need access
 - **Destination**: a group that includes the routing peer
 
-This additional policy ensures that the routing peer's input chain allows inbound connections from your NetBird peers. Without it, traffic destined for the routing peer's own IP will be dropped even if there is a valid network resource policy for the subnet behind it.
+This additional policy ensures that the routing peer's input chain allows inbound connections from your openZro peers. Without it, traffic destined for the routing peer's own IP will be dropped even if there is a valid network resource policy for the subnet behind it.
 
 <Note>
     This is a common pitfall when the routing peer also runs local services. Remember: network resource policies control forwarded traffic (forward chain), while peer-to-peer access control policies control traffic to the peer itself (input chain). You need both if you want to access the routing peer **and** the resources behind it.
@@ -168,7 +168,7 @@ To enable DNS wildcard routing, go to **Settings** > **Networks** > **Enable DNS
 </Note>
 
 <Note>
-    Starting with NetBird v0.59.0, the local DNS forwarder port changed from `5353` to `22054` to avoid port collisions. For backward compatibility, the new port is only used when **all peers in the account** run v0.59.0 or newer. If any peer is on an older version, port `5353` is used for all peers.
+    Starting with openZro v0.59.0, the local DNS forwarder port changed from `5353` to `22054` to avoid port collisions. For backward compatibility, the new port is only used when **all peers in the account** run v0.59.0 or newer. If any peer is on an older version, port `5353` is used for all peers.
 </Note>
 
 ## Use Cases
@@ -180,10 +180,10 @@ To enable DNS wildcard routing, go to **Settings** > **Networks** > **Enable DNS
 ## Get Started
 
 <div className="text-center">
-    <Button name="button" className="button-5" href="https://netbird.io/pricing">Use NetBird</Button>
+    <Button name="button" className="button-5" href="https://openzro.io/pricing">Use openZro</Button>
 </div>
 
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

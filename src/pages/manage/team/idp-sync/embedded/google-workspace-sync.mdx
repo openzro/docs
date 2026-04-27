@@ -4,14 +4,14 @@
 communication. Notably, its [identity management](https://cloud.google.com/architecture/identity/overview-google-authentication) features streamline user authentication and access control,
 ensuring efficiency and security across your organization.
 
-NetBird's Google Workspace integration enhances user management capabilities by synchronizing users and groups from
-Google Workspace to NetBird. You can utilize these synchronized groups to configure your network, establish network
+openZro's Google Workspace integration enhances user management capabilities by synchronizing users and groups from
+Google Workspace to openZro. You can utilize these synchronized groups to configure your network, establish network
 access policies, and automate onboarding and offboarding processes, adding significant value to your organizational
 workflow and security posture.
 
 The integration process involves two complementary services: Google Workspace and Google Cloud Platform (GCP).
 Google Workspace serves as your Identity Provider (IdP), managing user and group identities and providing Single Sign-On (SSO)
-capabilities. GCP is used to create a service account, which NetBird uses to authenticate and access Google Workspace
+capabilities. GCP is used to create a service account, which openZro uses to authenticate and access Google Workspace
 data via the Admin SDK API. This service account uses OAuth 2.0 for secure, authorized access to Workspace information.
 
 import {Note} from "@/components/mdx";
@@ -21,7 +21,7 @@ import {Note} from "@/components/mdx";
     If not, refer to the [Identity Providers](/selfhosted/identity-providers/managed/google-workspace) documentation to set it up.
 </Note>
 
-## Get Started with NetBird-Google Workspace Integration
+## Get Started with openZro-Google Workspace Integration
 
 Go to the `Integrations` section in the left menu to access the `Identity Provider` integration. Click the `Google Workspace` button.
 
@@ -31,13 +31,13 @@ Select your **Google Workspace** identity provider connector for this integratio
     <img src="/docs-static/img/manage/team/idp-sync/google-workspace-sync/select-idp.png" alt="select-identity-provider" className="imagewrapper-big"/>
 </p>
 
-This will open a pop-up window featuring an intuitive wizard to guide you through the synchronization process between NetBird and Google Workspace.
+This will open a pop-up window featuring an intuitive wizard to guide you through the synchronization process between openZro and Google Workspace.
 
-![NetBird Connect NetBird with Google Workspace](/docs-static/img/manage/team/idp-sync/google-workspace-sync/q1aq98X.png)
+![openZro Connect openZro with Google Workspace](/docs-static/img/manage/team/idp-sync/google-workspace-sync/q1aq98X.png)
 
 ## Prerequisites
 
-The NetBird-Google Workspace integration process involves:
+The openZro-Google Workspace integration process involves:
 
 * Creating a project on the Google Cloud Platform.
 * Setting up a service account within that GCP project.
@@ -81,24 +81,24 @@ To [check your organization-level permissions](https://cloud.google.com/resource
 
 If you lack the required role, contact your organization's IT department or the person who set up your Google Cloud account.
 
-## Creating the NetBird Project
+## Creating the openZro Project
 
-Once you have the necessary permissions, you can create the NetBird project in GCP.
+Once you have the necessary permissions, you can create the openZro project in GCP.
 
-![NetBird Create NetBird Project](/docs-static/img/manage/team/idp-sync/google-workspace-sync/GBbcnt3.png)
+![openZro Create openZro Project](/docs-static/img/manage/team/idp-sync/google-workspace-sync/GBbcnt3.png)
 
 Let's go through the required steps:
 
 * Sign in to [Google Console](https://console.cloud.google.com)
 * Click the project dropdown at the top of the page.
 * Click `New Project` in the dropdown menu.
-* Enter `NetBird` as the project name.
+* Enter `openZro` as the project name.
 * Ensure the proper organization is selected in the `Organization` field.
 * Click `CREATE`.
 
 ![Google Workspace New Project](/docs-static/img/manage/team/idp-sync/google-workspace-sync/sGLG0tX.png)
 
-To let `NetBird` authenticate and access Google Workspace, you must enable the `Admin SDK API`. Here's how to do it:
+To let `openZro` authenticate and access Google Workspace, you must enable the `Admin SDK API`. Here's how to do it:
 
 * Ensure you're in the correct project.
 * Navigate to [https://console.cloud.google.com/apis/library/admin.googleapis.com](https://console.cloud.google.com/apis/library/admin.googleapis.com)
@@ -106,11 +106,11 @@ To let `NetBird` authenticate and access Google Workspace, you must enable the `
 
 ![Google Workspace Admin SDK API](/docs-static/img/manage/team/idp-sync/google-workspace-sync/ij3niha.png)
 
-## Creating the NetBird Service Account
+## Creating the openZro Service Account
 
-Once you create the project, you can set up the `NetBird` service account. On NetBird, click `Continue →`. That will show you a summary of the required steps.
+Once you create the project, you can set up the `openZro` service account. On openZro, click `Continue →`. That will show you a summary of the required steps.
 
-![NetBird Create Service Account](/docs-static/img/manage/team/idp-sync/google-workspace-sync/tRbBQsR.png)
+![openZro Create Service Account](/docs-static/img/manage/team/idp-sync/google-workspace-sync/tRbBQsR.png)
 
 Here are the step-by-step instructions:
 
@@ -119,8 +119,8 @@ Navigate to [https://console.cloud.google.com/apis/credentials](https://console.
 ![Google Workspace Service Account](/docs-static/img/manage/team/idp-sync/google-workspace-sync/rDU0Puv.png)
 
 Complete the form with the supplied values:
-* `NetBird` for the service account name
-* `netbird` for the service account ID
+* `openZro` for the service account name
+* `openzro` for the service account ID
 
 Click `DONE` when ready.
 
@@ -128,9 +128,9 @@ Click `DONE` when ready.
 
 ## Getting Your Service Account Email
 
-On NetBird, click `Continue →`. You'll need to provide the email of the service account.
+On openZro, click `Continue →`. You'll need to provide the email of the service account.
 
-![NetBird Get Service Account Email](/docs-static/img/manage/team/idp-sync/google-workspace-sync/IBEGQD8.png)
+![openZro Get Service Account Email](/docs-static/img/manage/team/idp-sync/google-workspace-sync/IBEGQD8.png)
 
 You can copy the email from the `Credentials` page.
 
@@ -138,9 +138,9 @@ You can copy the email from the `Credentials` page.
 
 ## Creating a New Service Account Key
 
-Back on NetBird, click `Continue →`. You'll see a summary of how to create a service account key.
+Back on openZro, click `Continue →`. You'll see a summary of how to create a service account key.
 
-![NetBird Create Service Account Key](/docs-static/img/manage/team/idp-sync/google-workspace-sync/MGgCzky.png)
+![openZro Create Service Account Key](/docs-static/img/manage/team/idp-sync/google-workspace-sync/MGgCzky.png)
 
 First, click on the service account email to show its details.
 
@@ -170,15 +170,15 @@ gcloud org-policies delete iam.disableServiceAccountKeyCreation --organization=O
 
 Remember to replace `ORGANIZATION_ID` with your organization ID.
 
-Now, you can upload the service account key to NetBird. After a successful upload, you'll see the key listed in the NetBird interface.
+Now, you can upload the service account key to openZro. After a successful upload, you'll see the key listed in the openZro interface.
 
-![NetBird Paste New Key](/docs-static/img/manage/team/idp-sync/google-workspace-sync/g8omqCt.png)
+![openZro Paste New Key](/docs-static/img/manage/team/idp-sync/google-workspace-sync/g8omqCt.png)
 
 ## Creating a New Admin Role in Google Workspace
 
-After creating the service account in GCP and uploading its secret key, return to NetBird and click 'Continue →'. The next steps will guide you through creating a role in Google Workspace for this service account
+After creating the service account in GCP and uploading its secret key, return to openZro and click 'Continue →'. The next steps will guide you through creating a role in Google Workspace for this service account
 
-![NetBird Create Admin Role](/docs-static/img/manage/team/idp-sync/google-workspace-sync/F80lm4H.png)
+![openZro Create Admin Role](/docs-static/img/manage/team/idp-sync/google-workspace-sync/F80lm4H.png)
 
 Navigate to Google Workspace [Admin Console](https://admin.google.com/ac/home). Select `Account` on the left menu and then click `Admin Roles`
 
@@ -188,7 +188,7 @@ Click `Create new role`
 
 ![Google Workspace Create New Role](/docs-static/img/manage/team/idp-sync/google-workspace-sync/pmeCOd4.png)
 
-Fill in the form with the values provided in NetBird:
+Fill in the form with the values provided in openZro:
 * Name: `User and Group Management ReadOnly`
 * Description: `User and Group Management ReadOnly`
 
@@ -198,9 +198,9 @@ When done, click `CONTINUE`
 
 ## Granting Role Privileges
 
-Return to NetBird and click `Continue →`. The next screen shows the privileges needed for the Admin API.
+Return to openZro and click `Continue →`. The next screen shows the privileges needed for the Admin API.
 
-![NetBird Add Role Privileges](/docs-static/img/manage/team/idp-sync/google-workspace-sync/IZn8XWY.png)
+![openZro Add Role Privileges](/docs-static/img/manage/team/idp-sync/google-workspace-sync/IZn8XWY.png)
 
 Back to Google Workspace, enter `admin api` in the search bar and enable the following privileges for the Admin API:
 * Users: `Read`
@@ -216,9 +216,9 @@ Review the Admin API privileges to verify they are correct and click `CREATE ROL
 
 ## Assigning Admin API Privileges to Google Cloud Service Account
 
-In NetBird, click `Continue →`. For convenience, you can copy the service account Email from this screen and use it to grant it the necessary permissions in Google Workspace.
+In openZro, click `Continue →`. For convenience, you can copy the service account Email from this screen and use it to grant it the necessary permissions in Google Workspace.
 
-![NetBird Assign Service Account](/docs-static/img/manage/team/idp-sync/google-workspace-sync/jhgTfsk.png)
+![openZro Assign Service Account](/docs-static/img/manage/team/idp-sync/google-workspace-sync/jhgTfsk.png)
 
 Then, in Google Workspace, click on `Assign service accounts` as shown below:
 
@@ -228,15 +228,15 @@ Paste the service account Email address and click the `ADD` button.
 
 ![Google Workspace Add Service Account](/docs-static/img/manage/team/idp-sync/google-workspace-sync/ZYSw3KZ.png)
 
-Verify the Email and click `ASSIGN ROLE` to grant the role `User and Group Management ReadOnly` to the `NetBird` service account.
+Verify the Email and click `ASSIGN ROLE` to grant the role `User and Group Management ReadOnly` to the `openZro` service account.
 
 ![Google Workspace Assign Role](/docs-static/img/manage/team/idp-sync/google-workspace-sync/rPYNLz1.png)
 
 ## Entering Customer ID
 
-Go back to NetBird and click `Continue →`. The next screen will prompt you to enter your Google Workspace Customer ID.
+Go back to openZro and click `Continue →`. The next screen will prompt you to enter your Google Workspace Customer ID.
 
-![NetBird Enter Customer ID](/docs-static/img/manage/team/idp-sync/google-workspace-sync/q6tuStz.png)
+![openZro Enter Customer ID](/docs-static/img/manage/team/idp-sync/google-workspace-sync/q6tuStz.png)
 
 To get your customer ID, navigate to [Account Settings](https://admin.google.com/ac/accountsettings/profile?hl=en_US) and copy the corresponding ID.
 
@@ -244,21 +244,21 @@ To get your customer ID, navigate to [Account Settings](https://admin.google.com
 
 ## Synchronizing Google Workspace Groups and Users
 
-Return to NetBird. The next two screens allow you to select which Google Workspace groups and users you want to synchronize. By default, NetBird synchronizes all groups and users. If you're okay with syncing everything, click `Continue` on both screens.
+Return to openZro. The next two screens allow you to select which Google Workspace groups and users you want to synchronize. By default, openZro synchronizes all groups and users. If you're okay with syncing everything, click `Continue` on both screens.
 
-![NetBird Groups Sync](/docs-static/img/manage/team/idp-sync/google-workspace-sync/gAgKeL0.png)
+![openZro Groups Sync](/docs-static/img/manage/team/idp-sync/google-workspace-sync/gAgKeL0.png)
 
 You can also click on `+ Add group (or user group) filter` to change this settings as you see fit. To finish the integration process, click the `Connect` button.
 
-![NetBird Users Sync](/docs-static/img/manage/team/idp-sync/google-workspace-sync/6Huo7vW.png)
+![openZro Users Sync](/docs-static/img/manage/team/idp-sync/google-workspace-sync/6Huo7vW.png)
 
 The next screen, should be similar the following one, verifying that the integration was successful:
 
-![NetBird Google Workspace Enabled](/docs-static/img/manage/team/idp-sync/google-workspace-sync/EkPJqpJ.png)
+![openZro Google Workspace Enabled](/docs-static/img/manage/team/idp-sync/google-workspace-sync/EkPJqpJ.png)
 
 To verify the integration is working correctly, you can also navigate to `Team` > `Users`. Here, you should see your synchronized Google Workspace users listed.
 
-![NetBird Users](/docs-static/img/manage/team/idp-sync/google-workspace-sync/5AcaIqW.png)
+![openZro Users](/docs-static/img/manage/team/idp-sync/google-workspace-sync/5AcaIqW.png)
 
 The users should be the same listed in Google Workspace Admin console:
 

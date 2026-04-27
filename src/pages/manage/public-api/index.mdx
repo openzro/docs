@@ -1,26 +1,26 @@
 
-# Use service users and tokens to access NetBird's public API   
+# Use service users and tokens to access openZro's public API   
 
 ## Service Users
 
-Service users are non-interactive accounts that are used to create tokens to access resources and perform actions within your organization's network using [NetBird's public API](/api).
+Service users are non-interactive accounts that are used to create tokens to access resources and perform actions within your organization's network using [openZro's public API](/api).
 
 Service users provide additional security by allowing you to limit the scope of access granted to the service user and void losing automated access to critical systems when employees leave the company.
 
-### What can you use NetBird service users and access tokens for? 
+### What can you use openZro service users and access tokens for? 
 
 
-Most network management operations administrators do in the [NetBird Dashboard](https://app.netbird.io) can also be done via NetBird API using service users' access tokens.
+Most network management operations administrators do in the [openZro Dashboard](https://app.openzro.io) can also be done via openZro API using service users' access tokens.
 
 The most common usage scenarios:
 
-- **Automated scripts**: if you need to run automated scripts or infrastructure as code tools like Ansible or Terraform that configure your NetBird network.
-- **Third-party integrations**: if you want to integrate NetBird with a third-party service, you can use a service user to provide access to your data without giving the third-party service access to your personal account.
-- **Command-line tools**: if you use command-line tools like cUrl to interact with your NetBird network.
+- **Automated scripts**: if you need to run automated scripts or infrastructure as code tools like Ansible or Terraform that configure your openZro network.
+- **Third-party integrations**: if you want to integrate openZro with a third-party service, you can use a service user to provide access to your data without giving the third-party service access to your personal account.
+- **Command-line tools**: if you use command-line tools like cUrl to interact with your openZro network.
 
 ### Creating a service user
 
-To create a service user, you'll need to log in to your organization's account at https://app.netbird.io and navigate to the "Team" -> "Service Users" section of your account.
+To create a service user, you'll need to log in to your organization's account at https://app.openzro.io and navigate to the "Team" -> "Service Users" section of your account.
 <p>
     <img src="/docs-static/img/manage/public-api/service-user-overview.png" alt="service-user-overview" className="imagewrapper-big"/>
 </p>
@@ -51,7 +51,7 @@ From there, you can create a new token and specify expiration for the token. You
 </p>
 
 After the token was generated successfully you will see a plain version of your token to copy and store in a secure place.
-Be aware that once you close the popup it is impossible to see the plain version of the token again as NetBird only stores a hashed version of the token.
+Be aware that once you close the popup it is impossible to see the plain version of the token again as openZro only stores a hashed version of the token.
 
 <p>
     <img src="/docs-static/img/manage/public-api/personal-access-token-example.png" alt="personal-access-token-example" width="400" className="imagewrapper"/>
@@ -63,17 +63,17 @@ Be aware that once you close the popup it is impossible to see the plain version
 
 ### Using access tokens
 
-Once you have created an access token, you can use it to authenticate API requests to NetBird. See [NetBird API](/api/introduction) documentation for detailed usage.
+Once you have created an access token, you can use it to authenticate API requests to openZro. See [openZro API](/api/introduction) documentation for detailed usage.
 
 <Note>
-    For the cloud solution we are limiting the usage to 120 requests per minute with burst of 1200 requests. If your workload requires more requests, please contact us at [support@netbird.io](mailto:support@netbird.io).
+    For the cloud solution we are limiting the usage to 120 requests per minute with burst of 1200 requests. If your workload requires more requests, please contact us at [support@openzro.io](mailto:support@openzro.io).
 </Note>
 
 For example, if you were using the API, you might include your personal access token like this:
 
 ```bash {{ title: 'Example request with personal access token' }}
-curl https://api.netbird.io/api/users \
+curl https://api.openzro.io/api/users \
   -H "Authorization: Token {token}"
 ```
 
-With this header included, the NetBird API would authenticate your request using your personal access token and grant you access to the resources that your user has been authorized to.
+With this header included, the openZro API would authenticate your request using your personal access token and grant you access to the resources that your user has been authorized to.

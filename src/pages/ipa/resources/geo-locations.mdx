@@ -12,7 +12,7 @@ export const title = 'Geo Locations'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/locations/countries">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/locations/countries \
+curl -X GET https://api.openzro.io/api/locations/countries \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -43,7 +43,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/locations/countries"
+url = "https://api.openzro.io/api/locations/countries"
 
 headers = {     
   'Accept': 'application/json',
@@ -67,7 +67,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/locations/countries"
+  url := "https://api.openzro.io/api/locations/countries"
   method := "GET"
   
   client := &http.Client {
@@ -103,7 +103,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/locations/countries")
+url = URI("https://api.openzro.io/api/locations/countries")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -121,7 +121,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/locations/countries")
+  .url("https://api.openzro.io/api/locations/countries")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -135,7 +135,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/locations/countries',
+  CURLOPT_URL => 'https://api.openzro.io/api/locations/countries',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -196,7 +196,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/locations/countries/{country}/cities">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/locations/countries/{country}/cities \
+curl -X GET https://api.openzro.io/api/locations/countries/{country}/cities \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -227,7 +227,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/locations/countries/{country}/cities"
+url = "https://api.openzro.io/api/locations/countries/{country}/cities"
 
 headers = {     
   'Accept': 'application/json',
@@ -251,7 +251,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/locations/countries/{country}/cities"
+  url := "https://api.openzro.io/api/locations/countries/{country}/cities"
   method := "GET"
   
   client := &http.Client {
@@ -287,7 +287,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/locations/countries/{country}/cities")
+url = URI("https://api.openzro.io/api/locations/countries/{country}/cities")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -305,7 +305,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/locations/countries/{country}/cities")
+  .url("https://api.openzro.io/api/locations/countries/{country}/cities")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -319,7 +319,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/locations/countries/{country}/cities',
+  CURLOPT_URL => 'https://api.openzro.io/api/locations/countries/{country}/cities',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

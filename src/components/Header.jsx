@@ -63,11 +63,11 @@ export const Header = forwardRef(function Header({ className }, ref) {
       <div className="flex items-center gap-3 xl:gap-2">
         <nav className="hidden md:block">
           <ul role="list" className="flex items-center gap-3 xl:gap-2 m-0 p-0 list-none">
-            <TopLevelNavItem href="https://netbird.io/">Home</TopLevelNavItem>
+            <TopLevelNavItem href="https://openzro.io/">Home</TopLevelNavItem>
             <TopLevelNavItem href="/">Docs</TopLevelNavItem>
             <TopLevelNavItem href="/api">API</TopLevelNavItem>
-            <TopLevelNavItem href="https://netbird.io/knowledge-hub/">Learn</TopLevelNavItem>
-            <TopLevelNavItem href="https://github.com/netbirdio/netbird">Github</TopLevelNavItem>
+            <TopLevelNavItem href="https://openzro.io/knowledge-hub/">Learn</TopLevelNavItem>
+            <TopLevelNavItem href="https://github.com/openzro/openzro">Github</TopLevelNavItem>
             <TopLevelNavItem href="/slack-url">Support</TopLevelNavItem>
           </ul>
         </nav>
@@ -77,7 +77,7 @@ export const Header = forwardRef(function Header({ className }, ref) {
           <ModeToggle />
         </div>
         <div className="hidden min-[416px]:contents">
-          <Button href="https://app.netbird.io/" target="_blank" className="!py-1.5 !px-3 text-xs">Try NetBird</Button>
+          <Button href="https://app.openzro.io/" target="_blank" className="!py-1.5 !px-3 text-xs">Try openZro</Button>
         </div>
       </div>
     </motion.div>

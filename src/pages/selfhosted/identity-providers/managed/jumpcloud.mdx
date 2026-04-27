@@ -1,16 +1,16 @@
 import {Note} from "@/components/mdx";
 
-# JumpCloud SSO with NetBird Self-Hosted
+# JumpCloud SSO with openZro Self-Hosted
 
 [JumpCloud](https://jumpcloud.com/) is a cloud-based directory platform that provides identity, access, and device management. It offers single sign-on (SSO), multi-factor authentication (MFA), and centralized user management.
 
 ## Management Setup (Recommended)
 
-Add JumpCloud as an external IdP directly in the NetBird Management Dashboard. This is the simplest approach and recommended for most deployments.
+Add JumpCloud as an external IdP directly in the openZro Management Dashboard. This is the simplest approach and recommended for most deployments.
 
 ### Prerequisites
 
-- NetBird self-hosted with embedded IdP enabled
+- openZro self-hosted with embedded IdP enabled
 - JumpCloud account with admin permissions
 
 ### Step 1: Start Creating OIDC Application in JumpCloud
@@ -35,27 +35,27 @@ Add JumpCloud as an external IdP directly in the NetBird Management Dashboard. T
 </p>
 
 6. Click **Next**
-7. Enter **Display Label**: `NetBird`
+7. Enter **Display Label**: `openZro`
 8. Click **Next**
 9. Review and click **Configure Application**
 10. On the **SSO** tab, configure:
-    - **Redirect URIs**: `https://<your-netbird-domain>/oauth2/callback` (you'll verify this matches exactly in Step 3)
+    - **Redirect URIs**: `https://<your-openzro-domain>/oauth2/callback` (you'll verify this matches exactly in Step 3)
     - **Client Authentication Type**: `Client Secret POST`
-    - **Login URL**: `https://<your-netbird-domain>/` 
+    - **Login URL**: `https://<your-openzro-domain>/` 
 11. Under **Attribute Mapping**, enable:
     - **Email** scope
     - **Profile** scope
 12. Click **Save** to save the SSO configuration
-13. Click the **User Groups** tab and select at least one user group that can access NetBird
+13. Click the **User Groups** tab and select at least one user group that can access openZro
 14. **Don't click Activate yet** — keep this tab open and proceed to Step 2
 
 <Note>
 Sometimes, the JumpCloud application configuration will add duplicate attributes, like `email` and `email_verified`. Remove any duplicates if they appear.
 </Note>
 
-### Step 2: Get Redirect URL from NetBird
+### Step 2: Get Redirect URL from openZro
 
-1. Open a new tab or window and log in to your NetBird Dashboard
+1. Open a new tab or window and log in to your openZro Dashboard
 2. Navigate to **Settings** → **Identity Providers**
 3. Click **Add Identity Provider**
 4. Fill in the fields:
@@ -72,7 +72,7 @@ Sometimes, the JumpCloud application configuration will add duplicate attributes
 **Important:** The Issuer must be exactly `https://oauth.id.jumpcloud.com/` (with trailing slash) to match what JumpCloud returns. If you enter it without the trailing slash, the connector will fail to initialize.
 </Note>
 
-5. **Copy the Redirect URL** that NetBird displays (but don't click **Add Provider** yet)
+5. **Copy the Redirect URL** that openZro displays (but don't click **Add Provider** yet)
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/jumpcloud/4_copy-redirect.png" alt="Copy redirect URL" className="imagewrapper-big"/>
@@ -82,7 +82,7 @@ Sometimes, the JumpCloud application configuration will add duplicate attributes
 
 1. Return to the JumpCloud tab
 2. Click the **SSO** tab
-3. Under **Redirect URIs**, verify the redirect URL matches the exact URL you copied from NetBird (e.g., `https://netbird.hopkins.sh/oauth2/callback`). If it doesn't match exactly, update it to match.
+3. Under **Redirect URIs**, verify the redirect URL matches the exact URL you copied from openZro (e.g., `https://openzro.hopkins.sh/oauth2/callback`). If it doesn't match exactly, update it to match.
 4. Click **Save** (if you made any changes)
 
 <p>
@@ -96,9 +96,9 @@ Sometimes, the JumpCloud application configuration will add duplicate attributes
     <img src="/docs-static/img/selfhosted/identity-providers/managed/jumpcloud/6_client-ids.png" alt="Client IDs" className="imagewrapper-big"/>
 </p>
 
-### Step 4: Complete NetBird Setup
+### Step 4: Complete openZro Setup
 
-1. Return to the NetBird tab
+1. Return to the openZro tab
 2. Fill in the **Client ID** and **Client Secret** from Step 3
 
 <p>
@@ -109,19 +109,19 @@ Sometimes, the JumpCloud application configuration will add duplicate attributes
 
 ### Step 5: Test the Connection
 
-1. Log out of NetBird Dashboard
+1. Log out of openZro Dashboard
 2. On the login page, you should see a "JumpCloud" button
 3. Click it and authenticate with your JumpCloud credentials
-4. You should be redirected back to NetBird and logged in. Unless your user approval setting were changed you will need to log back into your local admin account to approve the user.
+4. You should be redirected back to openZro and logged in. Unless your user approval setting were changed you will need to log back into your local admin account to approve the user.
 
 ### Configuring JWT 'groups' Claim
 
-To sync JumpCloud groups with NetBird, you need to enable the group attribute in your JumpCloud OIDC application.
+To sync JumpCloud groups with openZro, you need to enable the group attribute in your JumpCloud OIDC application.
 
 #### Step 1: Enable Group Attributes in JumpCloud
 
 1. In [JumpCloud Admin Portal](https://console.jumpcloud.com/), go to **Access** → **SSO Applications**
-2. Select your NetBird application
+2. Select your openZro application
 3. Go to the **SSO** tab
 4. Under **Attribute Mapping**, find the **Group Attributes** section
 5. Check **Include group attribute**
@@ -134,15 +134,15 @@ To sync JumpCloud groups with NetBird, you need to enable the group attribute in
 
 #### Step 2: Assign User Groups to the Application
 
-1. In your NetBird application, go to the **User Groups** tab
-2. Select the groups whose members should have access to NetBird
+1. In your openZro application, go to the **User Groups** tab
+2. Select the groups whose members should have access to openZro
 3. Click **Save**
 
 Users will receive group claims based on which assigned groups they belong to.
 
-#### Step 3: Enable JWT Group Sync in NetBird
+#### Step 3: Enable JWT Group Sync in openZro
 
-1. In NetBird Dashboard, go to **Settings** → **Groups**
+1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to `groups`
 4. Optionally configure **JWT allow groups** to restrict access
@@ -155,11 +155,11 @@ Users will receive group claims based on which assigned groups they belong to.
 
 ## Standalone Setup (Advanced)
 
-Use JumpCloud as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced JumpCloud administrators as it also requires additional setup and ongoing maintenance.
+Use JumpCloud as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced JumpCloud administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
-For detailed instructions on the standalone setup, see the [JumpCloud SSO with NetBird Self-Hosted (Legacy)](/selfhosted/identity-providers/managed/advanced/jumpcloud) documentation.
+For detailed instructions on the standalone setup, see the [JumpCloud SSO with openZro Self-Hosted (Legacy)](/selfhosted/identity-providers/managed/advanced/jumpcloud) documentation.
 
 <Note>
 If you prefer to have full control over authentication, consider self-hosted alternatives like [PocketID](/selfhosted/identity-providers/pocketid).
@@ -173,9 +173,9 @@ If you prefer to have full control over authentication, consider self-hosted alt
 
 - Ensure **Attribute Mapping** has both **Email** and **Profile** scopes enabled
 - Verify at least one **User Group** is assigned to the application before activation
-- Check that **Redirect URIs** exactly matches the URL from NetBird (no trailing slashes)
+- Check that **Redirect URIs** exactly matches the URL from openZro (no trailing slashes)
 - Ensure **Client Authentication Type** is set to `Client Secret POST`
-- Verify **Login URL** matches your NetBird domain exactly
+- Verify **Login URL** matches your openZro domain exactly
 - Make sure the application is **Activated** and you have the correct **Client ID** and **Client Secret**
 - Remove any duplicate attributes in **Attribute Mapping** (e.g., `email` and `email_verified`)
 
@@ -185,10 +185,10 @@ If you prefer to have full control over authentication, consider self-hosted alt
 - Check for trailing slashes
 - Verify URLs match exactly
 
-### Users can't access NetBird
+### Users can't access openZro
 
 - Verify the user belongs to an assigned user group
-- Check that the user group is assigned to the NetBird application
+- Check that the user group is assigned to the openZro application
 
 ---
 

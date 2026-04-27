@@ -1,8 +1,8 @@
 import {Note} from "@/components/mdx";
 
-# Zitadel on NetBird Cloud
+# Zitadel on openZro Cloud
 
-You can use Zitadel as your Identity Provider with NetBird, but it will require some additional configuration steps. Zitadel is an open-source, API-first identity infrastructure platform built with multi-tenancy at its core. It provides single sign-on, passwordless authentication, role-based access control, and supports OpenID Connect, OAuth 2.0, and SAML.
+You can use Zitadel as your Identity Provider with openZro, but it will require some additional configuration steps. Zitadel is an open-source, API-first identity infrastructure platform built with multi-tenancy at its core. It provides single sign-on, passwordless authentication, role-based access control, and supports OpenID Connect, OAuth 2.0, and SAML.
 
 <Note>
     Support for OIDC-compliant IdPs is available on the Team plan and higher.
@@ -15,7 +15,7 @@ You can use Zitadel as your Identity Provider with NetBird, but it will require 
     This step is optional. You can skip it and create the application directly in an existing project.
 </Note>
 
-Log in to your Zitadel console at `https://<your-instance>.zitadel.cloud`. Navigate to **Projects** and click **+ Create New Project**. Enter `NetBird` as the project name and click **Continue**.
+Log in to your Zitadel console at `https://<your-instance>.zitadel.cloud`. Navigate to **Projects** and click **+ Create New Project**. Enter `openZro` as the project name and click **Continue**.
 
 <p>
     <img src="/docs-static/img/manage/team/single-sign-on/zitadel-idp/create-project.png" alt="zitadel-create-project" className="imagewrapper-big"/>
@@ -30,7 +30,7 @@ You should see the project dashboard once the project is created.
 ## Step 2: Create a New Application
 
 Inside your project, click **+ New** to create a new application. Configure the following:
-- **Name**: `NetBird`
+- **Name**: `openZro`
 - **Type**: `Web`
 
 <p>
@@ -52,8 +52,8 @@ Click **Continue**.
 ## Step 4: Configure Redirect URIs
 
 Set the following redirect settings:
-- **Redirect URIs**: `https://login.netbird.io/login/callback`
-- **Post Logout URIs**: `https://app.netbird.io`
+- **Redirect URIs**: `https://login.openzro.io/login/callback`
+- **Post Logout URIs**: `https://app.openzro.io`
 
 <p>
     <img src="/docs-static/img/manage/team/single-sign-on/zitadel-idp/redirect-uris.png" alt="zitadel-redirect-uris" className="imagewrapper-big"/>
@@ -73,9 +73,9 @@ After creation, Zitadel displays the **Client ID** and **Client Secret**. Copy a
     <img src="/docs-static/img/manage/team/single-sign-on/zitadel-idp/client-credentials.png" alt="zitadel-client-credentials" className="imagewrapper-big"/>
 </p>
 
-## Step 6: Share Configuration with NetBird
+## Step 6: Share Configuration with openZro
 
-Send the following information to the NetBird support team at support@netbird.io:
+Send the following information to the openZro support team at support@openzro.io:
 
 - **Client ID**
 - **Client Secret**

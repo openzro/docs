@@ -2,18 +2,18 @@ import { Tiles } from '@/components/Tiles'
 
 # Site-to-Site Connectivity
 
-Site-to-site connectivity allows you to connect entire networks together, enabling devices to communicate across locations without installing the NetBird client on every device.
+Site-to-site connectivity allows you to connect entire networks together, enabling devices to communicate across locations without installing the openZro client on every device.
 
 ## Understanding Remote Access Scenarios
 
-NetBird supports three distinct remote access scenarios. Understanding which one you need is the first step to a successful setup.
+openZro supports three distinct remote access scenarios. Understanding which one you need is the first step to a successful setup.
 
 ### VPN-to-Site
 
-A NetBird peer (device running the NetBird client) accesses devices on a remote network that don't have NetBird installed.
+A openZro peer (device running the openZro client) accesses devices on a remote network that don't have openZro installed.
 
 ```
-Your Laptop ──────► NetBird Tunnel ──────► Routing Peer ──────► Office Printer
+Your Laptop ──────► openZro Tunnel ──────► Routing Peer ──────► Office Printer
   (peer)                                    (peer)              (clientless)
 ```
 
@@ -26,10 +26,10 @@ Your Laptop ──────► NetBird Tunnel ──────► Routing P
 
 ### Site-to-VPN
 
-A device without NetBird initiates connections to NetBird peers. This is the reverse of VPN-to-Site—the clientless device starts the connection.
+A device without openZro initiates connections to openZro peers. This is the reverse of VPN-to-Site—the clientless device starts the connection.
 
 ```
-Office Server ──────► Routing Peer ──────► NetBird Tunnel ──────► Your Laptop
+Office Server ──────► Routing Peer ──────► openZro Tunnel ──────► Your Laptop
  (clientless)           (peer)                                      (peer)
 ```
 
@@ -42,10 +42,10 @@ Office Server ──────► Routing Peer ──────► NetBird T
 
 ### Site-to-Site
 
-Devices on separate networks communicate with each other, with neither running NetBird directly. Each network has a routing peer that handles traffic.
+Devices on separate networks communicate with each other, with neither running openZro directly. Each network has a routing peer that handles traffic.
 
 ```
-Home NAS ──► Routing Peer ──► NetBird Tunnel ──► Routing Peer ──► Office Server
+Home NAS ──► Routing Peer ──► openZro Tunnel ──► Routing Peer ──► Office Server
 (clientless)    (peer)                              (peer)         (clientless)
 ```
 
@@ -61,7 +61,7 @@ Home NAS ──► Routing Peer ──► NetBird Tunnel ──► Routing Peer 
 Exit nodes route all internet-bound traffic (`0.0.0.0/0`) through a designated peer, changing your apparent public IP address. Unlike the scenarios above, exit nodes handle internet egress rather than private network access.
 
 ```
-Your Laptop ──────► NetBird Tunnel ──────► Exit Node ──────► Internet
+Your Laptop ──────► openZro Tunnel ──────► Exit Node ──────► Internet
   (peer)                                     (peer)
 ```
 
@@ -86,10 +86,10 @@ Your Laptop ──────► NetBird Tunnel ──────► Exit Node
 
 ## How It Works
 
-All scenarios use a routing peer—a device running NetBird that forwards traffic for its local network:
+All scenarios use a routing peer—a device running openZro that forwards traffic for its local network:
 
-1. **Deploy a routing peer** at each site (any device running NetBird with access to the local network)
-2. **Configure routing** to advertise each site's subnet through NetBird
+1. **Deploy a routing peer** at each site (any device running openZro with access to the local network)
+2. **Configure routing** to advertise each site's subnet through openZro
 3. **Set access policies** to control which peers can reach which networks
 4. **Configure clientless devices** to route traffic through the routing peer (for Site-to-VPN and Site-to-Site)
 
@@ -144,13 +144,13 @@ All scenarios use a routing peer—a device running NetBird that forwards traffi
 
 | Term | Description |
 |------|-------------|
-| Routing peer | A device running NetBird that forwards traffic for its local network |
-| Clientless device | A device that doesn't run NetBird (printers, IoT, legacy systems) |
+| Routing peer | A device running openZro that forwards traffic for its local network |
+| Clientless device | A device that doesn't run openZro (printers, IoT, legacy systems) |
 | Masquerade | NAT that hides source IPs behind the routing peer's IP (simplifies routing configuration on clientless devices) |
 
 ## Networks vs Network Routes
 
-NetBird offers two features for routing traffic to private networks: [Networks](/manage/networks) (newer, simpler) and [Network Routes](/manage/network-routes) (original, more flexible). Both are fully supported and will continue to be maintained.
+openZro offers two features for routing traffic to private networks: [Networks](/manage/networks) (newer, simpler) and [Network Routes](/manage/network-routes) (original, more flexible). Both are fully supported and will continue to be maintained.
 
 **Use Networks** for VPN-to-Site scenarios where you want a guided setup experience and per-resource access policies.
 

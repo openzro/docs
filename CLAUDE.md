@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Documentation website for [NetBird](https://netbird.io), an open-source WireGuard-based Zero Trust Networking platform. Built with Next.js 16 (Pages Router), React 19, MDX, and Tailwind CSS 3.
+Documentation website for [openZro](https://openzro.io), an open-source WireGuard-based Zero Trust Networking platform. Built with Next.js 16 (Pages Router), React 19, MDX, and Tailwind CSS 3.
 
 There is no test suite in this project. Validate changes with `npm run build`.
 
@@ -15,7 +15,7 @@ npm install          # Install dependencies
 npm run dev          # Start dev server (also runs gen:llm)
 npm run build        # Production build (also runs gen:llm)
 npm run lint         # ESLint (next/core-web-vitals) on src/
-npm run gen          # Regenerate API docs from NetBird OpenAPI spec
+npm run gen          # Regenerate API docs from openZro OpenAPI spec
 npm run gen:llm      # Regenerate LLM-friendly markdown (auto-runs with dev/build)
 ```
 
@@ -23,7 +23,7 @@ npm run gen:llm      # Regenerate LLM-friendly markdown (auto-runs with dev/buil
 
 ### Content Structure
 Documentation pages are MDX files in `src/pages/` using the Next.js Pages Router (not App Router). Key directories:
-- `about-netbird/` - Conceptual docs
+- `about-openzro/` - Conceptual docs
 - `get-started/` - Installation and quickstart guides
 - `manage/` - Feature documentation (peers, networks, DNS, access control, etc.)
 - `selfhosted/` - Self-hosting deployment guides
@@ -50,7 +50,7 @@ Custom components available in MDX files (see `README.md` for full usage example
 - API docs: `<Properties>`, `<Property>`
 
 ### API Documentation Generator
-- `generator/` - TypeScript generator that creates MDX pages from the NetBird OpenAPI spec
+- `generator/` - TypeScript generator that creates MDX pages from the openZro OpenAPI spec
 - `generator/templates/ApiTemplate.ts` - Template for generated pages
 - Output: `src/pages/ipa/resources/` (don't edit these files manually)
 

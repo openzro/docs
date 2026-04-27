@@ -1,20 +1,20 @@
 import {Note} from "@/components/mdx";
 
-# Zitadel with NetBird Self-Hosted
+# Zitadel with openZro Self-Hosted
 
 [Zitadel](https://zitadel.com) is an open-source identity infrastructure platform designed for cloud-native environments. It provides multi-tenancy, customizable branding, passwordless authentication, and supports protocols like OpenID Connect, OAuth2, SAML2, and LDAP.
 
 <Note>
-Zitadel was previously used in the NetBird quickstart script. If you have an existing Zitadel deployment, you can continue using it as a standalone IdP or migrate to the embedded IdP with Zitadel as an external IdP directly in the NetBird Management Dashboard.
+Zitadel was previously used in the openZro quickstart script. If you have an existing Zitadel deployment, you can continue using it as a standalone IdP or migrate to the embedded IdP with Zitadel as an external IdP directly in the openZro Management Dashboard.
 </Note>
 
 ## Management Setup (Recommended)
 
-Add Zitadel as an external IdP directly in the NetBird Management Dashboard. This is the simplest approach for new deployments or when migrating from the previous quickstart.
+Add Zitadel as an external IdP directly in the openZro Management Dashboard. This is the simplest approach for new deployments or when migrating from the previous quickstart.
 
 ### Prerequisites
 
-- NetBird self-hosted with embedded IdP enabled
+- openZro self-hosted with embedded IdP enabled
 - Zitadel instance (cloud or self-hosted)
 
 ### Step 1: Create a Project in Zitadel
@@ -27,7 +27,7 @@ Add Zitadel as an external IdP directly in the NetBird Management Dashboard. Thi
 </p>
 
 3. Fill in the project details:
-   - **Name**: `NetBird` (or your preferred name)
+   - **Name**: `openZro` (or your preferred name)
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/zitadel/02_name-project-zitadel.png" alt="Name project" className="imagewrapper-big"/>
@@ -45,7 +45,7 @@ Add Zitadel as an external IdP directly in the NetBird Management Dashboard. Thi
 </p>
 
 3. Fill in:
-   - **Name**: `NetBird`
+   - **Name**: `openZro`
    - **Type**: `Web`
 
 <p>
@@ -62,9 +62,9 @@ Add Zitadel as an external IdP directly in the NetBird Management Dashboard. Thi
 
 6. **Don't click Create yet** — you'll add the redirect URI in Step 4
 
-### Step 3: Get Redirect URL from NetBird
+### Step 3: Get Redirect URL from openZro
 
-1. Open a new tab or window and log in to your NetBird Dashboard
+1. Open a new tab or window and log in to your openZro Dashboard
 2. Navigate to **Settings** → **Identity Providers**
 3. Click **Add Identity Provider**
 4. Fill in the fields (you can leave **Client ID and Secret** empty for now):
@@ -77,16 +77,16 @@ Add Zitadel as an external IdP directly in the NetBird Management Dashboard. Thi
 | Client ID | Leave empty for now |
 | Client Secret | Leave empty for now |
 
-5. NetBird will display a **Redirect URL** — **copy this URL** (but don't click **Save** yet)
+5. openZro will display a **Redirect URL** — **copy this URL** (but don't click **Save** yet)
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/zitadel/06_copy-callback-url-netbird-zitadel.png" alt="Copy callback URL from NetBird" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/zitadel/06_copy-callback-url-openzro-zitadel.png" alt="Copy callback URL from openZro" className="imagewrapper-big"/>
 </p>
 
 ### Step 4: Complete Application Configuration in Zitadel
 
 1. Return to the Zitadel Console tab
-2. In the redirect URIs field, paste the redirect URL you copied from NetBird
+2. In the redirect URIs field, paste the redirect URL you copied from openZro
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/zitadel/07_add_redirect-uri-zitadel.png" alt="Add redirect URI" className="imagewrapper-big"/>
@@ -104,20 +104,20 @@ Add Zitadel as an external IdP directly in the NetBird Management Dashboard. Thi
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/zitadel/09_copy-client-id-zitadel.png" alt="Copy Client ID" className="imagewrapper-big"/>
 </p>
 
-### Step 5: Complete NetBird Setup
+### Step 5: Complete openZro Setup
 
-1. Return to the NetBird tab
+1. Return to the openZro tab
 2. In the identity provider form, paste the **Client ID and Secret** you displayed in Step 4
 3. Click **Save**
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/zitadel/10_fill-netbird-config-zitadel.png" alt="Fill NetBird configuration" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/zitadel/10_fill-openzro-config-zitadel.png" alt="Fill openZro configuration" className="imagewrapper-big"/>
 </p>
 
 ### Step 6: Configure Token Settings in Zitadel
 
 1. Return to the Zitadel Console tab
-2. Navigate to your NetBird application → **Token Settings**
+2. Navigate to your openZro application → **Token Settings**
 3. Enable:
    - **Include user's profile info in the ID Token**
    - **User roles inside ID Token** (if group mapping is needed)
@@ -130,14 +130,14 @@ Add Zitadel as an external IdP directly in the NetBird Management Dashboard. Thi
 
 ### Step 7: Test the Connection
 
-1. Log out of NetBird Dashboard
+1. Log out of openZro Dashboard
 2. On the login page, you should see a "Zitadel" button
 3. Click it and authenticate with your Zitadel credentials
-4. You should be redirected back to NetBird and logged in
+4. You should be redirected back to openZro and logged in
 
 ### Configuring JWT 'groups' Claim
 
-Zitadel uses **roles** instead of groups. By default, Zitadel's role claims use a nested JSON object format, but NetBird expects a flat array of strings. You'll need to create a Zitadel Action to transform roles into a `groups` claim.
+Zitadel uses **roles** instead of groups. By default, Zitadel's role claims use a nested JSON object format, but openZro expects a flat array of strings. You'll need to create a Zitadel Action to transform roles into a `groups` claim.
 
 #### Step 1: Create the Groups Action
 
@@ -190,9 +190,9 @@ function groupsClaim(ctx, api) {
 2. Navigate to **Roles** and create roles (e.g., `admin`, `developer`)
 3. Go to **Authorizations** and assign roles to users
 
-#### Step 4: Enable JWT Group Sync in NetBird
+#### Step 4: Enable JWT Group Sync in openZro
 
-1. In NetBird Dashboard, go to **Settings** → **Groups**
+1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to `groups`
 4. Optionally configure **JWT allow groups** to restrict access
@@ -205,11 +205,11 @@ The action transforms Zitadel's role structure into a flat array. If you need to
 
 ## Standalone Setup (Advanced)
 
-Use Zitadel as your primary identity provider instead of NetBird's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Zitadel administrators as it also requires additional setup and ongoing maintenance.
+Use Zitadel as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Zitadel administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into NetBird, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
-For detailed instructions on the standalone setup, see the [Zitadel SSO with NetBird Self-Hosted (Advanced)](/selfhosted/identity-providers/advanced/zitadel) documentation.
+For detailed instructions on the standalone setup, see the [Zitadel SSO with openZro Self-Hosted (Advanced)](/selfhosted/identity-providers/advanced/zitadel) documentation.
 
 <Note>
 If you prefer not to self-host, Zitadel offers a managed cloud option at [zitadel.com](https://zitadel.com/).
@@ -219,20 +219,20 @@ If you prefer not to self-host, Zitadel offers a managed cloud option at [zitade
 
 ## Migrating from Zitadel Quickstart
 
-If you deployed NetBird using the previous quickstart script with Zitadel:
+If you deployed openZro using the previous quickstart script with Zitadel:
 
 **Option A - Keep using Zitadel standalone**: Continue with your existing setup. No changes needed.
 
-**Option B - Add Zitadel as external IdP directly in NetBird Management Dashboard**:
-1. Deploy new NetBird version with embedded IdP
-2. Add your existing Zitadel as an external IdP directly in the NetBird Management Dashboard (follow Management Setup above)
+**Option B - Add Zitadel as external IdP directly in openZro Management Dashboard**:
+1. Deploy new openZro version with embedded IdP
+2. Add your existing Zitadel as an external IdP directly in the openZro Management Dashboard (follow Management Setup above)
 3. Users can continue logging in with Zitadel
 4. Optionally create local user accounts as fallback
 
 **Option C - Migrate fully to embedded IdP**:
 1. Export user list from Zitadel
-2. Deploy new NetBird version with embedded IdP
-3. Recreate users in NetBird Dashboard
+2. Deploy new openZro version with embedded IdP
+3. Recreate users in openZro Dashboard
 4. Decommission Zitadel when ready
 
 ---

@@ -3,14 +3,14 @@ import { Tiles } from '@/components/Tiles'
 
 # Network Routes
 
-Network Routes let you route traffic from NetBird peers to private networks without installing the NetBird agent on every device. A routing peer forwards packets between your NetBird mesh network and your internal networks (LANs, VPCs, data centers).
+Network Routes let you route traffic from openZro peers to private networks without installing the openZro agent on every device. A routing peer forwards packets between your openZro mesh network and your internal networks (LANs, VPCs, data centers).
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes.png" alt="Network Routes diagram" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes.png" alt="Network Routes diagram" className="imagewrapper-big"/>
 </p>
 
 <Note>
-Network Routes require NetBird [v0.9.0](https://github.com/netbirdio/netbird/releases) or later.
+Network Routes require openZro [v0.9.0](https://github.com/openzro/openzro/releases) or later.
 </Note>
 
 <Warning>
@@ -31,7 +31,7 @@ A **network identifier** is a name for the network you want to route. A **range*
 
 ### Routing Peer
 
-A routing peer is a NetBird device that forwards traffic between the NetBird network and a private network. It must have network access to the resources you want to reach.
+A routing peer is a openZro device that forwards traffic between the openZro network and a private network. It must have network access to the resources you want to reach.
 
 <Note>
 A network route grants access to the network behind the routing peer, not to the routing peer machine itself. If you need to reach services running on the routing peer, create a separate peer-to-peer [access control policy](/manage/access-control) that targets the routing peer's group as the destination.
@@ -39,13 +39,13 @@ A network route grants access to the network behind the routing peer, not to the
 
 ### Routing Group
 
-A routing group is a set of routing peers. Each peer in the group routes packets between your routed network and other NetBird peers. Using a routing group provides automatic high availability.
+A routing group is a set of routing peers. Each peer in the group routes packets between your routed network and other openZro peers. Using a routing group provides automatic high availability.
 
 ### Masquerade
 
 When enabled (the default), the routing peer performs NAT on forwarded traffic, hiding the original source IP. This simplifies setup by eliminating the need for return routes on the remote network.
 
-Disable masquerade when you need source IP visibility for auditing or compliance. In this case, you must configure a return route to your NetBird network in your external network infrastructure.
+Disable masquerade when you need source IP visibility for auditing or compliance. In this case, you must configure a return route to your openZro network in your external network infrastructure.
 
 ### Distribution Groups
 
@@ -78,13 +78,13 @@ Instead of specifying network ranges directly, you can use DNS routes. Add domai
 For example, route traffic to `website.com` or `api.website.com` through a specific machine by configuring DNS routes for these domains instead of specifying IP ranges.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-dns-routes.png" alt="DNS Routes diagram" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-dns-routes.png" alt="DNS Routes diagram" className="imagewrapper"/>
 </p>
 
 By default, DNS routes resolve every 60 seconds. Adjust this interval with the `--dns-router-interval` flag:
 
 ```bash
-netbird up --dns-router-interval 30s
+openzro up --dns-router-interval 30s
 ```
 
 The **Keep routes** option is enabled by default. When enabled, if a domain stops resolving to an IP address, the existing route remains (and new resolved addresses are added). When disabled, routes are replaced with newly resolved addresses only.
@@ -92,23 +92,23 @@ The **Keep routes** option is enabled by default. When enabled, if a domain stop
 This preserves connections during IP changes, such as DNS-based load balancing where long-running connections to a previous IP remain valid.
 
 <Note>
-DNS Routes require NetBird [v0.28.0](https://github.com/netbirdio/netbird/releases) or later. Wildcard domains are not supported.
+DNS Routes require openZro [v0.28.0](https://github.com/openzro/openzro/releases) or later. Wildcard domains are not supported.
 </Note>
 
 <Note>
-Starting with NetBird v0.59.0, the local DNS forwarder port changed from `5353` to `22054` to avoid collisions. The Management Service applies the new port only when all peers in the account run v0.59.0 or newer.
+Starting with openZro v0.59.0, the local DNS forwarder port changed from `5353` to `22054` to avoid collisions. The Management Service applies the new port only when all peers in the account run v0.59.0 or newer.
 </Note>
 
 ## Managing Network Routes
 
-A network route describes a network you want to connect with your NetBird peers. It includes an identifier, network range, routing peer or peer groups, and parameters for priority and masquerading.
+A network route describes a network you want to connect with your openZro peers. It includes an identifier, network range, routing peer or peer groups, and parameters for priority and masquerading.
 
 ### Creating a Network Route
 
 Access the **Network Routes** tab and click **Add Route**.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-add-button.png" alt="Add route button" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-add-button.png" alt="Add route button" className="imagewrapper-big"/>
 </p>
 
 Enter your route details. In this example:
@@ -120,13 +120,13 @@ Enter your route details. In this example:
 - **Distribution Groups:** `All`
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-create.png" alt="Create network route form" className="imagewrapper" width="70%"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-create.png" alt="Create network route form" className="imagewrapper" width="70%"/>
 </p>
 
 Click **Add Route** to save.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-saved-new.png" alt="Saved network route" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-saved-new.png" alt="Saved network route" className="imagewrapper-big"/>
 </p>
 
 Peers connected to your routing peer can now send traffic to your external network.
@@ -138,18 +138,18 @@ Select the **Peer group** tab when creating a route to use a peer group as your 
 Groups with multiple peers automatically provide [high availability](#high-availability).
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-groups-create.png" alt="Create route with peer group" className="imagewrapper" width="70%"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-groups-create.png" alt="Create route with peer group" className="imagewrapper" width="70%"/>
 </p>
 
 Click **Add Route** to save.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-groups-saved-new.png" alt="Saved route with peer group" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-groups-saved-new.png" alt="Saved route with peer group" className="imagewrapper-big"/>
 </p>
 
 ### Creating Highly Available Routes
 
-To avoid single points of failure, we recommend installing NetBird on every resource. When that is not feasible, use high availability mode to ensure reliable connections. Multiple NetBird peers can serve as routing peers for the same private network.
+To avoid single points of failure, we recommend installing openZro on every resource. When that is not feasible, use high availability mode to ensure reliable connections. Multiple openZro peers can serve as routing peers for the same private network.
 
 Enable high availability in two ways:
 
@@ -163,13 +163,13 @@ To add individual peers, click **Add Peer** in the High Availability column. Sel
 This example adds `aws-nb-europe-router-az-b` to the `aws-eu-central-1-vpc` route:
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-create-ha.png" alt="Add HA peer to route" className="imagewrapper" width="70%"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-create-ha.png" alt="Add HA peer to route" className="imagewrapper" width="70%"/>
 </p>
 
 Peers connected to either `aws-nb-europe-router-az-a` or `aws-nb-europe-router-az-b` now have highly available access to `172.31.0.0/16`.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-saved-new-ha.png" alt="Saved HA route" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-saved-new-ha.png" alt="Saved HA route" className="imagewrapper-big"/>
 </p>
 
 <Note>
@@ -185,17 +185,17 @@ Ensure access control rules allow connectivity between these peers and the routi
 In this example, peers in `berlin-office` use `aws-nb-europe-router-az-a` to access `aws-eu-central-1-vpc`, while peers in `london-office` use `aws-nb-europe-router-az-b`:
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-groups-attribution.png" alt="Group attribution for routes" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-groups-attribution.png" alt="Group attribution for routes" className="imagewrapper-big"/>
 </p>
 
 ### Routes Without Masquerading
 
-Disable masquerade when you need source IP transparency or want to manage routing on your external network. The routing peer forwards packets with the original NetBird peer IP intact.
+Disable masquerade when you need source IP transparency or want to manage routing on your external network. The routing peer forwards packets with the original openZro peer IP intact.
 
-This requires configuring your external network router with a return route to your NetBird network through the routing peer. Devices without the agent can then communicate with your NetBird peers.
+This requires configuring your external network router with a return route to your openZro network through the routing peer. Devices without the agent can then communicate with your openZro peers.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/netbird-network-routes-masquerading.png" alt="Routes without masquerading" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-masquerading.png" alt="Routes without masquerading" className="imagewrapper-big"/>
 </p>
 
 ## Network Routes Caveats
@@ -221,7 +221,7 @@ After creating an Access Policy granting only `ICMP` access from `Group A` to `G
 You might expect only ICMP traffic to work. However, all traffic to the routed network succeeds because Network Routes only require connectivity to the Routing Peer to activate:
 
 ```shell
-root@brys-vm-nbt-ubuntu-01:~# netbird networks ls
+root@brys-vm-nbt-ubuntu-01:~# openzro networks ls
 Available Networks:
 
   - ID: network-route-srvs-site
@@ -257,7 +257,7 @@ An HTTP-only policy grants access from `manual:client`:
 HTTP access works as expected:
 
 ```shell
-root@brys-vm-nbt-ubuntu-02:~# netbird networks ls
+root@brys-vm-nbt-ubuntu-02:~# openzro networks ls
 Available Networks:
 
   - ID: *.nb.test
@@ -266,7 +266,7 @@ Available Networks:
     Resolved IPs: -
 root@brys-vm-nbt-ubuntu-02:~# curl srv.nb.test/health; echo
 OK
-root@brys-vm-nbt-ubuntu-02:~# netbird networks ls
+root@brys-vm-nbt-ubuntu-02:~# openzro networks ls
 Available Networks:
 
   - ID: *.nb.test
@@ -339,10 +339,10 @@ To prevent permission overflow, use dedicated Routing Peers for Network Routes a
 
 ## Get started
 <p float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://netbird.io/pricing")}>Use NetBird</Button>
+    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
 </p>
 
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

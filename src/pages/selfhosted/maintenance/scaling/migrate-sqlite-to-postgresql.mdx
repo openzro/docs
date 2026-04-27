@@ -4,7 +4,7 @@ import {Note, Warning} from "@/components/mdx";
 
 This guide is part of the [Splitting Your Self-Hosted Deployment](/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment) guide. It covers migrating your Management server database from SQLite to PostgreSQL.
 
-The default NetBird deployment uses SQLite, which stores all data in a single file. This works well for smaller setups, but you may want to migrate to PostgreSQL if:
+The default openZro deployment uses SQLite, which stores all data in a single file. This works well for smaller setups, but you may want to migrate to PostgreSQL if:
 - You want the database on a separate, dedicated machine
 - You need better concurrency handling for larger deployments
 - You prefer the operational tooling and backup options that PostgreSQL provides
@@ -35,7 +35,7 @@ Before migrating, create a backup of your SQLite database:
 
 ```bash
 mkdir backup
-docker compose cp -a netbird-server:/var/lib/netbird/. backup/
+docker compose cp -a openzro-server:/var/lib/openzro/. backup/
 ```
 
 ## Install pgloader
@@ -101,7 +101,7 @@ server:
 Alternatively, you can pass the connection string as an environment variable instead of putting it in the config file:
 
 ```yaml
-  netbird-server:
+  openzro-server:
     environment:
       - NETBIRD_STORE_ENGINE_POSTGRES_DSN=host=postgres-server user=postgres password=password dbname=postgres port=5432
 ```
@@ -115,7 +115,7 @@ docker compose up -d
 Check the logs to confirm PostgreSQL is being used:
 
 ```bash
-docker compose logs netbird-server | grep store
+docker compose logs openzro-server | grep store
 ```
 
 You should see:
@@ -130,7 +130,7 @@ The embedded identity provider (Dex) uses a separate SQLite database (`idp.db`) 
 ### Create the Auth Database
 
 ```bash
-docker exec postgres-server psql -U postgres -c "CREATE DATABASE netbird_auth;"
+docker exec postgres-server psql -U postgres -c "CREATE DATABASE openzro_auth;"
 ```
 
 ### Create the Auth Migration File
@@ -140,7 +140,7 @@ Create a file called `auth-sqlite.load` with the following content:
 ```
 LOAD DATABASE
      FROM sqlite:///root/combined/backup/idp.db
-     INTO postgresql://postgres:password@localhost:5432/netbird_auth
+     INTO postgresql://postgres:password@localhost:5432/openzro_auth
 
 WITH include drop, create tables, create indexes, reset sequences
 
@@ -174,7 +174,7 @@ server:
 
   authStore:
     engine: "postgres"
-    dsn: "host=postgres-server port=5432 user=postgres password=password dbname=netbird_auth sslmode=disable"
+    dsn: "host=postgres-server port=5432 user=postgres password=password dbname=openzro_auth sslmode=disable"
 ```
 
 ### Restart and Verify
@@ -190,7 +190,7 @@ The activity events store uses a separate SQLite database (`events.db`) to recor
 ### Create the Activity Database
 
 ```bash
-docker exec postgres-server psql -U postgres -c "CREATE DATABASE netbird_events;"
+docker exec postgres-server psql -U postgres -c "CREATE DATABASE openzro_events;"
 ```
 
 ### Create the Activity Migration File
@@ -200,7 +200,7 @@ Create a file called `activity-sqlite.load` with the following content:
 ```
 LOAD DATABASE
      FROM sqlite:///root/combined/backup/events.db
-     INTO postgresql://postgres:password@localhost:5432/netbird_events
+     INTO postgresql://postgres:password@localhost:5432/openzro_events
 
 WITH include drop, create tables, create indexes, reset sequences
 ;
@@ -228,7 +228,7 @@ server:
 
   activityStore:
     engine: "postgres"
-    dsn: "host=postgres-server port=5432 user=postgres password=password dbname=netbird_events sslmode=disable"
+    dsn: "host=postgres-server port=5432 user=postgres password=password dbname=openzro_events sslmode=disable"
 ```
 
 ### Restart and Verify

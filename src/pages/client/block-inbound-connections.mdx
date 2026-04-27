@@ -2,12 +2,12 @@ import {Note} from "@/components/mdx";
 
 # Block Inbound Connections
 
-The Block Inbound Connections setting prevents all inbound connections to the local machine and any networks it routes. When enabled, the NetBird client will drop all incoming peer traffic — including peer-to-peer connections, routed network traffic, and SSH — regardless of access control policies configured in the management service.
+The Block Inbound Connections setting prevents all inbound connections to the local machine and any networks it routes. When enabled, the openZro client will drop all incoming peer traffic — including peer-to-peer connections, routed network traffic, and SSH — regardless of access control policies configured in the management service.
 
 This is a client-side override that takes precedence over any policies received from the management service.
 
 <Note>
-    Available since NetBird <strong>v0.46.0</strong>.
+    Available since openZro <strong>v0.46.0</strong>.
 </Note>
 
 ## When to use it
@@ -22,7 +22,7 @@ When Block Inbound Connections is enabled, the client will not add any inbound f
 
 - **Peer connections**: Other peers cannot initiate connections to this machine.
 - **Routed network traffic**: If this peer acts as a routing peer, inbound traffic to its routed networks is also blocked.
-- **SSH access**: NetBird SSH connections to this peer are blocked.
+- **SSH access**: openZro SSH connections to this peer are blocked.
 
 <Note>
     This setting overrides all policies from the management service. Even if an access control policy explicitly allows traffic to this peer, inbound connections will still be blocked.
@@ -30,7 +30,7 @@ When Block Inbound Connections is enabled, the client will not add any inbound f
 
 ## Enabling via the system tray
 
-1. Click the NetBird icon in the system tray.
+1. Click the openZro icon in the system tray.
 2. Go to **Settings**.
 3. Click **Block Inbound Connections** to toggle the setting.
 
@@ -38,18 +38,18 @@ When enabled, a checkmark will appear next to the menu item.
 
 ## Enabling via the CLI
 
-You can enable Block Inbound Connections when starting the NetBird client:
+You can enable Block Inbound Connections when starting the openZro client:
 
 ```bash
-netbird up --block-inbound
+openzro up --block-inbound
 ```
 
 To disable it, run:
 
 ```bash
-netbird up --block-inbound=false
+openzro up --block-inbound=false
 ```
 
 <Note>
-    When toggling this setting via the CLI, the system tray UI may not reflect the change until the NetBird GUI is restarted.
+    When toggling this setting via the CLI, the system tray UI may not reflect the change until the openZro GUI is restarted.
 </Note>

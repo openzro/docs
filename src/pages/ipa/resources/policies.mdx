@@ -12,7 +12,7 @@ export const title = 'Policies'
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/policies">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/policies \
+curl -X GET https://api.openzro.io/api/policies \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -43,7 +43,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/policies"
+url = "https://api.openzro.io/api/policies"
 
 headers = {     
   'Accept': 'application/json',
@@ -67,7 +67,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/policies"
+  url := "https://api.openzro.io/api/policies"
   method := "GET"
   
   client := &http.Client {
@@ -103,7 +103,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/policies")
+url = URI("https://api.openzro.io/api/policies")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -121,7 +121,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/policies")
+  .url("https://api.openzro.io/api/policies")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -135,7 +135,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/policies',
+  CURLOPT_URL => 'https://api.openzro.io/api/policies',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -359,7 +359,7 @@ echo $response;
             Define if the rule is applicable in both directions, sources, and destinations.
         
         </Property>
-    <Property name="protocol" type="string" required={true} enumList={["all","tcp","udp","icmp","netbird-ssh"]}>
+    <Property name="protocol" type="string" required={true} enumList={["all","tcp","udp","icmp","openzro-ssh"]}>
         
             Policy rule type of the traffic
         
@@ -469,7 +469,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="POST" label="/api/policies">
 ```bash {{ title: 'cURL' }}
-curl -X POST https://api.netbird.io/api/policies \
+curl -X POST https://api.openzro.io/api/policies \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -600,7 +600,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/policies"
+url = "https://api.openzro.io/api/policies"
 payload = json.dumps({
   "name": "ch8i4ug6lnn4g9hqv7mg",
   "description": "This is a default policy that allows connections between all the resources",
@@ -673,7 +673,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/policies"
+  url := "https://api.openzro.io/api/policies"
   method := "POST"
   
   payload := strings.NewReader(`{
@@ -759,7 +759,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/policies")
+url = URI("https://api.openzro.io/api/policies")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -876,7 +876,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   ]
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/policies")
+  .url("https://api.openzro.io/api/policies")
   .method("POST", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -891,7 +891,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/policies',
+  CURLOPT_URL => 'https://api.openzro.io/api/policies',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1120,7 +1120,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="GET" label="/api/policies/{policyId}">
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.netbird.io/api/policies/{policyId} \
+curl -X GET https://api.openzro.io/api/policies/{policyId} \
 -H 'Accept: application/json' \
 -H 'Authorization: Token <TOKEN>' 
 ```
@@ -1151,7 +1151,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/policies/{policyId}"
+url = "https://api.openzro.io/api/policies/{policyId}"
 
 headers = {     
   'Accept': 'application/json',
@@ -1175,7 +1175,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/policies/{policyId}"
+  url := "https://api.openzro.io/api/policies/{policyId}"
   method := "GET"
   
   client := &http.Client {
@@ -1211,7 +1211,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/policies/{policyId}")
+url = URI("https://api.openzro.io/api/policies/{policyId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1229,7 +1229,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/policies/{policyId}")
+  .url("https://api.openzro.io/api/policies/{policyId}")
   .method("GET")    
   .addHeader("Accept", "application/json")
   .addHeader("Authorization: Token <TOKEN>")
@@ -1243,7 +1243,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/policies/{policyId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/policies/{policyId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -1471,7 +1471,7 @@ echo $response;
             Define if the rule is applicable in both directions, sources, and destinations.
         
         </Property>
-    <Property name="protocol" type="string" required={true} enumList={["all","tcp","udp","icmp","netbird-ssh"]}>
+    <Property name="protocol" type="string" required={true} enumList={["all","tcp","udp","icmp","openzro-ssh"]}>
         
             Policy rule type of the traffic
         
@@ -1581,7 +1581,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="PUT" label="/api/policies/{policyId}">
 ```bash {{ title: 'cURL' }}
-curl -X PUT https://api.netbird.io/api/policies/{policyId} \
+curl -X PUT https://api.openzro.io/api/policies/{policyId} \
 -H 'Accept: application/json' \
 -H 'Content-Type: application/json' \
 -H 'Authorization: Token <TOKEN>' \
@@ -1712,7 +1712,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/policies/{policyId}"
+url = "https://api.openzro.io/api/policies/{policyId}"
 payload = json.dumps({
   "name": "ch8i4ug6lnn4g9hqv7mg",
   "description": "This is a default policy that allows connections between all the resources",
@@ -1785,7 +1785,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/policies/{policyId}"
+  url := "https://api.openzro.io/api/policies/{policyId}"
   method := "PUT"
   
   payload := strings.NewReader(`{
@@ -1871,7 +1871,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/policies/{policyId}")
+url = URI("https://api.openzro.io/api/policies/{policyId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -1988,7 +1988,7 @@ RequestBody body = RequestBody.create(mediaType, '{
   ]
 }');
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/policies/{policyId}")
+  .url("https://api.openzro.io/api/policies/{policyId}")
   .method("PUT", body)  
   .addHeader("Content-Type", "application/json")  
   .addHeader("Accept", "application/json")
@@ -2003,7 +2003,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/policies/{policyId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/policies/{policyId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -2232,7 +2232,7 @@ echo $response;
   <Col sticky>
     <CodeGroup title="Request" tag="DELETE" label="/api/policies/{policyId}">
 ```bash {{ title: 'cURL' }}
-curl -X DELETE https://api.netbird.io/api/policies/{policyId} \
+curl -X DELETE https://api.openzro.io/api/policies/{policyId} \
 -H 'Authorization: Token <TOKEN>' 
 ```
 
@@ -2261,7 +2261,7 @@ axios(config)
 import requests
 import json
 
-url = "https://api.netbird.io/api/policies/{policyId}"
+url = "https://api.openzro.io/api/policies/{policyId}"
 
 headers = {     
   'Authorization': 'Token <TOKEN>'
@@ -2284,7 +2284,7 @@ import (
 
 func main() {
 
-  url := "https://api.netbird.io/api/policies/{policyId}"
+  url := "https://api.openzro.io/api/policies/{policyId}"
   method := "DELETE"
   
   client := &http.Client {
@@ -2319,7 +2319,7 @@ require "uri"
 require "json"
 require "net/http"
 
-url = URI("https://api.netbird.io/api/policies/{policyId}")
+url = URI("https://api.openzro.io/api/policies/{policyId}")
 
 https = Net::HTTP.new(url.host, url.port)
 https.use_ssl = true
@@ -2336,7 +2336,7 @@ OkHttpClient client = new OkHttpClient().newBuilder()
   .build();
 
 Request request = new Request.Builder()
-  .url("https://api.netbird.io/api/policies/{policyId}")
+  .url("https://api.openzro.io/api/policies/{policyId}")
   .method("DELETE")    
   .addHeader("Authorization: Token <TOKEN>")
   .build();
@@ -2349,7 +2349,7 @@ Response response = client.newCall(request).execute();
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'https://api.netbird.io/api/policies/{policyId}',
+  CURLOPT_URL => 'https://api.openzro.io/api/policies/{policyId}',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,

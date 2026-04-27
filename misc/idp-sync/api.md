@@ -9,10 +9,10 @@ Table of contents
 
 
 ## Introduction
-This reference provides detailed information on managing integrations via NetBird Cloud API.
+This reference provides detailed information on managing integrations via openZro Cloud API.
 
 ## Authentication
-Authentication is required for all API requests. Please refer to the [authentication guideline](https://docs.netbird.io/how-to/access-netbird-public-api) for how to create and authenticate API calls using Personal Access Tokens (PAT).
+Authentication is required for all API requests. Please refer to the [authentication guideline](https://docs.openzro.io/how-to/access-openzro-public-api) for how to create and authenticate API calls using Personal Access Tokens (PAT).
 
 ## Google Endpoints
 
@@ -20,7 +20,7 @@ Authentication is required for all API requests. Please refer to the [authentica
 By default, for new integration synchronization is enabled.
 
 Request:
-- `service_account_key`: A Base64 encoded string derived from a service account key JSON. For the creation of the service account key JSON, refer to the provided [IdP guideline](https://docs.netbird.io/how-to/idp-sync#google-work-space).
+- `service_account_key`: A Base64 encoded string derived from a service account key JSON. For the creation of the service account key JSON, refer to the provided [IdP guideline](https://docs.openzro.io/how-to/idp-sync#google-work-space).
 Encode service account JSON to base64 by using the command:
 ```shell
   base64 -i <SERVICE_ACCOUNT_KEY_PATH>
@@ -32,7 +32,7 @@ Encode service account JSON to base64 by using the command:
 
 ```shell
 curl --request POST \
-  --url https://api.netbird.io/api/integrations/google-idp \
+  --url https://api.openzro.io/api/integrations/google-idp \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>' \
   --header 'Content-Type: application/json' \
@@ -60,7 +60,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/google-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/google-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -81,7 +81,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/google-idp \
+  --url https://api.openzro.io/api/integrations/google-idp \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -104,7 +104,7 @@ Response
 Request
 ```shell
 curl --request POST \
-  --url https://api.netbird.io/api/integrations/google-idp/<ID>/sync \
+  --url https://api.openzro.io/api/integrations/google-idp/<ID>/sync \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -120,7 +120,7 @@ Response
 Updates the selected parameters for a specific integration.
 
 Request
-- `service_account_key`: Optional. A Base64 encoded string derived from a service account key JSON.For the creation of the service account key JSON, refer to the provided [IdP guideline](https://docs.netbird.io/how-to/idp-sync#google-work-space).
+- `service_account_key`: Optional. A Base64 encoded string derived from a service account key JSON.For the creation of the service account key JSON, refer to the provided [IdP guideline](https://docs.openzro.io/how-to/idp-sync#google-work-space).
   Encode service account JSON to base64 by using the command:
 ```shell
   base64 -i <SERVICE_ACCOUNT_KEY_PATH>
@@ -133,7 +133,7 @@ Request
 
 ```shell
 curl --request PUT \
-  --url https://api.netbird.io/api/integrations/google-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/google-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>' \
   --header 'Content-Type: application/json' \
@@ -162,7 +162,7 @@ Response
 Request
 ```shell
 curl --request DELETE \
-  --url https://api.netbird.io/api/integrations/google-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/google-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -175,7 +175,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/google-idp/<ID>/logs \
+  --url https://api.openzro.io/api/integrations/google-idp/<ID>/logs \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -193,7 +193,7 @@ Response
 
 
 ## Azure Endpoints
-Before proceeding with the setup, please ensure that you have configured Azure as per the guidelines outlined in the [IdP guideline](https://docs.netbird.io/how-to/idp-sync#azure-ad).
+Before proceeding with the setup, please ensure that you have configured Azure as per the guidelines outlined in the [IdP guideline](https://docs.openzro.io/how-to/idp-sync#azure-ad).
 
 ### Create Integration
 By default, for new integration synchronization is enabled.
@@ -213,7 +213,7 @@ Request:
 
 ```shell
 curl --request POST \
-  --url https://api.netbird.io/api/integrations/azure-idp \
+  --url https://api.openzro.io/api/integrations/azure-idp \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>' \
   --header 'Content-Type: application/json' \
@@ -241,7 +241,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/azure-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/azure-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -263,7 +263,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/azure-idp \
+  --url https://api.openzro.io/api/integrations/azure-idp \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -287,7 +287,7 @@ Response
 Request
 ```shell
 curl --request POST \
-  --url https://api.netbird.io/api/integrations/azure-idp/<ID>/sync \
+  --url https://api.openzro.io/api/integrations/azure-idp/<ID>/sync \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -317,7 +317,7 @@ Request
 
 ```shell
 curl --request PUT \
-  --url https://api.netbird.io/api/integrations/azure-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/azure-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>' \
   --header 'Content-Type: application/json' \
@@ -345,7 +345,7 @@ Response
 Request
 ```shell
 curl --request DELETE \
-  --url https://api.netbird.io/api/integrations/azure-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/azure-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -358,7 +358,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/azure-idp/<ID>/logs \
+  --url https://api.openzro.io/api/integrations/azure-idp/<ID>/logs \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -386,7 +386,7 @@ Request input:
 
 ```shell
 curl --request POST \
-  --url https://api.netbird.io/api/integrations/okta-scim-idp \
+  --url https://api.openzro.io/api/integrations/okta-scim-idp \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>' \
   --header 'Content-Type: application/json' \
@@ -415,7 +415,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/okta-scim-idp \
+  --url https://api.openzro.io/api/integrations/okta-scim-idp \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -437,7 +437,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/okta-scim-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/okta-scim-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -457,7 +457,7 @@ Response
 Request
 ```shell
 curl --request POST \
-  --url https://api.netbird.io/api/integrations/okta-scim-idp/<ID>/token \
+  --url https://api.openzro.io/api/integrations/okta-scim-idp/<ID>/token \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -484,7 +484,7 @@ Request
 
 ```shell
 curl --request PUT \
-  --url https://api.netbird.io/api/integrations/okta-scim-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/okta-scim-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>' \
   --header 'Content-Type: application/json' \
@@ -512,7 +512,7 @@ Response
 Request
 ```shell
 curl --request DELETE \
-  --url https://api.netbird.io/api/integrations/okta-scim-idp/<ID> \
+  --url https://api.openzro.io/api/integrations/okta-scim-idp/<ID> \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```
@@ -528,7 +528,7 @@ Response
 Request
 ```shell
 curl --request GET \
-  --url https://api.netbird.io/api/integrations/okta-scim-idp/<ID>/logs \
+  --url https://api.openzro.io/api/integrations/okta-scim-idp/<ID>/logs \
   --header 'Accept: application/json' \
   --header 'Authorization: Token <PAT>'
 ```

@@ -5,11 +5,11 @@
 device data including disk encryption status, software vulnerabilities, and policy compliance, which can be used to
 enforce network access controls based on device security posture.
 
-The integration of NetBird with FleetDM ensures only devices that are managed by Fleet and meet your defined compliance
+The integration of openZro with FleetDM ensures only devices that are managed by Fleet and meet your defined compliance
 policies can access the network. Administrators can enforce access restrictions based on criteria such as disk encryption,
 failing policies, vulnerable software, and specific policy requirements — blocking non-compliant devices automatically.
 
-In this guide, you'll learn how to integrate NetBird with FleetDM and configure compliance-based access controls for your network.
+In this guide, you'll learn how to integrate openZro with FleetDM and configure compliance-based access controls for your network.
 
 <Note>
     TLDR: Devices that fail to meet FleetDM compliance requirements (disk encryption, policy compliance, vulnerable software, etc.) will automatically lose network access. Once a device meets all criteria, access is restored.
@@ -28,8 +28,8 @@ Before you start creating and configuring a FleetDM integration, ensure that you
 - Go to **Settings** &raquo; **Users**
 - Click **Create user** and select **API-only user**
 - Fill in the form:
-  - **Name**: `NetBird Integration`
-  - **Email**: `netbird-integration@yourcompany.com`
+  - **Name**: `openZro Integration`
+  - **Email**: `openzro-integration@yourcompany.com`
   - **Role**: **Observer** (read-only access to hosts and policies)
 - Click **Create**
 - Generate an API token for this user
@@ -40,9 +40,9 @@ Before you start creating and configuring a FleetDM integration, ensure that you
 Keep the API token somewhere secure. You'll need it along with your server URL in the next step.
 </Note>
 
-## Configure a FleetDM Integration in NetBird
+## Configure a FleetDM Integration in openZro
 
-- Navigate to the [Integrations &raquo; EDR](https://app.netbird.io/integrations?tab=edr) tab in the NetBird dashboard
+- Navigate to the [Integrations &raquo; EDR](https://app.openzro.io/integrations?tab=edr) tab in the openZro dashboard
 - Click **Connect FleetDM** to start the configuration wizard
 
 - Click the **Get Started** button to initiate the integration process
@@ -64,7 +64,7 @@ Keep the API token somewhere secure. You'll need it along with your server URL i
   - **Disk Encryption**: Requires disk encryption (FileVault on macOS, BitLocker on Windows) to be enabled on the device.
   - **Online Status**: Requires the host to be online and recently seen by Fleet.
 
-- Configure the **FleetDM Sync Window** (default is 24 hours). This setting determines which devices NetBird will consider for network access based on their recent activity in FleetDM. Only devices that have been active and reporting to Fleet within this time window will be synchronized. These devices must then also meet the configured compliance criteria to gain network access.
+- Configure the **FleetDM Sync Window** (default is 24 hours). This setting determines which devices openZro will consider for network access based on their recent activity in FleetDM. Only devices that have been active and reporting to Fleet within this time window will be synchronized. These devices must then also meet the configured compliance criteria to gain network access.
 
 <Note>
     For example, if the sync window is set to 24 hours and a device hasn't synced with FleetDM for 27 hours, it will be blocked from the network even if it was previously marked as compliant.
@@ -77,7 +77,7 @@ Keep the API token somewhere secure. You'll need it along with your server URL i
   the network until they are registered in Fleet and satisfy all the specified security requirements.
 
 <Note>
-    NetBird matches FleetDM hosts to peers using the **hardware serial number** of the device. You must ensure that each of your devices has a unique serial number.
+    openZro matches FleetDM hosts to peers using the **hardware serial number** of the device. You must ensure that each of your devices has a unique serial number.
 </Note>
 
 ## Finding FleetDM Policy IDs
@@ -88,4 +88,4 @@ To use the **Required Policy IDs** compliance setting, you need to know the nume
 - Go to **Policies**
 - Click on a policy to view its details
 - The policy ID is visible in the URL (e.g., `https://fleet.yourcompany.com/policies/5` — the ID is `5`)
-- Enter the desired policy IDs as a comma-separated list in the NetBird compliance configuration
+- Enter the desired policy IDs as a comma-separated list in the openZro compliance configuration

@@ -1,11 +1,11 @@
 import {Note, Warning} from "@/components/mdx"
 
 export const description =
-    'Expose internal services to the public internet with automatic TLS, authentication, access restrictions, and traffic routing through the NetBird mesh network.'
+    'Expose internal services to the public internet with automatic TLS, authentication, access restrictions, and traffic routing through the openZro mesh network.'
 
 # Reverse Proxy
 
-NetBird Reverse Proxy lets you expose internal services running on peers or behind network resources to the public internet. NetBird handles TLS termination, optional authentication and access restrictions, and proxies incoming traffic through the NetBird mesh to reach the target service, all without opening ports or configuring firewalls on your internal machines.
+openZro Reverse Proxy lets you expose internal services running on peers or behind network resources to the public internet. openZro handles TLS termination, optional authentication and access restrictions, and proxies incoming traffic through the openZro mesh to reach the target service, all without opening ports or configuring firewalls on your internal machines.
 
 <Note>
     **Availability:** Reverse Proxy is currently in **beta**.
@@ -19,13 +19,13 @@ NetBird Reverse Proxy lets you expose internal services running on peers or behi
 
 ## How it works
 
-When you create a reverse proxy service, NetBird provisions a public domain with an automatic TLS certificate. Incoming traffic to that domain is received at the NetBird proxy cluster, then forwarded through an encrypted NetBird tunnel to the target peer or network resource running your application. The target service only needs to be reachable within your NetBird network: it does not need a public IP address or open ports.
+When you create a reverse proxy service, openZro provisions a public domain with an automatic TLS certificate. Incoming traffic to that domain is received at the openZro proxy cluster, then forwarded through an encrypted openZro tunnel to the target peer or network resource running your application. The target service only needs to be reachable within your openZro network: it does not need a public IP address or open ports.
 
 <p>
-    <img src="/docs-static/img/manage/reverse-proxy/reverse-proxy-diagram.png" alt="Reverse proxy traffic flow diagram showing User to Proxy Service (TLS) through WireGuard tunnel to either a NetBird Peer directly or via a Routing Peer to a Network Resource" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/reverse-proxy/reverse-proxy-diagram.png" alt="Reverse proxy traffic flow diagram showing User to Proxy Service (TLS) through WireGuard tunnel to either a openZro Peer directly or via a Routing Peer to a Network Resource" className="imagewrapper-big"/>
 </p>
 
-NetBird supports two categories of service:
+openZro supports two categories of service:
 
 - **HTTP services** operate at Layer 7. The proxy terminates TLS at the edge and forwards HTTP requests to your backend. This mode supports path-based routing, host header forwarding, redirect rewriting, and browser-based authentication (SSO, password, PIN).
 - **L4 services** (TCP, UDP, TLS) operate at Layer 4. The proxy forwards raw connections or datagrams directly to your backend without inspecting application-layer content. TLS mode performs SNI-based routing, passing the encrypted connection through to the backend without terminating it.
@@ -65,11 +65,11 @@ L4 services (TCP, UDP, TLS) listen on a dedicated port on the proxy cluster. Dep
 
 ### Targets
 
-A target defines where proxied traffic is sent within your NetBird network. Every target specifies a type and port. HTTP services additionally support path-based routing.
+A target defines where proxied traffic is sent within your openZro network. Every target specifies a type and port. HTTP services additionally support path-based routing.
 
 | Type | Description | How to select |
 |------|-------------|---------------|
-| **Peer** | A machine running the NetBird agent directly | Select from the peer list |
+| **Peer** | A machine running the openZro agent directly | Select from the peer list |
 | **Host** | A network resource identified by an IP address | Select from your network resources |
 | **Domain** | A network resource identified by a domain name | Select from your network resources |
 | **Subnet** | A network resource within a CIDR range | Select from your network resources, then specify an IP within the range |
@@ -91,15 +91,15 @@ L4 targets do not support path-based routing or HTTP/HTTPS protocol selection.
 
 ### Domains
 
-Every service needs a domain. The available domain types depend on whether you are using NetBird Cloud or a self-hosted deployment.
+Every service needs a domain. The available domain types depend on whether you are using openZro Cloud or a self-hosted deployment.
 
 **Cloud deployments** provide free domains in the format:
 
 ```
-{subdomain}.{nonce}.{cluster}.proxy.netbird.io
+{subdomain}.{nonce}.{cluster}.proxy.openzro.io
 ```
 
-For example: `myapp.abc123.eu.proxy.netbird.io` where `myapp` is your chosen subdomain, `abc123` is a nonce unique to your account, and `eu` is the proxy cluster region. These domains appear in the domain selector with a **Free** badge and are available immediately with no additional configuration.
+For example: `myapp.abc123.eu.proxy.openzro.io` where `myapp` is your chosen subdomain, `abc123` is a nonce unique to your account, and `eu` is the proxy cluster region. These domains appear in the domain selector with a **Free** badge and are available immediately with no additional configuration.
 
 **Self-hosted deployments** provide cluster domains in the format:
 
@@ -108,7 +108,7 @@ For example: `myapp.abc123.eu.proxy.netbird.io` where `myapp` is your chosen sub
 ```
 
 <Note>
-**DNS records for certificates on self-hosted:** For certificates to work properly, ensure you have the proper records set with your domain name registrar: an **A** record for your NetBird host (e.g. `netbird` → your server IP), plus **CNAME** records for `proxy` and `*.proxy` pointing to that host. See the [self-hosted quickstart](/selfhosted/selfhosted-quickstart#cname-record-for-proxy-domain) for the full table and setup.
+**DNS records for certificates on self-hosted:** For certificates to work properly, ensure you have the proper records set with your domain name registrar: an **A** record for your openZro host (e.g. `openzro` → your server IP), plus **CNAME** records for `proxy` and `*.proxy` pointing to that host. See the [self-hosted quickstart](/selfhosted/selfhosted-quickstart#cname-record-for-proxy-domain) for the full table and setup.
 </Note>
 
 For example: `myapp.proxy.mycompany.com` where `myapp` is your chosen subdomain and `proxy.mycompany.com` is the domain configured on your proxy instance(s) via the `NB_PROXY_DOMAIN` environment variable. These domains appear in the domain selector with a **Cluster** badge.
@@ -139,7 +139,7 @@ For detailed configuration instructions, see [Authentication](/manage/reverse-pr
 
 ### Service statuses
 
-After creating a service, it progresses through several statuses as NetBird provisions the domain and establishes connectivity:
+After creating a service, it progresses through several statuses as openZro provisions the domain and establishes connectivity:
 
 | Status | Meaning |
 |--------|---------|
@@ -152,10 +152,10 @@ After creating a service, it progresses through several statuses as NetBird prov
 
 ## Self-hosted proxy setup
 
-Self-hosted deployments require a separate NetBird proxy instance (`netbirdio/netbird-proxy`) that connects to your management server via gRPC and handles TLS termination and traffic forwarding for your reverse proxy services.
+Self-hosted deployments require a separate openZro proxy instance (`openzro/openzro-proxy`) that connects to your management server via gRPC and handles TLS termination and traffic forwarding for your reverse proxy services.
 
 <Note>
-**Already set up?** If you deployed NetBird using the setup script (`getting-started.sh`) starting from **v0.65.0** and selected the **built-in Traefik** option, the proxy container is already included in your Docker Compose stack. You can skip straight to [creating your first service](#quick-start).
+**Already set up?** If you deployed openZro using the setup script (`getting-started.sh`) starting from **v0.65.0** and selected the **built-in Traefik** option, the proxy container is already included in your Docker Compose stack. You can skip straight to [creating your first service](#quick-start).
 </Note>
 
 **Existing deployments** - If you have an existing self-hosted deployment and want to add the proxy, follow the [Enable Reverse Proxy migration guide](/selfhosted/migration/enable-reverse-proxy). It covers generating an access token, adding the proxy container with Traefik TLS passthrough labels, setting up wildcard DNS, and verifying the setup.
@@ -179,7 +179,7 @@ The default ACME challenge type (`tls-alpn-01`) validates domain ownership by re
 
 - **Port 443 must be publicly reachable** - Let's Encrypt connects to your server on port 443 to perform the challenge. If port 443 is blocked by a firewall or not forwarded correctly, certificate issuance will fail.
 - **No geo-blocking** - Let's Encrypt validates from multiple global locations simultaneously. If your firewall or CDN blocks requests from non-local IP ranges, some or all validation attempts will fail and the certificate will not be issued.
-- **ALPN protocol support** - If there is an additional proxy or load balancer in front of the NetBird proxy, it must support passing through the `acme-tls/1` ALPN protocol. Traefik and Caddy handle this natively through TLS passthrough. Nginx, Apache, and some CDN providers (such as Cloudflare) may strip or fail to negotiate the `acme-tls/1` protocol, causing the challenge to fail.
+- **ALPN protocol support** - If there is an additional proxy or load balancer in front of the openZro proxy, it must support passing through the `acme-tls/1` ALPN protocol. Traefik and Caddy handle this natively through TLS passthrough. Nginx, Apache, and some CDN providers (such as Cloudflare) may strip or fail to negotiate the `acme-tls/1` protocol, causing the challenge to fail.
 
 <Note>
 If any of these requirements cannot be met in your environment, switch to the `http-01` challenge type by setting `NB_PROXY_ACME_CHALLENGE_TYPE=http-01`. The HTTP-01 challenge validates over port 80 using a plain HTTP request and does not depend on ALPN protocol support. However, it requires port 80 to be accessible from the internet.
@@ -209,16 +209,16 @@ For self-hosted deployments, multiple proxy instances configured with the same `
 
 ### Traefik requirement
 
-Self-hosted deployments must use [Traefik](/selfhosted/external-reverse-proxy) as the external reverse proxy in front of the NetBird management server. Traefik is required because it supports TLS passthrough, which allows the NetBird proxy to handle TLS termination directly. Other reverse proxies that do not support TLS passthrough are not compatible with this feature.
+Self-hosted deployments must use [Traefik](/selfhosted/external-reverse-proxy) as the external reverse proxy in front of the openZro management server. Traefik is required because it supports TLS passthrough, which allows the openZro proxy to handle TLS termination directly. Other reverse proxies that do not support TLS passthrough are not compatible with this feature.
 
 ## Prerequisites
 
 Before creating a reverse proxy service, make sure you have:
 
-- At least one **peer** connected to your NetBird network, OR at least one **network** with resources and routing peers configured. See [Networks](/manage/networks) for details.
+- At least one **peer** connected to your openZro network, OR at least one **network** with resources and routing peers configured. See [Networks](/manage/networks) for details.
 - A domain to use. Free (cloud) or cluster (self-hosted) domains are available automatically, or you can [add a custom domain](/manage/reverse-proxy/custom-domains).
 - **Self-hosted only:** At least one proxy instance deployed and connected to your management server. See [Self-hosted proxy setup](#self-hosted-proxy-setup) above, or follow the [Enable Reverse Proxy migration guide](/selfhosted/migration/enable-reverse-proxy) to add it to an existing deployment.
-- Access to a NetBird account with the 'Services' permission module ('Network Admin' role or higher).
+- Access to a openZro account with the 'Services' permission module ('Network Admin' role or higher).
 
 ## Quick start
 
@@ -226,7 +226,7 @@ Follow these steps to create your first reverse proxy service and expose an inte
 
 ### Step 1: Open the Reverse Proxy page
 
-Navigate to **Reverse Proxy** > **Services** in the NetBird dashboard and click **Add Service**.
+Navigate to **Reverse Proxy** > **Services** in the openZro dashboard and click **Add Service**.
 
 ### Step 2: Configure service details
 
@@ -234,7 +234,7 @@ In the **Details** tab:
 
 1. Select a **service mode**. Choose **HTTP** for web applications, or **TCP**, **UDP**, or **TLS** for Layer 4 services. See [Service modes](#service-modes) for details on each mode.
 2. Enter a **subdomain** for your service (e.g., `myapp`).
-3. Select a **base domain**. Cloud users see domains with a **Free** badge (e.g., `abc123.eu.proxy.netbird.io`). Self-hosted users see domains with a **Cluster** badge (e.g., `proxy.mycompany.com`, based on their deployed proxy instances). You can also select a custom domain you have already configured.
+3. Select a **base domain**. Cloud users see domains with a **Free** badge (e.g., `abc123.eu.proxy.openzro.io`). Self-hosted users see domains with a **Cluster** badge (e.g., `proxy.mycompany.com`, based on their deployed proxy instances). You can also select a custom domain you have already configured.
 4. For L4 services, set the **listen port** that the proxy will accept connections on. Some clusters auto-assign ports; others allow you to specify one manually.
 5. Click **Add Target** to define where traffic should be sent.
 
@@ -296,12 +296,12 @@ Switch to the **Settings** tab to adjust advanced proxy behavior. The available 
 - **Session Idle Timeout** (UDP only) - how long a UDP session can be idle before the proxy reaps it. Specified as a duration string (e.g., `30s`, `2m`). Defaults to 30 seconds.
 
 <Warning>
-    **Backend configuration may be required.** If your backend service has a "trusted proxies", "known hosts", or "allowed networks" setting (common in Jellyfin, Home Assistant, Plex, Nextcloud, and others), you must configure it to trust the NetBird IP range. Without this, the backend may reject proxied requests or fail to read the real client IP. See [Backend Service Configuration](/manage/reverse-proxy/service-configuration) for details and per-service examples.
+    **Backend configuration may be required.** If your backend service has a "trusted proxies", "known hosts", or "allowed networks" setting (common in Jellyfin, Home Assistant, Plex, Nextcloud, and others), you must configure it to trust the openZro IP range. Without this, the backend may reject proxied requests or fail to read the real client IP. See [Backend Service Configuration](/manage/reverse-proxy/service-configuration) for details and per-service examples.
 </Warning>
 
 ### Step 5: Create the service
 
-Click **Add Service** to create the reverse proxy service. NetBird will begin provisioning the TLS certificate and establishing the tunnel. Monitor the service status on the services list page until it shows `active`.
+Click **Add Service** to create the reverse proxy service. openZro will begin provisioning the TLS certificate and establishing the tunnel. Monitor the service status on the services list page until it shows `active`.
 
 ## Managing services
 
@@ -330,7 +330,7 @@ Within a service, you can:
 L4 services (TCP, UDP, TLS) require a dedicated port on the proxy cluster. How ports are assigned depends on whether the proxy cluster supports custom port selection:
 
 - **Custom port selection available**: you choose the exact port the proxy listens on. This is useful when clients expect a well-known port (e.g., 5432 for PostgreSQL, 3306 for MySQL). Self-hosted proxy clusters support this when configured to allow it.
-- **Auto-assigned ports only**: the proxy cluster automatically assigns an available port. This is the case for NetBird's shared cloud proxy clusters, where port allocation is managed to avoid conflicts between accounts. The assigned port is shown in the service details after creation.
+- **Auto-assigned ports only**: the proxy cluster automatically assigns an available port. This is the case for openZro's shared cloud proxy clusters, where port allocation is managed to avoid conflicts between accounts. The assigned port is shown in the service details after creation.
 
 The dashboard indicates whether a proxy cluster supports custom ports when you select the domain. If custom ports are not supported, the listen port field is read-only and populated after creation.
 
@@ -390,10 +390,10 @@ The Networks page also displays a badge on each resource indicating how many rev
 
 ## Expose from CLI
 
-In addition to creating services through the dashboard, peers can expose local services directly from the command line using the `netbird expose` command. This creates a temporary (ephemeral) service that lives only as long as the command is running, useful for quick demos, development sharing, or temporary webhook endpoints.
+In addition to creating services through the dashboard, peers can expose local services directly from the command line using the `openzro expose` command. This creates a temporary (ephemeral) service that lives only as long as the command is running, useful for quick demos, development sharing, or temporary webhook endpoints.
 
 ```shell
-netbird expose 8080
+openzro expose 8080
 ```
 
 The command supports HTTP and L4 protocols (`--protocol`), optional authentication (`--with-pin`, `--with-password`, `--with-user-groups`), custom domains (`--with-custom-domain`), and name prefixes (`--with-name-prefix`). For L4 services, use `--with-external-port` to specify the listen port on the proxy cluster.
@@ -406,7 +406,7 @@ For the complete guide including setup, authentication options, session lifecycl
 
 ## Related pages
 
-- [Expose from CLI](/manage/reverse-proxy/expose-from-cli) - expose local services from the command line using `netbird expose`
+- [Expose from CLI](/manage/reverse-proxy/expose-from-cli) - expose local services from the command line using `openzro expose`
 - [Multiple Proxy Instances](/selfhosted/maintenance/scaling/multiple-proxy-instances) - deploy multiple proxy instances for high availability and redundancy
 - [Custom Domains](/manage/reverse-proxy/custom-domains) - configure your own domain names for reverse proxy services
 - [Authentication](/manage/reverse-proxy/authentication) - SSO, password, PIN, header authentication, and access restrictions
@@ -416,10 +416,10 @@ For the complete guide including setup, authentication options, session lifecycl
 
 ## Get started
 <div float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://netbird.io/pricing")}>Use NetBird</Button>
+    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
 </div>
 
-- Make sure to [star us on GitHub](https://github.com/netbirdio/netbird)
-- Follow us [on X](https://x.com/netbird)
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
 - Join our [Slack Channel](/slack-url)
-- NetBird [latest release](https://github.com/netbirdio/netbird/releases) on GitHub
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

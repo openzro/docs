@@ -11,7 +11,7 @@ Masquerade determines how source IP addresses are handled when traffic passes th
 ### With Masquerade (Default)
 
 The routing peer performs NAT on forwarded traffic:
-- Source IP is replaced with the routing peer's NetBird IP
+- Source IP is replaced with the routing peer's openZro IP
 - Return traffic is automatically translated back
 - No additional routing configuration is needed on remote networks
 
@@ -47,11 +47,11 @@ Device A (192.168.1.50) → Routing Peer → [Source stays 192.168.1.50] → Rem
 
 **Disadvantages:**
 - Requires manual route configuration on both ends
-- NetBird access control cannot restrict individual source devices
+- openZro access control cannot restrict individual source devices
 - More complex setup
 
 <Warning>
-Without masquerade, traffic from unknown source IPs is rejected by NetBird's policy engine. You cannot use ACL Groups or Network Resources without masquerade enabled.
+Without masquerade, traffic from unknown source IPs is rejected by openZro's policy engine. You cannot use ACL Groups or Network Resources without masquerade enabled.
 </Warning>
 
 ## Choosing the Right Approach
@@ -134,7 +134,7 @@ Source: site-b-resources → Destination: site-a-resources (specific protocols)
 
 ### Configuring Clientless Devices
 
-Devices without NetBird need routes to remote networks through the local routing peer.
+Devices without openZro need routes to remote networks through the local routing peer.
 
 **Linux:**
 
@@ -190,7 +190,7 @@ Configure your router to advertise routes via DHCP or add static routes for all 
 
 ### Route Not Active
 
-**Symptoms:** Peers do not see the route; `netbird routes list` shows nothing
+**Symptoms:** Peers do not see the route; `openzro routes list` shows nothing
 
 **Causes:**
 1. No access policy grants access to the routing peer
@@ -232,7 +232,7 @@ Configure your router to advertise routes via DHCP or add static routes for all 
 
 ### Wrong Traffic Routed
 
-**Symptoms:** Unexpected traffic going through NetBird
+**Symptoms:** Unexpected traffic going through openZro
 
 **Causes:**
 1. Overlapping routes
@@ -249,11 +249,11 @@ Configure your router to advertise routes via DHCP or add static routes for all 
 **On the routing peer:**
 
 ```bash
-# Check NetBird status
-netbird status
+# Check openZro status
+openzro status
 
 # List active routes
-netbird routes list
+openzro routes list
 
 # Check system routes
 ip route show
@@ -269,7 +269,7 @@ cat /proc/sys/net/ipv4/ip_forward
 
 ```bash
 # Check which route is being used
-netbird networks ls
+openzro networks ls
 
 # Trace the path
 traceroute 192.168.200.50
@@ -287,7 +287,7 @@ traceroute 192.168.200.50
 
 For high availability or load distribution:
 - Deploy multiple routing peers for the same route
-- NetBird distributes traffic across available peers
+- openZro distributes traffic across available peers
 - Monitor peer health and remove failed peers promptly
 
 ### Monitoring
@@ -298,4 +298,4 @@ Track these metrics for routing peers:
 - Connection count
 - Packet loss and latency
 
-Use NetBird's [activity logging](/manage/activity) to monitor access patterns and troubleshoot issues.
+Use openZro's [activity logging](/manage/activity) to monitor access patterns and troubleshoot issues.
