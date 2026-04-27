@@ -2,9 +2,6 @@
 
 openZro includes a built-in Traefik reverse proxy that handles TLS certificates automatically via Let's Encrypt. However, if you already have an existing reverse proxy (Nginx, Caddy, etc.), you can configure openZro to work with it instead.
 
-<Note>
-This is not to be confused with the openZro reverse proxy service that launched with v0.65.0. The openZro reverse proxy feature is only compatible with Traefik because it requires TLS passthrough, which Traefik supports natively. To learn more about using openZro as a reverse proxy, see the [openZro Proxy documentation](/manage/reverse-proxy).
-</Note>
 
 Not all reverse proxies are supported as openZro uses *gRPC* for various components. Your reverse proxy must support HTTP/2 and gRPC proxying.
 
@@ -494,7 +491,7 @@ All reverse proxy configurations must route the following endpoints:
 | `/api/*` | HTTP | management:80 | REST API |
 | `/ws-proxy/management*` | WebSocket | management:80 | WebSocket upgrade required |
 | `/management.ManagementService/*` | gRPC | management:80 | HTTP/2 (h2c) required |
-| `/management.ProxyService/*` | gRPC | management:80 | HTTP/2 (h2c) required. Only needed if using the [Reverse Proxy feature](/manage/reverse-proxy). |
+
 | `/oauth2/*` | HTTP | management:80 | Embedded IdP |
 | `/*` | HTTP | dashboard:80 | Catch-all for dashboard |
 
@@ -633,7 +630,7 @@ services:
       - traefik.http.routers.openzro-mgmt-ws.service=openzro-mgmt-ws
       - traefik.http.services.openzro-mgmt-ws.loadbalancer.server.port=80
       # Management gRPC router
-      - traefik.http.routers.openzro-mgmt-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
+      - traefik.http.routers.openzro-mgmt-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/management.ManagementService/`))
       - traefik.http.routers.openzro-mgmt-grpc.entrypoints=websecure
       - traefik.http.routers.openzro-mgmt-grpc.tls=true
       - traefik.http.routers.openzro-mgmt-grpc.tls.certresolver=letsencrypt

@@ -274,34 +274,6 @@ export const docsNavigation = [
         ],
       },
       {
-        title: 'Reverse Proxy',
-        isOpen: false,
-        links: [
-          { title: 'Overview', href: '/manage/reverse-proxy' },
-          {
-            title: 'Custom Domains',
-            href: '/manage/reverse-proxy/custom-domains',
-          },
-          {
-            title: 'Authentication',
-            href: '/manage/reverse-proxy/authentication',
-          },
-          { title: 'Access Logs', href: '/manage/reverse-proxy/access-logs' },
-          {
-            title: 'Service Configuration',
-            href: '/manage/reverse-proxy/service-configuration',
-          },
-          {
-            title: 'Expose from CLI',
-            href: '/manage/reverse-proxy/expose-from-cli',
-          },
-          {
-            title: 'Troubleshooting',
-            href: '/manage/reverse-proxy/troubleshooting',
-          },
-        ],
-      },
-      {
         title: 'DNS',
         isOpen: false,
         links: [

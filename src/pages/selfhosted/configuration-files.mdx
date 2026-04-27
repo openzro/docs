@@ -143,12 +143,10 @@ openzro-server:
   labels:
     - traefik.enable=true
     # gRPC router (needs h2c backend for HTTP/2 cleartext)
-    # The /management.ProxyService/ path is only required if the reverse proxy
-    # container (openzro/reverse-proxy) connects through Traefik — i.e., it
     # runs on a separate host or a different Docker network. If the proxy is on
     # the same Docker network as openzro-server, it connects directly and this
     # path prefix can be omitted.
-    - traefik.http.routers.openzro-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
+    - traefik.http.routers.openzro-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`))
     - traefik.http.routers.openzro-grpc.entrypoints=websecure
     - traefik.http.routers.openzro-grpc.tls=true
     - traefik.http.routers.openzro-grpc.tls.certresolver=letsencrypt
@@ -197,7 +195,7 @@ When using the built-in Traefik, the `openzro-server` service uses two routers t
 
 | Router | Path Prefixes | Backend Service | Purpose |
 |--------|---------------|-----------------|---------|
-| `openzro-grpc` | `/signalexchange.SignalExchange/`, `/management.ManagementService/`, `/management.ProxyService/` | `openzro-server-h2c` (h2c scheme) | gRPC traffic for signal exchange, management API, and the [Reverse Proxy feature](/manage/reverse-proxy). Uses HTTP/2 cleartext (h2c) backend because gRPC requires HTTP/2. The `/management.ProxyService/` path is only needed if the reverse proxy container connects through Traefik (see comment in the snippet above). |
+| `openzro-grpc` | `/signalexchange.SignalExchange/`, `/management.ManagementService/` | `openzro-server-h2c` (h2c scheme) | gRPC traffic for signal exchange and the management API. Uses HTTP/2 cleartext (h2c) backend because gRPC requires HTTP/2. |
 | `openzro-backend` | `/relay`, `/ws-proxy/`, `/api`, `/oauth2` | `openzro-server` (http scheme) | HTTP traffic for relay connections, WebSocket proxying, REST API, and OAuth2/OIDC endpoints. |
 
 The dashboard router has `priority=1` (lowest), so it acts as a catch-all for requests that don't match the more specific server routes.

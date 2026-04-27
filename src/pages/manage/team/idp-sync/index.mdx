@@ -33,22 +33,27 @@ offboarding scenarios:
 
 ## Supported Identity Providers
 
-openZro provides native support for syncing with the most popular identify providers.
-For detailed setup and configuration steps, select an IdP from the section below:
+The openZro management binary ships native sync drivers for **8 IdPs**
+under [`management/server/idp/`](https://github.com/openzro/openzro/tree/main/management/server/idp):
 
-* [Entra ID (API)](/manage/team/idp-sync/microsoft-entra-id-sync)
-* [Entra ID (SCIM)](/manage/team/idp-sync/microsoft-entra-id-scim-sync)
-* [Okta](/manage/team/idp-sync/okta-sync)
-* [Google Workspace](/manage/team/idp-sync/google-workspace-sync)
-* [JumpCloud](/manage/team/idp-sync/jumpcloud-sync)
-* [Keycloak](/manage/team/idp-sync/keycloak-sync)
+| Provider | Walkthrough | Native sync driver |
+|---|---|---|
+| Microsoft Entra ID (Azure AD) | [API](/manage/team/idp-sync/microsoft-entra-id-sync) · [SCIM](/manage/team/idp-sync/microsoft-entra-id-scim-sync) | `azure.go` |
+| Okta | [API](/manage/team/idp-sync/okta-sync) | `okta.go` |
+| Google Workspace | [API](/manage/team/idp-sync/google-workspace-sync) | `google_workspace.go` |
+| JumpCloud | [API](/manage/team/idp-sync/jumpcloud-sync) | `jumpcloud.go` |
+| Keycloak | [API](/manage/team/idp-sync/keycloak-sync) | `keycloak.go` |
+| Auth0 | TODO walkthrough | `auth0.go` |
+| Authentik | TODO walkthrough | `authentik.go` |
+| Zitadel | TODO walkthrough | `zitadel.go` |
 
 ### Generic SCIM
 
-openZro provides a way to sync users and groups from any identity provider that supports the SCIM (System for Cross-domain Identity Management) protocol.
-SCIM is a standardized protocol that works with most modern identity providers, although configuration varies between providers.
-
-If your provider is not listed above, contact us at support@openzro.io for assistance with your specific IdP setup.
+For any IdP not in the list above, use the
+[SCIM 2.0 server](https://github.com/openzro/openzro/tree/main/management/server/http/handlers/scim)
+that openZro exposes natively. The IdP-Sync side only requires the
+provider to push SCIM events at the openZro endpoint — no openZro-side
+driver is needed.
 
 <p>
     <img src="/docs-static/img/manage/team/idp-sync/generic-scim.png" alt="generic-scim"

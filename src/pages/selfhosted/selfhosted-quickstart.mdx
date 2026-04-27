@@ -73,18 +73,11 @@ CNAME on top of the A record for the management host:
 | A | `openzro` | `YOUR.SERVER.IP.ADDRESS` | DNS only |
 | CNAME | `*.openzro` | `openzro.example.com` | DNS only |
 
-This is not required for the quickstart itself — only when you
-configure the openZro Proxy later via
-[Enable Reverse Proxy](/selfhosted/migration/enable-reverse-proxy).
-
-### CrowdSec IP Reputation (Optional)
-
-[CrowdSec](/selfhosted/maintenance/crowdsec) gives you automatic
-IP-reputation blocking on the reverse proxy. Adds a local CrowdSec
-LAPI container that syncs community threat intelligence; the proxy
-then checks every incoming connection against it. You can enable
-CrowdSec per service in enforce or observe mode through the
-dashboard.
+This wildcard CNAME is **not required for the openZro core
+deployment** — it only matters if you later layer your own reverse
+proxy in front of the management server to expose internal services
+under subdomains. See [External Reverse Proxy](/selfhosted/external-reverse-proxy)
+when you reach that stage.
 
 ### Initial setup (Onboarding)
 
