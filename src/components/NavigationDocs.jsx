@@ -58,10 +58,6 @@ export const docsNavigation = [
           { title: 'Windows', href: '/get-started/install/windows' },
           { title: 'MacOS', href: '/get-started/install/macos' },
           { title: 'Docker', href: '/get-started/install/docker' },
-          { title: 'iOS', href: '/get-started/install/ios' },
-          { title: 'tvOS', href: '/get-started/install/tvos' },
-          { title: 'Android', href: '/get-started/install/android' },
-          { title: 'Android TV', href: '/get-started/install/android-tv' },
         ],
       },
       {
@@ -494,20 +490,6 @@ export const docsNavigation = [
         title: 'Public API',
         isOpen: false,
         links: [{ title: 'Access Public API', href: '/manage/public-api' }],
-      },
-      {
-        title: 'For Partners',
-        isOpen: false,
-        links: [
-          {
-            title: 'Managed Service Providers',
-            href: '/manage/for-partners/msp-portal',
-          },
-          {
-            title: 'Acronis openZro integration',
-            href: '/manage/for-partners/acronis-integration',
-          },
-        ],
       },
     ],
   },
