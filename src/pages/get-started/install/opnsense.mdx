@@ -12,12 +12,16 @@ OPNsense plugin manager, then point the **Management URL** field at
 your openZro management server. No openZro-specific build needed.
 
 <Note>
-    The plugin appears as `os-netbird` in the plugin manager because
-    that's the upstream package name. You'll see the `NetBird` label
-    inside the OPNsense UI; configure it to talk to openZro. The
-    agent binary is licensed AGPLv3 (NetBird's current license);
-    you're an end-user consuming it — that doesn't affect your
-    openZro management deployment, which stays BSD-3.
+    The plugin source lives at
+    [netbirdio/OPNsensePlugins](https://github.com/netbirdio/OPNsensePlugins/tree/Netbird-devel)
+    (a BSD-2-Clause fork of OPNsense's official plugins repo) and
+    is published into the OPNsense plugin manager as `os-netbird`
+    by Deciso. The label says `NetBird` inside the UI because that's
+    the upstream package name — configure it to point at openZro
+    in the next step. The agent binary that the plugin installs is
+    licensed AGPLv3 (NetBird's current license); you're an end-user
+    consuming it, which doesn't affect your openZro management
+    deployment (which stays BSD-3).
 </Note>
 
 {/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="AK0Ct-ULFKg" start={669} /> */}
