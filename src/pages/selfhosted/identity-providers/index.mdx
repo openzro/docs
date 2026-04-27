@@ -182,8 +182,11 @@ Your IdP may require specific configuration in order to pass a groups claim to o
 Groups with matching names in openZro and your IdP will **not** sync. To import a group from your IdP, first delete the existing group with that name in openZro.
 </Note>
 
-#### SCIM 
-openZro supports provisioning users and groups through SCIM. However, this functionality is not available in the open source Community Edition. It is offered only in the cloud-managed version of openZro or through a [Commercial License](https://openzro.io/pricing#on-prem) for enterprise self-hosted deployments.
+#### SCIM
+openZro ships a [SCIM 2.0 server](https://github.com/openzro/openzro/tree/main/management/server/http/handlers/scim)
+in the management binary — available in self-host with no licensing
+gate. Tested against Okta and Microsoft Entra; setup walkthrough at
+[Manage → Team → IdP Sync](/manage/team/idp-sync).
 
 ### Best Practices
 

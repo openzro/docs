@@ -1,9 +1,11 @@
 # Traffic Events Logging
 
 <Note>
-This feature is available only in the openZro cloud under the [Business plan](https://www.openzro.io/pricing?utm_source=docs&utm_content=traffic-events).
-This is feature is in Beta and may change over time — including how data is collected and reported.
-To use this feature, make sure you're running openZro client version 0.39 or higher.
+Traffic events logging is implemented in the openZro management server
+([flow_service.go](https://github.com/openzro/openzro/blob/main/management/server/flow_service.go))
+and is available in self-host with no licensing gate. The wire protocol
+between the client and the management was added in upstream NetBird
+v0.39 — operators on older versions need to upgrade.
 </Note>
 
 

@@ -20,7 +20,10 @@ or update network configurations like [DNS](/manage/dns#distribution-groups),
 eliminating the need for manual grouping.
 
 <Note>
-    This feature is only available in the cloud version of openZro in the [Team plan](https://openzro.io/pricing) and above.
+    IdP-Sync is implemented end-to-end in openZro and ships in the same binary
+    as the rest of the management server — see the
+    [SCIM 2.0 server](https://github.com/openzro/openzro/tree/main/management/server/http/handlers/scim)
+    in the core repo. There is no cloud-tier or licensing gate.
 </Note>
 
 This video guide walks you through an example integration with Microsoft Entra ID, covering both user onboarding and

@@ -4,13 +4,14 @@
 Whether you have a network for personal use or manage your company's corporate network, you'd probably want to add machines
 (or peers in openZro's terms) to your network.
 
-openZro peer is a machine that runs the [openZro agent](/about-openzro/how-openzro-works#client-application)
-and is connected to the network. openZro peer can be a virtual machine running in the cloud like AWS or Google Cloud,
-an Android or iOS device, a personal laptop, a single-board computer like Raspberry Pi, a docker container, or even a router.
+An openZro peer is any machine that runs the [openZro agent](/about-openzro/how-openzro-works#client-application)
+and is connected to the network — a virtual machine running in
+AWS, GCP, or Azure; a personal laptop on Linux, macOS, or Windows;
+a single-board computer like a Raspberry Pi; a Docker container;
+a pfSense or OPNsense gateway; or any other host that can run the
+openZro client.
 
-## Related Video Content
-For details on adding machines to your network, part of our "Getting started with openZro" video covers this topic:
-<YouTube videoId="JRCZy4rLi-c" start={34} />
+{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="JRCZy4rLi-c" start={34} /> */}
 
 ## Use openZro web UI to add new peers
 
@@ -36,18 +37,8 @@ To add a new peer to your network follow these steps:
 
 ## What's next?
 
-Here are a few links that might be handy as you venture further into openZro:
-
 - [Add users to your network](/manage/team/add-users-to-your-network)
-- [Require a peer approval from the administrator](/manage/peers/approve-peers)
+- [Require peer approval from the administrator](/manage/peers/approve-peers)
 - [Allow only managed devices in the network](/manage/access-control/endpoint-detection-and-response)
 - [Use setup keys to automate openZro deployments](/manage/peers/register-machines-using-setup-keys)
-
-<p float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Try openZro</Button>
-</p>
-
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Follow us [on X](https://x.com/openzro)
-- Join our [Slack Channel](/slack-url)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub
+- [Star openZro on GitHub](https://github.com/openzro/openzro)

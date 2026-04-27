@@ -13,8 +13,12 @@ This makes a stable relay infrastructure especially important.
 This guide assumes you have already [deployed a single-server openZro](/selfhosted/selfhosted-quickstart) and have a working configuration.
 
 <Note>
-    If you are looking for a high-availability setup for the Management and Signal services, this is available through an enterprise
-    commercial license [here](https://openzro.io/pricing#on-prem).
+    High availability for Management and Signal is implemented in the
+    BSD-3 fork via the [cluster layer](https://github.com/openzro/openzro/tree/main/cluster)
+    (Redis or NATS backends, leader election, per-resource locks) —
+    no commercial license required. See
+    [Multiple Proxy Instances](/selfhosted/maintenance/scaling/multiple-proxy-instances)
+    for the deployment topology.
 </Note>
 
 ## Architecture Overview

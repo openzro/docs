@@ -6,7 +6,13 @@ This guide is part of the [Splitting Your Self-Hosted Deployment](/selfhosted/ma
 
 In most deployments, the embedded Signal server works well and does not need to be extracted. Consider running an external Signal server if you want to separate it from the Management server for organizational or infrastructure reasons.
 
-Unlike relay servers, the Signal server cannot be replicated as it maintains in-memory connection state. If you need high-availability active-active mode for both Management and Signal, this is available through an [enterprise commercial license](https://openzro.io/pricing#on-prem).
+For active-active HA across multiple Signal instances, openZro
+ships a [distributed dispatcher](https://github.com/openzro/openzro/tree/main/signal/dispatcher)
+that fans out signaling messages between Signal nodes via Redis or
+NATS — no commercial license required. The single-instance setup
+on this page is the simpler topology that fits most operators;
+graduate to the dispatched mode when the in-memory connection state
+of one Signal node becomes a scaling ceiling.
 
 <Warning>
 Changing the Signal server URL requires all clients to restart. After updating the configuration, each client must run `openzro down` followed by `openzro up` to reconnect to the new Signal server. This limitation will be addressed in a future client release.
