@@ -42,6 +42,14 @@ export default function Document() {
       <Head>
           <GoogleTagManagerHeadScript />
           <script dangerouslySetInnerHTML={{ __html: modeScript }} />
+          {/*
+            Primary favicon is the openZro brand SVG — modern browsers
+            (>=2017) pick it. A `.ico` fallback path is kept for older
+            agents but the file behind it is upstream's; it ships with
+            the clone and should be replaced when we generate a
+            multi-resolution ico from the brand SVG.
+          */}
+          <link rel="icon" type="image/svg+xml" href="/docs-static/img/openzro-icon.svg" />
           <link rel="shortcut icon" href="/docs-static/img/favicon.ico" />
       </Head>
       <body className="bg-white antialiased dark:bg-[#181A1D]">

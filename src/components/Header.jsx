@@ -61,14 +61,26 @@ export const Header = forwardRef(function Header({ className }, ref) {
         </Link>
       </div>
       <div className="flex items-center gap-3 xl:gap-2">
+        {/*
+          Top nav points only at things that actually exist for the
+          openZro project: docs, the API reference, the GitHub repo,
+          and GitHub Discussions for support. The upstream had Home
+          / Learn pointing at marketing pages and a "Try cloud" CTA;
+          openZro is self-host only so those are gone.
+        */}
         <nav className="hidden md:block">
-          <ul role="list" className="flex items-center gap-3 xl:gap-2 m-0 p-0 list-none">
-            <TopLevelNavItem href="https://openzro.io/">Home</TopLevelNavItem>
+          <ul
+            role="list"
+            className="flex items-center gap-3 xl:gap-2 m-0 p-0 list-none"
+          >
             <TopLevelNavItem href="/">Docs</TopLevelNavItem>
             <TopLevelNavItem href="/api">API</TopLevelNavItem>
-            <TopLevelNavItem href="https://openzro.io/knowledge-hub/">Learn</TopLevelNavItem>
-            <TopLevelNavItem href="https://github.com/openzro/openzro">Github</TopLevelNavItem>
-            <TopLevelNavItem href="/slack-url">Support</TopLevelNavItem>
+            <TopLevelNavItem href="https://github.com/openzro/openzro">
+              GitHub
+            </TopLevelNavItem>
+            <TopLevelNavItem href="https://github.com/openzro/openzro/discussions">
+              Support
+            </TopLevelNavItem>
           </ul>
         </nav>
         <div className="hidden md:block md:h-5 md:w-px md:bg-zinc-900/10 md:dark:bg-neutral-500/20" />
@@ -77,7 +89,13 @@ export const Header = forwardRef(function Header({ className }, ref) {
           <ModeToggle />
         </div>
         <div className="hidden min-[416px]:contents">
-          <Button href="https://app.openzro.io/" target="_blank" className="!py-1.5 !px-3 text-xs">Try openZro</Button>
+          <Button
+            href="https://github.com/openzro/openzro/releases/latest"
+            target="_blank"
+            className="!py-1.5 !px-3 text-xs"
+          >
+            Get openZro
+          </Button>
         </div>
       </div>
     </motion.div>

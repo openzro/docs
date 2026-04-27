@@ -233,14 +233,17 @@ function SmallPrint() {
         &copy; Copyright {new Date().getFullYear()}. All rights reserved.
       </p>
       <div className="flex gap-4">
-        <SocialLink href="https://x.com/openzro" icon={TwitterIcon}>
-          Follow us on X
+        <SocialLink
+          href="https://github.com/openzro/openzro"
+          icon={GitHubIcon}
+        >
+          openZro on GitHub
         </SocialLink>
-        <SocialLink href="https://github.com/openzro/openzro" icon={GitHubIcon}>
-          Follow us on GitHub
-        </SocialLink>
-        <SocialLink href="/slack-url" icon={SlackIcon}>
-          Join us on Slack
+        <SocialLink
+          href="https://github.com/openzro/openzro/discussions"
+          icon={SlackIcon}
+        >
+          Discussions
         </SocialLink>
       </div>
     </div>

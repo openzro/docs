@@ -8,8 +8,12 @@ import {
   useState,
 } from 'react'
 
-const ANNOUNCEMENTS_URL =
-  'https://raw.githubusercontent.com/openzro/dashboard/main/announcements.json'
+// Set NEXT_PUBLIC_ANNOUNCEMENTS_URL at build time to point this at a
+// JSON document served by the operator (the upstream pointed at the
+// dashboard repo, but openZro doesn't ship a maintained
+// announcements file by default — empty URL leaves the banner
+// silent, which is the right default for a self-host fork).
+const ANNOUNCEMENTS_URL = process.env.NEXT_PUBLIC_ANNOUNCEMENTS_URL || ''
 const STORAGE_KEY = 'openzro-announcements'
 const CACHE_DURATION_MS = 30 * 60 * 1000
 const BANNER_HEIGHT = 33
@@ -34,6 +38,11 @@ const getAnnouncements = async () => {
 
     if (stored && now - stored.timestamp < CACHE_DURATION_MS) {
       raw = stored.announcements
+    } else if (!ANNOUNCEMENTS_URL) {
+      // Banner disabled: no fetch URL is configured. Keep cache
+      // semantics quiet — return an empty list so downstream code
+      // sees "nothing to show".
+      raw = []
     } else {
       const response = await fetch(ANNOUNCEMENTS_URL)
       if (!response.ok) return []

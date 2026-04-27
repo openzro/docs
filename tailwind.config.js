@@ -22,7 +22,23 @@ module.exports = {
     typography: require('./typography'),
     extend: {
       colors: {
-        openzro: '#f68330',
+        // Brand palette per the openZro CLAUDE.md spec. The shorthand
+        // `openzro` alias maps to the primary (violet-600) so existing
+        // Tailwind classes like text-openzro / bg-openzro keep working
+        // after the rebrand.
+        openzro: '#7c3aed',
+        violet: {
+          50: '#f5f3ff',
+          100: '#ede9fe',
+          200: '#ddd6fe',
+          300: '#c4b5fd',
+          400: '#a78bfa',
+          500: '#8b5cf6',
+          600: '#7c3aed',
+          700: '#6d28d9',
+          800: '#5b21b6',
+          900: '#4c1d95',
+        },
       },
       boxShadow: {
         glow: '0 0 4px rgb(0 0 0 / 0.1)',

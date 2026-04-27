@@ -37,7 +37,10 @@ export function CookieConsent() {
           to enhance your experience, analyze our traffic, and for security and
           marketing. View our{' '}
           <a
-            href="https://openzro.io/privacy"
+            href={
+              process.env.NEXT_PUBLIC_PRIVACY_URL ||
+              'https://github.com/openzro/openzro#privacy'
+            }
             target="_blank"
             rel="noopener noreferrer"
             className="text-white underline underline-offset-4 transition-colors hover:text-openzro"

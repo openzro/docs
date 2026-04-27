@@ -21,7 +21,10 @@ yarn-error.log*
 
 .idea
 
-package-lock.json
+# package-lock.json IS tracked in this fork — see Makefile `install`
+# target. Rationale: reproducible builds + pinned-version security.
+# Upstream excludes it; we override.
+
 /.next/
 /yarn.lock
 /generator/openapi/
