@@ -15,7 +15,7 @@ Cloud VM ────► openZro Tunnel ────► Routing Peer ───�
 
 ## Prerequisites
 
-- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://your-management.example.com/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - Access to deploy VMs or containers in your cloud environment
 - Network configuration permissions in your cloud VPC
 
@@ -90,7 +90,7 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 3. On your on-premise server, run:
 
 ```bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 sudo openzro up --setup-key YOUR_SETUP_KEY
 ```
 
@@ -107,7 +107,7 @@ Create a setup key for your cloud workloads:
 **For VMs:**
 
 ```bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 sudo openzro up --setup-key YOUR_CLOUD_SETUP_KEY
 ```
 

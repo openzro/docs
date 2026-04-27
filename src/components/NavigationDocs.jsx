@@ -25,10 +25,6 @@ export const docsNavigation = [
         href: '/about-openzro/openzro-vs-traditional-vpn',
       },
       {
-        title: 'Self-Hosted vs. Cloud',
-        href: '/about-openzro/self-hosted-vs-cloud',
-      },
-      {
         title: 'Understanding NAT and Connectivity',
         href: '/about-openzro/understanding-nat-and-connectivity',
       },
@@ -446,10 +442,6 @@ export const docsNavigation = [
             title: 'Notifications',
             href: '/manage/settings/notifications',
           },
-          {
-            title: 'Plans and Billing',
-            href: '/manage/settings/plans-and-billing',
-          },
           { title: 'Delete Account', href: '/manage/settings/delete-account' },
         ],
       },
@@ -718,29 +710,6 @@ export const docsNavigation = [
           {
             title: 'openZro on MikroTik Router',
             href: '/use-cases/homelab/client-on-mikrotik-router',
-          },
-        ],
-      },
-      {
-        title: 'Cloud',
-        isOpen: false,
-        links: [
-          { title: 'Overview', href: '/use-cases/cloud' },
-          {
-            title: 'openZro on AWS ECS',
-            href: '/use-cases/cloud/aws-ecs-terraform',
-          },
-          {
-            title: 'openZro on Serverless (FaaS)',
-            href: '/use-cases/cloud/openzro-on-faas',
-          },
-          {
-            title: 'Routing Peers and Kubernetes',
-            href: '/use-cases/cloud/routing-peers-and-kubernetes',
-          },
-          {
-            title: 'Distributed Multi-Cloud AI',
-            href: '/use-cases/cloud/distributed-multi-cloud-ai',
           },
         ],
       },

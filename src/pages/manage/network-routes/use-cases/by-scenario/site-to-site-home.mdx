@@ -22,7 +22,7 @@ Site-to-Site requires Network Routes because the Networks feature doesn't yet su
 
 ## Prerequisites
 
-- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://your-management.example.com/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - An always-on device at each home to serve as routing peers (Raspberry Pi, NAS with Docker, etc.)
 - Different subnets at each location (if both use `192.168.1.0/24`, see [Resolve Overlapping Routes](/manage/network-routes/use-cases/by-configuration/overlapping-routes))
 
@@ -54,14 +54,14 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 **At your home:**
 
 ```bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 sudo openzro up --setup-key YOUR_HOME_SETUP_KEY
 ```
 
 **At parents' home:**
 
 ```bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 sudo openzro up --setup-key YOUR_PARENTS_SETUP_KEY
 ```
 

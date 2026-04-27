@@ -22,7 +22,7 @@ Site-to-Site requires Network Routes because the Networks feature doesn't yet su
 
 ## Prerequisites
 
-- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://your-management.example.com/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - Admin access to network infrastructure at each location
 - A server or VM at each location to serve as routing peers
 
@@ -56,14 +56,14 @@ Install openZro on a server at each location:
 **At headquarters:**
 
 ```bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 sudo openzro up --setup-key YOUR_HQ_SETUP_KEY
 ```
 
 **At branch office:**
 
 ```bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 sudo openzro up --setup-key YOUR_BRANCH_SETUP_KEY
 ```
 

@@ -15,7 +15,7 @@ Remote Laptop ──────► openZro Tunnel ──────► Routing
 
 ## Prerequisites
 
-- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://your-management.example.com/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - Admin access to office network infrastructure
 - A server or VM at the office to serve as the routing peer
 
@@ -23,10 +23,10 @@ Remote Laptop ──────► openZro Tunnel ──────► Routing
 
 If you haven't already, install openZro on a remote worker's laptop and connect:
 
-1. Download openZro from [app.openzro.io/install](https://app.openzro.io/install)
+1. Download openZro from [your-management.example.com/install](https://your-management.example.com/)
 2. Run the application and click **Connect** in the system tray
 3. Complete the sign-up process in your browser
-4. Verify the device appears in the [openZro dashboard](https://app.openzro.io/) under **Peers**
+4. Verify the device appears in the [openZro dashboard](https://your-management.example.com/) under **Peers**
 
 ## Step 2: Add the Remote Worker to a User Group
 
@@ -116,11 +116,11 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 
 ```bash
 # Linux
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 sudo openzro up --setup-key YOUR_SETUP_KEY
 
 # Windows (PowerShell as Administrator)
-Invoke-WebRequest -Uri "https://pkgs.openzro.io/install.ps1" -OutFile "install.ps1"; .\install.ps1
+Invoke-WebRequest -Uri "https://github.com/openzro/openzro/releases/latest" -OutFile "install.ps1"; .\install.ps1
 openzro up --setup-key YOUR_SETUP_KEY
 ```
 
@@ -142,7 +142,7 @@ Remote workers can now access office resources from any location.
 
 For additional remote workers:
 
-1. Have employees install openZro from [app.openzro.io/install](https://app.openzro.io/install)
+1. Have employees install openZro from [your-management.example.com/install](https://your-management.example.com/)
 2. After they connect, go to **Peers** and select their device
 3. Under **Assigned Groups**, add them to the "`remote-workers`" group
 

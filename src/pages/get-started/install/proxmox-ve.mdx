@@ -79,7 +79,7 @@ ls /dev/net
 
 Before we install openZro, we are going to want to generate a one-off setup key to use with our LXC installation. While [openZro's documentation offers comprehensive guidance on this process](https://docs.openzro.io/manage/peers/register-machines-using-setup-keys), let's quickly review the essential steps:
 
-- Access your [openZro dashboard](https://app.openzro.io/)
+- Access your [openZro dashboard](https://your-management.example.com/)
 - Navigate to the `Setup Keys` section
 - Click the `Create Setup Key` button on the right
 - Name your key (e.g., "ProxmoxLXC")
@@ -97,7 +97,7 @@ apt update && apt upgrade -y && apt install curl -y
 Now that our system is updated, we can install openZro with the following command. 
 
 ```bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 ```
 
 Now that openZro is installed, we can connect our peer to our account using the setup key we generated earlier. 

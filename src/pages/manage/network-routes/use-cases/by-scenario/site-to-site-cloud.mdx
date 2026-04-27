@@ -19,7 +19,7 @@ Multi-cloud Site-to-Site requires Network Routes because the Networks feature do
 
 ## Prerequisites
 
-- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://your-management.example.com/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - Access to deploy VMs in your cloud environments
 - Network configuration permissions in your cloud VPCs
 
@@ -56,7 +56,7 @@ Launch an EC2 instance in your VPC with openZro installed. Use the following use
 
 ```bash
 #!/bin/bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 openzro up --setup-key YOUR_AWS_SETUP_KEY
 ```
 
@@ -66,7 +66,7 @@ Launch a Compute Engine instance in your VPC:
 
 ```bash
 #!/bin/bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 openzro up --setup-key YOUR_GCP_SETUP_KEY
 ```
 

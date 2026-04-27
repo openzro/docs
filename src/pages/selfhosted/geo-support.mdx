@@ -13,10 +13,10 @@ This guide outlines the steps to configure Management with the GeoLite2 database
 Upon openZro Application startup, our management checks if the GeoLite2 databases exist in its data directory. If not present, the
 databases will be downloaded from the following URLs:
 
-- GeoLite2 City Database: [Download Link](https://pkgs.openzro.io/geolocation-dbs/GeoLite2-City/download?suffix=tar.gz)
-- GeoLite2 City Database (SHA256): [Download Link](https://pkgs.openzro.io/geolocation-dbs/GeoLite2-City/download?suffix=tar.gz.sha256)
-- GeoLite2 City CSV Database: [Download Link](https://pkgs.openzro.io/geolocation-dbs/GeoLite2-City-CSV/download?suffix=zip)
-- GeoLite2 City CSV Database (SHA256): [Download Link](https://pkgs.openzro.io/geolocation-dbs/GeoLite2-City-CSV/download?suffix=zip.sha256)
+- GeoLite2 City Database: [Download Link](https://github.com/openzro/openzro/releases/latest)
+- GeoLite2 City Database (SHA256): [Download Link](https://github.com/openzro/openzro/releases/latest)
+- GeoLite2 City CSV Database: [Download Link](https://github.com/openzro/openzro/releases/latest)
+- GeoLite2 City CSV Database (SHA256): [Download Link](https://github.com/openzro/openzro/releases/latest)
 
 After downloading, the management system prepares the databases for use. If the databases already exist, the system will load and utilize the existing ones.
 
@@ -50,11 +50,11 @@ When set, the management server will skip geolocation initialization and will no
 
 ## Troubleshooting: GeoLite2 download fails in restricted networks
 
-In some network environments, the automatic download of the GeoLite2 database from `pkgs.openzro.io` may fail.
+In some network environments, the automatic download of the GeoLite2 database from `github.com/openzro/openzro/releases` may fail.
 This commonly happens when:
 
 - Corporate firewalls perform **deep packet inspection (DPI)**, intercepting HTTPS traffic and re-signing certificates with internal certificate authorities. The management server cannot verify these intercepted certificates, causing TLS errors during the download.
-- Outbound access to `pkgs.openzro.io` is **blocked by firewall rules** or proxy restrictions.
+- Outbound access to `github.com/openzro/openzro/releases` is **blocked by firewall rules** or proxy restrictions.
 - The server has **no internet access** at all (air-gapped environments).
 
 See [openzro/openzro#5216](https://github.com/openzro/openzro/pull/5216) for more context on this issue.

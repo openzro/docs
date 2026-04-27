@@ -15,7 +15,7 @@ Your Laptop ──────► openZro Tunnel ──────► Routing P
 
 ## Prerequisites
 
-- A [openZro cloud account](https://app.openzro.io/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
+- A [openZro cloud account](https://your-management.example.com/) or [self-hosted instance](/selfhosted/selfhosted-quickstart)
 - openZro installed on your laptop or phone ([installation guide](/get-started/install))
 - An always-on device at home to serve as the routing peer (Raspberry Pi, NAS with Docker, old laptop, etc.)
 
@@ -23,10 +23,10 @@ Your Laptop ──────► openZro Tunnel ──────► Routing P
 
 If you haven't already, install openZro on your laptop and connect:
 
-1. Download openZro from [app.openzro.io/install](https://app.openzro.io/install)
+1. Download openZro from [your-management.example.com/install](https://your-management.example.com/)
 2. Run the application and click **Connect** in the system tray
 3. Complete the sign-up process in your browser
-4. Verify your device appears in the [openZro dashboard](https://app.openzro.io/) under **Peers**
+4. Verify your device appears in the [openZro dashboard](https://your-management.example.com/) under **Peers**
 
 ## Step 2: Add Your Laptop to a User Group
 
@@ -112,7 +112,7 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 3. On your routing peer, run:
 
 ```bash
-curl -fsSL https://pkgs.openzro.io/install.sh | sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
 sudo openzro up --setup-key YOUR_SETUP_KEY
 ```
 

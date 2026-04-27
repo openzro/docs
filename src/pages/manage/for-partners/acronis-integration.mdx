@@ -16,7 +16,7 @@ In this hands-on tutorial, you'll learn how to use Acronis Cyber Protect Cloud s
 
 Before beginning this tutorial, ensure you have the following prerequisites in place:
 
-- A [openZro account](https://app.openzro.io) with administrative permissions to create and manage access policies.
+- A [openZro account](https://your-management.example.com) with administrative permissions to create and manage access policies.
 - openZro's Windows installer (`exe` or `.msi`) downloaded from the [openZro installation documentation](https://docs.openzro.io/get-started/install/windows)
 - An active [Acronis Cyber Protect Cloud](https://www.acronis.com/en-us/products/cloud/cyber-protect/) subscription like [Cyber Protect Advanced](https://www.acronis.com/en-us/support/documentation/AcronisCyberProtect_15/index.html#editions-and-licensing.html).
 - Acronis Cyber Protect Cloud Agent [installed and registered on all target Windows and macOS machines](https://www.acronis.com/en-us/support/documentation/AcronisCyberProtect_15/index.html#installation-overview.html).
@@ -297,7 +297,7 @@ try {
         Write-Host "Found MSI installer: $($MSIAsset.name)"
     } else {
         # Use the direct package repository URL
-        $DownloadUrl = "https://pkgs.openzro.io/windows/msi/x64/openzro_installer_windows_amd64.msi"
+        $DownloadUrl = "https://github.com/openzro/openzro/releases/latest"
         Write-Host "Using direct package repository URL"
     }
     
@@ -574,7 +574,7 @@ You can optionally use openZro's [setup keys](https://docs.openzro.io/manage/pee
 Download the most recent openZro macOS installer script using the following command:
 
 ```shell
-curl -fsSL https://pkgs.openzro.io/install.sh > install.sh
+curl -fsSL https://github.com/openzro/openzro/releases/latest > install.sh
 ```
 
 The script downloads the latest macOS package (`.pkg`) from the official openZro releases page and perform a silent, unattended installation.
