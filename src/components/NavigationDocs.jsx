@@ -33,10 +33,6 @@ export const docsNavigation = [
         href: '/about-openzro/why-wireguard-with-openzro',
       },
       {
-        title: 'Browser Client Architecture',
-        href: '/about-openzro/browser-client-architecture',
-      },
-      {
         title: 'Why self-host only',
         href: '/about-openzro/self-host-only',
       },
@@ -92,7 +88,6 @@ export const docsNavigation = [
             title: 'Setup Keys',
             href: '/manage/peers/register-machines-using-setup-keys',
           },
-          { title: 'Browser Client', href: '/manage/peers/browser-client' },
           { title: 'SSH', href: '/manage/peers/ssh' },
           { title: 'Lazy Connections', href: '/manage/peers/lazy-connection' },
           { title: 'Remote Jobs', href: '/manage/peers/remote-jobs' },
