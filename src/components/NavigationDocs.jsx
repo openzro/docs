@@ -36,6 +36,10 @@ export const docsNavigation = [
         title: 'Browser Client Architecture',
         href: '/about-openzro/browser-client-architecture',
       },
+      {
+        title: 'Why self-host only',
+        href: '/about-openzro/self-host-only',
+      },
       { title: 'FAQ', href: '/about-openzro/faq' },
       /*{ title: 'Whats new in version xx', href: '/welcome/how-openzro-works' },
             { title: 'Release notes', href: '/about-openzro/openzro-vs-traditional-vpn' },*/
@@ -135,6 +139,10 @@ export const docsNavigation = [
             href: '/manage/access-control/posture-checks',
             isOpen: false,
             links: [
+              {
+                title: 'Device Admission',
+                href: '/manage/access-control/posture-checks/device-admission',
+              },
               {
                 title: 'Disable route when in the office',
                 href: '/manage/access-control/posture-checks/connecting-from-the-office',
@@ -420,6 +428,10 @@ export const docsNavigation = [
                 title: 'Generic HTTP',
                 href: '/manage/activity/event-streaming/generic-http',
               },
+              {
+                title: 'Custom Payload Templates',
+                href: '/manage/activity/event-streaming/payload-templates',
+              },
             ],
           },
         ],
@@ -500,7 +512,7 @@ export const docsNavigation = [
     ],
   },
   {
-    title: 'SELF-HOST NETBIRD',
+    title: 'SELF-HOST OPENZRO',
     links: [
       { title: 'Quickstart Guide', href: '/selfhosted/selfhosted-quickstart' },
       {
@@ -549,6 +561,10 @@ export const docsNavigation = [
           {
             title: 'Activity Events Postgres Store',
             href: '/selfhosted/activity-postgres-store',
+          },
+          {
+            title: 'Flow Archive — GCS (native)',
+            href: '/selfhosted/flow-archive-gcs',
           },
           {
             title: 'Management Geolocation Database',
@@ -723,6 +739,16 @@ export const docsNavigation = [
             href: '/use-cases/security/implement-zero-trust',
           },
         ],
+      },
+    ],
+  },
+  {
+    title: 'COMPLIANCE',
+    links: [
+      { title: 'Overview', href: '/compliance' },
+      {
+        title: 'Bacen 4.893 (Brazil)',
+        href: '/compliance/bacen-4893',
       },
     ],
   },

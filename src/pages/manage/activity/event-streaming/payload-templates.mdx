@@ -1,0 +1,170 @@
+import { Note } from '@/components/mdx'
+
+# Custom Payload Templates
+
+Activity Streamer destinations (HTTP webhook, Datadog, Elastic)
+ship a default JSON payload that openZro defines. That shape works
+for most receivers but is wrong for some — a legacy SIEM that
+expects a flat key=value alert line, an internal SOC pipeline keyed
+on a specific JSON schema, a chat receiver that wants a Markdown
+message, or a Slack-style webhook that wraps a JSON envelope.
+
+**Custom payload templates** let the operator supply a
+[Go text/template](https://pkg.go.dev/text/template) that openZro
+renders against each event. The rendered output is sent verbatim;
+no JSON wrapping, no second-guessing. The receiver gets exactly
+the shape it expects.
+
+<Note>
+  Templates are off by default. The default payload is what the
+  upstream HTTP webhook always shipped — if your receiver was
+  happy with that, do nothing. Configure a template only when
+  you have a specific receiver shape to match.
+</Note>
+
+## Configuring a template
+
+Settings → Integrations → Activity Streamer → **Add exporter**
+(or **Edit** on an existing one). The modal exposes a multi-line
+**Custom payload template** field at the bottom plus a **Validate
+template** button.
+
+### Validate before save
+
+The Validate button POSTs the template to
+`/api/admin/activity-exporters/validate-template`, which compiles
+it and renders against a synthetic event. If the template has a
+syntax error or references a nonexistent field, the modal
+surfaces the error and refuses to save. Operators see the problem
+in the UI — not at 3am when the audit pipeline silently stops.
+
+## What the template sees
+
+The template binds `.` to a `RenderableEvent` view of the
+activity event. Field names use Go's PascalCase conventions:
+
+| Field | Type | Notes |
+|---|---|---|
+| `.ID` | uint64 | Stable per-account event ID |
+| `.Timestamp` | time.Time | UTC, nanosecond precision |
+| `.Activity` | string | Stable code like `peer.admission.deny` |
+| `.ActivityCode` | uint32 | Numeric form of Activity |
+| `.Message` | string | Human-readable label like `Peer admission denied` |
+| `.InitiatorID` | string | User or service-user ID |
+| `.InitiatorName` | string | Display name (resolved at fetch) |
+| `.InitiatorEmail` | string | Email (resolved at fetch) |
+| `.TargetID` | string | Target peer / user / setup-key ID |
+| `.AccountID` | string | Tenant account ID |
+| `.Meta` | map[string]any | Per-activity structured payload |
+
+`.Meta` shape varies by activity. For `peer.admission.deny` it
+carries `posture_check_id`, `posture_check_name`, `check_type`,
+`reason`, and `peer_hostname`. For
+`account.setting.admission.checks.update` it carries
+`posture_check_ids`. Etc.
+
+## Helper functions
+
+The template engine ships a small, read-only `FuncMap`:
+
+| Function | Purpose | Example |
+|---|---|---|
+| `json` | Marshal a value to JSON | `{{ json .Meta }}` |
+| `dict` | Build a map from key/value pairs | `{{ json (dict "ts" .Timestamp "act" .Activity) }}` |
+| `default` | Fallback for empty values | `{{ default "anon" .InitiatorEmail }}` |
+| `rfc3339` | UTC RFC3339Nano timestamp | `{{ rfc3339 .Timestamp }}` |
+| `upper`, `lower` | String case | `{{ upper .Activity }}` |
+| `meta` | Read a key from `.Meta` (returns "" if absent) | `{{ meta .Meta "reason" }}` |
+
+The standard `text/template` builtins (`range`, `with`, `if`,
+`eq`, `ne`, `and`, `or`, `not`, `index`) work as documented.
+
+## Examples
+
+### Canonical JSON payload (most SIEMs)
+
+```text
+{{ json (dict
+  "ts"     (rfc3339 .Timestamp)
+  "user"   .InitiatorEmail
+  "action" .Activity
+  "tenant" .AccountID
+  "extra"  .Meta
+) }}
+```
+
+Output:
+
+```json
+{"action":"peer.admission.deny","extra":{"reason":"non-compliant","peer_hostname":"alice-laptop","posture_check_id":"abc-123","posture_check_name":"intune-compliant","check_type":"EndpointSecurityCheck"},"tenant":"acct-1","ts":"2026-04-26T10:00:00Z","user":"alice@example.test"}
+```
+
+### Flat key=value alert line (legacy SIEM, syslog)
+
+```text
+ts={{rfc3339 .Timestamp}} act={{.Activity}} usr={{default "system" .InitiatorID}} acct={{.AccountID}}{{range $k, $v := .Meta}} {{$k}}={{$v}}{{end}}
+```
+
+Output:
+
+```
+ts=2026-04-26T10:00:00Z act=peer.admission.deny usr=u1 acct=acct-1 reason=non-compliant peer_hostname=alice-laptop posture_check_id=abc-123 posture_check_name=intune-compliant check_type=EndpointSecurityCheck
+```
+
+Pair this with `Content-Type: text/plain` in the headers.
+
+### Slack incoming webhook
+
+```text
+{{ json (dict
+  "username" "openZro"
+  "icon_emoji" ":lock:"
+  "text" (printf "%s — %s" .Message (default "system" .InitiatorEmail))
+  "attachments" (list (dict
+    "color" "warning"
+    "fields" (list
+      (dict "title" "Activity" "value" .Activity "short" true)
+      (dict "title" "Account"  "value" .AccountID "short" true)
+    )
+  ))
+) }}
+```
+
+(Slack-shaped output omitted; matches Slack's
+[incoming webhook](https://api.slack.com/messaging/webhooks)
+contract verbatim.)
+
+## Limits
+
+| Cap | Value | Reason |
+|---|---|---|
+| Source length | 4 KB | Larger usually a paste accident or DoS |
+| Rendered output | 256 KB / event | Defense against runaway `range` under high event throughput |
+
+Templates that exceed either return an error at render time and
+the event is dropped (with a loud log line). Source-length limit
+is enforced at parse time and refuses Save before the template
+ever reaches the live pipeline.
+
+## Safety
+
+The template engine has no exec, no file, no network
+primitives — `text/template` builtins are pure by construction,
+and the FuncMap above is read-only. The input is openZro's own
+event struct, not user-controlled data. The output is bounded.
+
+You can use templates without worrying about a malformed event
+crashing the management process.
+
+## When NOT to use templates
+
+- **Datadog Logs Intake** has a fixed envelope shape Datadog
+  parses; the openZro Datadog exporter handles that envelope
+  directly. A template here would wrap something Datadog
+  expects in something Datadog does not. Use the default.
+- **Elastic Bulk API** uses NDJSON with action lines; the
+  openZro Elastic exporter assembles the bulk body. Same
+  reason — leave the default.
+
+Templates apply to the **HTTP webhook** exporter where the body
+shape is yours to control end-to-end.

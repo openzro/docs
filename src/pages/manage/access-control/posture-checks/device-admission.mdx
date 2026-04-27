@@ -1,0 +1,204 @@
+import { Note } from '@/components/mdx'
+
+# Device Admission
+
+The standard posture-check pipeline (Country, OS Version, Process,
+openZro Version, Network Range, Endpoint Security) filters peers
+out of policy source groups. A peer that fails a check loses
+visibility into the peers it was supposed to talk to, but it stays
+connected to the management plane and keeps its IP. Useful for
+fine-grained ACLs; not enough for regulated environments that need
+to **refuse non-compliant devices outright** and produce an audit
+trail to prove it.
+
+**Device Admission** closes that gap. It is an account-wide gate
+evaluated at every Login, AddPeer, and Sync gRPC call. A peer that
+fails the listed posture checks is rejected with
+`PermissionDenied` at the control plane — it never enters the mesh
+on a fresh connect, and an existing session is closed within
+~6 minutes when the operator's MDM/EDR vendor reports a
+compliance flip.
+
+<Note>
+  Device Admission is required for tenants subject to Bacen
+  Resolução 4.893 / Circular 3.909 (Brazilian fintechs and banks),
+  DORA, NYDFS Part 500, and PCI-DSS v4.0 §8 — controls that
+  mandate provable refusal of non-compliant endpoints with an
+  auditable record. See the
+  [Bacen → openZro mapping](/compliance/bacen-4893) for the
+  per-control crosswalk.
+</Note>
+
+## How it works
+
+Three phases run together; all are enabled by a single account
+toggle.
+
+**Phase 1 — control-plane refusal.** Every Login, AddPeer, and
+Sync evaluates the configured posture checks against the peer's
+freshly-reported metadata. The first failing check produces a
+structured denial that names the check, the type, and the reason.
+The gRPC handler returns `PermissionDenied` with a message like
+`device admission denied: EndpointSecurityCheck: device not
+compliant per Microsoft Intune`. The peer never enters the mesh.
+
+**Phase 2 — active revalidation.** A goroutine on every management
+instance iterates locally connected peers every 60 seconds (tunable
+via `OPENZRO_ADMISSION_REVALIDATE_INTERVAL_SECONDS`) and re-runs
+the same checks. On denial, the peer's update channel is closed,
+which terminates its open Sync stream cleanly. The client backs
+off and retries Login, where Phase 1 refuses re-entry. End-to-end
+revocation latency is bounded by the worker interval plus the MDM
+cache TTL plus client backoff — typically ~6 minutes worst case.
+
+**Phase 3 — audit trail.** Every refusal emits a
+`peer.admission.deny` event into the Activity log with the failing
+check ID, the check type, the reason verbatim from the vendor, and
+the peer hostname. Toggle flips and admission-list edits emit
+their own events
+(`account.setting.admission.enforcement.{enable,disable}`,
+`account.setting.admission.checks.update`) so changes to the
+policy itself leave a paper trail.
+
+## Configuring Device Admission
+
+Prerequisites: at least one configured posture check. For the
+common case (block non-compliant devices reported by an MDM/EDR),
+configure the
+[MDM/EDR provider](/manage/integrations/mdm-deployment/intune-openzro-integration)
+first, then build a Posture Check of type **Endpoint Security
+(MDM/EDR)** pointing at it.
+
+### Step 1 — Add the posture check to the admission list (no enforce yet)
+
+Open `Settings` → `Device Admission`. The page exposes three
+controls:
+
+1. **Enforce admission on Login & Sync** — the global toggle.
+2. **Posture checks that gate admission** — the multi-select.
+3. **Audit CSV** — quarterly evidence export button.
+
+Tick the posture checks you want to gate admission on, but **leave
+the toggle off**. Save. The list is recorded; nothing is enforced
+yet.
+
+### Step 2 — Observe what would fail (soft rollout)
+
+There is no built-in dry-run mode by design — keeping the auth
+trail simple. The recommended path:
+
+1. Attach the same posture check to a single test policy (Source
+   Posture Checks). Anything that disappears from that policy's
+   source group would have been refused by the admission gate.
+2. Wait one Sync window. Confirm the failure set matches the
+   "known-bad" devices you expect to block.
+3. Flip the toggle once the disappearing set is empty (or matches
+   your target list).
+
+### Step 3 — Enforce
+
+Settings → Device Admission → toggle **Enforce admission on Login
+& Sync** → Save.
+
+Within ~6 minutes:
+
+- Every connected peer that fails admission has its session
+  closed.
+- New connection attempts are refused at the Login gRPC.
+- The Activity log carries one `peer.admission.deny` row per
+  refusal, with structured `meta`:
+
+```json
+{
+  "posture_check_id":   "abc-123",
+  "posture_check_name": "intune-compliant",
+  "check_type":         "EndpointSecurityCheck",
+  "reason":             "device not compliant per Microsoft Intune",
+  "peer_hostname":      "alice-laptop"
+}
+```
+
+### Step 4 — Audit CSV for the auditor
+
+`Settings` → `Device Admission` → **Audit CSV** downloads the
+admission slice of the activity log with stable columns:
+
+```
+timestamp, activity_code, activity, initiator_id, initiator_name,
+initiator_email, target_id, posture_check_id, posture_check_name,
+check_type, reason, peer_hostname
+```
+
+For a time-bounded export (quarterly review):
+
+```
+GET /api/events/admission.csv?from=2026-01-01T00:00:00Z&to=2026-04-01T00:00:00Z
+```
+
+with the user's bearer token.
+
+## Tuning
+
+### Revocation latency vs vendor API load
+
+Default cadence is 60s revalidate interval + 5min MDM cache TTL.
+Tunable via:
+
+```bash
+# 1 = pure Phase 1 (gate only at fresh Sync); no active revocation
+# 0 = same as 1, except the worker is fully off
+# >=10 = revalidator runs every N seconds. 60 is the default.
+export OPENZRO_ADMISSION_REVALIDATE_INTERVAL_SECONDS=60
+```
+
+The 10-second floor protects vendor APIs from stampede. Most
+deployments stay at the default; tighten only if your compliance
+window is narrower than 5 minutes.
+
+### Fail-open semantics
+
+Set per posture check, not globally. Default is **fail-closed**:
+vendor lookup failure (timeout, vendor outage, device not found) is
+treated as non-compliant. The Endpoint Security check exposes a
+`Fail open on lookup error` toggle that flips the behavior to
+fail-open if the operator cares more about availability than
+strict posture.
+
+| Profile | Recommended setting |
+|---|---|
+| Bacen-regulated | Fail-closed (the auditor will ask why a vendor outage let non-compliant devices through) |
+| Enterprise IT | Fail-open is usually reasonable |
+| Critical infra | Fail-closed + a manually-revoked break-glass auth path |
+
+## Common scenarios
+
+### "I need to let one specific peer through despite failing"
+
+Either fix the device at the vendor (MDM/EDR) or remove the check
+from the admission list. There is **no per-peer override** by
+design — that would erode the audit story. Vendor-side fix is the
+fastest path; revalidator picks up the new state within ~6
+minutes.
+
+### "Vendor went down, everyone's locked out"
+
+Two options, in order of preference:
+
+1. Pre-emptive: enable Fail-Open on the EndpointSecurityCheck.
+   Vendor outages no longer lock anyone out. The auditor will
+   want to know this is on.
+2. Quick remediation: flip the Enforce toggle off. Audit event
+   records the change with operator identity. Re-enable when the
+   vendor recovers.
+
+### "Compromised device: how fast does access stop?"
+
+Worst case ≈ 6 min:
+
+```
+revalidate_interval (60s) + mdm_cache_ttl (5min) + client_backoff (~30s)
+```
+
+To compress further, the cache TTL can be reduced in the source
+(currently a 5-minute hard-coded constant) but be aware of the
+vendor rate-limit cost.
