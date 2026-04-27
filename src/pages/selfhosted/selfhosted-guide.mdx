@@ -102,27 +102,27 @@ The [setup.env.example](https://github.com/openzro/openzro/tree/main/infrastruct
 ## example file, you can copy this file to setup.env and update its values
 ##
 # Dashboard domain. e.g. app.mydomain.com
-NETBIRD_DOMAIN=""
+OPENZRO_DOMAIN=""
 # OIDC configuration e.g., https://example.eu.auth0.com/.well-known/openid-configuration
-NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT=""
-NETBIRD_AUTH_AUDIENCE=""
+OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT=""
+OPENZRO_AUTH_AUDIENCE=""
 # e.g. openzro-client
-NETBIRD_AUTH_CLIENT_ID=""
+OPENZRO_AUTH_CLIENT_ID=""
 # indicates whether to use Auth0 or not: true or false
-NETBIRD_USE_AUTH0="false"
-NETBIRD_AUTH_DEVICE_AUTH_PROVIDER="none"
+OPENZRO_USE_AUTH0="false"
+OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="none"
 # enables Interactive SSO Login feature (Oauth 2.0 Device Authorization Flow)
-NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID=""
+OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID=""
 # e.g. hello@mydomain.com
-NETBIRD_LETSENCRYPT_EMAIL=""
+OPENZRO_LETSENCRYPT_EMAIL=""
 ```
 
 <Note>
     The changes made to `setup.env` will not take any effect until you run `configure.sh` (mentioned later on).
 </Note>
 
-- Set ```NETBIRD_DOMAIN``` to your domain, e.g.  `demo.openzro.io`
-- Configure ```NETBIRD_LETSENCRYPT_EMAIL``` property.
+- Set ```OPENZRO_DOMAIN``` to your domain, e.g.  `demo.openzro.io`
+- Configure ```OPENZRO_LETSENCRYPT_EMAIL``` property.
 This can be any email address. [Let's Encrypt](https://letsencrypt.org/) will create an account while generating a new certificate.
 
 <Note>

@@ -36,13 +36,13 @@ If you prefer not to self-host, Zitadel offers a managed cloud option at [zitade
 1. Navigate to Zitadel console
 2. Click **Projects** at the top menu, then click **Create New Project**
 3. Fill in:
-   - **Name**: `NETBIRD`
+   - **Name**: `OPENZRO`
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/zitadel/zitadel-new-project.png" alt="New project" className="imagewrapper-big"/>
 </p>
 
-4. Click **Projects** and select **NETBIRD** project
+4. Click **Projects** and select **OPENZRO** project
 5. Click **New** in **Applications** section
 6. Fill in:
    - **Name**: `openzro`
@@ -158,23 +158,23 @@ Double-check if the endpoint returns a JSON response by calling it from your bro
 Set properties in the `setup.env` file:
 
 ```shell
-NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<YOUR_ZITADEL_HOST_AND_PORT>/.well-known/openid-configuration"
-NETBIRD_USE_AUTH0=false
-NETBIRD_AUTH_CLIENT_ID="<CLIENT_ID>"
-NETBIRD_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api"
-NETBIRD_AUTH_AUDIENCE="<CLIENT_ID>"
-NETBIRD_AUTH_REDIRECT_URI="/auth"
-NETBIRD_AUTH_SILENT_REDIRECT_URI="/silent-auth"
+OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<YOUR_ZITADEL_HOST_AND_PORT>/.well-known/openid-configuration"
+OPENZRO_USE_AUTH0=false
+OPENZRO_AUTH_CLIENT_ID="<CLIENT_ID>"
+OPENZRO_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api"
+OPENZRO_AUTH_AUDIENCE="<CLIENT_ID>"
+OPENZRO_AUTH_REDIRECT_URI="/auth"
+OPENZRO_AUTH_SILENT_REDIRECT_URI="/silent-auth"
 
-NETBIRD_AUTH_DEVICE_AUTH_PROVIDER="hosted"
-NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID="<CLIENT_ID>"
-NETBIRD_AUTH_DEVICE_AUTH_AUDIENCE="<CLIENT_ID>"
+OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="hosted"
+OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID="<CLIENT_ID>"
+OPENZRO_AUTH_DEVICE_AUTH_AUDIENCE="<CLIENT_ID>"
 
-NETBIRD_MGMT_IDP="zitadel"
-NETBIRD_IDP_MGMT_CLIENT_ID="openzro"
-NETBIRD_IDP_MGMT_CLIENT_SECRET="<CLIENT_SECRET>"
-NETBIRD_IDP_MGMT_EXTRA_MANAGEMENT_ENDPOINT="https://<YOUR_ZITADEL_HOST_AND_PORT>/management/v1"
-NETBIRD_MGMT_IDP_SIGNKEY_REFRESH=true
+OPENZRO_MGMT_IDP="zitadel"
+OPENZRO_IDP_MGMT_CLIENT_ID="openzro"
+OPENZRO_IDP_MGMT_CLIENT_SECRET="<CLIENT_SECRET>"
+OPENZRO_IDP_MGMT_EXTRA_MANAGEMENT_ENDPOINT="https://<YOUR_ZITADEL_HOST_AND_PORT>/management/v1"
+OPENZRO_MGMT_IDP_SIGNKEY_REFRESH=true
 ```
 
 ### Step 7: Continue with openZro Setup

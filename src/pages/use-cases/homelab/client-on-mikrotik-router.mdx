@@ -104,7 +104,7 @@ and getting access to router's private keys. This file doesn't really change all
 
 ```shell
 /container envs
-add key=NB_SETUP_KEY name=openzro value=YOUR_NETBIRD_SETUP_KEY
+add key=NB_SETUP_KEY name=openzro value=YOUR_OPENZRO_SETUP_KEY
 add key=NB_NAME name=openzro value=CONTAINER_HOSTNAME
 add key=NB_HOSTNAME name=openzro value=CONTAINER_HOSTNAME
 add key=NB_LOG_LEVEL name=openzro value=info
@@ -116,8 +116,8 @@ We also set `NB_NAME` and `NB_HOSTNAME` to match our router's identity as seen i
 because RouterOS won't allow us to set container's hostname to the same value as router's hostname.
 If using a self-hosted openZro server we'll also want to add the correct URLs to our server:
 ```shell
-add key=NB_MANAGEMENT_URL name=openzro value=YOUR_NETBIRD_MANAGEMENT_URL
-add key=NB_ADMIN_URL name=openzro value=YOUR_NETBIRD_ADMIN_URL
+add key=NB_MANAGEMENT_URL name=openzro value=YOUR_OPENZRO_MANAGEMENT_URL
+add key=NB_ADMIN_URL name=openzro value=YOUR_OPENZRO_ADMIN_URL
 ```
 
 Create the container and trigger image pull from DockerHub:

@@ -179,7 +179,7 @@ To locate the openZro-assigned IP or domain, go to the `Peers` page in your open
 Verify connectivity to the VM from any openZro-connected device using:
 
 ```bash
-curl http://<NETBIRD_IP>:8080
+curl http://<OPENZRO_IP>:8080
 ```
 
 The expected output should be similar to the following:
@@ -189,7 +189,7 @@ $ curl 100.85.148.249:8080
 <html><body><h1>Welcome to openZro Demo</h1><p>If you can see this, you've successfully connected to the container via openZro.</p></body></html>
 ```
 
-Alternatively, you can go to `http://VM_NETBIRD_DOMAIN:8080` using your browser:
+Alternatively, you can go to `http://VM_OPENZRO_DOMAIN:8080` using your browser:
 
 ![openZro Welcome Page](/docs-static/img/manage/peers/access-infrastructure/setup-keys-add-servers-to-network/setup-keys-add-server-04.png)
 
@@ -208,7 +208,7 @@ openzro up --allow-server-ssh
 You can then use the openZro SSH client to connect to your VM:
 
 ```bash
-sudo openzro ssh <NETBIRD_DOMAIN | NETBIRD_IP>
+sudo openzro ssh <OPENZRO_DOMAIN | OPENZRO_IP>
 ```
 
 Summing up, openZro's setup keys solve the challenge of securely connecting unattended resources, streamlining the integration of servers and containers without user intervention. For those looking to scale, the [openZro API](https://docs.openzro.io/api/resources/setup-keys) offers powerful automation capabilities, allowing programmatic management of peers, setup keys, and access policies. These features combine to create a robust, secure, and easily manageable network infrastructure that adapts to your organization's needs.

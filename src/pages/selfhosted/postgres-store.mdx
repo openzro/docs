@@ -44,7 +44,7 @@ This section applies to deployments using the older multi-container architecture
 
 To enable Postgres, add to your `setup.env`:
 ```bash
-NETBIRD_STORE_CONFIG_ENGINE=postgres
+OPENZRO_STORE_CONFIG_ENGINE=postgres
 ```
 This sets the following in your `management.json`:
 ```json
@@ -55,13 +55,13 @@ This sets the following in your `management.json`:
 
 Create a `.env` file with the connection string:
 ```bash
-NETBIRD_STORE_ENGINE_POSTGRES_DSN="host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
+OPENZRO_STORE_ENGINE_POSTGRES_DSN="host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
 ```
 
 Update `docker-compose.yml` to pass the config to the `management` container:
 ```yaml
 environment:
-  - NETBIRD_STORE_ENGINE_POSTGRES_DSN=${NETBIRD_STORE_ENGINE_POSTGRES_DSN}
+  - OPENZRO_STORE_ENGINE_POSTGRES_DSN=${OPENZRO_STORE_ENGINE_POSTGRES_DSN}
 env_file:
   - .env
 ```

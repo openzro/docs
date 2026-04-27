@@ -48,17 +48,17 @@ This guide assumes you're using Docker and everything is run in the same bash se
 
 | Flag | Environment variable | Description | Expected format |
 |------|----------------------|-------------| --------------- |
-| `--domain` | `NETBIRD_DOMAIN` | Domain for both dashboard and API | example.com |
-| `--dashboard-url` | `NETBIRD_DASHBOARD_URL` | Dashboard domain (will override --domain) | example.com or example.com:33073 or https://example.com |
-| `--api-url` | `NETBIRD_API_URL` | API domain (will override --domain) | example.com or example.com:33073 or https://example.com |
-| `--config` | `NETBIRD_CONFIG_PATH` | Path to management.json (required) | /path/to/management.json |
-| `--datadir` | `NETBIRD_DATA_DIR` | Override data directory from config (store.db path will be derived from this) | /path/to/datadir |
-| `--idp-seed-info` | `NETBIRD_IDP_SEED_INFO` | Base64-encoded connector JSON | base64-encoded JSON string |
-| `--dry-run` | `NETBIRD_DRY_RUN` | Preview changes without writing | true or false |
-| `--force` | `NETBIRD_FORCE` | Skip confirmation prompt | true or false |
-| `--skip-config` | `NETBIRD_SKIP_CONFIG` | Skip config generation (DB migration only) | true or false |
-| `--skip-populate-user-info` | `NETBIRD_SKIP_POPULATE_USER_INFO` | Skip populating user info (user id migration only) | true or false |
-| `--log-level` | `NETBIRD_LOG_LEVEL` | Log level: debug, info, warn, error (default "info") | debug, info, warn, error |
+| `--domain` | `OPENZRO_DOMAIN` | Domain for both dashboard and API | example.com |
+| `--dashboard-url` | `OPENZRO_DASHBOARD_URL` | Dashboard domain (will override --domain) | example.com or example.com:33073 or https://example.com |
+| `--api-url` | `OPENZRO_API_URL` | API domain (will override --domain) | example.com or example.com:33073 or https://example.com |
+| `--config` | `OPENZRO_CONFIG_PATH` | Path to management.json (required) | /path/to/management.json |
+| `--datadir` | `OPENZRO_DATA_DIR` | Override data directory from config (store.db path will be derived from this) | /path/to/datadir |
+| `--idp-seed-info` | `OPENZRO_IDP_SEED_INFO` | Base64-encoded connector JSON | base64-encoded JSON string |
+| `--dry-run` | `OPENZRO_DRY_RUN` | Preview changes without writing | true or false |
+| `--force` | `OPENZRO_FORCE` | Skip confirmation prompt | true or false |
+| `--skip-config` | `OPENZRO_SKIP_CONFIG` | Skip config generation (DB migration only) | true or false |
+| `--skip-populate-user-info` | `OPENZRO_SKIP_POPULATE_USER_INFO` | Skip populating user info (user id migration only) | true or false |
+| `--log-level` | `OPENZRO_LOG_LEVEL` | Log level: debug, info, warn, error (default "info") | debug, info, warn, error |
 
 
 <Note>
@@ -150,10 +150,10 @@ Using Zitadel as an example, the JSON should have the following values:
 </Note>
 
 
-2. Encode and store it in the `NETBIRD_IDP_SEED_INFO` environment variable:
+2. Encode and store it in the `OPENZRO_IDP_SEED_INFO` environment variable:
 
 ```bash
-export NETBIRD_IDP_SEED_INFO=$(base64 < connector.json | tr -d '\n') 
+export OPENZRO_IDP_SEED_INFO=$(base64 < connector.json | tr -d '\n') 
 ```
 
 ---
@@ -182,18 +182,18 @@ VOLUME_NAME=$(docker volume ls --format '{{ .Name }}' | grep -Ei 'management|mgm
 echo "Volume: $VOLUME_NAME"
 
 # Get the host path
-export NETBIRD_DATA_DIR=$(docker volume inspect "$VOLUME_NAME" --format '{{ .Mountpoint }}')
-echo "Path: $NETBIRD_DATA_DIR"
+export OPENZRO_DATA_DIR=$(docker volume inspect "$VOLUME_NAME" --format '{{ .Mountpoint }}')
+echo "Path: $OPENZRO_DATA_DIR"
 
 # (SQLite only) Verify store.db exists, then back up
-sudo ls "$NETBIRD_DATA_DIR/store.db"
-sudo cp "$NETBIRD_DATA_DIR/store.db" "$NETBIRD_DATA_DIR/store.db.bak"
+sudo ls "$OPENZRO_DATA_DIR/store.db"
+sudo cp "$OPENZRO_DATA_DIR/store.db" "$OPENZRO_DATA_DIR/store.db.bak"
 
 # Verify management.json exists, the path will vary based on your setup, then back up
-export NETBIRD_CONFIG_PATH="<path-to-config>/management.json"
-cat "$NETBIRD_CONFIG_PATH"
+export OPENZRO_CONFIG_PATH="<path-to-config>/management.json"
+cat "$OPENZRO_CONFIG_PATH"
 
-cp "$NETBIRD_CONFIG_PATH" "$NETBIRD_CONFIG_PATH.bak"
+cp "$OPENZRO_CONFIG_PATH" "$OPENZRO_CONFIG_PATH.bak"
 ```
 ---
 
@@ -202,9 +202,9 @@ cp "$NETBIRD_CONFIG_PATH" "$NETBIRD_CONFIG_PATH.bak"
 ### Validate required env vars / flags
 
 ```bash
-echo $NETBIRD_CONFIG_PATH
-echo $NETBIRD_DATA_DIR
-echo $NETBIRD_IDP_SEED_INFO | base64 -d
+echo $OPENZRO_CONFIG_PATH
+echo $OPENZRO_DATA_DIR
+echo $OPENZRO_IDP_SEED_INFO | base64 -d
 ```
 
 You should expect to see an output similar to this:
@@ -418,8 +418,8 @@ If something goes wrong after migration:
 
 1. **Stop** the management server: `docker compose stop management`
 2. **Restore the database:**
-   - SQLite (Docker volume): `sudo cp $NETBIRD_DATA_DIR/store.db.bak $NETBIRD_DATA_DIR/store.db`
+   - SQLite (Docker volume): `sudo cp $OPENZRO_DATA_DIR/store.db.bak $OPENZRO_DATA_DIR/store.db`
    - PostgreSQL: restore from your `pg_dump` backup
-3. **Restore the config:** `cp $NETBIRD_CONFIG_PATH.bak $NETBIRD_CONFIG_PATH`
+3. **Restore the config:** `cp $OPENZRO_CONFIG_PATH.bak $OPENZRO_CONFIG_PATH`
 4. **Revert** any reverse proxy or dashboard env changes.
 5. **Start** the management server: `docker compose up -d management`

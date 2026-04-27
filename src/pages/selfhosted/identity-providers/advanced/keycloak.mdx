@@ -214,19 +214,19 @@ Double-check if the endpoint returns a JSON response by calling it from your bro
 Set properties in the `setup.env` file:
 
 ```shell
-NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<YOUR_KEYCLOAK_HOST_AND_PORT>/realms/openzro/.well-known/openid-configuration"
-NETBIRD_USE_AUTH0=false
-NETBIRD_AUTH_CLIENT_ID="openzro-client"
-NETBIRD_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api"
-NETBIRD_AUTH_AUDIENCE="openzro-client"
+OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<YOUR_KEYCLOAK_HOST_AND_PORT>/realms/openzro/.well-known/openid-configuration"
+OPENZRO_USE_AUTH0=false
+OPENZRO_AUTH_CLIENT_ID="openzro-client"
+OPENZRO_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api"
+OPENZRO_AUTH_AUDIENCE="openzro-client"
 
-NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID="openzro-client"
-NETBIRD_AUTH_DEVICE_AUTH_AUDIENCE="openzro-client"
+OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID="openzro-client"
+OPENZRO_AUTH_DEVICE_AUTH_AUDIENCE="openzro-client"
 
-NETBIRD_MGMT_IDP="keycloak"
-NETBIRD_IDP_MGMT_CLIENT_ID="openzro-backend"
-NETBIRD_IDP_MGMT_CLIENT_SECRET="<NETBIRD_BACKEND_CLIENT_SECRET>"
-NETBIRD_IDP_MGMT_EXTRA_ADMIN_ENDPOINT="https://<YOUR_KEYCLOAK_HOST_AND_PORT>/admin/realms/openzro"
+OPENZRO_MGMT_IDP="keycloak"
+OPENZRO_IDP_MGMT_CLIENT_ID="openzro-backend"
+OPENZRO_IDP_MGMT_CLIENT_SECRET="<OPENZRO_BACKEND_CLIENT_SECRET>"
+OPENZRO_IDP_MGMT_EXTRA_ADMIN_ENDPOINT="https://<YOUR_KEYCLOAK_HOST_AND_PORT>/admin/realms/openzro"
 ```
 
 <Note>

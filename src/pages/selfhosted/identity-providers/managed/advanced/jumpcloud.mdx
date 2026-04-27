@@ -140,21 +140,21 @@ If you already have an integration user, confirm it has the required role and sk
 Set properties in the `setup.env` file:
 
 ```shell
-NETBIRD_DOMAIN="<YOUR_DOMAIN>"
-NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://oauth.id.jumpcloud.com/.well-known/openid-configuration"
-NETBIRD_USE_AUTH0=false
-NETBIRD_DASH_AUTH_USE_AUDIENCE=false
-NETBIRD_AUTH_AUDIENCE="<CLIENT_ID>"
-NETBIRD_AUTH_SUPPORTED_SCOPES="openid profile email offline_access"
-NETBIRD_AUTH_CLIENT_ID="<CLIENT_ID>"
-NETBIRD_AUTH_REDIRECT_URI="/auth"
-NETBIRD_AUTH_SILENT_REDIRECT_URI="/silent-auth"
-NETBIRD_TOKEN_SOURCE="idToken"
+OPENZRO_DOMAIN="<YOUR_DOMAIN>"
+OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://oauth.id.jumpcloud.com/.well-known/openid-configuration"
+OPENZRO_USE_AUTH0=false
+OPENZRO_DASH_AUTH_USE_AUDIENCE=false
+OPENZRO_AUTH_AUDIENCE="<CLIENT_ID>"
+OPENZRO_AUTH_SUPPORTED_SCOPES="openid profile email offline_access"
+OPENZRO_AUTH_CLIENT_ID="<CLIENT_ID>"
+OPENZRO_AUTH_REDIRECT_URI="/auth"
+OPENZRO_AUTH_SILENT_REDIRECT_URI="/silent-auth"
+OPENZRO_TOKEN_SOURCE="idToken"
 
-NETBIRD_AUTH_DEVICE_AUTH_PROVIDER="none"
+OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="none"
 
-NETBIRD_MGMT_IDP="jumpcloud"
-NETBIRD_IDP_MGMT_EXTRA_API_TOKEN="<API_TOKEN>"
+OPENZRO_MGMT_IDP="jumpcloud"
+OPENZRO_IDP_MGMT_EXTRA_API_TOKEN="<API_TOKEN>"
 ```
 
 ### Step 5: Continue with openZro Setup
@@ -264,7 +264,7 @@ The service should now start successfully, and the error should be resolved.
 ### Device authorization not available
 
 - JumpCloud has limited device auth support
-- Set `NETBIRD_AUTH_DEVICE_AUTH_PROVIDER="none"`
+- Set `OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="none"`
 
 ---
 

@@ -76,7 +76,7 @@ export const docsNavigation = [
     ],
   },
   {
-    title: 'MANAGE NETBIRD',
+    title: 'MANAGE OPENZRO',
     links: [
       { title: 'Control Center', href: '/manage/control-center' },
       {

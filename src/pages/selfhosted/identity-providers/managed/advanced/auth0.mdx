@@ -31,15 +31,15 @@ If you prefer to have full control over authentication, consider self-hosted alt
 
 You will configure these properties in `setup.env`:
 
-- `NETBIRD_AUTH_CLIENT_ID`
-- `NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT`
-- `NETBIRD_USE_AUTH0`
-- `NETBIRD_AUTH_AUDIENCE`
-- `NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID` (Optional)
-- `NETBIRD_MGMT_IDP`
-- `NETBIRD_IDP_MGMT_CLIENT_ID`
-- `NETBIRD_IDP_MGMT_CLIENT_SECRET`
-- `NETBIRD_IDP_MGMT_EXTRA_AUDIENCE`
+- `OPENZRO_AUTH_CLIENT_ID`
+- `OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT`
+- `OPENZRO_USE_AUTH0`
+- `OPENZRO_AUTH_AUDIENCE`
+- `OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID` (Optional)
+- `OPENZRO_MGMT_IDP`
+- `OPENZRO_IDP_MGMT_CLIENT_ID`
+- `OPENZRO_IDP_MGMT_CLIENT_SECRET`
+- `OPENZRO_IDP_MGMT_EXTRA_AUDIENCE`
 
 ### Step 1: Create Dashboard Application
 
@@ -53,8 +53,8 @@ This application authorizes access to openZro Dashboard.
 Ensure **Token Endpoint Authentication Method** is set to **None**.
 </Note>
 
-4. Use **Client ID** for `NETBIRD_AUTH_CLIENT_ID`
-5. Use **Domain** to configure `NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT`:
+4. Use **Client ID** for `OPENZRO_AUTH_CLIENT_ID`
+5. Use **Domain** to configure `OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT`:
 
 ```bash
 https://<DOMAIN>/.well-known/openid-configuration
@@ -69,8 +69,8 @@ Double-check if the endpoint returns a JSON response by calling it from your bro
 This API is used to access openZro Management Service.
 
 1. Follow the [Auth0 Create An API](https://auth0.com/docs/quickstart/backend/golang#create-an-api) guide
-2. Use the API **Identifier** for `NETBIRD_AUTH_AUDIENCE`
-3. Set `NETBIRD_USE_AUTH0=true`
+2. Use the API **Identifier** for `OPENZRO_AUTH_AUDIENCE`
+3. Set `OPENZRO_USE_AUTH0=true`
 
 ### Step 3: Enable Interactive SSO Login (Optional)
 
@@ -88,7 +88,7 @@ This enables machine authorization via your Identity Provider as an alternative 
 </p>
 
 5. Click **Settings** tab
-6. Copy **Client ID** to `NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID`
+6. Copy **Client ID** to `OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID`
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/auth0/advanced/auth0-interactive-login-settings.png" alt="Interactive login settings" className="imagewrapper-big"/>
@@ -132,9 +132,9 @@ This application authorizes access to Auth0 Management API.
 
 7. Click **Settings** tab
 8. Copy values:
-   - **Client ID** → `NETBIRD_IDP_MGMT_CLIENT_ID`
-   - **Client Secret** → `NETBIRD_IDP_MGMT_CLIENT_SECRET`
-   - **Domain** → `NETBIRD_IDP_MGMT_EXTRA_AUDIENCE` (format: `https://<DOMAIN>/api/v2/`)
+   - **Client ID** → `OPENZRO_IDP_MGMT_CLIENT_ID`
+   - **Client Secret** → `OPENZRO_IDP_MGMT_CLIENT_SECRET`
+   - **Domain** → `OPENZRO_IDP_MGMT_EXTRA_AUDIENCE` (format: `https://<DOMAIN>/api/v2/`)
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/auth0/advanced/auth0-machine-settings.png" alt="Machine settings" className="imagewrapper-big"/>
@@ -145,17 +145,17 @@ This application authorizes access to Auth0 Management API.
 Set properties in the `setup.env` file:
 
 ```shell
-NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<DOMAIN>/.well-known/openid-configuration"
-NETBIRD_USE_AUTH0=true
-NETBIRD_AUTH_CLIENT_ID="<CLIENT_ID>"
-NETBIRD_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api email_verified"
-NETBIRD_AUTH_AUDIENCE="<IDENTIFIER>"
-NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID="<INTERACTIVE_CLIENT_ID>"
+OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<DOMAIN>/.well-known/openid-configuration"
+OPENZRO_USE_AUTH0=true
+OPENZRO_AUTH_CLIENT_ID="<CLIENT_ID>"
+OPENZRO_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api email_verified"
+OPENZRO_AUTH_AUDIENCE="<IDENTIFIER>"
+OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID="<INTERACTIVE_CLIENT_ID>"
 
-NETBIRD_MGMT_IDP="auth0"
-NETBIRD_IDP_MGMT_CLIENT_ID="<NETBIRD_API_CLIENT_ID>"
-NETBIRD_IDP_MGMT_CLIENT_SECRET="<NETBIRD_API_CLIENT_SECRET>"
-NETBIRD_IDP_MGMT_EXTRA_AUDIENCE="https://<DOMAIN>/api/v2/"
+OPENZRO_MGMT_IDP="auth0"
+OPENZRO_IDP_MGMT_CLIENT_ID="<OPENZRO_API_CLIENT_ID>"
+OPENZRO_IDP_MGMT_CLIENT_SECRET="<OPENZRO_API_CLIENT_SECRET>"
+OPENZRO_IDP_MGMT_EXTRA_AUDIENCE="https://<DOMAIN>/api/v2/"
 ```
 
 ### Step 6: Continue with openZro Setup
@@ -175,7 +175,7 @@ You've configured all required resources in Auth0. Continue with the [openZro Se
 ### "Unauthorized" errors for Management API
 
 - Verify the Machine to Machine application has correct permissions
-- Check that `NETBIRD_IDP_MGMT_EXTRA_AUDIENCE` includes `/api/v2/`
+- Check that `OPENZRO_IDP_MGMT_EXTRA_AUDIENCE` includes `/api/v2/`
 
 ### Device authorization not working
 
@@ -184,7 +184,7 @@ You've configured all required resources in Auth0. Continue with the [openZro Se
 
 ### Token validation errors
 
-- Verify `NETBIRD_USE_AUTH0=true` is set
+- Verify `OPENZRO_USE_AUTH0=true` is set
 - Check the audience matches the API identifier
 
 ---
