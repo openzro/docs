@@ -170,15 +170,70 @@ strict posture.
 | Enterprise IT | Fail-open is usually reasonable |
 | Critical infra | Fail-closed + a manually-revoked break-glass auth path |
 
+## Bringing up routing / gateway peers (no MDM)
+
+Server-side peers (cloud VMs, Kubernetes pods, on-prem gateways
+running the openZro client as a daemon) are not enrolled in
+MDM/EDR — their host has no Intune / SentinelOne / Huntress
+agent to report from. With the gate on, the posture check would
+always fail and the operator could not bring up their own
+infrastructure.
+
+Use **exempt groups** for this. Workflow:
+
+1. Create a group `infrastructure-peers` under `Team → Groups`.
+2. Issue or edit setup keys with
+   `AutoGroups: ["infrastructure-peers"]` for every gateway peer.
+3. On `Settings → Device Admission`, tick `infrastructure-peers`
+   under **Exempt groups**. Save.
+
+New gateway peers join the mesh transparently. The change emits
+`account.setting.admission.exempt_groups.update` so the auditor
+sees who set the exemption.
+
 ## Common scenarios
 
-### "I need to let one specific peer through despite failing"
+### "I need to let one user laptop in temporarily (break-glass)"
 
-Either fix the device at the vendor (MDM/EDR) or remove the check
-from the admission list. There is **no per-peer override** by
-design — that would erode the audit story. Vendor-side fix is the
-fastest path; revalidator picks up the new state within ~6
-minutes.
+The bypass path. CEO laptop failed Intune, has a meeting in 10
+minutes, the device is in remediation. Grant a per-peer bypass
+with a mandatory reason and time-bounded expiry:
+
+```bash
+curl -fsS -X POST \
+  -H "Authorization: Bearer <PAT>" \
+  -H "Content-Type: application/json" \
+  -d '{"reason":"Intune re-enrol pending — board meeting","expires_in_seconds":86400}' \
+  https://your-management.example.com/api/peers/<peer-id>/admission-bypass
+```
+
+The grant emits `peer.admission.bypass.granted` with the
+initiator (your user ID), the reason, and the expiry. When the
+bypass expires (or the operator revokes it via DELETE on the
+same URL), the worker emits
+`peer.admission.bypass.{expired,revoked}` so the auditor sees
+the full lifecycle.
+
+Validation the API enforces: `reason` required,
+`expires_in_seconds` or `expires_at` required (no-expiry refused),
+maximum 30 days (longer windows must be re-granted).
+
+The bypass applies only to the admission gate. Per-policy posture
+checks still run.
+
+### "I need to let a routing peer / gateway in"
+
+Use exempt groups instead of bypass — see the section above.
+Bypass is per-peer + time-bounded, designed for break-glass on
+user endpoints. Exempt groups are per-class + permanent, designed
+for infrastructure.
+
+### "Permanent fix instead of bypass"
+
+Either fix the device at the vendor (MDM/EDR) so it reports
+compliant, or remove the relevant check from the admission list.
+Vendor-side fix is the fastest path; the revalidator picks up
+the new state within ~6 minutes.
 
 ### "Vendor went down, everyone's locked out"
 
