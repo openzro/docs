@@ -150,10 +150,6 @@ export const docsNavigation = [
                 href: '/manage/access-control/endpoint-detection-and-response/crowdstrike-edr',
               },
               {
-                title: 'FleetDM',
-                href: '/manage/access-control/endpoint-detection-and-response/fleetdm-edr',
-              },
-              {
                 title: 'Huntress',
                 href: '/manage/access-control/endpoint-detection-and-response/huntress-edr',
               },
@@ -402,18 +398,6 @@ export const docsNavigation = [
               {
                 title: 'Datadog',
                 href: '/manage/activity/event-streaming/datadog',
-              },
-              {
-                title: 'Amazon S3',
-                href: '/manage/activity/event-streaming/amazon-s3',
-              },
-              {
-                title: 'Amazon Firehose',
-                href: '/manage/activity/event-streaming/amazon-firehose',
-              },
-              {
-                title: 'SentinelOne Data Lake',
-                href: '/manage/activity/event-streaming/sentinelone-data-lake',
               },
               {
                 title: 'Generic HTTP',

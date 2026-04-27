@@ -52,7 +52,6 @@ export const apiNavigation = [
             { title: 'Event Streaming', href: '/api/resources/event-streaming-integrations' },
             { title: 'EDR Peers', href: '/api/resources/edr-peers' },
             { title: 'EDR Falcon', href: '/api/resources/edr-falcon-integrations' },
-            { title: 'EDR FleetDM', href: '/api/resources/edr-fleetdm-integrations' },
             { title: 'EDR Huntress', href: '/api/resources/edr-huntress-integrations' },
             { title: 'EDR Intune', href: '/api/resources/edr-intune-integrations' },
             { title: 'EDR SentinelOne', href: '/api/resources/edr-sentinelone-integrations' },

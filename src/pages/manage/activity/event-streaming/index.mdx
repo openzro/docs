@@ -1,25 +1,46 @@
-# Stream Network Activity to Third-Party SIEM Platforms
+import {Note} from "@/components/mdx";
+
+# Stream Activity Events to Third-Party SIEMs
 
 <p>
     <img src="/docs-static/img/manage/activity/event-streaming/event-streaming-integration.png" alt="event-streaming-integration" className="imagewrapper-big"/>
 </p>
 
-Security Information and Event Management (SIEM) systems play a critical role in network security by monitoring,
-detecting, and responding to security threats in real-time. By aggregating and analyzing activity across the network,
-SIEMs help identify anomalous patterns and potential breaches, providing a centralized view of security events.
+openZro emits a structured stream of activity events — peer logins,
+posture decisions, admission gate verdicts, policy changes,
+configuration updates, IdP-Sync runs — that you can fan out to your
+SIEM in real time. The feature ships in the management binary and
+is configured via environment variables; see
+[`management/server/activity/exporter`](https://github.com/openzro/openzro/tree/main/management/server/activity/exporter)
+for the implementation.
 
-openZro provides an event streaming feature that allows you to stream network [activity events](/manage/activity/traffic-events-logging)
-to third-party SIEM systems, such as [Datadog](https://www.datadoghq.com/dg/security/siem-solution/), [Amazon S3](https://aws.amazon.com/s3/), [Amazon Data Firehose](https://aws.amazon.com/firehose/), and others through a generic HTTP integration.
+## Supported destinations
+
+| Destination | Wire protocol | Use when |
+|---|---|---|
+| **Datadog** | Logs Intake API (HTTPS) | You're already on Datadog and want events alongside the rest of your observability |
+| **Elastic** | Bulk API + ECS-shaped JSON | You run Elastic / Kibana / OpenSearch as your primary SIEM |
+| **Generic HTTP** | POST / PUT to any URL | Anything else — Splunk via HEC, Grafana Loki, Vector, Fluent Bit, a custom endpoint. Optionally with a [custom payload template](/manage/activity/event-streaming/payload-templates) |
+
+The destinations are independent — you can run any combination of
+the three concurrently. Slow downstreams don't block each other,
+and a transient outage at one doesn't drop events for the others.
 
 <Note>
-    This feature is only available in the cloud version of openZro.
+    Activity streaming is implemented end-to-end in the BSD-3
+    open-source build — there is no licensing gate. The streamer
+    runs alongside the rest of the management binary; events are
+    emitted within ~1 second of the originating action.
 </Note>
 
-This documentation provides step-by-step guides and best practices for integrating openZro activity event streaming with
-supported third-party platforms. To get started, select one of the following integrations:
+## Per-destination guides
 
 - [Datadog](/manage/activity/event-streaming/datadog)
-- [Amazon S3](/manage/activity/event-streaming/amazon-s3)
-- [Amazon Data Firehose](/manage/activity/event-streaming/amazon-firehose)
-- [SentinelOne Data Lake](/manage/activity/event-streaming/sentinelone-data-lake)
 - [Generic HTTP](/manage/activity/event-streaming/generic-http)
+- [Custom Payload Templates](/manage/activity/event-streaming/payload-templates)
+
+Elastic doesn't have its own walkthrough yet; configure it via the
+environment variables documented at
+[`activity/exporter/factory.go`](https://github.com/openzro/openzro/blob/main/management/server/activity/exporter/factory.go)
+(`OPENZRO_ACTIVITY_EXPORT_ELASTIC_*`). A walkthrough is on the
+[roadmap](https://github.com/openzro/openzro/blob/main/docs/ROADMAP.md).

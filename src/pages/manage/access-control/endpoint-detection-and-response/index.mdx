@@ -28,18 +28,24 @@ openZro doesn't apply the MDM and EDR checks to all devices in the network. Inst
 the checks to apply.
 
 <Note>
-     This feature is only available in the cloud version of openZro.
+    EDR / MDM posture checks ship in the BSD-3 management binary —
+    no licensing gate. The driver code lives at
+    [`management/server/mdm/`](https://github.com/openzro/openzro/tree/main/management/server/mdm),
+    one file per vendor (~150 lines each). New vendors are
+    welcome — see the [`Provider` interface](https://github.com/openzro/openzro/blob/main/management/server/mdm/provider.go)
+    for the contract.
 </Note>
 
-## Supported EDR Platforms
-
-openZro integrates with the following EDR and MDM platforms:
+## Supported EDR / MDM platforms
 
 * [CrowdStrike Falcon](/manage/access-control/endpoint-detection-and-response/crowdstrike-edr)
-* [FleetDM](/manage/access-control/endpoint-detection-and-response/fleetdm-edr)
 * [Huntress](/manage/access-control/endpoint-detection-and-response/huntress-edr)
 * [Microsoft Intune](/manage/access-control/endpoint-detection-and-response/intune-mdm)
 * [SentinelOne Singularity](/manage/access-control/endpoint-detection-and-response/sentinelone-edr)
+
+Tanium, Jamf Pro, and Kandji are on the
+[roadmap](https://github.com/openzro/openzro/blob/main/docs/ROADMAP.md)
+as P2.
 
 ## Managing Exceptions
 
