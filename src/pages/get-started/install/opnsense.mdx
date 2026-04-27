@@ -1,149 +1,169 @@
 # OPNsense Installation
 
-The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available,
-there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
+OPNsense ships a NetBird package (maintained by Deciso, the OPNsense
+vendor) directly in the firmware plugin manager since version `25.7.3`.
+**openZro is wire-compatible with that client** because we forked
+NetBird at `v0.52.2`, the last permissively-licensed release before
+the upstream's AGPL relicense — and the agent ↔ management protocol
+hasn't broken across versions.
 
-
-<YouTube videoId="AK0Ct-ULFKg" start={669} />
+So the workflow is: install Deciso's `os-netbird` plugin from the
+OPNsense plugin manager, then point the **Management URL** field at
+your openZro management server. No openZro-specific build needed.
 
 <Note>
-    The openZro package is officially included starting from OPNsense `25.7.3`.
+    The plugin appears as `os-netbird` in the plugin manager because
+    that's the upstream package name. You'll see the `NetBird` label
+    inside the OPNsense UI; configure it to talk to openZro. The
+    agent binary is licensed AGPLv3 (NetBird's current license);
+    you're an end-user consuming it — that doesn't affect your
+    openZro management deployment, which stays BSD-3.
 </Note>
 
+{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="AK0Ct-ULFKg" start={669} /> */}
 
 ## Prerequisites
+
+- OPNsense `25.7.3` or later
 - Shell or Web UI access to your OPNsense system
 - A [setup key](/manage/peers/register-machines-using-setup-keys#types-of-setup-keys) to authenticate and register the OPNsense device
 
 ## Installation
 
-1. **Log in to your OPNsense system**
+1. **Log in to your OPNsense Web UI**
 
-    You can use the Web UI or SSH.
+2. **Install the plugin**
 
-2. **Install the openZro package**
+   `System` > `Firmware` > `Plugins`, search for `os-netbird`, and
+   click the install button. OPNsense fetches and installs the
+   plugin from its official package repository.
 
-    In the OPNsense Web UI, navigate to `System` > `Firmware` > `Plugins`, and search for the `os-openzro` package. Click the install button next to it.
+3. **Verify**
 
-3. **Verify the installation**
-
-    Once installed, the openZro configuration interface will be available under `VPN` > `openZro` in the OPNsense menu
+   Once installed, the configuration UI is available under
+   `VPN` > `NetBird`. The label says NetBird because that's the
+   upstream package name — point it at openZro in the next step.
 
 ## Configuration
 
 ### Enable the service
 
-Navigate to `VPN` > `openZro` > `Settings` and ensure the toggle `Enable` is turned on in the `General` section.
-This will enable us to continue with the next steps.
+`VPN` > `NetBird` > `Settings`. Make sure the `Enable` toggle in
+the `General` section is on.
 
 ### Authenticate the machine
 
-Fill out the authentication form with the following values and click `Save`:
+Fill out the authentication form:
 
-- **Management URL**: Default is `https://api.openzro.io:443`. If self-hosting, enter your custom management server URL.
-- **Setup Key**: Paste the setup key from your openZro account.
+- **Management URL**: enter your openZro management server, e.g.
+  `https://your-management.example.com:443`. Do **not** leave the
+  default — that points at the upstream NetBird managed cloud.
+- **Setup Key**: paste a setup key from your openZro dashboard.
+
+Click `Save`.
 
 <p>
+    {/* TODO(docs): replace with openZro screenshot */}
     <img src="/docs-static/img/get-started/opnsense/authentication.png" alt="authentication" className="imagewrapper-big"/>
 </p>
 
-### Verify Connection Status
+### Verify connection status
 
-The Status page shows detailed information about connected peers and control services, helping you monitor your deployment.
-Access it via `VPN` > `openZro` > `Status` in the OPNsense menu.
-
-Use this section for diagnostics and troubleshooting common connection or setup issues.
+`VPN` > `NetBird` > `Status` shows connected peers and control-service
+health.
 
 <p>
+    {/* TODO(docs): replace with openZro screenshot */}
     <img src="/docs-static/img/get-started/opnsense/status.png" alt="connection status" className="imagewrapper-big"/>
 </p>
 
-### Assign openZro interface
-After installation, a new interface named `wt0` will be available but unassigned. To assign it go to `Interfaces` >
-`Assignments`. Under `Assign a new interface`, set the following values:
+### Assign the WireGuard interface
+
+A new interface named `wt0` will be available but unassigned. Under
+`Interfaces` > `Assignments`, in `Assign a new interface`:
+
 - **Device**: `wt0`
 - **Description**: `openZro`
+
+Click `Add`.
 
 <p>
     <img src="/docs-static/img/get-started/opnsense/interface_assignment.png" alt="interfaceAssignment" className="imagewrapper-big"/>
 </p>
-
-Click `Add` to assign the interface.
 <p>
     <img src="/docs-static/img/get-started/opnsense/new_interface.png" alt="interfaceAssignment" className="imagewrapper-big"/>
 </p>
 
+### Enable the interface
 
-### Enable the openZro interface
-Now that the openZro interface has been added, you need to enable it. Go to `Interfaces` > `[openZro]`, then configure
-the following options and click `Save`, then `Apply changes` to activate the interface:
+`Interfaces` > `[openZro]`, then:
+
 - **Enable**: `✓ Enable Interface`
 - **Lock**: `✓ Prevent interface removal`
 
-<p> <img src="/docs-static/img/get-started/opnsense/enable_interface.png" alt="enableInterface" className="imagewrapper-big"/> </p>
+`Save`, then `Apply changes`.
+
+<p><img src="/docs-static/img/get-started/opnsense/enable_interface.png" alt="enableInterface" className="imagewrapper-big"/></p>
 
 <Note>
-    OPNsense includes native WireGuard support, however do not configure or manage the openZro interface (wt0) via the OPNsense WireGuard UI.
-    openZro fully manages the WireGuard interface and keys.
+    OPNsense has its own WireGuard UI, but **do not** configure the
+    openZro interface (wt0) through it. openZro manages the
+    WireGuard interface and keys end-to-end.
 </Note>
 
-### Configure Firewall Rules for the openZro interface
-To allow openZro to handle all access control, permit all traffic on the openZro interface in OPNsense.
-This ensures traffic flows freely, while openZro’s own policies (ACLs) govern the access restrictions.
+### Configure firewall rules
 
-1. Navigate to `Firewall` > `Rules` > `openZro`.
-2. Click `+ Add` to create a new rule.
-3. Configure the rule:
-    - **Action**: `Pass`
-    - **Interface**: `openZro`
-    - **Direction**: `in`
-    - **TCP/IP Version**: `IPv4`
-    - **Protocol**: `any`
-    - **Source**: `any`
-    - **Destination**: `any`
-    - **Description**: `Allow all on openZro (managed by openZro)`
-4. Click `Save`, then `Apply changes`.
-5. Ensure this rule is at the top of the `openZro` rules list so it isn’t shadowed by other rules.
+Permit all traffic on the openZro interface — openZro's own access
+policies (ACLs) handle the access control. Under
+`Firewall` > `Rules` > `openZro`:
+
+1. Click `+ Add`
+2. Configure:
+   - **Action**: `Pass`
+   - **Interface**: `openZro`
+   - **Direction**: `in`
+   - **TCP/IP Version**: `IPv4`
+   - **Protocol**: `any`
+   - **Source**: `any`
+   - **Destination**: `any`
+   - **Description**: `Allow all on openZro (managed by openZro ACLs)`
+3. `Save`, then `Apply changes`
+4. Make sure this rule sits at the top of the openZro rules list
 
 <p>
     <img src="/docs-static/img/get-started/opnsense/firewall_rules.png" alt="firewallRules" className="imagewrapper-big"/>
 </p>
 
-### Config for Troubleshooting Relayed Connections
+### Static port for relayed connections
 
-By default, OPNsense uses automatic outbound NAT which randomizes source ports. This can cause issues with openZro's NAT traversal (hole punching). To ensure reliable direct connections, you must configure a Static Port mapping.
+OPNsense's automatic outbound NAT randomizes source ports, which
+can break openZro's NAT traversal (hole punching). Add a Static
+Port mapping for the openZro host:
 
-1.  **Change Outbound NAT Mode**:
-    -   Navigate to `Firewall` > `NAT` > `Outbound`.
-    -   Select `Hybrid outbound NAT rule generation`.
-    -   Click `Save`.
+1. **Switch outbound NAT mode**:
+   - `Firewall` > `NAT` > `Outbound`
+   - Select `Hybrid outbound NAT rule generation`, click `Save`
 
-2.  **Add Static Port Rule**:
-    -   Click `+` to add a new rule.
-    -   **Interface**: `WAN`
-    -   **TCP/IP Version**: `IPv4`
-    -   **Protocol**: `UDP`
-    -   **Source address**: `Single host or Network` (enter the IP address of your openZro host)
-    -   **Destination address**: `any`
-    -   **Translation / Static-port**: Check `Static-port` box
-    -   **Description**: `openZro Static Port`
-    -   Click `Save` and then `Apply changes`.
+2. **Add a static-port rule**:
+   - Click `+` to create a new rule
+   - **Interface**: `WAN`
+   - **TCP/IP Version**: `IPv4`
+   - **Protocol**: `UDP`
+   - **Source address**: `Single host or Network` — IP of the openZro host
+   - **Destination address**: `any`
+   - **Translation / Static-port**: ✓ check
+   - **Description**: `openZro Static Port`
+   - `Save` and `Apply changes`
 
-3.  **Reset States**:
-    -   Go to `Firewall` > `Diagnostics` > `States`.
-    -   Filter by the openZro host IP.
-    -   Delete the states.
+3. **Reset existing states**:
+   - `Firewall` > `Diagnostics` > `States`
+   - Filter by openZro host IP, delete the states
 
-4.  **Restart openZro**:
-    -   Run `openzro service restart` on the device.
-    -   Run `openzro status -d` to verify the connection.
+4. **Restart the agent**:
+   - `netbird service restart` on the device
+   - `netbird status -d` to verify
 
 ## Get started
-<p float="center" >
-    <Button name="button" className="button-5" onClick={() => window.open("https://openzro.io/pricing")}>Use openZro</Button>
-</p>
 
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Follow us [on X](https://x.com/openzro)
-- Join our [Slack Channel](/slack-url)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub
+- [Star openZro on GitHub](https://github.com/openzro/openzro)
+- Latest [release notes](https://github.com/openzro/openzro/releases)
