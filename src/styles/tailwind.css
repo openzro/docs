@@ -192,3 +192,88 @@
     opacity: 0;
   }
 }
+/* ----------------------------------------------------------------- */
+/* Pagefind UI theming.
+ *
+ * Pagefind ships a default white-on-light theme tuned for sites that
+ * don't have their own dark mode. The docs site uses Tailwind's
+ * `class` strategy (toggling `<html class="dark">`), so we override
+ * Pagefind's CSS custom properties at the `.pagefind-ui` selector to
+ * follow the openZro brand violet on light, and an inverted scheme
+ * with violet-400 accents for dark mode.
+ *
+ * The selectors for inputs/results that don't honour a CSS variable
+ * directly are overridden with explicit colour rules. `box-shadow:
+ * none` removes Pagefind's default focus ring so the violet outline
+ * lands cleanly on the input.
+ */
+
+.pagefind-ui {
+    --pagefind-ui-primary: #7c3aed;
+    --pagefind-ui-text: #0f0a1f;
+    --pagefind-ui-background: #ffffff;
+    --pagefind-ui-border: #ddd6fe;
+    --pagefind-ui-tag: #f5f3ff;
+    --pagefind-ui-border-width: 1px;
+    --pagefind-ui-border-radius: 8px;
+    --pagefind-ui-font: 'Inter', system-ui, sans-serif;
+}
+
+.dark .pagefind-ui {
+    --pagefind-ui-primary: #a78bfa;
+    --pagefind-ui-text: #f4f4f5;
+    --pagefind-ui-background: #18181b;
+    --pagefind-ui-border: #3f3f46;
+    --pagefind-ui-tag: #27272a;
+}
+
+/* The form input, results list, and tag chips don't all read from the
+ * CSS variables directly — explicit overrides for dark mode. */
+.dark .pagefind-ui__search-input {
+    background-color: #27272a;
+    color: #f4f4f5;
+}
+
+.dark .pagefind-ui__search-input::placeholder {
+    color: #a1a1aa;
+}
+
+.dark .pagefind-ui__search-clear {
+    color: #f4f4f5;
+}
+
+.dark .pagefind-ui__result-link {
+    color: #f4f4f5;
+}
+
+.dark .pagefind-ui__result-link:hover,
+.dark .pagefind-ui__result-link:focus {
+    color: #a78bfa;
+}
+
+.dark .pagefind-ui__result-excerpt {
+    color: #d4d4d8;
+}
+
+.dark .pagefind-ui__result-excerpt mark {
+    background-color: #5b21b6;
+    color: #f4f4f5;
+}
+
+.dark .pagefind-ui__result-tags {
+    color: #a1a1aa;
+}
+
+.dark .pagefind-ui__filter-name,
+.dark .pagefind-ui__filter-value {
+    color: #f4f4f5;
+}
+
+.dark .pagefind-ui__message {
+    color: #d4d4d8;
+}
+
+/* Page divider between result groups */
+.dark .pagefind-ui__results-area {
+    border-color: #3f3f46;
+}
