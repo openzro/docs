@@ -16,13 +16,7 @@
 
 import { Dialog, Transition } from '@headlessui/react'
 import { useRouter } from 'next/router'
-import {
-  Fragment,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from 'react'
+import { Fragment, useCallback, useEffect, useState } from 'react'
 
 const PAGEFIND_BASE_URL = '/pagefind/'
 
@@ -65,58 +59,55 @@ function loadPagefindUI() {
 
 function SearchModal({ isOpen, onClose }) {
   const router = useRouter()
-  const containerRef = useRef(null)
   const [error, setError] = useState(null)
 
-  // Boot the Pagefind UI on first open. We re-instantiate on every open
-  // to keep the input state clean — the cost (microseconds, not a
-  // re-fetch) is well worth not having to dance around stale state.
-  useEffect(() => {
-    if (!isOpen || !containerRef.current) return undefined
+  // Use a callback ref so we know exactly when the container DOM node
+  // mounts/unmounts. This avoids the race condition where useEffect
+  // fires before the Headless UI Dialog has rendered its panel and
+  // the ref is still null. Pagefind UI is created once per mount and
+  // torn down when the panel unmounts — no need to manage isOpen
+  // ourselves; Headless UI does that via Transition.Root.
+  const containerCallback = useCallback(
+    (node) => {
+      if (!node) return // unmount handled by Dialog
+      let widget
+      loadPagefindUI()
+        .then((PagefindUI) => {
+          if (!node.isConnected) return
+          widget = new PagefindUI({
+            element: node,
+            baseUrl: '/',
+            showImages: false,
+            showSubResults: true,
+            resetStyles: false,
+          })
 
-    let widget
-    let cancelled = false
+          // Intercept result clicks so Next.js handles routing
+          // client-side instead of a full page reload.
+          node.addEventListener('click', (e) => {
+            const target = e.target.closest('a[href]')
+            if (!target) return
+            const href = target.getAttribute('href')
+            if (!href || href.startsWith('http') || href.startsWith('#'))
+              return
+            e.preventDefault()
+            onClose()
+            router.push(href)
+          })
 
-    loadPagefindUI()
-      .then((PagefindUI) => {
-        if (cancelled || !containerRef.current) return
-        widget = new PagefindUI({
-          element: containerRef.current,
-          baseUrl: '/',
-          showImages: false,
-          showSubResults: true,
-          resetStyles: false,
+          // Auto-focus the search input — matches the previous
+          // Algolia modal UX where Cmd-K opened straight to typing.
+          requestAnimationFrame(() => {
+            node.querySelector('.pagefind-ui__search-input')?.focus()
+          })
         })
-
-        // Pagefind UI inserts <a href> into results — intercept clicks
-        // so Next.js handles routing client-side instead of a full
-        // page reload, matching the upstream Algolia UX.
-        const onClick = (e) => {
-          const target = e.target.closest('a[href]')
-          if (!target) return
-          const href = target.getAttribute('href')
-          if (!href || href.startsWith('http') || href.startsWith('#')) return
-          e.preventDefault()
-          onClose()
-          router.push(href)
-        }
-        containerRef.current.addEventListener('click', onClick)
-        widget._onClick = onClick
-      })
-      .catch((err) => {
-        console.error('Pagefind load failed:', err)
-        setError(err.message)
-      })
-
-    return () => {
-      cancelled = true
-      if (widget && containerRef.current) {
-        containerRef.current.removeEventListener('click', widget._onClick)
-        // PagefindUI doesn't expose destroy() — clear the DOM manually.
-        containerRef.current.innerHTML = ''
-      }
-    }
-  }, [isOpen, onClose, router])
+        .catch((err) => {
+          console.error('Pagefind load failed:', err)
+          setError(err.message)
+        })
+    },
+    [onClose, router],
+  )
 
   return (
     <Transition.Root show={isOpen} as={Fragment} afterLeave={() => setError(null)}>
@@ -147,7 +138,7 @@ function SearchModal({ isOpen, onClose }) {
             leaveTo="opacity-0 scale-95"
           >
             <Dialog.Panel className="mx-auto max-w-2xl transform-gpu rounded-xl bg-white shadow-xl ring-1 ring-zinc-900/7.5 dark:bg-zinc-900 dark:ring-zinc-700/40">
-              <div ref={containerRef} className="p-2" />
+              <div ref={containerCallback} className="p-2" />
               {error && (
                 <div className="px-4 py-3 text-sm text-red-600 dark:text-red-400">
                   Search is unavailable: {error}
