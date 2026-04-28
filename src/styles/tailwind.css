@@ -195,17 +195,22 @@
 /* ----------------------------------------------------------------- */
 /* Pagefind UI theming.
  *
- * Pagefind ships a default white-on-light theme tuned for sites that
- * don't have their own dark mode. The docs site uses Tailwind's
- * `class` strategy (toggling `<html class="dark">`), so we override
- * Pagefind's CSS custom properties at the `.pagefind-ui` selector to
- * follow the openZro brand violet on light, and an inverted scheme
- * with violet-400 accents for dark mode.
+ * The default Pagefind theme is white-on-light with a yellow <mark>
+ * for match highlights. Both look bad on the docs site's dark mode
+ * (yellow blocks float on a near-black panel) and aren't on-brand
+ * even on light mode. The selectors below:
  *
- * The selectors for inputs/results that don't honour a CSS variable
- * directly are overridden with explicit colour rules. `box-shadow:
- * none` removes Pagefind's default focus ring so the violet outline
- * lands cleanly on the input.
+ *   - Set Pagefind's CSS custom properties to the openZro violet
+ *     palette in light + dark mode.
+ *   - Force the <mark> highlight to use brand violet-200 / -700
+ *     in both modes — `mark` is a UA-styled element so we override
+ *     it with high specificity (!important) to beat both Pagefind's
+ *     own stylesheet and the browser default.
+ *   - Backfill explicit colours for the input, result links, and
+ *     dividers when the surrounding CSS variables don't reach them.
+ *
+ * The selectors are scoped inside `.pagefind-ui` so they never
+ * leak into the rest of the docs.
  */
 
 .pagefind-ui {
@@ -223,15 +228,35 @@
     --pagefind-ui-primary: #a78bfa;
     --pagefind-ui-text: #f4f4f5;
     --pagefind-ui-background: #18181b;
-    --pagefind-ui-border: #3f3f46;
+    --pagefind-ui-border: #27272a;
     --pagefind-ui-tag: #27272a;
 }
 
-/* The form input, results list, and tag chips don't all read from the
- * CSS variables directly — explicit overrides for dark mode. */
+/* Match highlights — kill the browser default yellow <mark> and
+ * paint with brand violet in both modes. Pagefind UI's stylesheet
+ * also targets these, so the !important is intentional. */
+.pagefind-ui mark,
+.pagefind-ui__result-excerpt mark,
+.pagefind-ui__result-link mark {
+    background-color: #ddd6fe !important;
+    color: #4c1d95 !important;
+    padding: 0 0.2em;
+    border-radius: 3px;
+}
+
+.dark .pagefind-ui mark,
+.dark .pagefind-ui__result-excerpt mark,
+.dark .pagefind-ui__result-link mark {
+    background-color: #6d28d9 !important;
+    color: #ede9fe !important;
+}
+
+/* Search input — Pagefind UI hard-codes its own background and border
+ * on the input, so override directly. */
 .dark .pagefind-ui__search-input {
     background-color: #27272a;
     color: #f4f4f5;
+    border-color: #3f3f46;
 }
 
 .dark .pagefind-ui__search-input::placeholder {
@@ -240,6 +265,16 @@
 
 .dark .pagefind-ui__search-clear {
     color: #f4f4f5;
+    background: transparent;
+}
+
+.dark .pagefind-ui__search-clear:hover {
+    color: #a78bfa;
+}
+
+/* Result rows */
+.dark .pagefind-ui__result {
+    border-bottom-color: #27272a !important;
 }
 
 .dark .pagefind-ui__result-link {
@@ -255,11 +290,6 @@
     color: #d4d4d8;
 }
 
-.dark .pagefind-ui__result-excerpt mark {
-    background-color: #5b21b6;
-    color: #f4f4f5;
-}
-
 .dark .pagefind-ui__result-tags {
     color: #a1a1aa;
 }
@@ -273,7 +303,19 @@
     color: #d4d4d8;
 }
 
-/* Page divider between result groups */
 .dark .pagefind-ui__results-area {
-    border-color: #3f3f46;
+    border-color: #27272a;
+}
+
+/* "Load more results" button — Pagefind paints it with the primary
+ * colour on a light background; on dark mode the result is a
+ * violet-on-violet smear. Force clearer contrast. */
+.dark .pagefind-ui__button {
+    background-color: #6d28d9;
+    color: #f4f4f5;
+    border-color: transparent;
+}
+
+.dark .pagefind-ui__button:hover {
+    background-color: #7c3aed;
 }

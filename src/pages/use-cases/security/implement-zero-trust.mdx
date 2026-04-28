@@ -11,29 +11,42 @@ This guide shows how to implement a practical Zero Trust Architecture (ZTA) with
 
 Before you start planning or changing policies, confirm the basics.
 
-### 0.1 Required openZro plan and features
+### 0.1 Required features
 
-This guide uses features from both the **Team** and **Business** plans. Check that your deployment includes what you need.
+openZro is open-source and self-host only — there are no licensing
+tiers gating individual features. Every capability used in this
+guide ships in the same management binary; you just need a
+deployment running a recent enough version to pick them up.
 
-**Team plan**
+This guide uses:
 
-- **[User and group provisioning from IdP (Identity Provider)](/manage/team/idp-sync)** for automatic group sync
-- **[Audit event logging](/manage/activity)** for policy and configuration change history
+- **[User and group provisioning from your IdP](/manage/team/idp-sync)**
+  for automatic group sync (Okta, Microsoft Entra, Google Workspace,
+  JumpCloud, Keycloak, Auth0, Authentik, Zitadel, or generic SCIM).
+- **[Audit event logging](/manage/activity)** for policy and
+  configuration change history.
+- **Device posture checks** to gate access based on OS version,
+  client version, geolocation, CIDR ranges, running processes, and
+  MDM/EDR compliance — see [Section 4.2](#42-posture-checks-and-their-limits)
+  and the [Posture Checks guide](/manage/access-control/posture-checks).
+- **Connection traffic event logging** for flow visibility — see
+  [Section 7](#7-visibility-traffic-events-siem-and-control-center)
+  and [Traffic Events](/manage/activity/traffic-events-logging).
+  Requires the openZro client at v0.39 or newer.
+- **Audit and traffic event streaming** to Datadog, Elastic, or any
+  generic HTTP endpoint for SIEM integration — see
+  [Section 7](#7-visibility-traffic-events-siem-and-control-center)
+  and [Event Streaming](/manage/activity/event-streaming).
+- [Access Control policies and groups](/manage/access-control),
+  [Networks](/manage/networks), [Private DNS](/manage/dns), and the
+  [Control Center](/manage/control-center) topology view.
 
-**Business plan**
-
-- **Device posture checks** for limiting user access based on OS, client version, geolocation, CIDR, and processes (see [Section 4.2](#42-posture-checks-and-their-limits) and the [Posture Checks guide](/manage/access-control/posture-checks))
-- **Connection traffic event logging** (Beta, requires client v0.39+) for flow visibility (see [Section 7](#7-visibility-traffic-events-siem-and-control-center) and [Traffic Events](/manage/activity/traffic-events-logging))
-- **Audit and traffic event streaming** to Datadog, S3, Firehose, or generic HTTP for SIEM (Security Information and Event Management) integration (see [Section 7](#7-visibility-traffic-events-siem-and-control-center) and [Event Streaming](/manage/activity/event-streaming))
-
-**Available in all plans (including Free)**
-
-- [Access Control policies and groups](/manage/access-control)
-- [Networks](/manage/networks) and routing peers
-- [Private DNS](/manage/dns)
-- [Control Center](/manage/control-center) topology view
-
-If you self-host, ensure that Management (the central coordination and authentication service), Signal (the signaling service for peer connection negotiation), and Relay (the traffic relay used when direct connections fail) are running supported versions (preferably the latest) for these features.
+Make sure your deployment's Management (the central coordination and
+authentication service), Signal (the signaling service for peer
+connection negotiation), and Relay (the traffic relay used when
+direct connections fail) are all running supported versions
+(preferably the [latest release](https://github.com/openzro/openzro/releases))
+so these features all line up.
 
 ### 0.2 Firewall rules for openZro traffic
 
