@@ -62,7 +62,10 @@ export const docsNavigation = [
         links: [
           { title: 'Proxmox VE', href: '/get-started/install/proxmox-ve' },
           { title: 'Synology', href: '/get-started/install/synology' },
-          { title: 'TrueNAS', href: '/get-started/install/truenas' },
+          // TrueNAS guide hidden from nav pending a decision on whether
+          // to submit `openzro-client` to the TrueNAS Apps catalog. The
+          // page itself stays at /get-started/install/truenas with a
+          // banner so direct links don't 404.
           { title: 'pfSense', href: '/get-started/install/pfsense' },
           { title: 'OPNsense', href: '/get-started/install/opnsense' },
           { title: 'Raspberry Pi', href: '/get-started/install/raspberrypi' },
