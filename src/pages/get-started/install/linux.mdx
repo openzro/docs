@@ -74,6 +74,58 @@ sudo zypper install openzro
 
 Replace `x86_64` with `aarch64` on ARM64 hosts.
 
+## Arch Linux / CachyOS / Manjaro / EndeavourOS (pacman)
+
+The openZro pacman repo at `pkg.openzro.io/pacman` ships signed
+`.pkg.tar.zst` packages for `x86_64` and `aarch64`. Use it to get
+`pacman -Syu` auto-updates with full signature verification.
+
+```bash
+# Trust the openZro signing key
+sudo pacman-key --init
+curl -fsSL https://pkg.openzro.io/openzro-archive-key.asc \
+  | sudo pacman-key -a -
+
+# Locally sign the imported key (required for SigLevel = Required)
+FP=$(curl -fsSL https://pkg.openzro.io/openzro-archive-key.asc \
+     | gpg --show-keys --with-colons --import-options show-only \
+     | awk -F: '/^fpr:/ {print $10; exit}')
+sudo pacman-key --lsign-key "$FP"
+
+# Add the [openzro] repo to /etc/pacman.conf
+sudo tee -a /etc/pacman.conf > /dev/null <<EOF
+
+[openzro]
+SigLevel = Required DatabaseRequired
+Server = https://pkg.openzro.io/pacman/\$arch
+EOF
+
+sudo pacman -Sy
+sudo pacman -S openzro
+```
+
+### AUR alternative
+
+If you prefer to use the AUR through `yay`/`paru` (e.g. for
+discoverability or to bundle openZro alongside your other AUR
+packages), the [`openzro-bin`](https://aur.archlinux.org/packages/openzro-bin)
+package downloads the same prebuilt binary from GitHub Releases.
+
+```bash
+yay -S openzro-bin
+# or
+paru -S openzro-bin
+```
+
+The AUR package has no compile step — it just unpacks the binary
+tarball and installs the same `/usr/bin/openzro` as the pacman repo.
+
+<Note>
+    `openzro-ui` is not yet packaged for Arch. If you want the
+    desktop tray application, install it separately from the binary
+    tarball (see [Direct download](#direct-download-if-you-cant-use-a-package-repo) below).
+</Note>
+
 ## Direct download (if you can't use a package repo)
 
 Every release publishes pre-built binaries to GitHub Releases. Pick
@@ -81,7 +133,7 @@ the asset matching your OS / architecture and unpack:
 
 ```bash
 # CLI / daemon — replace VERSION with the tag you want
-VERSION=v0.1.0-alpha.2
+VERSION=v0.53.1-alpha.1
 ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
 curl -L -o openzro.tar.gz \
   "https://github.com/openzro/openzro/releases/download/${VERSION}/openzro_${VERSION#v}_linux_${ARCH}.tar.gz"
