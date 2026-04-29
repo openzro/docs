@@ -9,7 +9,7 @@ Table of contents
 
 
 ## Introduction
-This reference provides detailed information on managing integrations via openZro Cloud API.
+This reference provides detailed information on managing IdP sync integrations via the openZro management API.
 
 ## Authentication
 Authentication is required for all API requests. Please refer to the [authentication guideline](https://docs.openzro.io/how-to/access-openzro-public-api) for how to create and authenticate API calls using Personal Access Tokens (PAT).

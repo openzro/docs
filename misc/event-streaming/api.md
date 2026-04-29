@@ -1,7 +1,7 @@
 # Event-Streaming Integration API Documentation
 
 ## Introduction
-This reference provides detailed information on managing event-streaming integrations via openZro Cloud API.
+This reference provides detailed information on managing event-streaming integrations via the openZro management API.
 
 ## Authentication
 Authentication is required for all API requests. Please refer to the [authentication guideline](https://docs.openzro.io/how-to/access-openzro-public-api) for how to create and authenticate API calls using Personal Access Tokens (PAT).

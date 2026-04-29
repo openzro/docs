@@ -40,8 +40,8 @@ kubectl -n openzro create secret generic openzro-mgmt-api-key --from-literal=NB_
 
 4. (Recommended) Create a [`values.yaml`](https://github.com/openzro/kubernetes-operator/blob/main/examples/ingress/values-kubernetes-operator.yaml) file, check `helm show values openzro/kubernetes-operator` for more info.
 ```yaml
-# by default the managementURL points to the openZro cloud service: https://api.openzro.io:443
-# managementURL: "https://openzro.example.io:443"
+# Required: point this at your self-hosted openZro management server.
+managementURL: "https://management.example.com:443"
 ingress:
   enabled: true
 
@@ -385,7 +385,7 @@ spec:
 ...
 ```
 With this setup, other peers in your openZro network can reach these pods using the domain `app.<OPENZRO_DOMAIN>`
-(e.g., for openZro cloud, app.openzro.cloud). The access will be made using a DNS round-robin fashion for multiple pods.
+(where `<OPENZRO_DOMAIN>` is the DNS suffix configured for your self-hosted deployment, e.g. `internal`). The access will be made using a DNS round-robin fashion for multiple pods.
 
 ## Uninstallation
 

@@ -36,7 +36,7 @@ When you install the openZro app, TrueNAS shows an **Edit openZro Client** form.
 - **Hostname**: Name this peer will use in openZro (e.g., "truenas" or "nas"). Pick something you’ll recognize in the dashboard.
 - **Setup Key** *(required)*: Paste the setup key you created in [Generate your Setup Key](#generate-your-setup-key). This registers the TrueNAS peer with your openZro network.
 - **Userspace**: Leave default (userspace networking). Only change if you have a specific need.
-- **Management URL** *(optional)*: Leave empty for openZro Cloud (`https://api.openzro.io`). Set this only if you use a [self-hosted](/selfhosted/selfhosted-quickstart) management server.
+- **Management URL** *(required)*: Set the URL of your [self-hosted](/selfhosted/selfhosted-quickstart) openZro management server (e.g., `https://management.example.com:443`). openZro is self-hosted only — there is no managed cloud, so this field must always point at your own server.
 - **Additional Environment Variables**: Leave empty unless you need extra [environment variables](/get-started/cli#environment-variables).
 
 **Network Configuration**
