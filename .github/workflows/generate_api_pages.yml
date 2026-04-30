@@ -8,6 +8,9 @@ on:
         default: "refs/tags/vX.Y.Z"
         type: string
 
+permissions:
+  contents: write   # checkout + git push back to the docs repo
+
 jobs:
   generate_api_pages:
     runs-on: macos-latest
@@ -20,8 +23,12 @@ jobs:
           version_extractor_regex: '\/v(.*)$'
 
       - uses: actions/checkout@v6
-        with:
-          token: ${{ secrets.DEV_GITHUB_TOKEN }}
+        # No `token: ...` here — actions/checkout falls back to the
+        # workflow-scoped `secrets.GITHUB_TOKEN` (always present).
+        # The previous `secrets.DEV_GITHUB_TOKEN` reference was an
+        # orphan from upstream NetBird — never set on openzro/docs,
+        # so every dispatch from openzro/openzro's update-docs
+        # workflow failed at "Input required and not supplied: token".
 
       - name: Create directory
         run: mkdir -p generator/openapi
