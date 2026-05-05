@@ -50,7 +50,7 @@ export function DocsBackground() {
           // --oz-ink registers without competing with body text;
           // higher alphas tested as "still aparente" on the deep
           // violet-black bg.
-          'dark:stroke-violet-400/2.5 dark:[&>svg_rect]:fill-violet-400/5'
+          'dark:stroke-violet-400/2.5 dark:[&>svg_rect]:fill-violet-400/2.5'
         }
       />
     </div>
