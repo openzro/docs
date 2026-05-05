@@ -2,84 +2,49 @@ import {Note} from "@/components/mdx";
 
 # Getting Started
 
-## Quickstart Guide
-
-This guide walks you through connecting your first devices to an
-existing openZro deployment and building a secure peer-to-peer
-overlay network in less than ten minutes.
+This page walks an admin from a fresh openZro deployment to two
+connected peers and a working access policy. About 10 minutes of
+hands-on time.
 
 <Note>
-    openZro is **self-host only** — you (or your team) operate the
-    management server. If a deployment isn't ready yet, follow the
-    [self-host quickstart](/selfhosted/selfhosted-quickstart) first
-    (~15 minutes), then come back here.
+openZro is **self-hosted only** — you operate the management
+server. If you don't have one yet, follow the
+[Self-Hosting Quickstart](/selfhosted/selfhosted-quickstart)
+first (~15 minutes) and then come back here.
 </Note>
 
-{/* TODO(docs): record openZro walkthrough */}
+## 1. Sign in to your dashboard
 
-## Sign in to your dashboard
-
-Open the dashboard URL of your openZro management server in a
-browser — `https://your-management.example.com/` in this guide.
+Open the dashboard URL in a browser
+(`https://<your-management>.example.com/`). You'll be redirected
+to your identity provider's sign-in page — openZro has no user
+database of its own, every account lives in your IdP (Dex,
+Authentik, Keycloak, Okta, Microsoft Entra, Google Workspace,
+Auth0, JumpCloud, Zitadel, or any OIDC-compliant provider).
 
 ![openZro IdP SSO and MFA](/docs-static/img/get-started/onboarding/01_openzro-sso.jpeg)
 
-1. You'll be redirected to your identity provider's sign-in page —
-   openZro uses your IdP (Okta, Microsoft Entra, Auth0, Keycloak,
-   Authentik, JumpCloud, Zitadel, Google Workspace, or any OIDC-
-   compliant provider) for authentication. There is no openZro
-   account separate from your IdP.
-2. Follow the authentication steps for your IdP. MFA configured at
-   the IdP works automatically.
+After successful authentication you land on the dashboard's
+**Peers** page. The first sign-in seeds a default account record,
+an **All** group, and a permissive **Default Policy** that lets
+every peer reach every other peer — you'll tighten this in step 4.
 
-On first login the dashboard creates the necessary baseline records
-(your user, a Default policy, the All group) and you're ready to
-add your first peer.
+## 2. Add your first peer
 
-## Peer-to-Peer Network
-One way of using openZro is to create a peer-to-peer network, where you run the openZro client on your devices to connect them directly.
-![Onboarding Method Selection](/docs-static/img/get-started/onboarding/02_p2p-network.jpeg)
+The dashboard's primary action is the **Add Peer** button (top
+right of the Peers page). It opens a modal with one tab per
+platform:
 
-The onboarding process will now guide you to connect your first device, also known as a peer.
-For this guide, we'll select Peer-to-Peer Network. If you’re selecting the Remote Network Access option, you can see that process [here](#remote-network-access).
+- **Linux** (Debian / Ubuntu / RHEL / Rocky / Fedora / Arch)
+- **macOS** (Homebrew or `.pkg` installer)
+- **Windows** (`.msi` installer)
+- **Docker** (single-container quickstart)
 
-### Install Your First Peer
-
-![Download openZro](/docs-static/img/get-started/onboarding/03_download-openzro.jpeg)
-
-1. On the "Let's get your first device online" screen, click the Install openZro button.
-2. An [installation modal](https://your-management.example.com/) will appear. Select your operating system (e.g., macOS, Windows, Linux). For this example, we're installing it on a macOS machine.
-3. Download the installer and run it. Follow the on-screen prompts to complete the installation.
-
-### Connect Your First Peer
-With the client installed, you now need to connect it to your network.
-
-![Connect openZro Client](/docs-static/img/get-started/onboarding/04_connect-client.jpeg)
-
-1. After installation, find the openZro icon in your system tray or menu bar.
-2. Click the icon and select **Connect**.
-3. This will open a new browser tab, prompting you to authorize the new device. Authenticate using the same IdP you used to sign up.
-4. Once authorized, you will see a "Login successful" message. The onboarding UI will update to show that your first peer is connected, displaying its name and assigned openZro IP address.
-
-### Add a Second Peer (Headless Linux Server)
-Next, let's add a second, headless peer, like a Linux server or a Raspberry Pi. For devices without a graphical interface, we use a [Setup Key](https://docs.openzro.io/manage/peers/register-machines-using-setup-keys).
-
-![Install openZro Headless](/docs-static/img/get-started/onboarding/05_headless-installed.jpeg)
-
-1. In the web UI, the onboarding flow will now prompt you to "bring in your second device." Click the link that says Install with a setup key.
-2. A pop-up will explain that a one-off setup key will be created, which you can also learn more about here. Click Continue..
-3. The onboarding UI will now provide two commands to run on your Linux server:
-
-* **Install openZro**: A curl command to download and run the installation script.
-* **Run openZro**: A [openzro up command](https://docs.openzro.io/get-started/cli) that includes your unique setup key.
-
-4. SSH into your Linux server and run the commands:
-
-First, copy the curl command, paste it into your server's terminal, and press **Enter**. You may be prompted for your sudo password.
+Pick your platform, copy the install command into a terminal on
+the device you want to enroll, and run it:
 
 ```bash
-# Add the openZro APT repo and install (Debian / Ubuntu —
-# see /get-started/install for other distros)
+# Debian / Ubuntu — see the modal for other distros
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg \
   | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null
 echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] \
@@ -88,134 +53,116 @@ https://pkg.openzro.io/apt stable main" \
 sudo apt-get update && sudo apt-get install -y openzro
 ```
 
-Next, copy the openzro up --setup-key ... command and paste it into the terminal.
+Then bring the client up:
 
 ```bash
-openzro up --setup-key <YOUR_SETUP_KEY>
+sudo openzro up --management-url https://<your-management>.example.com
 ```
 
-After running the second command, the terminal will confirm Connected. Your headless device is now part of your openZro network.
+The CLI opens a browser tab pointed at your IdP. Authenticate with
+the same account you used in step 1 — the device shows up in the
+dashboard's **Peers** list under your user, with a `100.x.y.z`
+address from openZro's overlay subnet.
 
-![Headless install connected](/docs-static/img/get-started/onboarding/06_headless-install-connected.jpeg)
+For full per-OS install details see [Install openZro](/get-started/install).
 
-### Verify the Connection
-The onboarding UI will now display both of your connected peers. The onboarding wizard provides a simple way to test that they can communicate directly.
+## 3. Add a second peer (headless / Linux server)
 
-![Testing ping on openZro](/docs-static/img/get-started/onboarding/07_ping-test.jpeg)
+Headless devices (servers, VMs, Raspberry Pi, CI runners) can't go
+through the browser-auth flow in step 2. Use a **setup key**
+instead: a long-lived token that pre-authenticates a peer and
+auto-assigns it to one or more groups.
 
-1. Copy the provided ping command from the onboarding UI. This command uses the openZro IP address of your second peer (the Ubuntu server).
-2. Open a terminal on your first peer and paste the command. Replace the example below with the openZro IP for your machine.
+In the dashboard:
+
+1. Open **Setup Keys** in the sidebar.
+2. Click **Add Setup Key**.
+3. Pick **Reusable** (the key works for many enrollments) or
+   **One-off** (single-use), set an expiration, and select which
+   groups new peers using this key should auto-join.
+4. Copy the generated key — it's shown once.
+
+On the headless device, install openZro the same way as step 2,
+then enroll using the key:
+
+```bash
+sudo openzro up --setup-key <YOUR_SETUP_KEY>
+```
+
+The peer appears in **Peers** within seconds, tagged with whatever
+groups the key assigned.
+
+For details on setup-key options (revocation, ephemeral peers,
+scoped expiration), see
+[Register Machines using Setup Keys](/manage/peers/register-machines-using-setup-keys).
+
+## 4. Verify the connection and inspect access control
+
+Both peers are now in the same overlay. Pick the IP openZro
+assigned to your second peer (from the Peers list — it's a
+`100.x.y.z` address) and from your first peer's terminal:
 
 ```bash
 ping 100.74.76.17
 ```
 
-3. You should see successful ping replies, confirming that the two devices are connected over the openZro network. Click It works! - Continue in the onboarding UI.
+You should see successful replies — the **Default Policy** that
+the dashboard seeded on first login is what makes this work.
 
-### Understanding Access Control
-The final onboarding step introduces openZro's powerful Access Control policies.
+To see the policy, open **Access Control → Policies**. The
+default rule allows `All → All` on every protocol/port. Disable
+that policy and the ping immediately starts timing out; re-enable
+it and traffic flows again. This is the simplest demo of how
+openZro mediates peer-to-peer access — every connection is gated
+by a policy, and policies reference **groups** (which peers
+belong to via setup-key assignment or manual edits in the
+dashboard).
 
-![openZro policy disabled](/docs-static/img/get-started/onboarding/08_policy-disabled-example.jpeg)
-1. By default, a policy is active that allows connections between all your devices. This is why the ping command in the previous step worked.
-2. The wizard demonstrates this by allowing you to toggle the policy. If you disable the "Default Policy," the ping between your devices will immediately fail with a "Request timeout" error.
-3. Re-enabling the policy instantly restores the connection. This gives you a basic understanding of how you can control traffic within your network. You can learn much more about policies [here](/manage/access-control/manage-network-access).
-4. Click Continue to finish.
+For the full access-control model (policies, groups, posture
+checks), see
+[Manage Network Access](/manage/access-control/manage-network-access).
 
-![Policy Example](/docs-static/img/get-started/onboarding/09_policy-example.jpeg)
-In the policy example above, we allowed _IT Admins_ port specific access to peers under the _AWS Servers_ group. Policies are a key building block to access in openZro. You can learn more about the power of policies [here](https://docs.openzro.io/manage/access-control/manage-network-access).
+## 5. (Optional) Expose a private subnet via a routing peer
 
-<Note>
-    If you manage users and groups with your identity provider, you can provision and sync them with openZro. Learn more [here](https://docs.openzro.io/manage/team/idp-sync) including the supported platforms.
-</Note>
+A **routing peer** is an openZro client running on a machine
+inside a private network (office LAN, VPC, home network) that
+forwards traffic from openZro peers to internal IPs that don't run
+openZro themselves — file servers, printers, RDS instances,
+internal APIs, etc.
 
-## Remote Network Access
-The second way to use openZro is for remote network access by running openZro on a single machine within your private network.
-This machine acts as a routing peer, routing traffic to internal resources that don't have the openZro client installed.
+Quick sketch:
 
-The onboarding process will now guide you to build our first network resource.
-For this guide, we'll select Remote Network Access.
+1. Install openZro on a host that lives inside the private
+   network (steps 2 or 3 above).
+2. In the dashboard, open **Networks → Add Network**.
+3. Define a **Network Resource** — either a single host
+   (`10.10.5.5`) or an entire subnet (`10.10.0.0/16`).
+4. Assign the resource to your routing peer (the host from step 1).
+5. Add a **policy** that lets the source group (e.g. your laptops)
+   reach this resource.
 
-![openZro Onboarding](/docs-static/img/get-started/onboarding/10_remote-access-onboarding.jpeg)
+Remote peers automatically learn the route via openZro's control
+plane and forward matching traffic through the routing peer.
 
-### Define Your Network Resource
-Next, you'll define the private network you want your users to be able to access.
-1. The onboarding UI will prompt you to "Add your first resource." There are a few options here, but the easiest way to get started is with full access to an entire Network. Select the Entire Subnet option.
-2. Enter the CIDR range of your private network. For example, `10.0.0.0/32`.
-3. Click Create Resource. A "Network" will be created in your dashboard to contain this resource and its access rules.
+For the full walkthrough — including high-availability setups
+with multiple routing peers per resource — see
+[Networks → Use Cases](/manage/networks/use-cases).
 
-![openZro Subnet Setup](/docs-static/img/get-started/onboarding/11_entire-subnet.jpeg)
+## Where to go next
 
-### Add and Configure a Routing Peer
-A [routing peer](https://docs.openzro.io/manage/network-routes) is a openZro peer that lives inside your private network and acts as a gateway, forwarding traffic between your remote users and the internal resources.
+- [Manage Peers](/manage/peers/add-machines-to-your-network) —
+  approval workflow, peer detail view, lazy connections, SSH.
+- [Access Control](/manage/access-control) — groups, policies,
+  posture checks, MDM/EDR integrations.
+- [Networks](/manage/networks) — routing peers, network
+  resources, DNS routes, exit nodes.
+- [DNS](/manage/dns) — magic DNS for peer names, custom
+  nameservers per route.
+- [CLI reference](/get-started/cli) — every flag for
+  `openzro up`, `openzro status`, `openzro down`, etc.
 
-![Adding a routing peer](/docs-static/img/get-started/onboarding/12_add-routing-peer.jpeg)
-
-1. The dashboard will now prompt you to "Add a routing peer." First, click Generate Setup Key. This creates a one-time key used to enroll the gateway machine into your openZro deployment.
-2. Next, click Install Routing Peer. Select the operating system of your gateway machine (the video uses Linux).
-3. The installation modal will provide two commands: a curl script to install the openZro agent and a openzro up command that includes your setup key.
-4. SSH into your gateway machine (which must be inside the 10.0.0.0/24 subnet) and run the commands:
-5. SSH into your Linux server and run the commands:
-
-```bash
-# Add the openZro APT repo and install (Debian / Ubuntu —
-# see /get-started/install for other distros)
-curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg \
-  | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null
-echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] \
-https://pkg.openzro.io/apt stable main" \
-  | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null
-sudo apt-get update && sudo apt-get install -y openzro
-```
-
-Next, copy the openzro up --setup-key ... command and paste it into the terminal.
-
-```bash
-openzro up --setup-key <YOUR_SETUP_KEY>
-```
-
-After running the second command, the terminal will confirm Connected. Your headless device is now part of your openZro network.
-
-### Connect a Client Device
-Now, set up the device you will use to connect to your private network.
-1. Back in the web UI, the wizard will prompt you to "Time to add your client device." Click Install openZro.
-2. Download and run the installer for your client machine's OS (e.g., macOS).
-3. Once installed, find the openZro icon in your system tray or menu bar, click it, and select Connect.
-4. Authorize this new device in the browser tab that opens.
-
-### Test the Connection
-With both the routing peer and your client device online, you can now test your connection to the private network. To properly test connectivity you should move the client device to a different network, for example, connecting the device using your phone's hotspot.
-
-![Switching Network](/docs-static/img/get-started/onboarding/13_switching-network.jpeg)
-
-1. Open a terminal on your client device and run the test command (e.g., `ping 10.0.0.100`). Due note, the IP you ping needs to be a device on the same network that the routing peer is installed on.
-2. You should see successful replies, confirming that your client device can reach internal resources through the routing peer.
-3. Click It works! - Continue in the UI.
-
-### Understanding Your Access Policy
-The final step of the onboarding wizard explains the access rule that was automatically created for you.
-
-![Testing Worked](/docs-static/img/get-started/onboarding/14_it-worked.jpeg)
-
-1. A policy, named "Users to My Subnet," is enabled by default. This policy allows all authenticated users to access the resources within the subnet you define.
-2. To demonstrate this, you can toggle this policy off. When disabled, the ping from your client device will begin to fail with a "Request timeout" error, showing that the connection is now blocked.
-3. Re-enabling the policy will immediately restore access.
-4. Click Continue to complete the setup.
-
-![Understanding Your Access Policy](/docs-static/img/get-started/onboarding/16_onboarding-policies.jpeg)
-
-Click Go to Dashboard to access the main openZro admin panel. From here, you can:
-
-* [Control Center](https://docs.openzro.io/manage/control-center): Visualize your network topology and access relationships with an interactive graph.
-* [Peers](https://docs.openzro.io/manage/peers/add-machines-to-your-network): View and manage all connected devices and their properties.
-* [Setup Keys](https://docs.openzro.io/manage/peers/register-machines-using-setup-keys): Create and manage keys for adding new headless or ephemeral devices.
-* [Access Control](https://docs.openzro.io/manage/access-control/manage-network-access): Define granular firewall rules to control which peers can access what.
-* [Team](https://docs.openzro.io/manage/team/add-users-to-your-network): Manage users and create groups for easier policy management.
-
-You are now ready to explore the full capabilities of openZro.
-
-## Support Us
+## Stay in touch
 
 - Star us on [GitHub](https://github.com/openzro/openzro)
-- Follow us [on X](https://x.com/openzro)
-- Join our [Slack Channel](/slack-url)
-- openZro release page on GitHub: [releases](https://github.com/openzro/openzro/releases/latest)
+- openZro release page on GitHub:
+  [releases](https://github.com/openzro/openzro/releases/latest)
