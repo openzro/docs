@@ -39,6 +39,21 @@ module.exports = {
           800: '#5b21b6',
           900: '#4c1d95',
         },
+        // Semantic aliases mapped to the --oz-* CSS variables in
+        // src/styles/tailwind.css. Components use `bg-page`,
+        // `bg-page-soft`, `border-default`, etc. and the values
+        // automatically follow the active theme (light vs dark).
+        // Adding a new semantic surface = one row here + one
+        // --oz-* var in tailwind.css.
+        page:        'var(--oz-bg)',
+        'page-soft': 'var(--oz-bg-soft)',
+        'page-dark': 'var(--oz-bg-dark)',
+        ink:         'var(--oz-text)',
+        'ink-muted': 'var(--oz-text-muted)',
+        'oz-link':       'var(--oz-primary)',
+        'oz-link-hover': 'var(--oz-primary-hover)',
+        'oz-soft':       'var(--oz-primary-soft)',
+        'oz-border':     'var(--oz-border)',
       },
       boxShadow: {
         glow: '0 0 4px rgb(0 0 0 / 0.1)',

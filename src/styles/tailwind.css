@@ -1,3 +1,44 @@
+/* openZro brand tokens (light mode default).
+ *
+ * Defined here so docs site components can use semantic aliases
+ * (`bg-page`, `bg-page-soft`, `border-default`, `text-link`, ...)
+ * — wired in tailwind.config.js's `theme.extend.colors` — instead
+ * of hard-coding hex values. Dark mode overrides live in the
+ * `:root.dark` block below.
+ *
+ * The --oz-* values mirror the brand spec in the openzro/openzro
+ * root CLAUDE.md so dashboard, marketing site, and docs render
+ * the same surfaces.
+ */
+:root {
+  /* Violet scale (brand primary) */
+  --oz-violet-50:  #f5f3ff;
+  --oz-violet-100: #ede9fe;
+  --oz-violet-200: #ddd6fe;
+  --oz-violet-300: #c4b5fd;
+  --oz-violet-400: #a78bfa;
+  --oz-violet-500: #8b5cf6;
+  --oz-violet-600: #7c3aed;
+  --oz-violet-700: #6d28d9;
+  --oz-violet-800: #5b21b6;
+  --oz-violet-900: #4c1d95;
+
+  /* Ink (deep neutrals, dark surfaces) */
+  --oz-ink:   #0f0a1f;
+  --oz-ink-2: #1a1330;
+
+  /* Semantic aliases — use these in components. */
+  --oz-primary:       var(--oz-violet-600);
+  --oz-primary-hover: var(--oz-violet-700);
+  --oz-primary-soft:  var(--oz-violet-100);
+  --oz-text:          var(--oz-ink);
+  --oz-text-muted:    var(--oz-violet-700);
+  --oz-bg:            #ffffff;
+  --oz-bg-soft:       var(--oz-violet-50);
+  --oz-bg-dark:       var(--oz-ink);
+  --oz-border:        var(--oz-violet-200);
+}
+
 :root {
   --shiki-color-text: theme('colors.black');
   --shiki-token-constant: theme('colors.emerald.600');
@@ -14,6 +55,22 @@
   --toastify-text-color-dark: theme('colors.zinc.600') !important;
   --toastify-color-light: theme('colors.white') !important;
   --toastify-text-color-light: theme('colors.zinc.600') !important;
+}
+
+/* Dark mode override of the openZro brand tokens. The semantic
+ * aliases shift to higher-luminance variants on dark surfaces
+ * (e.g. primary moves from violet-600 → violet-400 so links
+ * stay legible against --oz-ink), per the brand spec. */
+:root.dark {
+  --oz-primary:       var(--oz-violet-400);
+  --oz-primary-hover: var(--oz-violet-300);
+  --oz-primary-soft:  var(--oz-violet-900);
+  --oz-text:          #ffffff;
+  --oz-text-muted:    var(--oz-violet-300);
+  --oz-bg:            var(--oz-ink);
+  --oz-bg-soft:       var(--oz-ink-2);
+  --oz-bg-dark:       #000000;
+  --oz-border:        var(--oz-violet-800);
 }
 
 /* Dark mode styles */
