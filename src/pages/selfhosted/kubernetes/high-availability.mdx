@@ -1,0 +1,147 @@
+import {Note} from "../../../components/mdx";
+
+# High Availability on Kubernetes
+
+The chart's defaults run one replica of each component — fine for
+small teams and labs. Two HA paths are wired in:
+
+- **Management + signal** share a broker mode toggle
+  (`cluster.mode`) that turns on multi-replica with NATS-based
+  coordination between pods.
+- **Relay** has its own multi-pod fabric independent of the broker
+  mode (per [ADR-0014](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md)).
+
+## Management + signal
+
+Both deployments share the same `cluster.mode` switch. Three
+modes:
+
+```yaml
+cluster:
+  mode: disabled   # default — single replica each, no broker
+```
+
+```yaml
+cluster:
+  mode: embedded   # each pod runs an embedded NATS+JetStream cluster
+  embedded:
+    clientPort: 4222
+    clusterPort: 6222
+
+management:
+  replicaCount: 3
+signal:
+  replicaCount: 3
+```
+
+```yaml
+cluster:
+  mode: external   # point at an existing NATS endpoint
+  external:
+    url: nats://my-nats.svc.cluster.local:4222
+```
+
+In `embedded` mode the chart switches both deployments to
+`StatefulSet`, renders a Headless Service that anchors per-pod
+DNS names, and wires NATS routes via `OPENZRO_CLUSTER_PEERS` so
+the embedded brokers gossip between siblings. See
+[ADR-0009](https://github.com/openzro/openzro/blob/main/docs/adr/0009-bare-metal-ansible-and-ha.md)
+for the broker mode rationale.
+
+If you already operate NATS at a known endpoint, `external` mode
+points the chart at it and skips the embedded broker entirely.
+
+## Relay multi-pod fabric (ADR-0014)
+
+The relay has its own multi-pod fabric, independent of
+`cluster.mode`. At `relay.replicaCount > 1` the chart auto-wires:
+
+- A Headless Service (`<release>-relay-internal`) that resolves to
+  every relay pod's IP — used for inter-pod discovery
+- A second container port (`relay.cluster.port`, default `7090`)
+  for inter-pod TCP traffic
+- Downward API env vars (`POD_IP`, `POD_NAME`)
+- An HMAC-SHA256 secret (auto-generated on first install,
+  preserved across upgrades) that authenticates inter-pod HELLO
+  frames
+
+```yaml
+relay:
+  replicaCount: 3
+  cluster:
+    enabled: true        # null (default) = auto when replicaCount > 1
+    port: 7090
+    authSecret:
+      value: ""              # leave empty for chart auto-gen
+      # value: "your-32-char-secret"        # OR pin a literal
+      # existingSecret: "my-relay-secret"   # OR point at your own
+      # existingSecretKey: "authSecret"     # ...with this key name
+```
+
+### What's actually shared between relay pods
+
+Each pod owns its connected peers — there's no shared state
+between pods. What flows across the inter-pod fabric is:
+
+- A small **routing oracle** populated lazily on cache miss
+  (peer ID → pod address, 5min TTL)
+- The **forwarded packets** themselves when peers on different
+  pods need to communicate
+
+No conntrack replication, no per-flow state sync. When a relay
+pod dies, peers reconnect (sub-second WireGuard handshake) and
+the load balancer may land them on a different pod — the locator
+caches in the surviving pods invalidate lazily on the next failed
+forward.
+
+### NetworkPolicy guidance
+
+Operators with strict pod-to-pod NetworkPolicy must allow TCP/7090
+between pods labeled `app.kubernetes.io/name: openzro-relay`. The
+HMAC gate authenticates HELLO either way — NetworkPolicy is
+defense-in-depth, not the primary trust boundary.
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: relay-internal
+  namespace: openzro
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: openzro-relay
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/name: openzro-relay
+      ports:
+        - protocol: TCP
+          port: 7090
+```
+
+### Operations
+
+The chart exposes Prometheus metrics for the cluster fabric — wire
+your Prometheus operator via `metrics.serviceMonitor.enabled: true`
+to scrape:
+
+| Metric | Type | Notes |
+|---|---|---|
+| `relay_cluster_forwards_total{result}` | counter | OK / `peer_not_found` / `stream_gone` / `send_error` |
+| `relay_cluster_lookup_duration_seconds` | histogram | Locator broadcast latency on cache miss |
+| `relay_cluster_hello_rejects_total{reason}` | counter | Security signal — split by reason (`hmac_mismatch`, `stale_timestamp`, etc.) |
+| `relay_cluster_streams` | gauge | Live inter-pod TCP streams owned by this pod |
+
+A healthy steady state has near-zero forward errors and lookup p99
+under 100ms. Sustained `hmac_mismatch` rejects across the fleet
+mean a pod has the wrong secret — check the auth secret rotation.
+
+<Note>
+The multi-pod relay fabric scales linearly to ~30 pods under the
+current broadcast-on-miss design. Beyond that, the WHO_HAS
+broadcast amplifies and lookup latency starts to climb.
+Monitoring `relay_cluster_lookup_duration_seconds` p99 lets you
+trigger optimization work before scale becomes a real problem.
+</Note>

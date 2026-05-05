@@ -1,0 +1,80 @@
+import {Note} from "../../../components/mdx";
+
+# Self-hosting on Kubernetes
+
+openZro ships a Helm chart so you can deploy the full self-hosted
+control plane (management, signal, relay, dashboard, embedded Dex
+IdP) on any Kubernetes cluster — managed (EKS, GKE, AKS, DOKS) or
+self-managed (k3s, kubeadm, Talos, Rancher).
+
+This section covers the chart-based deployment path. For Docker
+Compose on a single VM, see the
+[Quickstart Guide](/selfhosted/selfhosted-quickstart). For
+bare-metal multi-node installs via Ansible, see
+[openzro-ansible](https://github.com/openzro/openzro-ansible).
+
+## When to choose Kubernetes
+
+| Scenario | Use Kubernetes | Use Docker Compose |
+|---|---|---|
+| You already operate Kubernetes | ✅ Native fit | ⚠️ Extra moving piece |
+| You want HA out of the box | ✅ Multi-replica per component | ❌ Single host |
+| You need declarative GitOps | ✅ Operator + CRDs | ❌ Compose files |
+| You need autoscaling | ✅ HPA on relay/signal | ❌ Vertical only |
+| You want a 5-minute first install | ⚠️ ~15min including ingress | ✅ 5min flat |
+| You're prototyping on a laptop | ⚠️ k3d / kind works but heavy | ✅ Single command |
+
+## What's included in the chart
+
+The [`openzro` Helm chart](https://github.com/openzro/helms/tree/main/charts/openzro)
+deploys the control plane as a single release:
+
+- **management** — account / peer / policy API (Deployment)
+- **signal** — gRPC peer-to-peer signaling (Deployment)
+- **relay** — WireGuard fallback relay with multi-pod fabric
+  (Deployment, see [High availability](/selfhosted/kubernetes/high-availability))
+- **dashboard** — React UI (Deployment)
+- **dex** — embedded federated IdP (Deployment, via subchart)
+- **postgres** / **mysql** — optional storage backends (subcharts)
+
+Routing peers (gateways, exit nodes) are **not** part of this
+chart — they're data plane and live independently. Deploy them
+via the [openZro operator](/selfhosted/operator/) using the
+`OZRoutingPeer` CRD.
+
+## Architecture choices
+
+The chart embeds these design decisions; see the linked ADRs for
+the full rationale:
+
+- **Embedded Dex IdP** — every install ships with a federated IdP
+  out of the box. Operators configure connectors (Google, GitHub,
+  Microsoft, Keycloak, Okta, generic OIDC) at runtime via the
+  dashboard. See [ADR-0006](https://github.com/openzro/openzro/blob/main/docs/adr/0006-embed-dex.md).
+- **Helm chart + Kubernetes operator** — chart for the control
+  plane, operator for the data plane. See
+  [ADR-0008](https://github.com/openzro/openzro/blob/main/docs/adr/0008-kubernetes-helm-operator.md).
+- **Multi-pod relay fabric** — when `relay.replicaCount > 1` the
+  chart auto-wires inter-pod TCP forwarding so peers connected to
+  different pods can still reach each other, with an HMAC-
+  authenticated control plane between pods. See
+  [ADR-0014](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md).
+
+## Section contents
+
+- [Helm Quickstart](/selfhosted/kubernetes/helm-quickstart) — install
+  in 15 minutes from a fresh cluster
+- [High Availability](/selfhosted/kubernetes/high-availability) — multi-replica
+  management/signal, multi-pod relay, the `cluster.mode` switch
+- [Storage Backends](/selfhosted/kubernetes/storage) — PostgreSQL or
+  MySQL via the bundled subcharts, manual DSN config for external
+  databases
+- [Upgrades](/selfhosted/kubernetes/upgrades) — `helm upgrade`
+  workflow + CRD upgrade gotchas
+
+<Note>
+The Helm chart is published on every tag push to
+[https://openzro.github.io/helms](https://openzro.github.io/helms)
+and as an OCI artifact at `oci://ghcr.io/openzro/charts/openzro`.
+Both paths produce the same chart.
+</Note>

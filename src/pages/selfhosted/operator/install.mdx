@@ -1,0 +1,136 @@
+import {Note} from "../../../components/mdx";
+
+# Installing the Operator
+
+The operator runs alongside the openZro control plane in the same
+or a different Kubernetes cluster. It needs:
+
+- Network reachability to the management API
+- A Personal Access Token (PAT) with permissions to manage
+  groups / policies / setup keys / resources
+
+This guide assumes you've already deployed the openZro control
+plane via the
+[Helm Quickstart](/selfhosted/kubernetes/helm-quickstart).
+
+## 1. Issue a Personal Access Token
+
+In the dashboard, go to **Settings → Users → admin → Personal
+Access Tokens → Generate**.
+
+Copy the token immediately — it's shown only once. Treat it like
+a long-lived credential: store it in your secret manager of
+choice (Vault, AWS Secrets Manager, SOPS-encrypted file, etc.).
+
+## 2. Store the credentials in a Kubernetes Secret
+
+```bash
+PAT="oz_pat_..."
+
+kubectl -n openzro create secret generic openzro-operator-mgmt \
+  --from-literal=managementApiUrl=https://openzro.example.com \
+  --from-literal=managementApiToken="$PAT"
+```
+
+For GitOps workflows, encrypt this Secret with SealedSecrets,
+sops, or vault-csi rather than hard-coding. Operators with
+external secret managers point the operator at their existing
+Secret via `existingSecret` instead of creating one through
+`kubectl create secret`.
+
+## 3. Install the operator chart
+
+```bash
+helm install openzro-operator openzro/openzro-operator \
+  --namespace openzro \
+  --set managementApiSecret=openzro-operator-mgmt
+```
+
+By default the chart pulls
+`ghcr.io/openzro/openzro-operator:0.3.2-alpha.1` (multi-arch:
+amd64 + arm64). Pin a specific version with
+`--set image.tag=0.3.2-alpha.1`.
+
+## 4. Verify
+
+```bash
+kubectl -n openzro get pods -l app.kubernetes.io/name=openzro-operator
+# Expect: openzro-operator-... Running
+
+kubectl -n openzro logs -l app.kubernetes.io/name=openzro-operator --tail=20
+# Expect: "starting manager", no auth errors against the management API
+```
+
+A successful first reconcile log line looks like:
+
+```
+INFO	controllers.ozgroup	Reconciled
+INFO	controllers.ozpolicy	Reconciled
+```
+
+If you see `401 Unauthorized` against the management API, the PAT
+is wrong or expired. Re-issue from the dashboard.
+
+## Apply your first CR
+
+```yaml
+# my-group.yaml
+apiVersion: openzro.io/v1
+kind: OZGroup
+metadata:
+  name: backend-team
+  namespace: openzro
+spec:
+  name: "Backend Team"
+```
+
+```bash
+kubectl apply -f my-group.yaml
+kubectl get ozgroups
+# NAME            STATUS
+# backend-team    Reconciled
+```
+
+The same pattern applies to `OZPolicy`, `OZSetupKey`,
+`OZResource`, `OZRoutingPeer` — see the
+[CRDs reference](/selfhosted/operator/crds).
+
+## Upgrading
+
+```bash
+helm repo update
+helm upgrade openzro-operator openzro/openzro-operator \
+  --namespace openzro \
+  --set managementApiSecret=openzro-operator-mgmt
+```
+
+CRDs aren't upgraded by `helm upgrade`. After every operator chart
+bump, re-apply them:
+
+```bash
+helm pull openzro/openzro-operator --untar --untardir /tmp/op
+kubectl apply -f /tmp/op/openzro-operator/crds/
+```
+
+## Uninstalling
+
+```bash
+# 1. Delete CRs first (operator releases the management-side
+#    objects through finalizers)
+kubectl delete ozgroups,ozpolicies,ozsetupkeys,ozresources,ozroutingpeers --all -n openzro
+
+# 2. Uninstall the operator chart
+helm uninstall openzro-operator -n openzro
+
+# 3. CRDs survive helm uninstall — remove explicitly to fully clean up
+kubectl delete crd ozgroups.openzro.io ozpolicies.openzro.io \
+                   ozresources.openzro.io ozroutingpeers.openzro.io \
+                   ozsetupkeys.openzro.io
+```
+
+<Note>
+Step 1 matters: deleting the operator deployment first leaves
+orphaned management-side objects, because the operator's
+finalizer no longer runs. Always delete CRs through `kubectl`
+first, then uninstall the chart.
+</Note>

@@ -1,0 +1,239 @@
+import {Note} from "../../../components/mdx";
+
+# Operator CRDs
+
+This page documents every CRD the operator reconciles, with an
+example manifest for each.
+
+The full schema (with field descriptions and validation rules)
+lives in the operator's
+[`crds/` directory](https://github.com/openzro/openzro-operator/tree/main/crds).
+What follows is the minimal-but-useful shape an operator
+typically writes.
+
+## OZGroup
+
+A peer group, used in policies and resource scopes.
+
+```yaml
+apiVersion: openzro.io/v1
+kind: OZGroup
+metadata:
+  name: backend-team
+  namespace: openzro
+spec:
+  name: "Backend Team"
+```
+
+The `metadata.name` is the K8s object name; `spec.name` is the
+display name shown in the openZro dashboard. They can differ —
+useful when you want kebab-case in K8s but title-case in the UI.
+
+After reconcile, `kubectl describe ozgroup backend-team` shows
+the management-API ID under `Status.ID`.
+
+## OZPolicy
+
+An access control policy between groups.
+
+```yaml
+apiVersion: openzro.io/v1
+kind: OZPolicy
+metadata:
+  name: dev-to-prod
+  namespace: openzro
+spec:
+  name: "Developers can SSH into prod"
+  enabled: true
+  rules:
+    - name: "ssh"
+      description: "TCP/22 from devs to prod hosts"
+      enabled: true
+      sources:
+        - backend-team
+      destinations:
+        - prod-bastions
+      protocol: "tcp"
+      ports:
+        - "22"
+      action: "accept"
+      bidirectional: false
+```
+
+The `sources` and `destinations` lists reference `OZGroup`
+`metadata.name` values — the operator resolves the management-API
+group IDs at reconcile time. If a referenced group doesn't exist
+yet, the policy reconcile retries with backoff until it does.
+
+## OZSetupKey
+
+A reusable enrollment key for new peers.
+
+```yaml
+apiVersion: openzro.io/v1
+kind: OZSetupKey
+metadata:
+  name: ci-runners-key
+  namespace: openzro
+spec:
+  name: "CI runners enrollment"
+  type: reusable          # or "one-off"
+  expiresIn: 30d          # 30 days
+  usageLimit: 100         # 0 = unlimited
+  autoGroups:
+    - ci-runners          # OZGroup metadata.name values
+  ephemeral: true         # peer is deleted automatically when offline
+```
+
+After reconcile the operator stores the actual setup key in a
+`Secret` named `<metadata.name>-key` in the same namespace. Mount
+it into peers that should auto-enroll:
+
+```yaml
+env:
+  - name: OZ_SETUP_KEY
+    valueFrom:
+      secretKeyRef:
+        name: ci-runners-key-key
+        key: setupKey
+```
+
+Rotating the key is a CR delete + re-create. The old `Secret` is
+removed; new peers picking up the new `Secret` enroll under the
+new key.
+
+## OZRoutingPeer
+
+A routing peer / gateway pod that openZro deploys + enrolls. This
+is how you stand up site-to-site routes, exit nodes, and
+infrastructure-access peers in K8s.
+
+```yaml
+apiVersion: openzro.io/v1
+kind: OZRoutingPeer
+metadata:
+  name: us-east-gateway
+  namespace: openzro
+spec:
+  replicas: 2
+  routes:
+    - "10.10.0.0/16"        # internal corp subnet
+    - "192.168.50.0/24"     # office LAN
+  groups:
+    - gateways              # OZGroup metadata.name
+  resources:
+    requests:
+      cpu: 100m
+      memory: 128Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+  nodeSelector:
+    topology.kubernetes.io/region: us-east-1
+```
+
+What the operator does on apply:
+
+1. Generates a one-off `OZSetupKey` with `autoGroups: [gateways]`
+2. Materializes the setup key into a `Secret`
+3. Creates a `Deployment` running `ghcr.io/openzro/relay-client`
+   that calls `openzro up` with the setup key + routes
+4. Updates the `Status` with the Setup Key ID and pod readiness
+
+When the CR is deleted, the operator's finalizer revokes the
+setup key and tears down the Deployment in that order.
+
+## OZResource
+
+A network resource (single host or subnet) for split tunneling.
+
+```yaml
+apiVersion: openzro.io/v1
+kind: OZResource
+metadata:
+  name: postgres-prod
+  namespace: openzro
+spec:
+  name: "Production PostgreSQL"
+  description: "Primary DB for prod workloads"
+  address: "10.10.5.10"
+  type: "host"              # "host" or "subnet"
+  groups:
+    - dbs                   # OZGroup metadata.name
+```
+
+Resources show up in the dashboard's **Networks** view and can be
+referenced in policies as destinations. The operator manages the
+resource definition; assigning a resource to a routing peer is
+done through the peer's CR or the dashboard.
+
+## A complete example
+
+Here's what a small declarative install looks like — a backend
+team that can SSH into a prod bastion via a gateway pod:
+
+```yaml
+---
+apiVersion: openzro.io/v1
+kind: OZGroup
+metadata:
+  name: backend-team
+spec:
+  name: "Backend Team"
+---
+apiVersion: openzro.io/v1
+kind: OZGroup
+metadata:
+  name: gateways
+spec:
+  name: "Gateways"
+---
+apiVersion: openzro.io/v1
+kind: OZRoutingPeer
+metadata:
+  name: prod-gateway
+spec:
+  replicas: 2
+  routes:
+    - "10.10.0.0/16"
+  groups:
+    - gateways
+---
+apiVersion: openzro.io/v1
+kind: OZResource
+metadata:
+  name: prod-bastion
+spec:
+  name: "Prod Bastion"
+  address: "10.10.5.5"
+  type: "host"
+  groups:
+    - gateways
+---
+apiVersion: openzro.io/v1
+kind: OZPolicy
+metadata:
+  name: backend-can-ssh-bastion
+spec:
+  name: "Backend → Prod Bastion (SSH)"
+  enabled: true
+  rules:
+    - name: ssh
+      enabled: true
+      sources: [backend-team]
+      destinations: [prod-bastion]
+      protocol: tcp
+      ports: ["22"]
+      action: accept
+      bidirectional: false
+```
+
+`kubectl apply -f this.yaml` and the operator stands up the whole
+thing in one reconcile pass.
+
+<Note>
+Operators using ArgoCD or Flux: drop these manifests into a
+GitOps repo and let your tooling apply them. The operator's
+reconciliation is idempotent — re-applying the same manifest a
+hundred times is a no-op after the first.
+</Note>

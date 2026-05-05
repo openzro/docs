@@ -1,0 +1,113 @@
+import {Note} from "../../../components/mdx";
+
+# Upgrades on Kubernetes
+
+`helm upgrade` is the typical path. A few component-specific
+notes apply.
+
+## Standard upgrade
+
+```bash
+helm repo update
+helm upgrade openzro openzro/openzro \
+  --namespace openzro \
+  -f my-openzro.yaml
+```
+
+The chart preserves operator-supplied secrets across upgrades via
+the Helm `lookup` function:
+
+- Relay inter-pod HMAC secret (auto-generated on first install,
+  preserved on upgrade)
+- Management WireGuard private key (provisioned by a pre-install
+  Helm hook, preserved across upgrades)
+- Database bootstrap credentials (idempotent provisioning Job)
+
+You shouldn't need to back these up before an upgrade — they
+travel through the upgrade unchanged. Operators who use external
+secret managers (SealedSecrets, sops, vault-csi) feed values via
+`existingSecret` references and bypass the chart's auto-gen
+entirely.
+
+## Component restart behavior
+
+| Component | Upgrade behavior |
+|---|---|
+| `management` | RollingUpdate. Peer connections continue talking to whichever replica is up. |
+| `signal` | RollingUpdate. Peers reconnect on disconnect — sub-second reconnect. |
+| `relay` | RollingUpdate. Peer TCP connections drop → reconnect via load balancer onto a (possibly different) pod. With multi-pod fabric on, peers on different pods continue communicating throughout. |
+| `dashboard` | RollingUpdate. UI is stateless. |
+| `dex` | RollingUpdate per upstream Dex chart. |
+
+Relay rolling updates are the most operationally-visible: every
+peer connection reconnects exactly once. Sub-second WireGuard
+handshake makes this invisible to most workloads, but
+latency-sensitive flows may notice the blip.
+
+## CRD upgrades
+
+Helm doesn't upgrade CRDs by default. After every chart bump,
+re-apply the CRDs:
+
+```bash
+helm pull openzro/openzro-operator --untar --untardir /tmp/op
+kubectl apply -f /tmp/op/openzro-operator/crds/
+```
+
+The CRDs are additive — new fields don't break existing CRs. If a
+CRD changes shape in a breaking way, the release notes will say
+so explicitly.
+
+## Database migrations
+
+The management daemon runs schema migrations automatically on
+first start after an upgrade. There's no separate migration step.
+
+Migrations are forward-only — downgrading from a newer chart to
+an older one isn't supported when migrations have already
+applied. If you need to roll back, restore from a database backup
+taken before the upgrade.
+
+## Dex storage migration
+
+By default the chart provisions a 1Gi PVC for Dex's SQLite.
+Migrating to PostgreSQL (recommended for HA) is a values flip —
+see the upstream
+[`dexidp/helm-charts`](https://github.com/dexidp/helm-charts)
+values for the postgres backend, then mirror that under
+`dex.config.storage` in your values.
+
+Before flipping:
+
+1. Export static passwords + connectors from the SQLite store
+   (Dex CLI or direct SQL dump)
+2. Apply the values change with `helm upgrade`
+3. Re-import passwords + connectors into Postgres
+
+There's no automated SQLite → Postgres migration in the upstream
+Dex chart, so the export/import is manual.
+
+## Verifying a successful upgrade
+
+```bash
+kubectl -n openzro rollout status deployment/openzro-management
+kubectl -n openzro rollout status deployment/openzro-signal
+kubectl -n openzro rollout status deployment/openzro-relay
+kubectl -n openzro rollout status deployment/openzro-dashboard
+
+# Quick smoke
+curl -s https://openzro.example.com/dex/.well-known/openid-configuration | jq .issuer
+```
+
+If a rollout hangs, `kubectl describe pod` and
+`kubectl logs --previous` are the first diagnostics. The chart's
+liveness probes are TCP-based, so a stuck rollout usually means
+the new image can't reach its database — check
+`OPENZRO_STORE_ENGINE_POSTGRES_DSN` first.
+
+<Note>
+Helm itself stores release history; you can roll the chart back
+with `helm rollback openzro <revision> --namespace openzro`. This
+reverts the K8s manifests but **does not** roll back database
+schema migrations — see the database migration section above.
+</Note>

@@ -1,0 +1,91 @@
+import {Note} from "../../../components/mdx";
+
+# openZro Kubernetes Operator
+
+The openZro operator reconciles openZro's domain objects (groups,
+policies, peers, setup keys, network resources) from Kubernetes
+manifests so GitOps + multi-tenant patterns work naturally. It's
+**optional** — you can run the chart without the operator and
+manage everything from the dashboard.
+
+The operator lives in
+[openzro/openzro-operator](https://github.com/openzro/openzro-operator)
+and ships as its own Helm chart on the same release feed as the
+main `openzro` chart.
+
+## When to use the operator
+
+Use the operator when:
+
+- You manage your infrastructure declaratively (Argo CD, Flux,
+  Terraform with the K8s provider)
+- You run multiple openZro tenants and want each tenant's
+  resources defined in their own namespace
+- You deploy routing peers / gateways as workloads inside the
+  same Kubernetes cluster as your control plane
+- You want pull-request-driven changes to access policies
+
+Skip the operator when:
+
+- You manage a small fleet from the dashboard and prefer the GUI
+- Your routing peers are all bare-metal / VM (use
+  [openzro-ansible](https://github.com/openzro/openzro-ansible)'s
+  `openzro_routing_peer` role instead)
+- You're prototyping and don't want a second control plane to
+  reason about
+
+## How it works
+
+The operator watches custom resources in the cluster and
+translates them into management-API calls against the openZro
+control plane:
+
+```
+┌────────────────┐   watch    ┌──────────────┐
+│  CR (OZGroup,  │──────────▶│   operator   │
+│  OZPolicy, …)  │            │  reconciler  │
+└────────────────┘            └──────┬───────┘
+                                     │ HTTPS + PAT
+                                     ▼
+                              ┌──────────────┐
+                              │  management  │
+                              │      API     │
+                              └──────────────┘
+```
+
+Each CR has a `Status` subresource the operator updates after
+each reconcile pass — `kubectl describe ozgroup my-team` shows
+whether the resource is `Reconciled` or what error it hit.
+
+The operator authenticates against the management API using a
+**Personal Access Token (PAT)** issued from the dashboard. It
+never holds long-term credentials; rotating the PAT is a Secret
+update + pod restart away.
+
+## Section contents
+
+- [Install the operator](/selfhosted/operator/install) — PAT
+  generation + Helm install
+- [CRDs](/selfhosted/operator/crds) — every supported CRD with
+  example manifests
+
+## Supported CRDs (today)
+
+| CRD | What it represents |
+|---|---|
+| `OZGroup` | A peer group, used in policies and resource scopes |
+| `OZPolicy` | An access control policy between groups |
+| `OZSetupKey` | A reusable enrollment key for new peers |
+| `OZRoutingPeer` | A routing peer / gateway pod that openZro deploys + enrolls |
+| `OZResource` | A network resource (host or subnet) for split tunneling |
+
+Each CRD is documented with its full spec on the
+[CRDs](/selfhosted/operator/crds) page.
+
+<Note>
+`OZNetworkResource` and `OZHTTPRoute` controllers exist in the
+operator but their server-side handlers are not yet wired in the
+management API. The CRDs apply cleanly; reconciliation returns 404
+until that work lands. Track via
+[ADR-0008 Stage 3](https://github.com/openzro/openzro/blob/main/docs/adr/0008-kubernetes-helm-operator.md#stage-3--server-side-handlers-for-dns-zones--reverse-proxy-services).
+</Note>

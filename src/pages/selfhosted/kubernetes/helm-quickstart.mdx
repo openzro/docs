@@ -1,0 +1,177 @@
+import {Note} from "../../../components/mdx";
+
+# Helm Quickstart
+
+This guide walks an operator from a fresh Kubernetes cluster to a
+working openZro deployment with the dashboard, management API,
+signal, relay, embedded Dex IdP, and (optionally) the openZro
+Kubernetes operator.
+
+## Prerequisites
+
+- Kubernetes 1.27+ (Gateway API CRDs require 1.31+ if you choose
+  that ingress path)
+- `helm` v3.12+
+- `kubectl` matching your cluster
+- A DNS record pointing at your cluster's ingress / Gateway —
+  this guide uses `openzro.example.com` throughout
+- (Optional) `cert-manager` for TLS — the chart references certs
+  by Secret name and lets cert-manager provision them
+- (Optional) Gateway API CRDs installed if you want the Gateway-API
+  path:
+  ```bash
+  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/latest/download/standard-install.yaml
+  ```
+
+## 1. Add the Helm repo
+
+Two options — both publish on every tag push from
+[openzro/helms](https://github.com/openzro/helms):
+
+**Traditional Helm repo (recommended for most operators):**
+
+```bash
+helm repo add openzro https://openzro.github.io/helms
+helm repo update
+```
+
+**OCI registry (modern):**
+
+```bash
+helm install --version 2.1.0-alpha.11 \
+  openzro oci://ghcr.io/openzro/charts/openzro
+```
+
+## 2. Author your values override
+
+Save this as `my-openzro.yaml`:
+
+```yaml
+management:
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: openzro.example.com
+        paths:
+          - path: /api
+            pathType: Prefix
+    tls:
+      - hosts: [openzro.example.com]
+        secretName: openzro-tls
+
+dashboard:
+  ingress:
+    enabled: true
+    className: nginx
+    hosts:
+      - host: openzro.example.com
+        paths:
+          - path: /
+            pathType: Prefix
+    tls:
+      - hosts: [openzro.example.com]
+        secretName: openzro-tls
+
+dex:
+  enabled: true
+  config:
+    issuer: https://openzro.example.com/dex
+    web:
+      allowedOrigins:
+        - https://openzro.example.com
+    staticPasswords:
+      # REPLACE THIS bcrypt hash before going to prod.
+      # Generate with:
+      #   htpasswd -bnBC 10 "" yourpassword | tr -d ':\n' | sed 's/$2y/$2a/'
+      - email: admin@openzro.example.com
+        hash: "$2a$10$REPLACE_ME"
+        username: admin
+        userID: openzro-bootstrap-admin
+    staticClients:
+      - id: openzro-dashboard
+        name: openZro Dashboard
+        public: true
+        redirectURIs:
+          - https://openzro.example.com/auth
+          - https://openzro.example.com/silent-auth
+          - https://openzro.example.com/
+```
+
+## 3. Install the chart
+
+```bash
+helm install openzro openzro/openzro \
+  --create-namespace \
+  --namespace openzro \
+  -f my-openzro.yaml
+```
+
+The chart's `NOTES.txt` prints the next-steps URL once everything
+is healthy.
+
+## 4. Verify
+
+```bash
+kubectl -n openzro get pods
+# Expect: dex, management, signal, relay, dashboard all Running
+
+kubectl -n openzro get ingress
+# Expect: openzro-dashboard, openzro-management with your hostname
+
+curl https://openzro.example.com/dex/.well-known/openid-configuration
+# Expect: 200 with the OIDC discovery document
+```
+
+Open `https://openzro.example.com/`, sign in with the bootstrap
+admin credentials. Settings → Authentication Providers →
+"Add provider" wires Google / GitHub / Microsoft Entra / Keycloak
+/ Okta / generic OIDC at runtime.
+
+## Optional: Gateway API instead of Ingress
+
+If your cluster runs Envoy Gateway, Cilium Gateway, Istio (ambient
+mode), or any conformant Gateway API controller:
+
+```yaml
+gatewayApi:
+  enabled: true
+  gatewayClassName: envoy   # or istio / cilium / traefik
+  createGateway: true
+  gateway:
+    hostname: openzro.example.com
+    tls:
+      certificateRefs:
+        - name: openzro-tls
+
+# Disable the per-component Ingress to avoid double-binding
+management:
+  ingress: {enabled: false}
+  ingressGrpc: {enabled: false}
+dashboard:
+  ingress: {enabled: false}
+signal:
+  ingress: {enabled: false}
+relay:
+  ingress: {enabled: false}
+```
+
+The chart emits `HTTPRoute` resources for HTTP traffic (dashboard,
+management REST, relay) and `GRPCRoute` for the gRPC services
+(management gRPC, signal). For shared Gateways managed outside
+this chart, set `gatewayApi.createGateway: false` and provide
+`gatewayApi.parentRefs`.
+
+<Note>
+At the time of writing the openZro container packages on `ghcr.io`
+are private by default. If your cluster can't pull, create an
+`imagePullSecret` with a Personal Access Token that has
+`read:packages` and reference it via
+`management.imagePullSecrets`, `signal.imagePullSecrets`, etc.
+</Note>
+
+## Where to file issues
+
+- **Helm chart bugs / values questions**: [openzro/helms](https://github.com/openzro/helms)
+- **Operator bugs / CRD reconciler issues**: [openzro/openzro-operator](https://github.com/openzro/openzro-operator)
+- **Management server / dashboard / Dex integration**: [openzro/openzro](https://github.com/openzro/openzro)

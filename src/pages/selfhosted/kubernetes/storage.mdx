@@ -1,0 +1,101 @@
+import {Note} from "../../../components/mdx";
+
+# Storage Backends on Kubernetes
+
+The Helm chart auto-wires three openZro stores against a
+PostgreSQL or MySQL backend when either subchart is enabled:
+
+- **Management store** — accounts, peers, groups, policies, setup
+  keys
+- **Flow store** — traffic events
+- **Activity event store** — audit log
+
+Each store gets its own database + dedicated user with restricted
+grants, provisioned by a pre-install Helm hook. You can also
+disable the auto-wiring entirely and point at an externally-managed
+database.
+
+## PostgreSQL (recommended)
+
+```yaml
+postgres:
+  enabled: true
+  username: openzro
+  password: change-me-in-production
+  # database / host / port have sane defaults for the bundled subchart
+```
+
+The chart provisions on first install:
+
+- `openzro_management` (database) + `openzro_mgmt` (user)
+- `openzro_flow` (database) + `openzro_flow` (user)
+- `openzro_activity` (database) + `openzro_activity` (user)
+
+Each user has GRANTs only on its own database. The bootstrap
+credentials in `postgres.username` / `postgres.password` are used
+once by the provisioning Job and never by the management daemon —
+the daemon uses the per-store users.
+
+## MySQL
+
+Same shape, different engine:
+
+```yaml
+mysql:
+  enabled: true
+  rootPassword: change-me-in-production
+```
+
+The same per-store databases + users get provisioned with `GRANT
+... ON <db>.*` scoped to each.
+
+## External database (no subchart)
+
+Skip both subcharts and point each store at an externally-managed
+database:
+
+```yaml
+postgres:
+  enabled: false
+mysql:
+  enabled: false
+
+management:
+  envFromSecret:
+    OPENZRO_STORE_ENGINE_POSTGRES_DSN: my-secret/managementDsn
+    OPENZRO_FLOW_STORE_DSN:            my-secret/flowDsn
+    OZ_ACTIVITY_EVENT_POSTGRES_DSN:    my-secret/activityDsn
+  env:
+    OPENZRO_STORE_ENGINE: postgres
+    OPENZRO_FLOW_STORE_ENGINE: postgres
+    OZ_ACTIVITY_EVENT_STORE_ENGINE: postgres
+```
+
+Where `my-secret` is a `Secret` you create out-of-band with the
+three DSN strings.
+
+## When to pick which
+
+| Backend | Best for | Notes |
+|---|---|---|
+| PostgreSQL (bundled) | Most installs | First-class openZro support, full feature parity |
+| PostgreSQL (external) | You already operate Postgres | Reuses existing backups, monitoring, HA |
+| MySQL (bundled) | Existing MySQL shop | Feature-parity but Postgres is the testing default |
+| MySQL (external) | Same | Same |
+| SQLite (defaults) | Lab / dev | Single replica only, file-based |
+
+For HA, an externally-managed Postgres with replication is the
+production target. The bundled subchart is single-replica and is
+intended for fresh installs and labs — flip to external when
+you're ready to manage backups and replication on your own
+schedule.
+
+<Note>
+The dashboard's geolocation posture-check populates from a
+GeoLite2 database the management binary fetches on cold boot. By
+default the chart pulls from the openZro mirror — no operator
+action needed. To pin a MaxMind license key (free at
+[maxmind.com/en/geolite2/signup](https://www.maxmind.com/en/geolite2/signup)),
+set `management.geoLite.licenseKey.value` or
+`management.geoLite.licenseKey.existingSecret`.
+</Note>
