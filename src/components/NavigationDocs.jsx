@@ -452,6 +452,44 @@ export const docsNavigation = [
     links: [
       { title: 'Quickstart Guide', href: '/selfhosted/selfhosted-quickstart' },
       {
+        title: 'Kubernetes',
+        href: '/selfhosted/kubernetes',
+        isOpen: false,
+        links: [
+          {
+            title: 'Helm Quickstart',
+            href: '/selfhosted/kubernetes/helm-quickstart',
+          },
+          {
+            title: 'High Availability',
+            href: '/selfhosted/kubernetes/high-availability',
+          },
+          {
+            title: 'Storage Backends',
+            href: '/selfhosted/kubernetes/storage',
+          },
+          {
+            title: 'Upgrades',
+            href: '/selfhosted/kubernetes/upgrades',
+          },
+        ],
+      },
+      {
+        title: 'Operator',
+        href: '/selfhosted/operator',
+        isOpen: false,
+        links: [
+          {
+            title: 'Install',
+            href: '/selfhosted/operator/install',
+          },
+          {
+            title: 'CRDs',
+            href: '/selfhosted/operator/crds',
+          },
+        ],
+      },
+      {
         title: 'Maintenance',
         isOpen: false,
         links: [
