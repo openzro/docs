@@ -1,0 +1,181 @@
+# Flow Events Store
+
+The Flow Events store is the backend that persists per-connection
+records the openZro client streams to management — TCP/UDP/ICMP
+flow start, end, drop events, with src/dst IPs, ports, byte counts,
+and the rule ID that allowed or denied the connection. Operators
+configure it once at deploy time; the dashboard's Network Traffic
+page and any configured SIEM exporters read from it.
+
+This page covers what storage engines openZro supports for the
+flow events HOT tier, how each one handles retention at scale,
+and the env vars + database setup an operator needs to wire it up.
+
+For the architectural rationale (HOT vs COLD tiers, why we picked
+this shape over ClickHouse, how SIEM streaming relates) see
+[ADR-0002](https://github.com/openzro/openzro/blob/main/docs/adr/0002-flow-events-storage.md).
+
+## Engine support matrix
+
+The flow events store sits on top of GORM and runs against the
+same three engines as the management primary store, but
+**partitioning is Postgres-only** — the other engines fall back
+to a single table with row-level retention.
+
+| Engine | Schema | Retention strategy | Recommended scale |
+|---|---|---|---|
+| **postgres** | `flow_events` partitioned parent + monthly children (`flow_events_2026_05`, `flow_events_2026_06`, ...). DDL is generated at boot, no `pg_partman` extension required. | `DROP TABLE flow_events_YYYY_MM` for every partition whose upper bound is at or before the cutoff. Constant-time per partition; frees disk immediately; no autovacuum bloat. | Small team → Medium tier (10⁵–10⁶ events/day comfortably). |
+| **mysql** | Single `flow_events` table managed by GORM AutoMigrate. MySQL's native partitioning is non-declarative (`ALTER TABLE … PARTITION BY RANGE`) and adds operational burden the GORM migration path cannot express. | Row-level `DELETE WHERE received_at < cutoff` on the retention loop. | Tiny → Small tier. Operators projecting Medium volume should run Postgres. |
+| **sqlite** | Single `flow_events` table managed by GORM AutoMigrate. SQLite has **no native partitioning** — there is no language to express it. | Row-level `DELETE WHERE received_at < cutoff`. | Dev / lab only. SQLite serializes writers, which throttles flow ingestion in any deployment that actually stores the events. |
+
+If you don't pick an engine the management process accepts flow
+events on the gRPC stream and **drops them** — clients keep streaming
+without errors, but neither the dashboard's Network Traffic page nor
+any exporter will show data. The `Enable Traffic Events Logging`
+toggle on the dashboard is independent of the engine selection: the
+toggle controls *whether peers report*; this page controls *whether
+management persists what they report*.
+
+## Configuration
+
+### Required environment variables
+
+Set these on the management process (helm `management.envRaw`,
+docker-compose `environment`, or whatever your runtime uses):
+
+```bash
+# Engine selection — postgres | mysql | sqlite | none (default = none)
+OPENZRO_FLOW_STORE_ENGINE=postgres
+
+# DSN, dialect-specific format. The flow store opens its own
+# connection pool; it does NOT share with the management primary
+# store, so a different database (or even host) is fine and often
+# preferable for production.
+OPENZRO_FLOW_STORE_DSN=host=postgres.example.com port=5432 dbname=openzro_flow user=openzro password=… sslmode=require
+
+# Optional — how long events live before retention removes them.
+# Accepts Go time.Duration syntax. Default: 168h (7 days).
+OPENZRO_FLOW_RETENTION=720h
+```
+
+### DSN format per engine
+
+```bash
+# postgres
+OPENZRO_FLOW_STORE_DSN="host=… port=5432 dbname=openzro_flow user=… password=… sslmode=require"
+
+# mysql
+OPENZRO_FLOW_STORE_DSN="user:password@tcp(mysql.example.com:3306)/openzro_flow?parseTime=true&loc=UTC"
+
+# sqlite (lab / dev only)
+OPENZRO_FLOW_STORE_DSN="/var/lib/openzro/flow.sqlite"
+```
+
+### Database creation
+
+For Postgres and MySQL the **operator must create the database
+before the management daemon starts**. Management migrates schema
+on first boot but does not have privileges (or expectations) to
+issue `CREATE DATABASE`. Suggested name is `openzro_flow` to keep
+it visually separate from the primary store database.
+
+Postgres:
+
+```sql
+CREATE DATABASE openzro_flow OWNER openzro;
+```
+
+MySQL:
+
+```sql
+CREATE DATABASE openzro_flow CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON openzro_flow.* TO 'openzro'@'%';
+```
+
+SQLite needs no setup — the file is created on first write.
+
+### Verifying it's wired
+
+Look for this line in the management logs at startup:
+
+```
+INFO flow/store/factory/factory.go:82: flow store: postgres engine, retention=720h0m0s
+```
+
+When `OPENZRO_FLOW_STORE_ENGINE` is unset or `none` the line will not
+appear and the dashboard's Network Traffic page will return empty.
+
+## Postgres partitioning details
+
+Postgres deployments use native declarative partitioning (PG 11+, no
+`pg_partman` extension needed). The `flow_events` parent is partitioned
+by `RANGE (received_at)`; one child per calendar month, named
+`flow_events_YYYY_MM`.
+
+### What runs on first boot
+
+When `sql.New` opens a Postgres-backed flow store, it:
+
+1. Inspects whether `flow_events` exists.
+2. If the existing relation is **not** partitioned (e.g. an older
+   alpha that ran the GORM single-table path), drops it and recreates
+   as the partitioned parent.
+3. Creates the partitioned parent with the dashboard-facing indexes
+   inlined into the DDL (GORM's AutoMigrate cannot express
+   `PARTITION BY RANGE`).
+4. Creates the current month's partition plus the next 3 months.
+
+The retention loop, which fires once a minute on first start and
+every 24 hours after, calls `ensureFuturePartitions(now, +3 months)`
+on every pass — so the partition lookahead stays fresh and writes
+arriving across a month boundary at midnight never hit a missing
+partition.
+
+### What `OPENZRO_FLOW_RETENTION` actually does
+
+On Postgres: every retention pass drops every partition whose upper
+bound is at or before `now - retention`. So `OPENZRO_FLOW_RETENTION=720h`
+keeps 30 days of partitions live; older partitions are released back
+as free disk in O(1) per partition.
+
+On MySQL / SQLite: every retention pass runs `DELETE WHERE received_at
+< now - retention`, which scans + tombstones rows and relies on
+autovacuum / `VACUUM` to reclaim space.
+
+### Alpha-stage migration policy (drop on upgrade)
+
+The current alpha line drops a pre-existing non-partitioned
+`flow_events` table when partitioning support comes online. Data loss
+is bounded by your retention window (default 30 days, often shorter
+in dev) and the source of truth is the live peer stream — peers
+reconnect after the management restart and immediately resume
+publishing events. After GA we'll ship a copy-then-swap migration
+for upgrades; until then the policy is loud-and-explicit drop.
+
+## Capacity guidance
+
+A single peer with ~100 active connections produces ~10 events/sec
+(start, end, drop). Realistic deployments:
+
+| Deployment | Peers | Events / day | Postgres? |
+|---|---|---|---|
+| Tiny / dev | 5–20 | 5M–20M | sqlite acceptable |
+| Small team | 50–200 | 50M–200M | yes |
+| Medium | 500–2000 | 500M–2B | yes, monitor partition size + IOPS |
+| Large | 5000+ | 5B+ | postgres struggles; ClickHouse engine planned (see [ADR-0002 PR-G](https://github.com/openzro/openzro/blob/main/docs/adr/0002-flow-events-storage.md)) |
+
+For Medium-tier deployments, plan for ~50 GB/month of flow data
+per 1k peers as a rough order of magnitude — partitions make this
+trivial to drop in one transaction once retention kicks in.
+
+## Related
+
+- [Traffic Events Logging](/manage/activity/traffic-events-logging) —
+  the operator-facing feature this store backs.
+- [Event streaming to SIEM](/manage/activity/event-streaming) —
+  alternative / complementary destination for the same events.
+- [Management Postgres store](/selfhosted/postgres-store) — the
+  primary store (accounts, peers, policies). Separate database from
+  the flow store; both can run on the same Postgres server.
+- [`flow/store/sql/`](https://github.com/openzro/openzro/tree/main/flow/store/sql) —
+  source of truth for the schema and partitioning logic.

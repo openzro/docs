@@ -25,6 +25,32 @@ to internal networks like VPCs, office networks, and internal services without r
 The way you use openZro influences the way traffic events are captured and logged. Below are the two main scenarios for traffic events logging
 that describe how openZro logs traffic events for different types of connections.
 
+### Where the events come from
+
+The openZro client captures connection state at two layers, depending on the platform:
+
+| Platform | Capture mechanism | Coverage |
+|---|---|---|
+| **Linux** (server, desktop, headless) | Kernel **netfilter conntrack** via netlink. The same connection tracker that `iptables` / `nftables` already use; the client subscribes to `NEW` / `UPDATE` / `DESTROY` events and emits a flow record per state transition. | Every TCP / UDP / ICMP connection the kernel sees, including traffic that does NOT enter the openZro WireGuard tunnel. |
+| **Windows / macOS / Android / BSD** | **Userspace filter** inside the WireGuard data plane. The userspace WireGuard implementation processes every tunnel packet; the filter instruments that path to produce the same flow records. | Tunnel traffic only — packets that bypass the WireGuard interface are not visible to the capture. |
+
+Both paths emit the same wire format ([`flow/proto/flow.proto`](https://github.com/openzro/openzro/blob/main/flow/proto/flow.proto))
+to the management server's `FlowService` gRPC stream, so the dashboard
+and any configured SIEM exporter see a unified event shape regardless
+of which OS the peer is running.
+
+This is the **same model NetBird upstream uses** — openZro inherits
+the capture pipeline unchanged and adds the storage / partitioning
+layer on the management side (see
+[Self-hosted → Flow Events Store](/selfhosted/flow-events-store)).
+
+No eBPF program is loaded for traffic capture on Linux. (eBPF is used
+inside `client/internal/ebpf/` for the WireGuard userspace proxy on
+restricted platforms, but that's a separate pipeline.) Conntrack was
+chosen because it gives kernel-level visibility without requiring
+elevated capabilities beyond what the openZro client already needs to
+manage WireGuard interfaces.
+
 ### Peer-to-Peer Connections
 
 When two peers are connected directly (p2p), openZro captures and logs the traffic events for that connection on both peers.
@@ -150,9 +176,23 @@ choose the groups you want to include, and click `Save Groups`.
 
 ## Log Retention
 
-While in experimental mode, logs are retained for **seven days**.
-Additionally, please note that the current API returns a maximum of **50,000 events**.
-We are actively working on expanding this limit in the coming days to support larger datasets and increased usage.
+Default retention is **30 days** (`OPENZRO_FLOW_RETENTION=720h`),
+configurable per deployment. The retention loop runs once a day and:
+
+- on **PostgreSQL**, drops the monthly partition whose upper bound
+  fell out of the window — constant time, frees disk immediately,
+  no autovacuum chase;
+- on **MySQL / SQLite**, deletes rows older than the cutoff at the
+  row level and relies on autovacuum / `VACUUM` for reclaim.
+
+The dashboard API currently returns up to **50,000 events** per query,
+filterable by peer / IP / port / protocol / time range. The store
+itself holds far more — the cap is just on a single API response
+to keep payloads bounded.
+
+For full setup details (engine matrix, env vars, DSN format,
+database creation, capacity sizing), see
+[Self-hosted → Flow Events Store](/selfhosted/flow-events-store).
 
 ## Report rate
 The events might take up to **ten minutes** to become available via API and Dashboard. For some TCP connections, the full event cycle might take longer, depending on OS settings and connection termination.

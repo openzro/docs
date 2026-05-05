@@ -552,6 +552,10 @@ export const docsNavigation = [
             href: '/selfhosted/activity-postgres-store',
           },
           {
+            title: 'Flow Events Store',
+            href: '/selfhosted/flow-events-store',
+          },
+          {
             title: 'Flow Archive — GCS (native)',
             href: '/selfhosted/flow-archive-gcs',
           },
@@ -668,6 +672,7 @@ export const docsNavigation = [
   {
     title: 'CLIENT',
     links: [
+      { title: 'States and Status Icons', href: '/client/states' },
       { title: 'Profiles', href: '/client/profiles' },
       { title: 'Environment Variables', href: '/client/environment-variables' },
       {

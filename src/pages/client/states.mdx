@@ -1,0 +1,156 @@
+# Client States and Status Icons
+
+The openZro desktop client surfaces what it's doing through a single systray
+icon that changes shape and badge depending on the connection state. The
+icon family is consistent across Linux (GNOME / KDE / others), macOS
+(menu bar) and Windows (notification area) — same shield silhouette,
+same badge anchor at the bottom-right corner.
+
+This page documents every state you can see, what triggered it, and what
+to do about it.
+
+## State reference
+
+<table>
+  <thead>
+    <tr>
+      <th style={{ width: '120px', textAlign: 'center' }}>Icon</th>
+      <th>State</th>
+      <th>What it means</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style={{ textAlign: 'center' }}>
+        <img src="/docs-static/img/client/states/shield.png" width="64" height="64" alt="disconnected" />
+      </td>
+      <td><strong>Disconnected</strong></td>
+      <td>
+        The client is installed and the daemon is running, but no connection
+        to the management server is active. You see this right after install,
+        after <code>openzro down</code>, or whenever the daemon has been
+        explicitly stopped.
+      </td>
+    </tr>
+    <tr>
+      <td style={{ textAlign: 'center' }}>
+        <img src="/docs-static/img/client/states/shield-connecting.png" width="64" height="64" alt="connecting" />
+      </td>
+      <td><strong>Connecting</strong></td>
+      <td>
+        Transient state while the client is establishing the management
+        gRPC stream, exchanging keys with the relay, and bringing the
+        WireGuard interface up. Normally lasts 2–8 seconds. If the icon
+        stays in this state for more than ~30 seconds, see
+        <a href="/help/troubleshooting-client">Troubleshooting</a>.
+      </td>
+    </tr>
+    <tr>
+      <td style={{ textAlign: 'center' }}>
+        <img src="/docs-static/img/client/states/shield-connected.png" width="64" height="64" alt="connected" />
+      </td>
+      <td><strong>Connected</strong></td>
+      <td>
+        The mesh is up. The client has an active management Sync stream,
+        has registered with the signal service, and the WireGuard tunnel
+        to peers is established. Traffic is flowing per the policies that
+        apply to this peer's groups.
+      </td>
+    </tr>
+    <tr>
+      <td style={{ textAlign: 'center' }}>
+        <img src="/docs-static/img/client/states/shield-update.png" width="64" height="64" alt="update available, disconnected" />
+      </td>
+      <td><strong>Update available</strong> (disconnected)</td>
+      <td>
+        A newer client release is available on the configured update channel,
+        and the client is not connected. Install the update from the system
+        package manager (
+        <code>apt</code>, <code>dnf</code>, <code>brew</code>,
+        Windows installer, etc.) to get the latest fixes.
+      </td>
+    </tr>
+    <tr>
+      <td style={{ textAlign: 'center' }}>
+        <img src="/docs-static/img/client/states/shield-connected-update.png" width="64" height="64" alt="connected with update" />
+      </td>
+      <td><strong>Update available</strong> (connected)</td>
+      <td>
+        Same as above, but the client is currently part of the mesh. Plan
+        your upgrade — restarting the client to pick up a new version
+        re-keys the WireGuard interface and triggers a brief reconnect.
+      </td>
+    </tr>
+    <tr>
+      <td style={{ textAlign: 'center' }}>
+        <img src="/docs-static/img/client/states/shield-error.png" width="64" height="64" alt="error" />
+      </td>
+      <td><strong>Error</strong></td>
+      <td>
+        The client tried to connect but ran into an unrecoverable failure
+        (invalid token, management unreachable, posture check rejected,
+        etc.). Hover the systray icon for the specific message, or run
+        <code>openzro status</code> in a terminal for the full diagnostic.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+## State transitions
+
+Typical happy-path lifecycle when a user runs `openzro up`:
+
+```
+Disconnected  ──▶  Connecting  ──▶  Connected
+                       │
+                       └──▶  Error  (auth or posture failure)
+```
+
+Background events that can shift state without user action:
+
+- **Token expiry** → `Connected` → `Connecting` (refresh) → `Connected`
+  (or `Error` if SSO denies).
+- **Network change** (WiFi roaming, sleep/wake) → `Connected` →
+  `Connecting` → `Connected`.
+- **Management restart** (operator-side, e.g. helm upgrade) →
+  `Connected` → `Connecting` → `Connected` (gRPC reconnect; usually under 10 s).
+- **Update detected by background poller** → flips badge to "update
+  available" without changing the underlying connected/disconnected
+  state.
+
+## Login success page
+
+When you run `openzro login` (or trigger SSO via the GUI), the desktop
+client opens your default browser to complete the OAuth/PKCE handshake.
+After a successful sign-in you'll see a confirmation page served by the
+client itself on `localhost`:
+
+> **You're in the mesh.**
+> Device registered, posture verified, keys exchanged. Your peer is
+> now routable across the openZro network.
+
+The page tries to close itself automatically after 10 seconds. Modern
+browsers restrict `window.close()` to scripts that opened the window —
+since the openZro client launches the browser via the OS shell, the
+close call is sometimes blocked. When that happens the countdown is
+replaced by a "You can safely close this window." note, and you can
+close the tab manually. Either way, the desktop client has already
+completed the handshake by the time the page renders.
+
+## Troubleshooting state-stuck scenarios
+
+If the icon stays in a state longer than expected, the
+[Troubleshooting](/help/troubleshooting-client) page covers the common
+causes. Quick reference:
+
+- **Stuck on Connecting (over 30 s)**: management URL unreachable, or DNS
+  is broken inside the daemon's network namespace. `openzro status`
+  prints the management URL it's trying.
+- **Disconnected → Error → Disconnected loop**: token expired and the
+  configured SSO connector is unavailable. Run `openzro login` again.
+- **Connected but no peer traffic**: a policy or admission posture
+  check is denying the peer. Check `openzro status --detail` for the
+  rejection reason.
+- **Update available stays after package upgrade**: the client polls
+  GitHub releases roughly every hour. Restart the daemon to force an
+  immediate refresh.
