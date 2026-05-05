@@ -17,6 +17,7 @@ import {ImageZoom} from "@/components/ImageZoom";
 import {MatomoTagManager} from "@/components/Matomo";
 import {CookieConsentProvider, useCookieConsent} from "@/components/cookie-consent/CookieConsentProvider";
 import {CookieConsent} from "@/components/cookie-consent/CookieConsent";
+import {DocsBackground} from "@/components/DocsBackground";
 
 function onRouteChange() {
   useMobileNavigationStore.getState().close()
@@ -40,6 +41,7 @@ function AppInner({ Component, pageProps }) {
         }
         <meta name="description" content={pageProps.description} />
       </Head>
+      <DocsBackground />
       <AnnouncementBannerProvider>
           <MDXProvider components={mdxComponents}>
               <Layout title={pageProps.title?.toString()} tableOfContents={tableOfContents} {...pageProps}>
