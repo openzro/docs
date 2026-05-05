@@ -44,11 +44,11 @@ Replace `signal.example.com` with your signal server's domain.
 Create `signal.env` with your signal settings:
 
 ```bash
-NB_PORT=443
-NB_LOG_LEVEL=info
+OZ_PORT=443
+OZ_LOG_LEVEL=info
 
 # TLS via Let's Encrypt (automatic certificate provisioning)
-NB_LETSENCRYPT_DOMAIN=signal.example.com
+OZ_LETSENCRYPT_DOMAIN=signal.example.com
 ```
 
 Create `docker-compose.yml`:
@@ -81,9 +81,9 @@ volumes:
 If you have existing TLS certificates, replace the Let's Encrypt variable in `signal.env` with:
 
 ```bash
-# Replace the NB_LETSENCRYPT_DOMAIN line with:
-NB_CERT_FILE=/certs/fullchain.pem
-NB_CERT_KEY=/certs/privkey.pem
+# Replace the OZ_LETSENCRYPT_DOMAIN line with:
+OZ_CERT_FILE=/certs/fullchain.pem
+OZ_CERT_KEY=/certs/privkey.pem
 ```
 
 And add a certificate volume to `docker-compose.yml`:

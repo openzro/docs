@@ -7,11 +7,11 @@ of Postgres for new instances beginning from version `0.46.0`.
 
 To enable Postgres add to your management service the following environmental variable:
 ```bash
-NB_ACTIVITY_EVENT_STORE_ENGINE=postgres
-NB_ACTIVITY_EVENT_POSTGRES_DSN=host=localhost port=5432 user=<user> password=<password> dbname=<db_name>
+OZ_ACTIVITY_EVENT_STORE_ENGINE=postgres
+OZ_ACTIVITY_EVENT_POSTGRES_DSN=host=localhost port=5432 user=<user> password=<password> dbname=<db_name>
 ```
 
-You can switch back to sqlite storage by setting the `NB_ACTIVITY_EVENT_STORE_ENGINE` variable to `sqlite`.
+You can switch back to sqlite storage by setting the `OZ_ACTIVITY_EVENT_STORE_ENGINE` variable to `sqlite`.
 <Note>
     Switching between storage options requires migration steps to prevent data loss.
 </Note>
@@ -41,15 +41,15 @@ pgloader --type sqlite backup/events.db "postgresql://<PG_USER>:<PG_PASSWORD>@<P
 
 3. Create `.env` file with the following content:
 ```bash
-NB_ACTIVITY_EVENT_STORE_ENGINE=postgres
-NB_ACTIVITY_EVENT_POSTGRES_DSN="host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
+OZ_ACTIVITY_EVENT_STORE_ENGINE=postgres
+OZ_ACTIVITY_EVENT_POSTGRES_DSN="host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
 ```
 
 4. Update `docker-compose.yml` file to  pass the postgres configuration to the `management` container
 ```yaml
 environment:
-  - NB_ACTIVITY_EVENT_STORE_ENGINE=${NB_ACTIVITY_EVENT_STORE_ENGINE}
-  - NB_ACTIVITY_EVENT_POSTGRES_DSN=${NB_ACTIVITY_EVENT_POSTGRES_DSN}
+  - OZ_ACTIVITY_EVENT_STORE_ENGINE=${OZ_ACTIVITY_EVENT_STORE_ENGINE}
+  - OZ_ACTIVITY_EVENT_POSTGRES_DSN=${OZ_ACTIVITY_EVENT_POSTGRES_DSN}
 env_file:
   - .env
 ```
@@ -79,9 +79,9 @@ To rollback to the Sqlite  store, follow these steps:
 docker compose cp backup/events.db management:/var/lib/openzro/events.db
 ```
 
-2. Enable SQLite by setting the `NB_ACTIVITY_EVENT_STORE_ENGINE` environment variable to `sqlite`:
+2. Enable SQLite by setting the `OZ_ACTIVITY_EVENT_STORE_ENGINE` environment variable to `sqlite`:
 ```bash
-NB_ACTIVITY_EVENT_STORE_ENGINE=sqlite
+OZ_ACTIVITY_EVENT_STORE_ENGINE=sqlite
 ```
 
 3. Restart the Management service.

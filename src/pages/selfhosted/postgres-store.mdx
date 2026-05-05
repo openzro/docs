@@ -15,11 +15,11 @@ server:
     dsn: "host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
 ```
 
-You can also pass the DSN as an `NB_` environment variable on the `openzro-server` container in your `docker-compose.yml`:
+You can also pass the DSN as an `OPENZRO_` environment variable on the `openzro-server` container in your `docker-compose.yml`:
 
 ```yaml
 environment:
-  - NB_STORE_ENGINE_POSTGRES_DSN=host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>
+  - OPENZRO_STORE_ENGINE_POSTGRES_DSN=host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>
 ```
 
 Restart the server and confirm:

@@ -40,13 +40,27 @@ and loaded, but it will not be updated on subsequent restarts of the `management
 
 ## Disabling geolocation entirely
 
-If you do not need geolocation-based posture checks, you can disable the geolocation service entirely by setting the environment variable:
+The management binary disables geolocation **by default** when the
+GeoLite2 database isn't available locally and auto-update is
+turned off. There's no dedicated "disable" toggle — you opt out
+by *not* configuring the database. Two ways:
 
 ```bash
-NB_DISABLE_GEOLOCATION=true
+# Pass the flag (or its env equivalent OZ_DISABLE_GEOLITE_UPDATE=true):
+openzro-mgmt --disable-geolite-update=true
 ```
 
-When set, the management server will skip geolocation initialization and will not attempt to download any databases.
+Combined with no `GeoLite2-City_*.mmdb` staged in the management
+`datadir`, the daemon logs
+
+```
+geolocation service not initialized (running without geolocation support): ...
+```
+
+at startup and serves all subsequent geo posture-check API calls
+with empty results. The dashboard's geo posture-check modal
+shows a banner explaining the database isn't configured, so
+admins don't fall into the "empty dropdown" trap.
 
 ## Troubleshooting: GeoLite2 download fails in restricted networks
 

@@ -37,19 +37,19 @@ cd ~/openzro-relay
 Create `relay.env` with your relay settings. The relay server can automatically obtain and renew TLS certificates via Let's Encrypt:
 
 ```bash
-NB_LOG_LEVEL=info
-NB_LISTEN_ADDRESS=:443
-NB_EXPOSED_ADDRESS=rels://relay-us.example.com:443
-NB_AUTH_SECRET=your-shared-secret-here
+OZ_LOG_LEVEL=info
+OZ_LISTEN_ADDRESS=:443
+OZ_EXPOSED_ADDRESS=rels://relay-us.example.com:443
+OZ_AUTH_SECRET=your-shared-secret-here
 
 # TLS via Let's Encrypt (automatic certificate provisioning)
-NB_LETSENCRYPT_DOMAINS=relay-us.example.com
-NB_LETSENCRYPT_EMAIL=admin@example.com
-NB_LETSENCRYPT_DATA_DIR=/data/letsencrypt
+OZ_LETSENCRYPT_DOMAINS=relay-us.example.com
+OZ_LETSENCRYPT_EMAIL=admin@example.com
+OZ_LETSENCRYPT_DATA_DIR=/data/letsencrypt
 
 # Embedded STUN (comma-separated for multiple ports, e.g., 3478,3479)
-NB_ENABLE_STUN=true
-NB_STUN_PORTS=3478
+OZ_ENABLE_STUN=true
+OZ_STUN_PORTS=3478
 ```
 
 <Note>
@@ -66,7 +66,7 @@ services:
     restart: unless-stopped
     ports:
       - '443:443'
-      # Expose all ports listed in NB_STUN_PORTS
+      # Expose all ports listed in OZ_STUN_PORTS
       - '3478:3478/udp'
     env_file:
       - relay.env
@@ -87,9 +87,9 @@ volumes:
 If you have existing TLS certificates (e.g., from your own CA or a wildcard cert), replace the Let's Encrypt variables in `relay.env` with:
 
 ```bash
-# Replace the NB_LETSENCRYPT_* lines with:
-NB_TLS_CERT_FILE=/certs/fullchain.pem
-NB_TLS_KEY_FILE=/certs/privkey.pem
+# Replace the OZ_LETSENCRYPT_* lines with:
+OZ_TLS_CERT_FILE=/certs/fullchain.pem
+OZ_TLS_KEY_FILE=/certs/privkey.pem
 ```
 
 And add a certificate volume to `docker-compose.yml`:
@@ -135,7 +135,7 @@ A `404 page not found` response is expected — what matters is that the TLS han
 
 ## Repeat for Additional Relay Servers
 
-If deploying multiple relays (e.g., for different regions), repeat the steps above on each server. Use the **same `NB_AUTH_SECRET`** but update the domain name for each.
+If deploying multiple relays (e.g., for different regions), repeat the steps above on each server. Use the **same `OZ_AUTH_SECRET`** but update the domain name for each.
 
 ## Update Main Server Configuration
 
@@ -188,7 +188,7 @@ server:
 ```
 
 <Warning>
-The `secret` under `relays` and the `NB_AUTH_SECRET` on all relay servers **must be identical**. Mismatched secrets will cause relay connections to fail silently.
+The `secret` under `relays` and the `OZ_AUTH_SECRET` on all relay servers **must be identical**. Mismatched secrets will cause relay connections to fail silently.
 </Warning>
 
 ### Update docker-compose.yml (Optional)

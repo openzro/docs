@@ -81,24 +81,28 @@ when you reach that stage.
 
 ### Initial setup (Onboarding)
 
-The script deploys openZro **without any users**. Once complete, you'll need to create your first user:
+When the script finishes it prints two pieces of information you'll
+use to sign in for the first time:
 
-<p>
-    <img src="/docs-static/img/selfhosted/quickstart/setup.png" alt="openZro setup page" width="600"/>
-</p>
+- The **dashboard URL** (`https://openzro.example.com`)
+- The **bootstrap admin credentials** for the bundled Zitadel IdP
+  (a randomly-generated email + password the script provisioned
+  for you)
 
-1. Open your browser and navigate to `https://openzro.example.com`
-2. You'll be redirected to the setup page (`/setup`)
-3. Create your admin account:
-   - Enter your email address
-   - Enter your name
-   - Enter a password
-   - Click **Create Account**
-
-You can then log in with your email and password.
+1. Open the dashboard URL in your browser.
+2. You'll be redirected to the Zitadel login page.
+3. Sign in with the bootstrap credentials the script printed.
+4. The first sign-in lands you in the dashboard with admin
+   permissions; from **Settings → Users** you can add additional
+   accounts or wire up an external IdP.
 
 <Note>
-The `/setup` page is only accessible when no users exist. After creating the first user, it redirects to the regular login page.
+Save the bootstrap credentials from the script output before
+closing the terminal — the script doesn't store them anywhere
+else. If you lose them, the recovery path is to redeploy from
+scratch (the data lives in `docker compose` volumes; remove them
+to start clean) or to reset the Zitadel admin via Zitadel's own
+admin console at `https://openzro.example.com/ui/console`.
 </Note>
 
 ## Add More Users
@@ -159,13 +163,21 @@ Once your openZro instance is running, refer to these guides for ongoing mainten
 
 ## Troubleshoot
 
-- **I can't access the `/setup` page**
+- **I lost the bootstrap admin credentials the script printed**
 
-  The setup page is only available when no users exist. If you've already created a user, go to the main login page instead.
+  They're not stored anywhere else. Easiest path: open Zitadel's
+  own admin console at `https://openzro.example.com/ui/console`
+  and reset via Zitadel's password-recovery flow (it sends an
+  email if SMTP is configured). If you can't recover that way,
+  redeploy from scratch — `docker compose down -v` removes the
+  volumes and the next run of the install script provisions a
+  fresh admin.
 
-- **I forgot my admin password**
+- **I forgot a user password (not the bootstrap admin)**
 
-  You can create a new user via the API using a PAT (Personal Access Token) from an existing admin, or reset the database to start fresh.
+  Have an existing admin reset it via **Settings → Users** in the
+  dashboard, or via the management API with a Personal Access
+  Token.
 
 - **SSO provider not appearing on login page**
 

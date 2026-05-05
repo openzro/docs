@@ -70,7 +70,7 @@ Delete the entire `coturn` service block from your `docker-compose.yml`:
 
 #### Update the Relay Service
 
-Add STUN configuration to your relay service. You need to expose the STUN UDP port(s) in the `ports` section. You can configure multiple STUN ports if needed (e.g., for different network interfaces or load balancing) - ensure each port is exposed in `docker-compose.yml` and listed in `NB_STUN_PORTS`:
+Add STUN configuration to your relay service. You need to expose the STUN UDP port(s) in the `ports` section. You can configure multiple STUN ports if needed (e.g., for different network interfaces or load balancing) - ensure each port is exposed in `docker-compose.yml` and listed in `OZ_STUN_PORTS`:
 
 ```yaml
   relay:
@@ -85,13 +85,13 @@ Add STUN configuration to your relay service. You need to expose the STUN UDP po
       - ./relay.env
     # OR use environment directly:
     # environment:
-    #   - NB_LOG_LEVEL=info
-    #   - NB_LISTEN_ADDRESS=:80
-    #   - NB_EXPOSED_ADDRESS=rels://your-domain.com:443
-    #   - NB_AUTH_SECRET=your-relay-secret
-    #   - NB_ENABLE_STUN=true           # Enable embedded STUN
-    #   - NB_STUN_LOG_LEVEL=info        # STUN logging level
-    #   - NB_STUN_PORTS=3478            # STUN port(s), comma-separated for multiple (e.g., 3478,3479)
+    #   - OZ_LOG_LEVEL=info
+    #   - OZ_LISTEN_ADDRESS=:80
+    #   - OZ_EXPOSED_ADDRESS=rels://your-domain.com:443
+    #   - OZ_AUTH_SECRET=your-relay-secret
+    #   - OZ_ENABLE_STUN=true           # Enable embedded STUN
+    #   - OZ_STUN_LOG_LEVEL=info        # STUN logging level
+    #   - OZ_STUN_PORTS=3478            # STUN port(s), comma-separated for multiple (e.g., 3478,3479)
     logging:
       driver: "json-file"
       options:
@@ -105,21 +105,21 @@ Create a `relay.env` file with the STUN configuration:
 
 ```bash
 # relay.env
-NB_LOG_LEVEL=info
-NB_LISTEN_ADDRESS=:80
-NB_EXPOSED_ADDRESS=rels://your-domain.com:443
-NB_AUTH_SECRET=your-existing-relay-secret
+OZ_LOG_LEVEL=info
+OZ_LISTEN_ADDRESS=:80
+OZ_EXPOSED_ADDRESS=rels://your-domain.com:443
+OZ_AUTH_SECRET=your-existing-relay-secret
 
 # New STUN configuration
-NB_ENABLE_STUN=true
-NB_STUN_LOG_LEVEL=info
-NB_STUN_PORTS=3478
+OZ_ENABLE_STUN=true
+OZ_STUN_LOG_LEVEL=info
+OZ_STUN_PORTS=3478
 # For multiple ports, use comma-separated values:
-# NB_STUN_PORTS=3478,3479
+# OZ_STUN_PORTS=3478,3479
 ```
 
 <Note>
-Keep your existing `NB_AUTH_SECRET` value from your current configuration. If using multiple STUN ports, ensure all ports are exposed in your `docker-compose.yml` and listed in `NB_STUN_PORTS`.
+Keep your existing `OZ_AUTH_SECRET` value from your current configuration. If using multiple STUN ports, ensure all ports are exposed in your `docker-compose.yml` and listed in `OZ_STUN_PORTS`.
 </Note>
 
 ### Step 4: Update management.json
@@ -208,7 +208,7 @@ level=info msg="Starting STUN server on port 3478"
 
 1. **Check STUN Server**:
 
-   Enable debug logging for the STUN server by setting `NB_STUN_LOG_LEVEL=debug` in your `relay.env`, then restart the relay service and observe the logs:
+   Enable debug logging for the STUN server by setting `OZ_STUN_LOG_LEVEL=debug` in your `relay.env`, then restart the relay service and observe the logs:
    ```bash
    docker logs --tail 100 -f openzro-relay
    ```
@@ -237,9 +237,9 @@ level=info msg="Starting STUN server on port 3478"
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `NB_ENABLE_STUN` | Enable embedded STUN server | `false` |
-| `NB_STUN_PORTS` | STUN UDP port(s), comma-separated | `3478` |
-| `NB_STUN_LOG_LEVEL` | STUN server log level | `info` |
+| `OZ_ENABLE_STUN` | Enable embedded STUN server | `false` |
+| `OZ_STUN_PORTS` | STUN UDP port(s), comma-separated | `3478` |
+| `OZ_STUN_LOG_LEVEL` | STUN server log level | `info` |
 
 ### Relay CLI Flags (Alternative)
 
@@ -258,7 +258,7 @@ If running the relay binary directly:
 
 **Symptom**: No STUN-related log messages
 
-**Solution**: Verify `NB_ENABLE_STUN=true` is set and the relay container has port 3478/udp exposed.
+**Solution**: Verify `OZ_ENABLE_STUN=true` is set and the relay container has port 3478/udp exposed.
 
 ### Clients Can't Connect
 

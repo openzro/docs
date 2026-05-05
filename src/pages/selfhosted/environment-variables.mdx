@@ -13,7 +13,7 @@ Environment variables set in your `setup.env` file are used by the `configure.sh
 openZro uses two types of environment variables:
 
 1. **Setup Variables** (`OPENZRO_` prefix) - Used in docker-compose templates and `setup.env` for initial configuration
-2. **Runtime Variables** (`NB_` prefix) - Can override CLI flags at runtime using the pattern `--flag-name` → `NB_FLAG_NAME`
+2. **Runtime Variables** (`OZ_` prefix) - Can override CLI flags at runtime using the pattern `--flag-name` → `OZ_FLAG_NAME`
 
 ## Core Setup Variables
 
@@ -44,9 +44,9 @@ The default quickstart deployment uses the relay service's embedded STUN server.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `NB_ENABLE_STUN` | `true` | Enable embedded STUN server in relay |
-| `NB_STUN_PORTS` | `3478` | STUN server UDP ports |
-| `NB_STUN_LOG_LEVEL` | `info` | STUN server log level |
+| `OZ_ENABLE_STUN` | `true` | Enable embedded STUN server in relay |
+| `OZ_STUN_PORTS` | `3478` | STUN server UDP ports |
+| `OZ_STUN_LOG_LEVEL` | `info` | STUN server log level |
 
 ## Management Server Variables
 
@@ -105,37 +105,37 @@ openZro runs in single account mode by default since v0.10.1. All users joining 
 |----------|---------|-------------|
 | `OPENZRO_DISABLE_ANONYMOUS_METRICS` | `false` | Disable anonymous usage metrics |
 
-## Runtime Environment Variables (NB_ prefix)
+## Runtime Environment Variables (OZ_ prefix)
 
-These variables can override CLI flags at runtime. The naming convention is `NB_<FLAG_NAME>` where the flag name is uppercased and hyphens are replaced with underscores.
+These variables can override CLI flags at runtime. The naming convention is `OZ_<FLAG_NAME>` where the flag name is uppercased and hyphens are replaced with underscores.
 
 ### Management Server Runtime
 
 | Variable | Description |
 |----------|-------------|
-| `NB_PORT` | Server port (overrides `--port`) |
-| `NB_DATADIR` | Data directory (overrides `--datadir`) |
-| `NB_CONFIG` | Config file path (overrides `--config`) |
-| `NB_LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` |
-| `NB_LOG_FILE` | Log file path |
-| `NB_METRICS_PORT` | Prometheus metrics port |
-| `NB_LETSENCRYPT_DOMAIN` | Let's Encrypt domain |
-| `NB_CERT_FILE` | TLS certificate file |
-| `NB_CERT_KEY` | TLS certificate key file |
-| `NB_DNS_DOMAIN` | DNS domain for peers |
-| `NB_DISABLE_GEOLITE_UPDATE` | Disable GeoLite database updates |
+| `OZ_PORT` | Server port (overrides `--port`) |
+| `OZ_DATADIR` | Data directory (overrides `--datadir`) |
+| `OZ_CONFIG` | Config file path (overrides `--config`) |
+| `OZ_LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` |
+| `OZ_LOG_FILE` | Log file path |
+| `OZ_METRICS_PORT` | Prometheus metrics port |
+| `OZ_LETSENCRYPT_DOMAIN` | Let's Encrypt domain |
+| `OZ_CERT_FILE` | TLS certificate file |
+| `OZ_CERT_KEY` | TLS certificate key file |
+| `OZ_DNS_DOMAIN` | DNS domain for peers |
+| `OZ_DISABLE_GEOLITE_UPDATE` | Disable GeoLite database updates |
 
 ### Advanced Runtime Variables
 
 | Variable | Description |
 |----------|-------------|
-| `NB_EVENT_ACTIVITY_LOG_ENABLED` | Enable activity log events |
-| `NB_GET_ACCOUNT_BUFFER_INTERVAL` | Account buffer interval duration |
-| `NB_SQL_MAX_OPEN_CONNS` | Maximum SQL database connections |
-| `NB_STORE_TRANSACTION_TIMEOUT` | Store transaction timeout |
-| `NB_API_RATE_LIMITING_ENABLED` | Enable API rate limiting |
-| `NB_API_RATE_LIMITING_RPM` | Rate limit requests per minute |
-| `NB_API_RATE_LIMITING_BURST` | Rate limit burst size |
+| `OZ_EVENT_ACTIVITY_LOG_ENABLED` | Enable activity log events |
+| `OZ_GET_ACCOUNT_BUFFER_INTERVAL` | Account buffer interval duration |
+| `OZ_SQL_MAX_OPEN_CONNS` | Maximum SQL database connections |
+| `OZ_STORE_TRANSACTION_TIMEOUT` | Store transaction timeout |
+| `OZ_API_RATE_LIMITING_ENABLED` | Enable API rate limiting |
+| `OZ_API_RATE_LIMITING_RPM` | Rate limit requests per minute |
+| `OZ_API_RATE_LIMITING_BURST` | Rate limit burst size |
 | `OPENZRO_METRICS_INTERVAL_IN_SECONDS` | Metrics push interval |
 
 ## Signal Server Variables
@@ -144,14 +144,14 @@ These variables can override CLI flags at runtime. The naming convention is `NB_
 
 | Variable | Description |
 |----------|-------------|
-| `NB_PORT` | Signal server port |
-| `NB_METRICS_PORT` | Prometheus metrics port |
-| `NB_SSL_DIR` | SSL certificates directory |
-| `NB_LETSENCRYPT_DOMAIN` | Let's Encrypt domain |
-| `NB_CERT_FILE` | TLS certificate file |
-| `NB_CERT_KEY` | TLS certificate key file |
-| `NB_LOG_LEVEL` | Log level |
-| `NB_LOG_FILE` | Log file path |
+| `OZ_PORT` | Signal server port |
+| `OZ_METRICS_PORT` | Prometheus metrics port |
+| `OZ_SSL_DIR` | SSL certificates directory |
+| `OZ_LETSENCRYPT_DOMAIN` | Let's Encrypt domain |
+| `OZ_CERT_FILE` | TLS certificate file |
+| `OZ_CERT_KEY` | TLS certificate key file |
+| `OZ_LOG_LEVEL` | Log level |
+| `OZ_LOG_FILE` | Log file path |
 
 ## Relay Server Variables
 
@@ -169,20 +169,20 @@ These variables can override CLI flags at runtime. The naming convention is `NB_
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `NB_LOG_LEVEL` | `info` | Log level |
-| `NB_LISTEN_ADDRESS` | `:443` | Listen address |
-| `NB_EXPOSED_ADDRESS` | - | Exposed address for peers |
-| `NB_AUTH_SECRET` | - | Authentication secret |
-| `NB_METRICS_PORT` | - | Prometheus metrics port |
-| `NB_TLS_CERT_FILE` | - | TLS certificate file |
-| `NB_TLS_KEY_FILE` | - | TLS key file |
-| `NB_LETSENCRYPT_DATA_DIR` | - | Let's Encrypt data directory |
-| `NB_LETSENCRYPT_DOMAINS` | - | Let's Encrypt domains |
-| `NB_LETSENCRYPT_EMAIL` | - | Let's Encrypt email |
-| `NB_HEALTH_LISTEN_ADDRESS` | - | Health check listen address |
-| `NB_ENABLE_STUN` | `false` | Enable embedded STUN server |
-| `NB_STUN_PORTS` | `3478` | STUN server UDP ports (comma-separated) |
-| `NB_STUN_LOG_LEVEL` | `info` | STUN server log level |
+| `OZ_LOG_LEVEL` | `info` | Log level |
+| `OZ_LISTEN_ADDRESS` | `:443` | Listen address |
+| `OZ_EXPOSED_ADDRESS` | - | Exposed address for peers |
+| `OZ_AUTH_SECRET` | - | Authentication secret |
+| `OZ_METRICS_PORT` | - | Prometheus metrics port |
+| `OZ_TLS_CERT_FILE` | - | TLS certificate file |
+| `OZ_TLS_KEY_FILE` | - | TLS key file |
+| `OZ_LETSENCRYPT_DATA_DIR` | - | Let's Encrypt data directory |
+| `OZ_LETSENCRYPT_DOMAINS` | - | Let's Encrypt domains |
+| `OZ_LETSENCRYPT_EMAIL` | - | Let's Encrypt email |
+| `OZ_HEALTH_LISTEN_ADDRESS` | - | Health check listen address |
+| `OZ_ENABLE_STUN` | `false` | Enable embedded STUN server |
+| `OZ_STUN_PORTS` | `3478` | STUN server UDP ports (comma-separated) |
+| `OZ_STUN_LOG_LEVEL` | `info` | STUN server log level |
 
 ## Dashboard Variables
 
@@ -257,9 +257,9 @@ Set these in your container environment or docker-compose:
 
 ```yaml
 environment:
-  - NB_API_RATE_LIMITING_ENABLED=true
-  - NB_API_RATE_LIMITING_RPM=60
-  - NB_API_RATE_LIMITING_BURST=10
+  - OZ_API_RATE_LIMITING_ENABLED=true
+  - OZ_API_RATE_LIMITING_RPM=60
+  - OZ_API_RATE_LIMITING_BURST=10
 ```
 
 ## Variable Precedence

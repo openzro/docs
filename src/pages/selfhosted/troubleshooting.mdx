@@ -2,31 +2,39 @@
 
 This page will help with various issues when self-hosting openZro.
 
-## Embedded IdP Issues
+## Identity provider Issues
 
-### Setup page not accessible
+### I lost the bootstrap admin credentials
 
-**Problem**: You can't access the `/setup` page to create the first user.
-
-**Solutions**:
-- The `/setup` page is only available when no users exist. If you've already created a user, use the regular login page.
-- Check that the embedded IdP is enabled in your configuration.
-- Verify the Management service is running: `docker compose logs management`
-
-### "Setup already completed" error (HTTP 412)
-
-**Problem**: The setup endpoint returns a 412 error.
-
-**Solution**: Setup has already been completed. The first user was already created. Use the regular login page to sign in.
-
-### Password not working after user creation
-
-**Problem**: You created a user but the password doesn't work.
+**Problem**: The install script printed admin credentials but you
+didn't save them, and the terminal session is gone.
 
 **Solutions**:
-- Passwords are shown only once during user creation. If you didn't save it, you'll need to delete and recreate the user.
-- Via API, you can create a new user with a new password.
-- For the owner account, you may need to reset the database if no other admins exist.
+- If you used the [Zitadel-based install
+  script](/selfhosted/selfhosted-quickstart): open Zitadel's own
+  admin console at `https://<your-domain>/ui/console` and use
+  the password-recovery flow (requires SMTP configured in
+  Zitadel).
+- For the embedded Dex IdP: edit `dex.config.yaml` to add a new
+  `staticPasswords` entry with a bcrypt hash you generate, then
+  restart Dex.
+- If neither path works, redeploy from scratch:
+  `docker compose down -v` removes the volumes, then re-run the
+  install script for a fresh admin.
+
+### A user can't sign in via the IdP
+
+**Problem**: Sign-in flow loops back to the IdP login page or
+fails with an OIDC error.
+
+**Solutions**:
+- Verify the redirect URI configured in the IdP exactly matches
+  `https://<your-domain>/auth` (no trailing slash, exact protocol).
+- Verify the IdP's issuer URL matches what management's
+  `OPENZRO_AUTH_ISSUER` (or `management.json` `Authentication.Issuer`)
+  points at.
+- Check the IdP's logs for "consent required" or "scope mismatch"
+  errors — openZro requests `openid profile email`.
 
 ### SSO connector not appearing on login page
 
