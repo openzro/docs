@@ -23,21 +23,34 @@ export function DocsBackground() {
         height={56}
         x={-12}
         y={4}
-        // No `squares` prop on purpose: GridPattern wraps them in
-        // a nested <svg> that resets the fill cascade, so Tailwind
-        // `fill-*` on the outer SVG doesn't reach the rects —
-        // they end up rendering as solid black against the page
-        // bg, which looks horrible. The plain hairline grid (the
-        // pattern's stroke) is the right brand identity anyway.
+        squares={[
+          [3, 2],
+          [6, 1],
+          [9, 4],
+          [12, 2],
+          [4, 7],
+          [10, 6],
+          [14, 5],
+          [7, 9],
+        ]}
         className={
+          // GridPattern wraps highlighted squares in a nested
+          // <svg>, and a normal `fill-violet-X/Y` on the outer
+          // SVG doesn't reach them through the nested boundary
+          // (the rects fall back to default `fill: black`).
+          // Workaround: target them explicitly via the arbitrary
+          // descendant selector `[&>svg_rect]` so the rule lands
+          // on the squares' rects (the first rect with the
+          // pattern fill is a direct child of the outer SVG, not
+          // of the inner SVG, so it isn't matched).
           'absolute inset-0 h-full w-full ' +
-          // Light: hairline violet on white. /15 puts the line at
-          // ~5 RGB delta from white — visible at the edge of
-          // peripheral vision, invisible under body text.
-          'stroke-violet-200/15 ' +
-          // Dark: lower alpha on --oz-ink. The deep-violet bg
-          // means even /5 registers cleanly.
-          'dark:stroke-violet-400/5'
+          // Light: hairline grid + faint violet squares.
+          'stroke-violet-200/15 [&>svg_rect]:fill-violet-200/15 ' +
+          // Dark: even subtler. /2.5 stroke + /5 fill against
+          // --oz-ink registers without competing with body text;
+          // higher alphas tested as "still aparente" on the deep
+          // violet-black bg.
+          'dark:stroke-violet-400/2.5 dark:[&>svg_rect]:fill-violet-400/5'
         }
       />
     </div>
