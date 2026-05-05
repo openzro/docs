@@ -12,7 +12,7 @@ export function Badge({ status, text, hoverText }) {
             case 'error':
                 return 'text-red-400';
             case 'cloud-only':
-                return 'text-violet-500';
+                return 'text-oz-link';
             case 'experimental':
                 return 'text-teal-400';
             default:

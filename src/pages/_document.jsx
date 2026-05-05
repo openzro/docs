@@ -57,7 +57,7 @@ export default function Document() {
           <link rel="icon" type="image/x-icon" href="/docs-static/img/favicon.ico" />
           <link rel="apple-touch-icon" href="/docs-static/img/apple-touch-icon.png" />
       </Head>
-      <body className="bg-white antialiased dark:bg-[#181A1D]">
+      <body className="bg-page text-ink antialiased">
         <GoogleTageManagerBodyScript />
         <Main />
         <NextScript />

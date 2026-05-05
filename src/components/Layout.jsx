@@ -194,7 +194,7 @@ export function Layout({ children, title, tableOfContents }) {
             className="contents lg:pointer-events-none lg:fixed lg:inset-0 lg:z-40 lg:flex"
             style={{ top: bannerHeight }}
         >
-          <div className="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:dark:border-neutral-700/50 lg:px-6 lg:pb-8 lg:pt-4 lg:bg-white/70 lg:dark:bg-[#181A1D]/95 lg:backdrop-blur-lg xl:w-80 lg:overflow-x-visible sidebar-scroll">
+          <div className="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:dark:border-neutral-700/50 lg:px-6 lg:pb-8 lg:pt-4 lg:bg-page/70 lg:dark:bg-page/95 lg:backdrop-blur-lg xl:w-80 lg:overflow-x-visible sidebar-scroll">
             <div className="hidden lg:flex">
               <Link href="/" aria-label="Home">
                 <Logo className="h-6" />
@@ -249,7 +249,7 @@ export function Layout({ children, title, tableOfContents }) {
                   {showJumpToTop && (
                     <button
                       onClick={scrollToTop}
-                      className="text-xs text-slate-500 hover:text-violet-500 dark:text-slate-400 dark:hover:text-violet-400 transition-colors flex items-center gap-1"
+                      className="text-xs text-slate-500 hover:text-oz-link dark:text-slate-400 transition-colors flex items-center gap-1"
                       aria-label="Jump to top"
                     >
                       <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -267,7 +267,7 @@ export function Layout({ children, title, tableOfContents }) {
                           href={`#${section.id}`}
                           className={clsx(
                             isActive(section)
-                              ? 'text-violet-500'
+                              ? 'text-oz-link'
                               : 'font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300'
                           )}
                         >
@@ -285,7 +285,7 @@ export function Layout({ children, title, tableOfContents }) {
                                 href={`#${subSection.id}`}
                                 className={
                                   isActive(subSection)
-                                    ? 'text-violet-500'
+                                    ? 'text-oz-link'
                                     : 'hover:text-slate-600 dark:hover:text-slate-300'
                                 }
                               >
