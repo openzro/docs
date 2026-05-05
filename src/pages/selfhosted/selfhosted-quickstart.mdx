@@ -2,34 +2,205 @@ import {Tiles} from "@/components/Tiles"
 
 {/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="bZAgpT6nzaQ" /> */}
 
-# Self-Hosting Quickstart Guide (5 min)
+# Self-Hosting Quickstart
 
-openZro is open source and can be self-hosted on your servers. If you would like to learn more about the architecture please refer to the [Architecture section](/about-openzro/how-openzro-works).
+openZro is open source and **self-hosted only** — there is no
+"openZro Cloud" SaaS. To run the platform, you bring a Linux
+host (or a Kubernetes cluster) and pick a deploy path that fits
+your infrastructure.
 
-<Note>
-This is the quickest way to try self-hosted openZro. It should take around 5 minutes to get started if you already have a public domain and a VM.
-</Note>
+If you want to learn the architecture before installing, see
+[How openZro works](/about-openzro/how-openzro-works).
+
+## Pick your deploy path
+
+<Tiles
+  id="install-paths"
+  items={[
+    {
+      href: '#docker-compose-with-embedded-dex-recommended',
+      name: 'Docker Compose (recommended)',
+      description: 'One Linux VM, native systemd-equivalent via docker compose, embedded Dex IdP. ~10 minutes start to finish.',
+    },
+    {
+      href: '/selfhosted/kubernetes/helm-quickstart',
+      name: 'Kubernetes (Helm)',
+      description: 'Multi-replica HA from day one, GitOps-friendly, embedded Dex via the bundled subchart.',
+    },
+    {
+      href: '/selfhosted/ansible/quickstart',
+      name: 'Ansible (bare-metal)',
+      description: 'Multiple Linux hosts via systemd, no container layer, optional cloud-LB integration.',
+    },
+  ]}
+/>
+
+The rest of this page covers the **Docker Compose** path. It's
+the fastest way to try openZro on a single VM.
 
 ## Infrastructure requirements
-- A Linux VM with at least **1CPU** and **2GB** of memory.
-- The VM must be publicly accessible on **TCP ports 80 and 443**, and **UDP port 3478**.
-- A **public domain** name that resolves to the VM's public IP address (e.g. `openzro.example.com`).
+
+- A Linux VM with at least **1 CPU** and **2 GB** of memory
+- Public reachability on **TCP 80 + 443** (dashboard / management API)
+  and **UDP 3478** (TURN — used when peers can't establish a direct
+  WireGuard tunnel)
+- A **public domain** that resolves to the VM (e.g.
+  `openzro.example.com`)
 
 ## Software requirements
 
-- Docker with docker-compose plugin ([Docker installation guide](https://docs.docker.com/engine/install/)) or Docker with docker-compose version 2 or higher
-- [jq](https://jqlang.github.io/jq/) - install with `sudo apt install jq` or `sudo yum install jq`
-- [curl](https://curl.se/) - install with `sudo apt install curl` or `sudo yum install curl`
+- [Docker](https://docs.docker.com/engine/install/) with the Compose v2 plugin
+- `curl` — `sudo apt install curl` / `sudo yum install curl`
+- `jq` — `sudo apt install jq` / `sudo yum install jq`
+- `envsubst` (from `gettext`) — `sudo apt install gettext-base` /
+  `sudo yum install gettext`
 
-## Installation Script
+## Docker Compose with embedded Dex (recommended)
 
-The install script today is the Zitadel-based flow inherited from
-upstream — it provisions a [Zitadel](https://zitadel.com/) IdP next
-to the management server and wires the OIDC trust between them, so
-you can sign in immediately without configuring an external
-provider.
+The `configure.sh` script under `infrastructure_files/` is the
+ADR-0006-aligned install path: it provisions an **embedded
+[Dex](https://dexidp.io/) IdP** alongside the management server
+and wires the OIDC trust between them. No external IdP needed
+on day one — operators add Google / GitHub / Microsoft / Keycloak
+/ Okta / Authentik / generic OIDC connectors at runtime via the
+dashboard's **Settings → Identity Providers** page.
 
-Download and run it:
+### 1. Clone the repo
+
+```bash
+git clone https://github.com/openzro/openzro.git
+cd openzro/infrastructure_files
+```
+
+### 2. Configure your environment
+
+```bash
+cp setup.env.example setup.env
+$EDITOR setup.env
+```
+
+The minimum you need to set:
+
+```bash
+# Public dashboard / management host
+OPENZRO_DOMAIN="openzro.example.com"
+
+# Datastore — sqlite (default), postgres, or mysql
+OPENZRO_STORE_CONFIG_ENGINE="sqlite"
+```
+
+Read the comments in `setup.env.example` for everything else
+(TURN external IP, custom Dex admin email, store DSNs, etc.).
+The rest has sane defaults.
+
+### 3. Run configure.sh
+
+```bash
+./configure.sh
+```
+
+The script:
+
+1. Auto-discovers the VM's public IP for TURN config.
+2. Generates random TURN + relay auth secrets.
+3. Generates **mTLS certificates** for the management ↔ Dex gRPC
+   channel (one-time setup; persisted under `artifacts/grpc-certs/`).
+4. Generates the **Dex admin email + password** (random) if you
+   didn't supply your own. **Captures the plaintext password to
+   stderr ONCE — copy it now**, only the bcrypt hash is persisted.
+5. Wires every `OPENZRO_AUTH_*` variable to point at
+   `https://<your-domain>/dex` (skip this step if you set
+   `OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT` to use an external IdP).
+6. Renders all templates (compose, management.json, dex.config.yaml,
+   turnserver.conf) into the `artifacts/` directory.
+
+Sample output you should see:
+
+```
+================================================================
+  Generated Dex admin credentials — capture these NOW. The
+  plaintext password is not stored anywhere; only its bcrypt
+  hash lands in dex.config.yaml.
+
+    Email:    admin@openzro.example.com
+    Password: <random-24-char-string>
+
+  Sign in at https://openzro.example.com/dex once the stack is up.
+  Rotate by re-running configure.sh with
+  OPENZRO_DEX_ADMIN_PASSWORD_BCRYPT set in setup.env.
+================================================================
+```
+
+### 4. Bring the stack up
+
+```bash
+cd artifacts
+docker compose up -d
+docker compose ps
+```
+
+Wait ~30 s for Let's Encrypt to issue the cert (first run). Then:
+
+- Dashboard: `https://openzro.example.com`
+- Dex IdP:   `https://openzro.example.com/dex`
+
+### 5. Sign in
+
+1. Open the dashboard URL.
+2. Click **Sign in** — you're redirected to the Dex login page.
+3. Enter the **email + password** the script printed in step 3.
+4. You land in the dashboard with admin permissions.
+5. From **Settings → Identity Providers** you can wire up
+   external connectors (Google, GitHub, Microsoft, Keycloak,
+   Authentik, Okta, generic OIDC) at runtime; from
+   **Settings → Users** you add additional admins.
+
+<Note>
+**Save the bootstrap password** before closing the terminal. The
+plaintext is shown exactly once. To rotate, set
+`OPENZRO_DEX_ADMIN_PASSWORD_BCRYPT` in `setup.env` (use
+`htpasswd -bnBC 10 "" <password>` to generate the hash) and
+re-run `./configure.sh`.
+</Note>
+
+### Optional: external IdP instead of embedded Dex
+
+If you'd rather front the deployment with your existing IdP (Auth0,
+Authentik, Keycloak, Okta, Zitadel, generic OIDC), set in
+`setup.env`:
+
+```bash
+OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://idp.example.com/.well-known/openid-configuration"
+OPENZRO_AUTH_CLIENT_ID="openzro-dashboard"
+OPENZRO_AUTH_AUDIENCE="openzro-dashboard"
+```
+
+`configure.sh` skips the embedded-Dex defaults when this URL is
+set, fetches the discovery document, and renders the management
+config to point at your IdP. Each provider has its own setup
+page under [Identity Providers](/selfhosted/identity-providers).
+
+### Optional: CNAME for wildcard subdomains
+
+If you'll later use the openZro Proxy to expose internal services
+under subdomains (e.g. `app.openzro.example.com`), add a wildcard
+on top of the A record:
+
+| Type  | Name        | Content                | Cloudflare proxy |
+|-------|-------------|------------------------|------------------|
+| A     | `openzro`   | `YOUR.SERVER.IP.ADDRESS` | DNS only       |
+| CNAME | `*.openzro` | `openzro.example.com`  | DNS only         |
+
+Not required for the openZro core deployment — only matters when
+you're layering your own reverse proxy. See
+[External Reverse Proxy](/selfhosted/external-reverse-proxy).
+
+## Legacy: Zitadel-bundled install
+
+For backward compatibility with installs that pre-date ADR-0006,
+`getting-started-with-zitadel.sh` is still shipped. It provisions
+**Zitadel** (instead of Dex) as the IdP and wires the OIDC trust
+between them.
 
 ```bash
 curl -fsSL \
@@ -37,95 +208,46 @@ curl -fsSL \
   | bash
 ```
 
-The script will:
+Use this only if:
 
-1. Ask for your domain (e.g. `openzro.example.com`).
-2. Pull the openZro images, generate `docker-compose.yml`,
-   `management.json`, the Zitadel config, and a Caddy reverse proxy
-   that handles Let's Encrypt automatically.
-3. Bring everything up with `docker compose`.
-4. Print the admin credentials for the new Zitadel IdP and the
-   openZro dashboard URL.
+- You have an existing Zitadel deployment you want to consolidate
+- Your tooling is Zitadel-specific (provisioning APIs, audit
+  pipelines, etc.)
 
-Once finished, you can manage the resources via `docker compose`.
-For details on the generated files and how to customize the
-install, see [Configuration files](/selfhosted/configuration-files).
+For new installs, prefer the `configure.sh`/Dex path above —
+Zitadel here is just one of the many IdPs operators can connect
+to (its own page is at
+[Identity Providers → Zitadel](/selfhosted/identity-providers/zitadel)),
+not a piece of openZro.
 
-<Note>
-    A simpler install flow that bundles the embedded Dex IdP (no
-    Zitadel needed) and offers reverse-proxy + openZro Proxy choices
-    is on the roadmap — see
-    [docs/ROADMAP.md](https://github.com/openzro/openzro/blob/main/docs/ROADMAP.md).
-    Until then, the Zitadel-based script above is the supported
-    quickstart, and you can swap to a different IdP afterwards by
-    following the [Identity Providers](/selfhosted/identity-providers)
-    guide.
-</Note>
+## Add more users / connect IdPs
 
-### CNAME Record for Wildcard Subdomains (Optional)
+openZro's user model goes through whichever IdP is wired into the
+management server's OIDC trust:
 
-If you'll later use the openZro Proxy to expose internal services
-under subdomains (e.g. `app.openzro.example.com`), set a wildcard
-CNAME on top of the A record for the management host:
+- **Embedded Dex (default)** — manage local accounts in
+  `dex.config.yaml`'s `staticPasswords` block, or wire upstream
+  connectors (Google, GitHub, etc.) at runtime via the dashboard
+- **External IdP** — users live in your IdP; openZro federates
+  via OIDC
 
-| Type | Name | Content | Proxy status (Cloudflare) |
-|------|------|---------|--------------|
-| A | `openzro` | `YOUR.SERVER.IP.ADDRESS` | DNS only |
-| CNAME | `*.openzro` | `openzro.example.com` | DNS only |
-
-This wildcard CNAME is **not required for the openZro core
-deployment** — it only matters if you later layer your own reverse
-proxy in front of the management server to expose internal services
-under subdomains. See [External Reverse Proxy](/selfhosted/external-reverse-proxy)
-when you reach that stage.
-
-### Initial setup (Onboarding)
-
-When the script finishes it prints two pieces of information you'll
-use to sign in for the first time:
-
-- The **dashboard URL** (`https://openzro.example.com`)
-- The **bootstrap admin credentials** for the bundled Zitadel IdP
-  (a randomly-generated email + password the script provisioned
-  for you)
-
-1. Open the dashboard URL in your browser.
-2. You'll be redirected to the Zitadel login page.
-3. Sign in with the bootstrap credentials the script printed.
-4. The first sign-in lands you in the dashboard with admin
-   permissions; from **Settings → Users** you can add additional
-   accounts or wire up an external IdP.
-
-<Note>
-Save the bootstrap credentials from the script output before
-closing the terminal — the script doesn't store them anywhere
-else. If you lose them, the recovery path is to redeploy from
-scratch (the data lives in `docker compose` volumes; remove them
-to start clean) or to reset the Zitadel admin via Zitadel's own
-admin console at `https://openzro.example.com/ui/console`.
-</Note>
-
-## Add More Users
-openZro includes built-in local user management powered by an embedded <a href="https://dexidp.io/" target="_blank" rel="noopener noreferrer">Dex</a> server, allowing you to create and manage users directly from the Dashboard without requiring an external identity provider. You can also add external identity providers for SSO authentication alongside local users.
 <Tiles
   id="user-management"
   items={[
     {
-      href: '/selfhosted/identity-providers/local',
-      name: 'Local User Management',
-      description: 'Create and manage users directly from the openZro Dashboard. No external identity provider required.',
-    },
-    {
       href: '/selfhosted/identity-providers',
       name: 'Identity Providers',
-      description: 'Connect external identity providers like Google, Microsoft, Okta, or self-hosted IdPs for SSO authentication.',
+      description: 'Connect Google, Microsoft, Okta, Keycloak, Authentik, generic OIDC, or Zitadel as connectors via the dashboard.',
+    },
+    {
+      href: '/selfhosted/identity-providers/disable-local-authentication',
+      name: 'Disable local authentication',
+      description: 'Lock the embedded Dex to a single external IdP — useful in compliance settings where local accounts are forbidden.',
     },
   ]}
 />
 
 ## Maintenance
-
-Once your openZro instance is running, refer to these guides for ongoing maintenance:
 
 <Tiles
   id="maintenance"
@@ -144,52 +266,47 @@ Once your openZro instance is running, refer to these guides for ongoing mainten
 />
 
 <Tiles
-    id="scaling"
-    items={[
-        {
-            href: '/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment',
-            name: 'Scaling Your Self-Hosted Deployment',
-            description: 'Split your openZro deployment into multiple nodes to scale your deployment.',
-        },
-        {
-            href: '/selfhosted/configuration-files',
-            name: 'Configuration Files Reference',
-            description: 'Learn more about the configuration files generated by the quick start script and how to customize them.',
-        },
-    ]}
+  id="scaling"
+  items={[
+    {
+      href: '/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment',
+      name: 'Scaling self-hosted deployments',
+      description: 'Split a single-VM install into separate management, signal, and relay tiers as you grow.',
+    },
+    {
+      href: '/selfhosted/configuration-files',
+      name: 'Configuration files reference',
+      description: 'Every file the install scripts generate, plus the variables in setup.env that drive them.',
+    },
+  ]}
 />
 
 ---
 
 ## Troubleshoot
 
-- **I lost the bootstrap admin credentials the script printed**
+- **I lost the bootstrap admin password**
 
-  They're not stored anywhere else. Easiest path: open Zitadel's
-  own admin console at `https://openzro.example.com/ui/console`
-  and reset via Zitadel's password-recovery flow (it sends an
-  email if SMTP is configured). If you can't recover that way,
-  redeploy from scratch — `docker compose down -v` removes the
-  volumes and the next run of the install script provisions a
-  fresh admin.
+  The plaintext is only printed once by `configure.sh`. Easiest
+  recovery: generate a new bcrypt hash, set
+  `OPENZRO_DEX_ADMIN_PASSWORD_BCRYPT` in `setup.env`, and re-run
+  `./configure.sh` followed by `docker compose restart dex`. The
+  next login uses the new password.
 
-- **I forgot a user password (not the bootstrap admin)**
+  If you can't recover that way, redeploy from scratch:
+  `docker compose down -v` removes the volumes, the next
+  `configure.sh` run provisions a fresh admin.
 
-  Have an existing admin reset it via **Settings → Users** in the
-  dashboard, or via the management API with a Personal Access
-  Token.
+- **A user can't sign in via the IdP**
 
-- **SSO provider not appearing on login page**
+  Verify the dashboard's redirect URI is whitelisted in the IdP
+  configuration (it's `https://<your-domain>/auth`). For embedded
+  Dex, check `artifacts/dex.config.yaml`'s `staticClients` section.
 
-  Check that the connector is properly configured in **Settings** → **Identity Providers**. Ensure the redirect URL is correctly configured in your IdP.
+- **OIDC connector configured but doesn't appear on login**
 
-For more troubleshooting help, see the [Troubleshooting guide](/selfhosted/troubleshooting).
+  Check **Settings → Identity Providers** — the connector must
+  be enabled. For Dex, verify the connector ID in `dex.config.yaml`
+  matches what the dashboard expects.
 
----
-
-## Get In Touch
-
-Feel free to ping us on [Slack](/slack-url) if you have any questions.
-
-- [Star openZro on GitHub](https://github.com/openzro/openzro)
-- Latest [release notes](https://github.com/openzro/openzro/releases)
+For more, see the [Troubleshooting guide](/selfhosted/troubleshooting).
