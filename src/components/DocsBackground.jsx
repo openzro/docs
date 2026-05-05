@@ -23,32 +23,21 @@ export function DocsBackground() {
         height={56}
         x={-12}
         y={4}
-        squares={[
-          [3, 2],
-          [6, 1],
-          [9, 4],
-          [12, 2],
-          [4, 7],
-          [10, 6],
-          [14, 5],
-          [7, 9],
-        ]}
+        // No `squares` prop on purpose: GridPattern wraps them in
+        // a nested <svg> that resets the fill cascade, so Tailwind
+        // `fill-*` on the outer SVG doesn't reach the rects —
+        // they end up rendering as solid black against the page
+        // bg, which looks horrible. The plain hairline grid (the
+        // pattern's stroke) is the right brand identity anyway.
         className={
-          // Tuned by trial against a real monitor. Below ~15% on
-          // light mode the grid drops below the human-perception
-          // floor (RGB delta ~3 from white) — visually invisible.
-          // Above ~30% it competes with body text. The values
-          // here were operator-validated.
           'absolute inset-0 h-full w-full ' +
-          // Light: faint violet-on-white grid. /15 stroke gives
-          // ~5 RGB delta from white — perceptible at the edge of
-          // peripheral vision without competing for attention
-          // with body text.
-          'fill-violet-200/8 stroke-violet-200/15 ' +
-          // Dark: low alpha on --oz-ink. Slightly higher floor
-          // than light because dark-mode contrast needs more lift
-          // to register without becoming aggressive.
-          'dark:fill-violet-400/2.5 dark:stroke-violet-400/5'
+          // Light: hairline violet on white. /15 puts the line at
+          // ~5 RGB delta from white — visible at the edge of
+          // peripheral vision, invisible under body text.
+          'stroke-violet-200/15 ' +
+          // Dark: lower alpha on --oz-ink. The deep-violet bg
+          // means even /5 registers cleanly.
+          'dark:stroke-violet-400/5'
         }
       />
     </div>
