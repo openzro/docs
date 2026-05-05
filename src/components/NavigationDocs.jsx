@@ -490,6 +490,21 @@ export const docsNavigation = [
         ],
       },
       {
+        title: 'Ansible (bare-metal)',
+        href: '/selfhosted/ansible',
+        isOpen: false,
+        links: [
+          {
+            title: 'Quickstart (lab)',
+            href: '/selfhosted/ansible/quickstart',
+          },
+          {
+            title: 'Multi-node HA',
+            href: '/selfhosted/ansible/multi-node',
+          },
+        ],
+      },
+      {
         title: 'Maintenance',
         isOpen: false,
         links: [

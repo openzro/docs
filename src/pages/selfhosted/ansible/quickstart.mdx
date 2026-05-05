@@ -1,0 +1,154 @@
+import {Note} from "../../../components/mdx";
+
+# Ansible Quickstart (lab, single-node)
+
+Stand up a working openZro server stack on a single Linux VM in
+~10 minutes. This is the lab path — small, all-in-one, SQLite,
+self-signed cert. For production / HA, see
+[Multi-node HA deployment](/selfhosted/ansible/multi-node).
+
+## Prerequisites
+
+- A Linux VM (Debian 12+ / Ubuntu 22.04+ / RHEL 9 / Rocky 9 /
+  Fedora) reachable via SSH from your workstation
+- Root or sudo access on the VM
+- Ansible 2.15+ on your workstation
+- A DNS record (or `/etc/hosts` entry on test machines) pointing
+  at the VM's public IP — this guide uses `openzro.example.com`
+
+## 1. Clone the repo
+
+```bash
+git clone https://github.com/openzro/openzro-ansible.git
+cd openzro-ansible
+```
+
+## 2. Configure the inventory
+
+Edit `inventories/lab/hosts.yml` to point at your VM:
+
+```yaml
+all:
+  hosts:
+    openzro1:
+      ansible_host: 203.0.113.5     # your VM's IP
+      ansible_user: ubuntu          # SSH user
+```
+
+The default lab inventory expects a single all-in-one host called
+`openzro1`. Multiple hosts in lab mode is also fine — the playbook
+just runs the same all-in-one on each.
+
+## 3. Configure group vars
+
+Copy the example and fill in the required values:
+
+```bash
+cp inventories/lab/group_vars/all.yml.example \
+   inventories/lab/group_vars/all.yml
+```
+
+Open `inventories/lab/group_vars/all.yml` and set:
+
+```yaml
+openzro_public_domain: "openzro.example.com"
+
+openzro_oidc_issuer: "https://dex.openzro.example.com"
+openzro_oidc_client_id: "openzro-dashboard"
+openzro_oidc_client_secret: "REPLACE_WITH_DEX_OR_KEYCLOAK_SECRET"
+
+openzro_admin_email: "you@example.com"
+
+# SQLite is fine for the lab. Postgres recommended for prod.
+openzro_datastore_engine: "sqlite"
+
+# Self-signed cert for the lab — flip to letsencrypt later.
+openzro_self_signed_tls: true
+```
+
+The full file has more knobs (relay port, signal port, OIDC scope
+list, etc.) — read its inline comments. Lab defaults are sane;
+the values above are the minimum the playbook needs to render
+working configs.
+
+<Note>
+The lab assumes a Dex-or-equivalent OIDC issuer is reachable at
+`dex.<openzro_public_domain>`. Stand up a Dex container alongside
+on the same VM for a self-contained lab — see the
+[OIDC providers](/selfhosted/identity-providers) section for
+options.
+</Note>
+
+## 4. Run the playbook
+
+```bash
+ansible-playbook -i inventories/lab playbooks/site.yml
+```
+
+What happens, idempotently:
+
+1. Imports `pkg.openzro.io`'s GPG key + adds the APT/YUM repo
+2. Installs the native packages (`openzro-management`,
+   `openzro-signal`, `openzro-relay`)
+3. Pulls the dashboard container (`ghcr.io/openzro/dashboard`)
+4. Renders `/etc/openzro/management.json` from the role's template
+5. Drops `/etc/default/openzro-{management,signal,relay}` env files
+6. Provisions nginx with a self-signed cert (since
+   `openzro_self_signed_tls: true`)
+7. `daemon-reload` + `enable --now` for every systemd unit
+
+Total time on a 2 vCPU / 4 GB VM: ~3–5 minutes (most of it is
+package downloads).
+
+## 5. Verify
+
+```bash
+# Daemons up?
+ansible -i inventories/lab all -m shell -a "systemctl is-active openzro-management openzro-signal openzro-relay nginx"
+
+# Dashboard reachable?
+curl -k https://openzro.example.com/
+
+# Management gRPC + REST?
+curl -k https://openzro.example.com/api/users
+```
+
+Open `https://openzro.example.com/` in a browser — accept the
+self-signed cert warning, sign in via your OIDC provider, and
+the dashboard loads with empty groups / peers / policies.
+
+## Sizing reference
+
+A single all-in-one VM is plenty for < 100 peers:
+
+| Resource | Size |
+|---|---|
+| CPU | 2 vCPU |
+| RAM | 4 GB |
+| Disk | 40 GB SSD |
+| Network | 1 Gbps |
+
+Components colocated on that one host:
+`management` + `signal` + `relay` + `dashboard` + `nginx` +
+`SQLite`.
+
+For larger deployments, see
+[Multi-node HA deployment](/selfhosted/ansible/multi-node) — that
+guide covers the controller + relay-tier split, cluster coordinator
+for HA management, and cloud-LB integration.
+
+## Common issues
+
+- **"Host key verification failed"** — first SSH connect from the
+  Ansible runner. Run `ssh-keyscan <ip> >> ~/.ssh/known_hosts` or
+  set `host_key_checking = False` in `ansible.cfg`.
+- **APT repo signature error** — the role imports the openZro
+  signing key automatically; if it fails, your VM has no outbound
+  HTTPS to `pkg.openzro.io`. Whitelist that host in egress rules.
+- **Dashboard 502** — nginx is up but the container isn't ready
+  yet. Wait ~30 s after the playbook finishes; the container
+  pulls on first start.
+- **OIDC redirect mismatch** — the IdP needs the dashboard's
+  callback URL whitelisted. Check the dashboard
+  [identity-providers docs](/selfhosted/identity-providers) for
+  the exact value to add.

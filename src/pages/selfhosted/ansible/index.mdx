@@ -1,0 +1,88 @@
+import {Note} from "../../../components/mdx";
+
+# Self-hosting on bare metal with Ansible
+
+The [openzro-ansible](https://github.com/openzro/openzro-ansible)
+repository ships idempotent roles + playbooks that install the
+openZro server stack (`management`, `signal`, `relay`, `dashboard`)
+on bare-metal Linux hosts (Debian/Ubuntu, RHEL/Rocky/Fedora). The
+roles wrap the native server packages from
+[pkg.openzro.io](https://pkg.openzro.io) so each daemon runs as a
+plain systemd unit — no container layer.
+
+This is the third deployment path openZro supports, alongside
+[Docker Compose](/selfhosted/selfhosted-quickstart) and
+[Kubernetes](/selfhosted/kubernetes).
+
+## When to choose Ansible
+
+| Scenario | Use Ansible | Use Compose | Use Kubernetes |
+|---|---|---|---|
+| Multiple Linux VMs in one or more regions | ✅ | ⚠️ One host | ⚠️ Heavy lift if K8s isn't already there |
+| You want zero container runtime on prod hosts | ✅ Native systemd | ❌ Docker required | ❌ K8s required |
+| You already manage infra with Ansible | ✅ Native fit | ⚠️ Manual playbook | ⚠️ Mixed paradigm |
+| You need cloud LB integration (ALB / GCP HTTPS LB) | ✅ Built-in roles | ❌ Manual | ⚠️ Service `LoadBalancer` |
+| You need rolling zero-downtime updates | ✅ `update.yml` drains LB targets | ❌ Single host | ✅ Helm rolling restart |
+| You're prototyping on a laptop | ⚠️ Heavier than Compose | ✅ Single command | ⚠️ k3d / kind |
+| You want declarative GitOps from CRDs | ❌ | ❌ | ✅ Operator + CRDs |
+
+## What's in the repo
+
+Roles wrap the native packages and add the operational glue:
+
+| Role | What it does |
+|---|---|
+| `openzro_management` | Installs `openzro-management`, renders `/etc/openzro/management.json`, wires Postgres/SQLite, OIDC, cluster coordinator |
+| `openzro_signal` | Installs `openzro-signal`, env file, systemd |
+| `openzro_relay` | Installs `openzro-relay`, exposed-address config |
+| `openzro_dashboard` | Container today (apt package on the openZro roadmap) |
+| `openzro_nginx` | Reverse proxy + TLS (certbot HTTP-01 / DNS-01 / BYO / self-signed) |
+| `openzro_nats_cluster` | Optional standalone NATS for HA management coordinator |
+| `openzro_redis_cluster` | Optional standalone Redis (master/replica) |
+| `aws_lb` | ALB + NLB + ACM + Route53 wiring (when `openzro_cloud=aws`) |
+| `gcp_lb` | HTTPS LB + NLB + managed cert + Cloud DNS (gcp) |
+| `common` | apt/yum repo setup, GPG key import |
+
+Playbooks under `playbooks/`:
+
+- **`site.yml`** — full stack provisioning (run once per host)
+- **`update.yml`** — rolling update with cloud LB drain/undrain
+- **`management.yml`** / **`signal.yml`** / **`relay.yml`** /
+  **`dashboard.yml`** — per-component, useful for component-specific
+  upgrades or splitting deployments
+
+## Section contents
+
+- [Quickstart (lab single-node)](/selfhosted/ansible/quickstart) —
+  one VM, all-in-one, ready in ~10 minutes
+- [Multi-node HA deployment](/selfhosted/ansible/multi-node) —
+  controller + relay tier + cluster coordinator + cloud LB
+  integration
+
+## Known gaps
+
+The repo is production-ready for its current scope; these aren't
+blockers but worth knowing before you commit:
+
+- **No `openzro_postgres` role.** Postgres is assumed managed (RDS,
+  Cloud SQL) or installed manually. The role consumes a DSN, not a
+  Postgres install.
+- **No backup/restore role for the management datastore.** SQL
+  dumps are expected to come from your DB layer's own tooling.
+- **`openzro_redis_cluster` ships as master/replica with manual
+  promotion** — no Sentinel-based auto-failover. For real HA Redis
+  use a managed service (Elasticache, Memorystore).
+- **`openzro_routing_peer` not yet shipped.** Routing peers
+  (gateways, exit nodes) are tracked on the
+  [roadmap](https://github.com/openzro/openzro/blob/main/docs/ROADMAP.md);
+  for K8s, the [operator's](/selfhosted/operator/crds) `OZRoutingPeer`
+  CRD covers this case today.
+
+<Note>
+The Ansible flow targets the same production-shape as the Helm
+chart but on bare metal. See
+[ADR-0008](https://github.com/openzro/openzro/blob/main/docs/adr/0008-kubernetes-helm-operator.md)
+for the K8s parallel and
+[ADR-0009](https://github.com/openzro/openzro/blob/main/docs/adr/0009-bare-metal-ansible-and-ha.md)
+for the broker-mode rationale shared between both deploy paths.
+</Note>

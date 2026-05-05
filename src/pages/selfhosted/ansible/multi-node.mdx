@@ -1,0 +1,310 @@
+import {Note} from "../../../components/mdx";
+
+# Multi-node HA deployment with Ansible
+
+This guide covers the production-shape: control plane separated
+from data plane, multi-replica relay tier across regions, optional
+HA management with a cluster coordinator, and cloud-LB integration
+for AWS or GCP.
+
+For the single-node lab walkthrough, see the
+[Quickstart](/selfhosted/ansible/quickstart).
+
+## Topology
+
+The recommended shape for small-to-medium production:
+
+```
+                ┌──────────────────┐
+                │  Cloud LB (443)  │
+                │   (ALB / GCP HTTPS)
+                └────────┬─────────┘
+                         │
+        ┌────────────────┴────────────────┐
+        │                                 │
+   ┌────▼─────┐                     ┌─────▼────┐
+   │controller│                     │controller│  (HA pair, optional)
+   │  mgmt    │                     │  mgmt    │
+   │  signal  │ ─── cluster ──────  │  signal  │
+   │  dash    │     coordinator     │  dash    │
+   │  nginx   │     (NATS / Redis)  │  nginx   │
+   └────┬─────┘                     └─────┬────┘
+        │                                 │
+        └───────────────┬─────────────────┘
+                        │
+              managed PostgreSQL
+            (RDS / Cloud SQL)
+
+           ┌──────────┐  ┌──────────┐  ┌──────────┐
+           │ relay-1  │  │ relay-2  │  │ relay-3  │   (NLB UDP/TCP 33080)
+           │  us-east │  │  eu-west │  │  ap-south│
+           └──────────┘  └──────────┘  └──────────┘
+```
+
+The control plane (mgmt + signal + dashboard + nginx) runs on
+one or two controllers behind a cloud LB. The relay tier is N
+hosts spread across regions for failover. Postgres is managed
+(RDS / Cloud SQL) — never co-resident with the controller.
+
+## How relay HA works on bare-metal
+
+The Ansible flow uses a different HA model than the Kubernetes
+multi-pod fabric — worth knowing the trade-off before you commit:
+
+| | Ansible (bare-metal) | Kubernetes (chart) |
+|---|---|---|
+| Multiple relays | N hosts in `relay` group | `relay.replicaCount > 1` |
+| Discovery | Static — clients learn all relays via `management.json`'s `Relay.Addresses[]` | Dynamic — Headless Service + DNS |
+| Forwarding between relays | ❌ Each relay is independent | ✅ Inter-pod TCP fabric (ADR-0014) with HMAC auth |
+| Two peers on different relays | Client opens connection to each relay it needs | Pod-to-pod forwarding handled transparently |
+| Load balancer | NLB distributes initial connections | Service `LoadBalancer` |
+| Failover when one relay drops | Client reconnects to next entry in the list (sub-second) | Same — TCP closes, peer reconnects |
+
+For most deployments the Ansible model is enough — clients have
+the full list, peers reconnect quickly, sticky-session at the LB
+isn't needed. The K8s-only multi-pod fabric matters when you
+want **transparent** cross-relay forwarding without the client
+opening multiple connections; on bare-metal the cost is one
+extra connection per cross-relay peer-pair, which is usually
+invisible.
+
+The two paths target the same SLA at the user-visible level —
+peer connectivity. They differ in how that's delivered.
+
+## 1. Inventory
+
+Use `inventories/production/` as the template:
+
+```yaml
+# inventories/production/hosts.yml
+all:
+  vars:
+    openzro_cloud: aws            # or "gcp" — drives the LB role
+    ansible_user: ubuntu
+  children:
+    management:
+      hosts:
+        controller1:
+          ansible_host: 10.0.1.10
+          aws_instance_id: i-0123456789abcdef0   # for aws_lb drain logic
+        controller2:
+          ansible_host: 10.0.1.11
+          aws_instance_id: i-0123456789abcdef1
+    signal:
+      hosts:
+        controller1: {}           # signal co-resident with mgmt
+        controller2: {}
+    dashboard:
+      hosts:
+        controller1: {}           # dashboard co-resident
+    relay:
+      hosts:
+        relay-us-east:
+          ansible_host: 10.10.1.20
+          aws_instance_id: i-0relay1
+        relay-eu-west:
+          ansible_host: 10.20.1.20
+          aws_instance_id: i-0relay2
+        relay-ap-south:
+          ansible_host: 10.30.1.20
+          aws_instance_id: i-0relay3
+```
+
+The `aws_instance_id` (or `gcp_instance_name`) per host is what
+the `update.yml` rolling-update playbook uses to drain that host
+from the LB target pool before upgrading. Without it, the playbook
+upgrades in-place — fine for the lab, not fine for production.
+
+## 2. Group vars (HA-specific)
+
+`inventories/production/group_vars/all.yml`:
+
+```yaml
+openzro_public_domain: "openzro.example.com"
+
+openzro_oidc_issuer: "https://idp.example.com"
+openzro_oidc_client_id: "openzro-dashboard"
+openzro_oidc_client_secret: "{{ vault_oidc_secret }}"
+
+openzro_admin_email: "ops@example.com"
+
+# Postgres is required for HA — SQLite breaks multi-controller writes.
+openzro_datastore_engine: "postgres"
+openzro_postgres_dsn: >-
+  host=openzro-prod.cluster-xxxxxxx.us-east-1.rds.amazonaws.com
+  port=5432
+  user=openzro
+  password={{ vault_postgres_password }}
+  dbname=openzro
+  sslmode=require
+
+# Real cert via Let's Encrypt
+openzro_tls_mode: "letsencrypt-http01"
+openzro_self_signed_tls: false
+
+# Cluster coordinator (next section)
+openzro_cluster_backend: "embedded"
+```
+
+`vault_*` values come from `ansible-vault` — encrypt the secrets:
+
+```bash
+ansible-vault create inventories/production/group_vars/vault.yml
+```
+
+## 3. Cluster coordinator (HA management)
+
+When the `management` group has more than one host, replicas need
+a coordinator so they don't corrupt shared state. Pick a backend
+via `openzro_cluster_backend`:
+
+| Backend | What gets installed | When to use |
+|---|---|---|
+| `none` (auto for 1 host) | Nothing — coordinator is nil | Single management host |
+| `embedded` (auto for HA) | Nothing extra — `openzro-mgmt` boots an internal NATS+JetStream, instances gossip on tcp/6222 | **Default for HA. Zero extra deps.** |
+| `nats` | Standalone `nats-server` daemon on every management host (`openzro_nats_cluster` role) | Want the broker as a separate process with its own logs |
+| `redis` | Standalone Redis master/replica across management hosts (`openzro_redis_cluster` role) | Already running Redis observability tooling |
+
+Embedded NATS is the right call ~90% of the time. Each
+`openzro-mgmt` boots a NATS+JetStream server bound to loopback,
+joined to the cluster on a peer port (default 6222). The role
+auto-derives the peer list from the inventory's `management`
+group — no manual config needed.
+
+**Firewall rule:** TCP/6222 between management hosts (or whatever
+`openzro_cluster_peer_port` is set to).
+
+For external NATS / Redis (managed brokers, Elasticache /
+Memorystore), set the backend to `nats` or `redis` and configure
+`openzro_cluster_nats_url` / `openzro_cluster_redis_url`. The
+`openzro_nats_cluster` and `openzro_redis_cluster` roles only
+run when you want the broker on the controllers themselves.
+
+## 4. Run site.yml (first install)
+
+```bash
+ansible-playbook -i inventories/production playbooks/site.yml \
+    --ask-vault-pass
+```
+
+`site.yml` provisions all hosts in parallel. After ~10 minutes
+(depending on package mirror latency), every controller is
+running mgmt + signal + dashboard + nginx, every relay host is
+running `openzro-relay`, and the cloud LB role has wired the
+target pools.
+
+## 5. Per-component playbooks
+
+When you want to upgrade or reconfigure just one tier without
+touching the others:
+
+```bash
+# Upgrade just the relay tier
+ansible-playbook -i inventories/production playbooks/relay.yml \
+    -e openzro_version=0.53.1-alpha.X --ask-vault-pass
+
+# Reconfigure just the management OIDC settings
+ansible-playbook -i inventories/production playbooks/management.yml \
+    --ask-vault-pass
+
+# Same for signal.yml / dashboard.yml
+```
+
+These playbooks scope to the corresponding inventory group, so
+running `relay.yml` won't restart your mgmt controllers.
+
+## 6. Rolling updates (zero-downtime)
+
+For HA deployments behind an LB, use `update.yml` — **not**
+`site.yml` — to upgrade. Per host, in order:
+
+1. Deregister the host from the cloud LB target pool
+2. Wait for the LB drain timeout — in-flight requests finish
+3. Run the role tasks (apt/yum upgrade + systemd restart)
+4. Wait for the local service to bind its port
+5. Re-register the host with the LB target pool
+6. Wait for the LB health check to mark the host healthy
+7. Move to the next host
+
+```bash
+ansible-playbook -i inventories/production playbooks/update.yml \
+    -e openzro_version=0.53.1-alpha.X --ask-vault-pass
+```
+
+`serial: 1` per play guarantees only one host is out of rotation
+at a time. Plan ~2–3 minutes per host with default settings.
+
+The control plane updates first, then the relay tier — separate
+play so the playbook doesn't drop mgmt at the same time as a
+relay (peers reconnecting fall back to other relays, but mgmt
+downtime affects new peer joins).
+
+### What if a host fails mid-upgrade?
+
+`any_errors_fatal: true` halts the play immediately. The current
+host stays drained from the LB. Diagnose, fix the issue, then
+re-run the same playbook — the host re-registers on the next
+run.
+
+### Single-host (no LB) deployments
+
+Re-run `playbooks/site.yml`. The `notify: restart …` handlers
+cause a brief restart; in-flight requests fail (~5–10 s) but
+everything else stays put.
+
+## Sizing reference
+
+### Small production (100 – 1,000 peers)
+
+| Role | Count | CPU | RAM | Disk |
+|---|---|---|---|---|
+| Controller | 1 | 2 vCPU | 4 GB | 60 GB SSD |
+| Gateway (relay) | 2 | 1 vCPU | 2 GB | 20 GB |
+| Postgres | 1 (managed) | 2 vCPU | 4 GB | 50 GB SSD |
+
+mgmt + signal + dashboard share the controller; relays in 2
+regions/AZs.
+
+### Medium production (1,000 – 10,000 peers)
+
+| Role | Count | CPU | RAM | Disk |
+|---|---|---|---|---|
+| Controller (HA pair) | 2 | 4 vCPU | 8 GB | 100 GB SSD |
+| Gateway (relay) | 3 | 2 vCPU | 4 GB | 40 GB |
+| Postgres (HA) | 1 cluster | 4 vCPU | 8 GB | 100 GB SSD |
+
+Controllers run mgmt + signal + dashboard active-active behind
+the LB. Use `inventories/production/` with `openzro_cloud: aws`
+or `openzro_cloud: gcp`.
+
+### Large production (10,000+ peers)
+
+Custom — bottleneck is usually Postgres + relay-tier bandwidth,
+not the management service. Profile first, then scale relays
+horizontally (more hosts in the same region balances better than
+scaling up a single host).
+
+## Networking
+
+- **Controller**: ports 80 + 443 public (nginx terminates TLS),
+  443 forwards to mgmt gRPC + REST + signal gRPC + dashboard
+- **Relay**: UDP 33080 + TCP 33080 public, direct (NOT through
+  nginx — relay is L4)
+- **Postgres**: never public, private network only
+- **Inter-controller**: TCP 6222 between management hosts (or
+  the configured `openzro_cluster_peer_port`) for the embedded
+  NATS coordinator
+
+## Where to file issues
+
+- **Ansible role bugs / inventory questions**: [openzro/openzro-ansible](https://github.com/openzro/openzro-ansible)
+- **Server package bugs (mgmt / signal / relay)**: [openzro/openzro](https://github.com/openzro/openzro)
+- **Dashboard bugs**: [openzro/openzro](https://github.com/openzro/openzro)
+
+<Note>
+The cluster coordinator design (embedded NATS by default, with
+NATS / Redis as alternatives) is shared with the
+[Helm chart's `cluster.mode`](/selfhosted/kubernetes/high-availability)
+— same primitive, two deploy paths. Operators who later move
+from bare-metal to K8s keep the same coordination model.
+</Note>
