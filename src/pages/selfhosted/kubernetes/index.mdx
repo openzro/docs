@@ -31,13 +31,15 @@ deploys the control plane as a single release:
 
 - **management** — account / peer / policy API (Deployment in
   single-node mode, StatefulSet when `cluster.mode=embedded`)
-- **signal** — gRPC peer-to-peer signaling (same workload kind
-  rule as management)
+- **signal** — gRPC peer-to-peer signaling. Exposed as a
+  `LoadBalancer` Service with TLS terminated on the binary
+  (recommended for ingress-nginx operators) OR via Ingress on
+  controllers that handle gRPC streaming correctly (Envoy,
+  Traefik, NGINX-Plus). See [High availability](/selfhosted/kubernetes/high-availability)
 - **relay** — TCP/WebSocket relay with TLS termination (cert-
-  manager-provisioned cert) and multi-pod fabric. Exposed as a
-  `LoadBalancer` Service — Ingress is **not** supported (TCP
-  persistent, idle timeouts kill connections). See
-  [High availability](/selfhosted/kubernetes/high-availability)
+  manager-provisioned cert) and multi-pod fabric. Always exposed
+  as a `LoadBalancer` Service — Ingress is **not** supported (TCP
+  persistent, idle timeouts kill connections).
 - **dashboard** — React SPA (Deployment, nginx)
 - **dex** — embedded federated IdP (Deployment, via subchart)
 

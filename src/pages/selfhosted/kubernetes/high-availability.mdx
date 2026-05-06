@@ -3,27 +3,53 @@ import {Note} from "../../../components/mdx";
 # High Availability on Kubernetes
 
 The chart's defaults run one replica of each component — fine for
-small teams and labs. Two HA paths are wired in:
+small teams and labs. Three HA paths are wired in:
 
 - **Management + signal** share a broker mode toggle
-  (`cluster.mode`) that turns on multi-replica with NATS-based
-  coordination between pods.
+  (`cluster.mode`) for distributed coordination
 - **Relay** has its own multi-pod fabric independent of the broker
-  mode (per [ADR-0014](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md)).
+  mode (per [ADR-0014](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md))
+- **Signal** terminates TLS on the binary itself when running under
+  ingress-nginx (community), bypassing a known streaming bug
 
-## Management + signal
+## Cluster broker — the three modes
 
-Both deployments share the same `cluster.mode` switch. Three
-modes:
+The `cluster.mode` switch controls how management and signal pods
+coordinate state across replicas. Three options:
 
-```yaml
-cluster:
-  mode: disabled   # default — single replica each, no broker
+```
+cluster.mode: disabled   ← single replica, no broker (default)
+cluster.mode: embedded   ← NATS+JetStream embedded in each pod
+cluster.mode: external   ← bring-your-own NATS or Redis
 ```
 
+### Mode 1 — `disabled` (lab / dev)
+
+No broker. Single replica per component. Smallest footprint.
+
 ```yaml
 cluster:
-  mode: embedded   # each pod runs an embedded NATS+JetStream cluster
+  mode: disabled
+
+management:
+  replicaCount: 1
+signal:
+  replicaCount: 1
+```
+
+Everything talks to itself in-process. Fine for labs, single-user
+mesh. Not recommended once you have more than a handful of peers.
+
+### Mode 2 — `embedded` (recommended for HA)
+
+Each pod runs an embedded NATS+JetStream cluster. The chart switches
+management and signal to **StatefulSet**, renders a Headless Service
+for stable DNS, and wires NATS routes via `OPENZRO_CLUSTER_PEERS`
+(FQDN-resolved to handle GKE VPC-native search domains correctly).
+
+```yaml
+cluster:
+  mode: embedded
   embedded:
     clientPort: 4222
     clusterPort: 6222
@@ -31,45 +57,141 @@ cluster:
       storage: memory   # locks bucket only — no PVC needed
 
 management:
+  replicaCount: 3   # 3 is JetStream meta-leader quorum minimum
+signal:
+  replicaCount: 3
+```
+
+Trade-offs:
+- ✅ Zero external infra dependency
+- ✅ Auto-wired by chart, JetStream cluster forms automatically
+- ✅ Signal cross-pod dispatch via local NATS (`OPENZRO_SIGNAL_DISPATCHER=nats`)
+- ⚠️ JetStream cluster needs **odd number ≥ 3** for quorum
+  (don't run with 2 replicas — split-brain on leader election)
+- ⚠️ All replicas must boot within ~60s for first leader election
+  (the management coordinator retries bucket creation with backoff)
+
+This is the default recommendation. Operators don't need to manage
+external NATS or Redis.
+
+### Mode 3a — `external` with bundled NATS subchart
+
+The chart bundles the upstream `nats-io/nats` subchart. Enable it
+to run a separate NATS deployment in the same release, decoupled
+from openzro pods:
+
+```yaml
+cluster:
+  mode: external
+  # external.url left empty — chart auto-derives nats://<release>-nats:4222
+
+nats:
+  enabled: true
+  config:
+    cluster:
+      enabled: true
+      replicas: 3
+    jetstream:
+      enabled: true
+      memoryStore:
+        enabled: true
+        maxSize: 256Mi
+      fileStore:
+        enabled: false   # change if you want persistent jetstream
+
+management:
   replicaCount: 3
 signal:
   replicaCount: 3
 ```
 
+Trade-offs:
+- ✅ Decouples broker from openzro pods (independent scaling, restarts)
+- ✅ Standard NATS deployment with its own monitoring / observability
+- ✅ Same quorum semantics as embedded
+- ⚠️ More resources (separate pods)
+- ⚠️ Two charts to keep updated (chart subchart + openzro chart)
+
+Use this when you want the broker as a separate concern but don't
+have an existing NATS cluster.
+
+### Mode 3b — `external` with operator-managed NATS
+
+When you already operate NATS at scale (shared with other workloads,
+managed cloud NATS, NATS Operator), point the chart at it:
+
 ```yaml
 cluster:
-  mode: external   # point at an existing NATS endpoint
+  mode: external
   external:
-    url: nats://my-nats.svc.cluster.local:4222
+    url: nats://my-nats.shared.svc.cluster.local:4222
+    # or with auth:
+    # url: nats://user:password@nats.example.com:4222
+
+nats:
+  enabled: false   # don't deploy the subchart
+
+management:
+  replicaCount: 3
+signal:
+  replicaCount: 3
 ```
 
-In `embedded` mode the chart switches both deployments to
-`StatefulSet`, renders a Headless Service that anchors per-pod
-DNS names, and wires NATS routes via `OPENZRO_CLUSTER_PEERS` so
-the embedded brokers gossip between siblings. The route URL
-scheme is `nats://` (the openZro embedded NATS validator rejects
-`nats-route://`). The chart also passes a unique `ServerName`
-per pod (auto-derived from the pod hostname via
-`os.Hostname()`) — required by JetStream cluster mode.
+Trade-offs:
+- ✅ Reuses existing NATS infra (cost, monitoring, ops)
+- ✅ Allows cross-workload subject namespacing
+- ⚠️ openzro publishes under `oz.cluster.*` and `oz.signal.*` —
+  ensure these subjects don't collide with other tenants
+- ⚠️ JetStream KV bucket `openzro_locks` is created on first start
+  if absent (you can pre-create it for stricter access control)
 
-See
-[ADR-0009](https://github.com/openzro/openzro/blob/main/docs/adr/0009-bare-metal-ansible-and-ha.md)
-for the broker mode rationale.
+### Mode 3c — `external` with Redis
 
-If you already operate NATS at a known endpoint, `external` mode
-points the chart at it and skips the embedded broker entirely.
+The openzro core supports Redis as an alternative coordinator
+backend (signal pub/sub + KV locks). The chart **does not yet**
+auto-wire Redis like it does NATS — operators set the env var
+manually and disable the chart's NATS plumbing.
 
-### JetStream cluster bootstrap
+```yaml
+# Disable the chart's cluster.mode flow — we'll wire Redis directly.
+cluster:
+  mode: disabled
 
-The first 60 seconds of a fresh HA install are the trickiest:
-JetStream needs all three pods up before it can elect a meta-
-leader, and the management coordinator's "create locks bucket"
-call fails until the leader is elected. The management binary
-retries the bucket creation with backoff for 60 seconds — long
-enough for typical leader election. If your boot is slower (slow
-PVC mount, slow image pull on small nodes), management may hit
-the retry timeout; in that case rolling restart once everything
-else is up.
+management:
+  replicaCount: 3
+  envRaw:
+    - name: OPENZRO_REDIS_URL
+      value: "redis://my-redis.shared.svc.cluster.local:6379"
+    # If using Sentinel / Redis Cluster:
+    # - name: OPENZRO_REDIS_URL
+    #   value: "redis://default:password@redis-sentinel:26379?master_name=mymaster"
+
+signal:
+  replicaCount: 3
+  envRaw:
+    - name: OPENZRO_REDIS_URL
+      value: "redis://my-redis.shared.svc.cluster.local:6379"
+    - name: OPENZRO_SIGNAL_DISPATCHER
+      value: "redis"
+```
+
+The openzro factory at `cluster/factory/factory.go` reads
+`OPENZRO_REDIS_URL` directly — no chart configuration knob beyond
+the env var. The signal binary needs `OPENZRO_SIGNAL_DISPATCHER=redis`
+to use Redis pub/sub (vs the in-process default).
+
+Trade-offs:
+- ✅ Reuse existing Redis (Memorystore, ElastiCache, in-cluster Redis)
+- ✅ Often cheaper to run than NATS at small scale
+- ⚠️ No first-class chart support — `cluster.mode` must be `disabled`,
+  envRaw is the escape hatch
+- ⚠️ Signal pub/sub via Redis is fan-out (no JetStream-equivalent
+  ordering guarantees) — fine for openzro's signaling pattern
+- ⚠️ KV locks via Redis use SET NX EX (TTL-based), no Raft consensus
+
+Track [openzro/helms#X](https://github.com/openzro/helms/issues)
+for the proposal to add `cluster.mode: external-redis` as a first-class
+option in a future alpha.
 
 ## Relay multi-pod fabric (ADR-0014)
 
@@ -141,22 +263,110 @@ spec:
           port: 7090
 ```
 
-### Operations
+## Signal HA — Ingress vs LoadBalancer
 
-The chart exposes Prometheus metrics for the cluster fabric — wire
-your Prometheus operator via `metrics.serviceMonitor.enabled: true`
-to scrape:
+Signal has two exposure paths, with significant operational
+implications:
 
-| Metric | Type | Notes |
+| Path | When to use | Status |
+|------|-------------|--------|
+| `signal.ingress` | Envoy / Traefik / NGINX-Plus controllers | OK |
+| `signal.tls` + LoadBalancer | **ingress-nginx (community)** | Recommended |
+
+### Why the LoadBalancer path
+
+[ingress-nginx#5366](https://github.com/kubernetes/ingress-nginx/issues/5366)
+documents a long-standing bug: gRPC server-streaming initial
+metadata is not flushed until the first response body chunk.
+Signal's `ConnectStream` sends only the `x-wiretrustee-peer-registered`
+header on the metadata path — no body until peers start exchanging
+candidates — so peer clients hang on registration and time out at
+60s.
+
+The community ingress-nginx project was archived in March 2026 with
+no fix planned. Operators on community ingress-nginx must bypass
+it for signal:
+
+```yaml
+signal:
+  publicHostname: signal.example.com   # DNS for peer client
+  containerPort: 443
+  service:
+    type: LoadBalancer
+    port: 443
+  tls:
+    enabled: true
+    certManager:
+      enabled: true
+      issuerRef:
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+  ingress:
+    enabled: false   # bypass nginx-ingress
+```
+
+Same pattern as the relay. Cert-manager renews via DNS-01 (or whatever
+challenge your ClusterIssuer uses). DNS for `signal.publicHostname`
+must point at the Service LoadBalancer's external IP (allocated by
+the cloud provider after first sync).
+
+### Why keep the Ingress option
+
+Operators on alternative controllers don't need this workaround:
+
+- **Envoy Gateway** — handles HTTP/2 trailers and streaming metadata
+  per the spec
+- **Traefik** — same
+- **NGINX-Plus** (F5 commercial fork) — fixed independently in 2023
+
+For those operators, `signal.ingress.enabled: true` is the simpler
+path.
+
+## Operations — verifying HA
+
+### Cluster broker is up
+
+Embedded NATS:
+
+```bash
+kubectl logs -n openzro openzro-management-0 \
+  | grep "JetStream cluster new metadata leader"
+# Expected: JetStream cluster new metadata leader: openzro-management-1/openzro
+```
+
+External NATS via subchart:
+
+```bash
+kubectl logs -n openzro <release>-nats-0 | tail
+```
+
+External Redis (mode 3c):
+
+```bash
+kubectl exec -n openzro openzro-management-0 -- env | grep OPENZRO_REDIS_URL
+# Expected: OPENZRO_REDIS_URL=redis://...
+```
+
+### Relay fabric is healthy
+
+```bash
+kubectl logs -n openzro -l app.kubernetes.io/name=openzro-relay \
+  | grep "cluster discovery"
+# Expected: cluster discovery: openzro-relay-internal reconciled — +N peers
+```
+
+Prometheus metrics on the cluster fabric (when
+`metrics.serviceMonitor.enabled: true`):
+
+| Metric | Type | Healthy steady-state |
 |---|---|---|
-| `relay_cluster_forwards_total{result}` | counter | OK / `peer_not_found` / `stream_gone` / `send_error` |
-| `relay_cluster_lookup_duration_seconds` | histogram | Locator broadcast latency on cache miss |
-| `relay_cluster_hello_rejects_total{reason}` | counter | Security signal — split by reason (`hmac_mismatch`, `stale_timestamp`, etc.) |
-| `relay_cluster_streams` | gauge | Live inter-pod TCP streams owned by this pod |
+| `relay_cluster_forwards_total{result}` | counter | OK rate dominates |
+| `relay_cluster_lookup_duration_seconds` | histogram | p99 < 100ms |
+| `relay_cluster_hello_rejects_total{reason}` | counter | ~0 (any non-zero is a security signal) |
+| `relay_cluster_streams` | gauge | matches peer count |
 
-A healthy steady state has near-zero forward errors and lookup p99
-under 100ms. Sustained `hmac_mismatch` rejects across the fleet
-mean a pod has the wrong secret — check the auth secret rotation.
+A sustained `hmac_mismatch` rate across the fleet means a pod has
+the wrong secret — check the auth secret rotation.
 
 <Note>
 The multi-pod relay fabric scales linearly to ~30 pods under the
@@ -165,3 +375,10 @@ broadcast amplifies and lookup latency starts to climb.
 Monitoring `relay_cluster_lookup_duration_seconds` p99 lets you
 trigger optimization work before scale becomes a real problem.
 </Note>
+
+## Storage HA
+
+Independent of the cluster broker, both management and Dex need a
+shared SQL backend for HA. Sqlite single-node only — see
+[Storage Backends](/selfhosted/kubernetes/storage) for the postgres /
+mysql / external DB patterns.

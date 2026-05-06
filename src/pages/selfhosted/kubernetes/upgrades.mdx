@@ -44,6 +44,54 @@ peer connection reconnects exactly once. Sub-second WireGuard
 handshake makes this invisible to most workloads, but
 latency-sensitive flows may notice the blip.
 
+## Migrating signal from Ingress to LoadBalancer (chart 2.1.0-alpha.31+)
+
+Operators on community ingress-nginx hitting the gRPC streaming bug
+([#5366](https://github.com/kubernetes/ingress-nginx/issues/5366),
+project archived 2026-03 with no fix) can move signal off the Ingress.
+Same shape as the relay TLS pattern.
+
+Steps:
+
+1. Set the new values block:
+   ```yaml
+   signal:
+     publicHostname: signal.example.com
+     containerPort: 443
+     service:
+       type: LoadBalancer
+       port: 443
+     tls:
+       enabled: true
+       certManager:
+         enabled: true
+         issuerRef:
+           kind: ClusterIssuer
+           name: letsencrypt-prod
+     ingress:
+       enabled: false
+   ```
+
+2. `helm upgrade` — chart creates Certificate CRD, signal pods
+   restart with TLS, Service becomes LoadBalancer.
+
+3. Wait for cert-manager to issue the cert (Certificate `Ready: True`):
+   ```bash
+   kubectl get certificate -n openzro openzro-signal-tls
+   ```
+
+4. Get the new external IP and update DNS:
+   ```bash
+   kubectl get svc -n openzro openzro-signal -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
+   ```
+   Point `signal.example.com` at that IP.
+
+5. Existing peers reconnect on next sync (within ~30s after the
+   management broadcasts the new signal URL via `Signal.URI`).
+
+For operators on Envoy / Traefik / NGINX-Plus controllers, the bug
+doesn't apply — keep `signal.ingress.enabled: true`.
+
 ## CRD upgrades
 
 Helm doesn't upgrade CRDs by default. After every chart bump,

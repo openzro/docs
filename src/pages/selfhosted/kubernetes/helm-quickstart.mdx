@@ -174,22 +174,26 @@ management:
 
 signal:
   replicaCount: 3
+  # Same pattern as relay: LoadBalancer + TLS on the signal binary.
+  # Bypasses ingress-nginx (community), which has a 2020-vintage bug
+  # that breaks gRPC server-streaming initial metadata — peers hang
+  # on the registration header. See HA docs for details.
+  publicHostname: signal.example.com
+  containerPort: 443
+  service:
+    type: LoadBalancer
+    port: 443
+  tls:
+    enabled: true
+    certManager:
+      enabled: true
+      issuerRef:
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      duration: 2160h
+      renewBefore: 360h
   ingress:
-    enabled: true             # signal stays on its own host (gRPC)
-    className: nginx
-    annotations:
-      cert-manager.io/cluster-issuer: letsencrypt-prod
-      nginx.ingress.kubernetes.io/backend-protocol: GRPC
-      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
-    hosts:
-      - host: signal.example.com
-        paths:
-          - path: /signalexchange.SignalExchange
-            pathType: ImplementationSpecific
-    tls:
-      - secretName: signal-tls
-        hosts:
-          - signal.example.com
+    enabled: false   # bypass community ingress-nginx
 
 relay:
   enabled: true
@@ -290,21 +294,29 @@ exist (`postgres`, `openzro_flow`, `openzro_activity`, `dex`).
 After that, management and Dex run their own schema migrations on
 boot.
 
-## 4. DNS for the relay LoadBalancer
+## 4. DNS for the LoadBalancer Services
 
-The relay Service comes up as `LoadBalancer` and the cloud
-provider provisions an external IP. Update DNS:
+Both relay and signal come up as `LoadBalancer`. Get their external
+IPs and update DNS:
 
 ```bash
-kubectl get svc -n openzro openzro-relay
-# NAME            TYPE           EXTERNAL-IP        PORT(S)
-# openzro-relay   LoadBalancer   34.x.x.x           33080:30869/TCP
+kubectl get svc -n openzro openzro-relay openzro-signal
+# NAME             TYPE           EXTERNAL-IP    PORT(S)
+# openzro-relay    LoadBalancer   34.x.x.x       33080:30869/TCP
+# openzro-signal   LoadBalancer   34.y.y.y       443:31000/TCP
 ```
 
-Point `relay.example.com` (the value you set in
-`relay.publicHostname`) at that IP. cert-manager validates the
-domain once DNS resolves and provisions the cert via the
-`Certificate` CRD the chart emits.
+Point in your DNS:
+
+| Hostname | → | Value |
+|----------|---|-------|
+| `relay.example.com` | A | `<openzro-relay EXTERNAL-IP>` |
+| `signal.example.com` | A | `<openzro-signal EXTERNAL-IP>` |
+
+cert-manager handles certificate issuance via DNS-01 (or whatever
+challenge your ClusterIssuer uses). With DNS-01 there's no chicken-
+and-egg with DNS — the cert is provisioned through the DNS provider
+API, not by reaching the host.
 
 ## 5. Verify
 
