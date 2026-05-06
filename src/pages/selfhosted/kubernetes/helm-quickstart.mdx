@@ -4,98 +4,276 @@ import {Note} from "../../../components/mdx";
 
 This guide walks an operator from a fresh Kubernetes cluster to a
 working openZro deployment with the dashboard, management API,
-signal, relay, embedded Dex IdP, and (optionally) the openZro
-Kubernetes operator.
+signal, relay (with TLS), embedded Dex IdP backed by external
+PostgreSQL.
+
+The chart reflects production-tested defaults from the openZro
+production deploy: consolidated Ingress for HTTP routes, cert-manager
+for all certificates (including the relay LoadBalancer cert), and
+external PostgreSQL via Cloud SQL or any managed/self-hosted
+Postgres. SQLite still works for labs but is not the default
+production target.
 
 ## Prerequisites
 
-- Kubernetes 1.27+ (Gateway API CRDs require 1.31+ if you choose
-  that ingress path)
-- `helm` v3.12+
-- `kubectl` matching your cluster
-- A DNS record pointing at your cluster's ingress / Gateway —
-  this guide uses `openzro.example.com` throughout
-- (Optional) `cert-manager` for TLS — the chart references certs
-  by Secret name and lets cert-manager provision them
-- (Optional) Gateway API CRDs installed if you want the Gateway-API
-  path:
-  ```bash
-  kubectl apply -f https://github.com/kubernetes-sigs/gateway-api/releases/latest/download/standard-install.yaml
-  ```
+- **Kubernetes 1.27+** with `kubectl` access
+- **Helm 3.12+**
+- **ingress-nginx** installed (`IngressClass` named `nginx`)
+- **cert-manager** installed with a working `ClusterIssuer`
+  (Let's Encrypt or zero-ssl-prod work equally well)
+- A **DNS record** pointing at your Ingress controller's external
+  IP — this guide uses `openzro.example.com` throughout
+- **PostgreSQL** reachable from the cluster — Cloud SQL, AWS RDS,
+  or a self-hosted instance. The user `openzro` needs `CREATEDB`
+  privilege if you want the chart's idempotent provisioning Job
+  to create the four databases for you (otherwise pre-create
+  them with the runtime user as `OWNER` and disable the Job)
+
+<Note>
+The chart **does not** bundle a PostgreSQL subchart anymore. Lab
+installs can fall back to SQLite (`postgres.enabled: false`,
+`mysql.enabled: false`) but multi-replica diverges silently — for
+production, point at an external Postgres.
+</Note>
 
 ## 1. Add the Helm repo
-
-Two options — both publish on every tag push from
-[openzro/helms](https://github.com/openzro/helms):
-
-**Traditional Helm repo (recommended for most operators):**
 
 ```bash
 helm repo add openzro https://openzro.github.io/helms
 helm repo update
 ```
 
-**OCI registry (modern):**
+OCI also works:
 
 ```bash
-helm install --version 2.1.0-alpha.11 \
+helm install --version 2.1.0-alpha.27 \
   openzro oci://ghcr.io/openzro/charts/openzro
 ```
 
 ## 2. Author your values override
 
-Save this as `my-openzro.yaml`:
+Save this as `my-openzro.yaml`. The minimum viable production
+configuration — adjust the placeholders before applying.
 
 ```yaml
-management:
-  ingress:
-    enabled: true
-    className: nginx
-    hosts:
-      - host: openzro.example.com
-        paths:
-          - path: /api
-            pathType: Prefix
-    tls:
-      - hosts: [openzro.example.com]
-        secretName: openzro-tls
+global:
+  namespace: openzro
 
-dashboard:
-  ingress:
+# Consolidated Ingress for HTTP routes — dashboard, management /api,
+# Dex /dex all on the same hostname/cert via path matching. Relay
+# does NOT use Ingress (TCP/WebSocket persistent — see step below).
+ingress:
+  enabled: true
+  className: nginx
+  host: openzro.example.com
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+    nginx.ingress.kubernetes.io/proxy-body-size: 200m
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+  tls:
+    - secretName: openzro-tls
+      hosts:
+        - openzro.example.com
+  dashboard:
+    path: /
+    pathType: Prefix
+  dex:
+    path: /dex
+    pathType: Prefix
+  management:
     enabled: true
+    path: /api
+    pathType: Prefix
+
+postgres:
+  enabled: true
+  host: "10.x.x.x"            # private IP of your Postgres / Cloud SQL
+  port: 5432
+  sslMode: require            # ENCRYPTED_ONLY in Cloud SQL terms
+  username: openzro
+  password: "REPLACE_WITH_PG_PASSWORD"
+  databases:
+    management: openzro
+    flow: openzro_flow
+    activity: openzro_activity
+    dex: dex
+  provisioning:
+    enabled: true             # set false if DBA pre-creates the 4 DBs
+    username: openzro
+    password: "REPLACE_WITH_PG_PASSWORD"
+
+# HA broker — embedded NATS+JetStream cluster across StatefulSet pods.
+cluster:
+  mode: embedded
+  embedded:
+    clientPort: 4222
+    clusterPort: 6222
+    jetstream:
+      storage: memory         # locks bucket only; PVCs not required
+
+management:
+  replicaCount: 3
+  dnsDomain: mesh.example.com
+  config:
+    dataStoreEncryptionKey: "REPLACE_WITH_BASE64_32_BYTES"   # openssl rand -base64 32
+    relay:
+      addresses: []           # auto-derived from relay.publicHostname + tls
+      credentialsTTL: "24h"
+      secret: "REPLACE_WITH_RELAY_HMAC"                      # openssl rand -hex 32
+    signal:
+      proto: https
+      uri: "signal.example.com:443"
+    httpConfig:
+      address: "0.0.0.0:33071"
+      authIssuer: "https://openzro.example.com/dex"
+      authAudience: "openzro-dashboard"
+      authUserIDClaim: "sub"
+      oidcConfigEndpoint: "https://openzro.example.com/dex/.well-known/openid-configuration"
+      idpSignKeyRefreshEnabled: true
+    pkceAuthorizationFlow:
+      providerConfig:
+        audience: "openzro-dashboard"
+        clientId: "openzro-dashboard"
+        clientSecret: ""        # public client + PKCE; no secret
+        domain: "openzro.example.com"
+        authorizationEndpoint: "https://openzro.example.com/dex/auth"
+        tokenEndpoint: "https://openzro.example.com/dex/token"
+        scope: "openid profile email offline_access"
+        redirectURLs:
+          - "http://localhost:53000/"
+          - "http://localhost:54000/"
+          - "http://localhost:55000/"
+        useIDToken: false
+    deviceAuthorizationFlow:
+      provider: hosted
+      providerConfig:
+        audience: "openzro-dashboard"
+        clientId: "openzro-dashboard"
+        domain: "openzro.example.com"
+        tokenEndpoint: "https://openzro.example.com/dex/token"
+        deviceAuthEndpoint: "https://openzro.example.com/dex/device/code"
+        scope: "openid profile email offline_access"
+        useIDToken: false
+  ingress:
+    enabled: false            # consolidated Ingress carries /api
+  ingressGrpc:
+    enabled: true             # gRPC needs its own host/cert
     className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
     hosts:
-      - host: openzro.example.com
+      - host: grpc.openzro.example.com
         paths:
-          - path: /
-            pathType: Prefix
+          - path: /management.ManagementService
+            pathType: ImplementationSpecific
     tls:
-      - hosts: [openzro.example.com]
-        secretName: openzro-tls
+      - secretName: grpc-openzro-tls
+        hosts:
+          - grpc.openzro.example.com
+
+signal:
+  replicaCount: 3
+  ingress:
+    enabled: true             # signal stays on its own host (gRPC)
+    className: nginx
+    annotations:
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+    hosts:
+      - host: signal.example.com
+        paths:
+          - path: /signalexchange.SignalExchange
+            pathType: ImplementationSpecific
+    tls:
+      - secretName: signal-tls
+        hosts:
+          - signal.example.com
+
+relay:
+  enabled: true
+  replicaCount: 2             # multi-pod fabric auto-on (ADR-0014)
+  publicHostname: relay.example.com
+  service:
+    type: LoadBalancer        # Ingress is NOT supported — TCP/WS persistent
+    port: 33080
+  tls:
+    enabled: true
+    certManager:
+      enabled: true
+      issuerRef:
+        kind: ClusterIssuer
+        name: letsencrypt-prod
+      duration: 2160h
+      renewBefore: 360h
 
 dex:
   enabled: true
+  replicaCount: 2
   config:
     issuer: https://openzro.example.com/dex
+    storage:
+      type: postgres
+      config:
+        host: 10.x.x.x        # same DB server, dex DB
+        port: 5432
+        database: dex
+        user: openzro
+        password: "REPLACE_WITH_PG_PASSWORD"
+        ssl:
+          mode: require
     web:
+      http: 0.0.0.0:5556
       allowedOrigins:
         - https://openzro.example.com
+    grpc:
+      addr: 0.0.0.0:5557
+      tlsCert: ""             # plaintext gRPC in-cluster (default)
+      tlsKey: ""              # operator opt-in mTLS later via cert-manager
+      tlsClientCA: ""
+    oauth2:
+      responseTypes: [code]
+      skipApprovalScreen: true
+    enablePasswordDB: true
     staticPasswords:
-      # REPLACE THIS bcrypt hash before going to prod.
-      # Generate with:
-      #   htpasswd -bnBC 10 "" yourpassword | tr -d ':\n' | sed 's/$2y/$2a/'
-      - email: admin@openzro.example.com
-        hash: "$2a$10$REPLACE_ME"
+      # Generate the bcrypt with:
+      # htpasswd -bnBC 10 "" yourpassword | tr -d ':\n' | sed 's/$2y/$2a/'
+      - email: admin@example.com
+        hash: "REPLACE_WITH_BCRYPT_HASH"
         username: admin
-        userID: openzro-bootstrap-admin
+        userID: openzro-admin
     staticClients:
       - id: openzro-dashboard
-        name: openZro Dashboard
-        public: true
+        name: openZro
+        public: true          # PKCE; no client secret
         redirectURIs:
           - https://openzro.example.com/auth
           - https://openzro.example.com/silent-auth
           - https://openzro.example.com/
+          - http://localhost:53000/
+          - http://localhost:54000/
+          - http://localhost:55000/
+          - /device/callback
+    connectors: []            # add Google/Microsoft/etc at runtime via dashboard
+    logger:
+      level: info
+      format: text
+
+dashboard:
+  replicaCount: 2
+  env:
+    USE_AUTH0: "false"
+    AUTH_AUTHORITY: "https://openzro.example.com/dex"
+    AUTH_CLIENT_ID: "openzro-dashboard"
+    AUTH_CLIENT_SECRET: ""
+    AUTH_SUPPORTED_SCOPES: "openid profile email offline_access"
+    AUTH_AUDIENCE: "openzro-dashboard"
+    AUTH_REDIRECT_URI: "/auth"
+    AUTH_SILENT_REDIRECT_URI: "/silent-auth"
+    OPENZRO_MGMT_API_ENDPOINT: "https://openzro.example.com"
+    OPENZRO_MGMT_GRPC_API_ENDPOINT: "https://grpc.openzro.example.com"
+    OPENZRO_TOKEN_SOURCE: "idToken"
 ```
 
 ## 3. Install the chart
@@ -107,68 +285,107 @@ helm install openzro openzro/openzro \
   -f my-openzro.yaml
 ```
 
-The chart's `NOTES.txt` prints the next-steps URL once everything
-is healthy.
+Pre-install Job creates the 4 PostgreSQL databases if they don't
+exist (`postgres`, `openzro_flow`, `openzro_activity`, `dex`).
+After that, management and Dex run their own schema migrations on
+boot.
 
-## 4. Verify
+## 4. DNS for the relay LoadBalancer
+
+The relay Service comes up as `LoadBalancer` and the cloud
+provider provisions an external IP. Update DNS:
+
+```bash
+kubectl get svc -n openzro openzro-relay
+# NAME            TYPE           EXTERNAL-IP        PORT(S)
+# openzro-relay   LoadBalancer   34.x.x.x           33080:30869/TCP
+```
+
+Point `relay.example.com` (the value you set in
+`relay.publicHostname`) at that IP. cert-manager validates the
+domain once DNS resolves and provisions the cert via the
+`Certificate` CRD the chart emits.
+
+## 5. Verify
 
 ```bash
 kubectl -n openzro get pods
-# Expect: dex, management, signal, relay, dashboard all Running
+# Expect (replicaCount=3 management/signal, 2 relay/dashboard/dex):
+#   openzro-management-0      1/1   Running
+#   openzro-management-1      1/1   Running
+#   openzro-management-2      1/1   Running
+#   openzro-signal-0          1/1   Running
+#   ...
+#   openzro-relay-...         1/1   Running   (x2)
+#   openzro-dashboard-...     1/1   Running   (x2)
+#   openzro-dex-...           1/1   Running   (x2)
 
-kubectl -n openzro get ingress
-# Expect: openzro-dashboard, openzro-management with your hostname
+curl https://openzro.example.com/dex/.well-known/openid-configuration | jq .issuer
+# "https://openzro.example.com/dex"
 
-curl https://openzro.example.com/dex/.well-known/openid-configuration
-# Expect: 200 with the OIDC discovery document
+curl -sI https://openzro.example.com/api/users
+# HTTP/2 401   ← expected (no auth header), management is reachable
 ```
 
 Open `https://openzro.example.com/`, sign in with the bootstrap
-admin credentials. Settings → Authentication Providers →
-"Add provider" wires Google / GitHub / Microsoft Entra / Keycloak
-/ Okta / generic OIDC at runtime.
+admin email + the password you put behind the bcrypt hash. From
+**Settings → Identity Providers** wire your corporate IdP
+(Microsoft Entra, Google Workspace, Okta, Keycloak, generic OIDC)
+at runtime.
 
-## Optional: Gateway API instead of Ingress
+## Optional: GitOps with argocd-vault-plugin
 
-If your cluster runs Envoy Gateway, Cilium Gateway, Istio (ambient
-mode), or any conformant Gateway API controller:
+For ArgoCD-driven deploys, all the secrets (postgres password,
+data store encryption key, relay HMAC, bcrypt admin hash) live
+in a Vault and are referenced via `<path:vault/path#field>`
+markers in the values. The chart was hardened in `2.1.0-alpha.20+`
+to use `mustToRawJson` so the markers survive intact through
+`management.json` rendering — without that fix the markers got
+HTML-escaped to `<` and the plugin couldn't resolve them.
 
 ```yaml
-gatewayApi:
-  enabled: true
-  gatewayClassName: envoy   # or istio / cilium / traefik
-  createGateway: true
-  gateway:
-    hostname: openzro.example.com
-    tls:
-      certificateRefs:
-        - name: openzro-tls
+postgres:
+  password: "<path:secret/data/openzro#dbPassword>"
 
-# Disable the per-component Ingress to avoid double-binding
 management:
-  ingress: {enabled: false}
-  ingressGrpc: {enabled: false}
-dashboard:
-  ingress: {enabled: false}
-signal:
-  ingress: {enabled: false}
+  config:
+    dataStoreEncryptionKey: "<path:secret/data/openzro#dataStoreEncryptionKey>"
+    relay:
+      secret: "<path:secret/data/openzro#relaySecret>"
+
 relay:
-  ingress: {enabled: false}
+  cluster:
+    authSecret:
+      value: "<path:secret/data/openzro#relayAuthSecret>"
+
+dex:
+  config:
+    staticPasswords:
+      - email: admin@example.com
+        hash: "<path:secret/data/openzro#adminPasswordHash>"
+        username: admin
+        userID: openzro-admin
 ```
 
-The chart emits `HTTPRoute` resources for HTTP traffic (dashboard,
-management REST, relay) and `GRPCRoute` for the gRPC services
-(management gRPC, signal). For shared Gateways managed outside
-this chart, set `gatewayApi.createGateway: false` and provide
-`gatewayApi.parentRefs`.
+argocd-vault-plugin substitutes the markers when ArgoCD renders
+the chart — values committed to git stay sanitized.
 
-<Note>
-At the time of writing the openZro container packages on `ghcr.io`
-are private by default. If your cluster can't pull, create an
-`imagePullSecret` with a Personal Access Token that has
-`read:packages` and reference it via
-`management.imagePullSecrets`, `signal.imagePullSecrets`, etc.
-</Note>
+## What the chart auto-derives
+
+To minimize duplication in the values:
+
+| Field on the wire | Auto-derived from |
+|---|---|
+| `OZ_LISTEN_ADDRESS` (relay) | `relay.containerPort` (default `:33080`) |
+| `OZ_EXPOSED_ADDRESS` (relay) | `relay.publicHostname` + `relay.service.port` |
+| `OZ_AUTH_SECRET` (relay) | `management.config.relay.secret` (same HMAC both ends) |
+| `rels://` scheme in `management.config.relay.addresses` | `relay.tls.enabled` (`rel://` when TLS off) |
+| Cert SANs | `relay.publicHostname` |
+| Postgres DSN | `postgres.host` + `postgres.port` + `postgres.databases.*` + `postgres.username` + `postgres.password` |
+| NATS routes (cluster.mode=embedded) | StatefulSet pod names + headless Service |
+
+You don't need to repeat these in `relay.env` / `relay.envRaw`
+or `management.envRaw`. If you do override them, your override wins.
 
 ## Where to file issues
 

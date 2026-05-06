@@ -2,100 +2,183 @@ import {Note} from "../../../components/mdx";
 
 # Storage Backends on Kubernetes
 
-The Helm chart auto-wires three openZro stores against a
-PostgreSQL or MySQL backend when either subchart is enabled:
+The Helm chart auto-wires four databases on a single PostgreSQL
+or MySQL server when either is enabled:
 
-- **Management store** — accounts, peers, groups, policies, setup
-  keys
-- **Flow store** — traffic events
-- **Activity event store** — audit log
+- **management** — accounts, peers, groups, policies, setup keys
+- **flow** — traffic events
+- **activity** — audit log
+- **dex** — IdP storage (when Dex is enabled)
 
-Each store gets its own database + dedicated user with restricted
-grants, provisioned by a pre-install Helm hook. You can also
-disable the auto-wiring entirely and point at an externally-managed
-database.
+All four databases share the same connection user (`openzro` by
+default). A pre-install Helm hook creates them if they don't
+exist; the management daemon and Dex run their own schema
+migrations on first boot.
 
 ## PostgreSQL (recommended)
 
+The chart points at an external Postgres — Cloud SQL, AWS RDS,
+Cloud Spanner with PG dialect, self-hosted with replication, etc.
+Bundled subchart was removed; for HA the production target is a
+managed service.
+
 ```yaml
 postgres:
   enabled: true
+  host: 10.x.x.x          # private IP / hostname of your Postgres
+  port: 5432
+  sslMode: require        # see SSL section below
   username: openzro
-  password: change-me-in-production
-  # database / host / port have sane defaults for the bundled subchart
+  password: "REPLACE_WITH_PG_PASSWORD"
+  databases:
+    management: openzro
+    flow: openzro_flow
+    activity: openzro_activity
+    dex: dex
+  provisioning:
+    enabled: true         # CREATE DATABASE if absent (idempotent)
+    username: openzro     # DBA user with CREATEDB privilege
+    password: "REPLACE_WITH_PG_PASSWORD"
 ```
 
-The chart provisions on first install:
+### Pre-install Job behavior
 
-- `openzro_management` (database) + `openzro_mgmt` (user)
-- `openzro_flow` (database) + `openzro_flow` (user)
-- `openzro_activity` (database) + `openzro_activity` (user)
+When `provisioning.enabled: true` the chart runs a pre-install /
+pre-upgrade Helm hook that:
 
-Each user has GRANTs only on its own database. The bootstrap
-credentials in `postgres.username` / `postgres.password` are used
-once by the provisioning Job and never by the management daemon —
-the daemon uses the per-store users.
+1. Connects as `provisioning.username` to the `postgres` admin DB
+2. Iterates through the four database names from
+   `postgres.databases`
+3. Skips any that already exist (`SELECT 1 FROM pg_database`)
+4. `CREATE DATABASE` for the missing ones with the runtime user
+   as `OWNER`
+
+The user used by the Job needs `CREATEDB`. The runtime user used
+by the management daemon and Dex only needs `CREATE/ALTER TABLE`
+inside its own databases — covered automatically by the `OWNER`
+grant.
+
+### When to disable provisioning
+
+Cloud-managed Postgres (Cloud SQL, RDS) often restricts the
+`CREATEDB` global privilege to a separate admin user. Two ways
+to live without it:
+
+```yaml
+postgres:
+  provisioning:
+    enabled: false
+```
+
+Then ask your DBA to pre-create the four databases:
+
+```sql
+CREATE DATABASE openzro            OWNER openzro;
+CREATE DATABASE openzro_flow       OWNER openzro;
+CREATE DATABASE openzro_activity   OWNER openzro;
+CREATE DATABASE dex                OWNER openzro;
+```
+
+### SSL — Cloud SQL ENCRYPTED_ONLY
+
+Cloud SQL with **"Allow only SSL connections"** (the
+`ENCRYPTED_ONLY` mode) rejects plaintext with
+`pg_hba.conf rejects ... no encryption`. Match it with:
+
+```yaml
+postgres:
+  sslMode: require
+```
+
+`require` cifrates the connection without validating the server
+certificate — sufficient when the DB is in a peered VPC or
+otherwise trusted at the network layer.
+
+For full validation:
+
+| sslMode | Encrypts | Validates server cert | Validates server hostname |
+|---------|----------|----------------------|---------------------------|
+| `disable` | ❌ | ❌ | ❌ |
+| `require` | ✅ | ❌ | ❌ |
+| `verify-ca` | ✅ | ✅ (needs CA file) | ❌ |
+| `verify-full` | ✅ | ✅ | ✅ |
+
+`verify-ca`/`verify-full` need the server CA mounted in the pod
+via a Secret + `PGSSLROOTCERT` env var. See the management deploy
+guide for the full mount pattern.
 
 ## MySQL
 
-Same shape, different engine:
+Symmetric structure — separate `mysql.enabled: true` block. Same
+four databases, same single-user model:
 
 ```yaml
 mysql:
   enabled: true
-  rootPassword: change-me-in-production
+  host: 10.x.x.x
+  port: 3306
+  tls: preferred           # true | false | preferred | skip-verify
+  username: openzro
+  password: "REPLACE_WITH_PASSWORD"
+  databases:
+    management: openzro
+    flow: openzro_flow
+    activity: openzro_activity
+    dex: dex
 ```
 
-The same per-store databases + users get provisioned with `GRANT
-... ON <db>.*` scoped to each.
+`postgres.enabled: true` and `mysql.enabled: true` are mutually
+exclusive — the chart fails fast at template time.
 
-## External database (no subchart)
+## SQLite (lab only)
 
-Skip both subcharts and point each store at an externally-managed
-database:
+With both `postgres.enabled: false` and `mysql.enabled: false`,
+each component falls back to its own SQLite file. Multi-replica
+diverges silently — different pods write to different files and
+authentication state desyncs. Use SQLite only for single-replica
+labs.
+
+## Dex storage
+
+Dex storage routes through the same `postgres:` block when
+postgres is enabled. The chart renders `dex.config.storage` to
+point at the `dex` database with the same credentials. No
+duplication needed.
+
+For lab installs (sqlite), the upstream Dex chart provisions a
+1Gi PVC at `/var/lib/dex` — flip `dex.persistence.enabled: true`
+and uncomment the `dex-data` volume in `dex.volumes` /
+`dex.volumeMounts`.
+
+## Backup
+
+Database backup is the operator's responsibility — outside the
+chart's scope. Recommended:
+
+- **Cloud SQL / RDS** — managed automated backups + PITR
+- **Self-hosted Postgres** — `pg_dump` cron + WAL archiving
+- **Self-hosted MySQL** — `mysqldump` cron + binlog archiving
+
+The `dataStoreEncryptionKey` (AES-256 encrypting sensitive fields
+in the `openzro` DB) is **not** rotatable in place — losing it
+invalidates the encrypted columns. Back it up alongside the DB.
+
+## GeoLite2 database (geo-location posture checks)
+
+Independent of the SQL backend, the management binary fetches a
+GeoLite2 database for posture checks. The chart pulls from the
+openZro mirror by default (`pkg.openzro.io/geolocation-dbs`), no
+operator action needed. To pin a MaxMind license key for direct
+upstream pulls:
 
 ```yaml
-postgres:
-  enabled: false
-mysql:
-  enabled: false
-
 management:
-  envFromSecret:
-    OPENZRO_STORE_ENGINE_POSTGRES_DSN: my-secret/managementDsn
-    OPENZRO_FLOW_STORE_DSN:            my-secret/flowDsn
-    OZ_ACTIVITY_EVENT_POSTGRES_DSN:    my-secret/activityDsn
-  env:
-    OPENZRO_STORE_ENGINE: postgres
-    OPENZRO_FLOW_STORE_ENGINE: postgres
-    OZ_ACTIVITY_EVENT_STORE_ENGINE: postgres
+  config:
+    geoLite:
+      licenseKey:
+        existingSecret: openzro-maxmind
+        existingSecretKey: licenseKey
 ```
 
-Where `my-secret` is a `Secret` you create out-of-band with the
-three DSN strings.
-
-## When to pick which
-
-| Backend | Best for | Notes |
-|---|---|---|
-| PostgreSQL (bundled) | Most installs | First-class openZro support, full feature parity |
-| PostgreSQL (external) | You already operate Postgres | Reuses existing backups, monitoring, HA |
-| MySQL (bundled) | Existing MySQL shop | Feature-parity but Postgres is the testing default |
-| MySQL (external) | Same | Same |
-| SQLite (defaults) | Lab / dev | Single replica only, file-based |
-
-For HA, an externally-managed Postgres with replication is the
-production target. The bundled subchart is single-replica and is
-intended for fresh installs and labs — flip to external when
-you're ready to manage backups and replication on your own
-schedule.
-
-<Note>
-The dashboard's geolocation posture-check populates from a
-GeoLite2 database the management binary fetches on cold boot. By
-default the chart pulls from the openZro mirror — no operator
-action needed. To pin a MaxMind license key (free at
-[maxmind.com/en/geolite2/signup](https://www.maxmind.com/en/geolite2/signup)),
-set `management.geoLite.licenseKey.value` or
-`management.geoLite.licenseKey.existingSecret`.
-</Note>
+Or use `value:` directly. With license key empty, the openZro
+mirror serves the same content with some hours of lag.

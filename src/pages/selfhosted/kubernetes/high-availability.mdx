@@ -27,6 +27,8 @@ cluster:
   embedded:
     clientPort: 4222
     clusterPort: 6222
+    jetstream:
+      storage: memory   # locks bucket only — no PVC needed
 
 management:
   replicaCount: 3
@@ -44,12 +46,30 @@ cluster:
 In `embedded` mode the chart switches both deployments to
 `StatefulSet`, renders a Headless Service that anchors per-pod
 DNS names, and wires NATS routes via `OPENZRO_CLUSTER_PEERS` so
-the embedded brokers gossip between siblings. See
+the embedded brokers gossip between siblings. The route URL
+scheme is `nats://` (the openZro embedded NATS validator rejects
+`nats-route://`). The chart also passes a unique `ServerName`
+per pod (auto-derived from the pod hostname via
+`os.Hostname()`) — required by JetStream cluster mode.
+
+See
 [ADR-0009](https://github.com/openzro/openzro/blob/main/docs/adr/0009-bare-metal-ansible-and-ha.md)
 for the broker mode rationale.
 
 If you already operate NATS at a known endpoint, `external` mode
 points the chart at it and skips the embedded broker entirely.
+
+### JetStream cluster bootstrap
+
+The first 60 seconds of a fresh HA install are the trickiest:
+JetStream needs all three pods up before it can elect a meta-
+leader, and the management coordinator's "create locks bucket"
+call fails until the leader is elected. The management binary
+retries the bucket creation with backoff for 60 seconds — long
+enough for typical leader election. If your boot is slower (slow
+PVC mount, slow image pull on small nodes), management may hit
+the retry timeout; in that case rolling restart once everything
+else is up.
 
 ## Relay multi-pod fabric (ADR-0014)
 

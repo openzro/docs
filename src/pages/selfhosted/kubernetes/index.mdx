@@ -29,13 +29,21 @@ bare-metal multi-node installs via Ansible, see
 The [`openzro` Helm chart](https://github.com/openzro/helms/tree/main/charts/openzro)
 deploys the control plane as a single release:
 
-- **management** — account / peer / policy API (Deployment)
-- **signal** — gRPC peer-to-peer signaling (Deployment)
-- **relay** — WireGuard fallback relay with multi-pod fabric
-  (Deployment, see [High availability](/selfhosted/kubernetes/high-availability))
-- **dashboard** — React UI (Deployment)
+- **management** — account / peer / policy API (Deployment in
+  single-node mode, StatefulSet when `cluster.mode=embedded`)
+- **signal** — gRPC peer-to-peer signaling (same workload kind
+  rule as management)
+- **relay** — TCP/WebSocket relay with TLS termination (cert-
+  manager-provisioned cert) and multi-pod fabric. Exposed as a
+  `LoadBalancer` Service — Ingress is **not** supported (TCP
+  persistent, idle timeouts kill connections). See
+  [High availability](/selfhosted/kubernetes/high-availability)
+- **dashboard** — React SPA (Deployment, nginx)
 - **dex** — embedded federated IdP (Deployment, via subchart)
-- **postgres** / **mysql** — optional storage backends (subcharts)
+
+Storage is **external** — the chart no longer bundles Postgres
+or MySQL subcharts. Point at Cloud SQL, RDS, or any reachable
+PostgreSQL. See [Storage](/selfhosted/kubernetes/storage).
 
 Routing peers (gateways, exit nodes) are **not** part of this
 chart — they're data plane and live independently. Deploy them

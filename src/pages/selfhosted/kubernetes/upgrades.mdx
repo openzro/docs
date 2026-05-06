@@ -70,22 +70,24 @@ taken before the upgrade.
 
 ## Dex storage migration
 
-By default the chart provisions a 1Gi PVC for Dex's SQLite.
-Migrating to PostgreSQL (recommended for HA) is a values flip —
-see the upstream
-[`dexidp/helm-charts`](https://github.com/dexidp/helm-charts)
-values for the postgres backend, then mirror that under
-`dex.config.storage` in your values.
+When `postgres.enabled: true` (the recommended setup), the chart
+auto-routes Dex's storage to the `dex` database via the same
+Postgres credentials. No PVC, no SQLite, no manual values flip.
 
-Before flipping:
+If you started in lab mode (sqlite) and want to migrate to
+Postgres later:
 
-1. Export static passwords + connectors from the SQLite store
-   (Dex CLI or direct SQL dump)
-2. Apply the values change with `helm upgrade`
-3. Re-import passwords + connectors into Postgres
+1. Set `postgres.enabled: true` and configure connection details
+2. Pre-create the `dex` database (or let the provisioning Job do
+   it on next upgrade)
+3. Export static passwords + connectors from the SQLite store
+   (`dex` CLI or direct SQL dump)
+4. `helm upgrade` — Dex starts against the empty Postgres `dex` DB
+5. Re-import passwords + connectors
 
-There's no automated SQLite → Postgres migration in the upstream
-Dex chart, so the export/import is manual.
+There's no automated SQLite → Postgres migration in upstream Dex,
+so the export/import is manual. Operators on the recommended
+postgres path skip this entirely.
 
 ## Verifying a successful upgrade
 
@@ -100,10 +102,14 @@ curl -s https://openzro.example.com/dex/.well-known/openid-configuration | jq .i
 ```
 
 If a rollout hangs, `kubectl describe pod` and
-`kubectl logs --previous` are the first diagnostics. The chart's
-liveness probes are TCP-based, so a stuck rollout usually means
-the new image can't reach its database — check
-`OPENZRO_STORE_ENGINE_POSTGRES_DSN` first.
+`kubectl logs --previous` are the first diagnostics. Probes:
+
+- **Management / signal / dashboard** — TCP probe on the service
+  port. Stuck rollout usually means the new image can't reach
+  its database (postgres) or its broker (NATS embedded peer
+  connection refused) — check the management/signal logs first.
+- **Relay** — `httpGet /metrics` on port 9090 (HTTP plaintext).
+  TLS handshake on the public port (33080) does not pollute logs.
 
 <Note>
 Helm itself stores release history; you can roll the chart back
