@@ -121,6 +121,40 @@ roles:
 Do not grant `roles/storage.admin` — the sink does not need it
 and the principle of least privilege says no.
 
+## How the data gets to the bucket
+
+This is **not** a synchronous write per event. Understanding the
+buffering / flush sequence saves a lot of "the bucket is empty,
+something's broken" support tickets:
+
+1. **Per-event ingest.** A peer's openzro client streams a
+   `flow.FlowEvent` to the management's `FlowService.Events`
+   bidi-stream. The Events handler enqueues the event onto an
+   in-memory channel (default capacity 10 000) and immediately
+   acks the peer. There is no per-event blocking write to GCS.
+
+2. **Worker tick.** A background goroutine (`runWorker`) ticks
+   every `FLUSH_INTERVAL` (default **5 seconds**) and **also**
+   flushes whenever the in-memory batch reaches `BATCH_SIZE`
+   (default **500** events) — whichever comes first.
+
+3. **Per-sink fan-out.** When a flush fires, the management
+   resolves peer identity for every event in the batch
+   (cached, sub-millisecond) and hands the resolved batch to
+   **every configured sink in parallel**. Sinks include the hot
+   store (`flow_events` Postgres table), any streaming exporter
+   (Datadog, Elastic, HTTP), and the cold archive (S3 or GCS).
+
+4. **Cold archive object write.** The GCS sink groups the batch
+   by `(account_id, day)` and writes one object per group. Object
+   keys follow the `year=…/month=…/day=…/account=…/<flush-id>.ndjson.gz`
+   layout described above. Each object is gzipped NDJSON, streamed
+   via the Google SDK with resumable uploads on by default.
+
+The first object lands in the bucket within 1 batch worth of
+events **or** 5 seconds (`FLUSH_INTERVAL`) of the first event,
+whichever fires sooner.
+
 ## Verifying the archive
 
 ```bash
@@ -137,10 +171,30 @@ gcloud storage cp \
 zcat /tmp/sample.ndjson.gz | head -3 | jq
 ```
 
-If the bucket stays empty for more than `FLUSH_INTERVAL`
-(default 15 min), check the management log for
-`flow sink GCS:` errors — typically wrong IAM binding or wrong
-bucket name.
+### "The bucket is empty"
+
+Walk the path top-down before assuming the sink is broken:
+
+1. **Are events even reaching the management?** Check
+   `/api/network-traffic-events?limit=10` returns rows. If
+   empty, the problem is upstream of any sink — peers aren't
+   delivering. Most common cause is the
+   [bidi-streaming bug with cluster ingress-nginx](/selfhosted/kubernetes/high-availability#management-grpc-bidi-streaming-and-the-flowservice-trap);
+   peers see "flow receiver sent no headers" in their logs and
+   never push events. The fix is `management.grpcProxy.enabled`
+   on Kubernetes, or a non-buggy ingress controller.
+2. **Is the GCS sink loaded?** `kubectl logs … | grep "flow sink GCS:"`
+   on the management pod should show one `flow sink GCS:
+   bucket=… prefix=…` line at boot per replica. If not, the
+   `flow_exports` row didn't land or the bucket field is empty
+   — re-save the destination from the dashboard.
+3. **Is IAM right?** A wrong binding produces `flow sink GCS:
+   write failed: googleapi: Error 403` once per batch. Fix the
+   binding (`roles/storage.objectCreator` on the bucket, not the
+   project) and a future flush will succeed.
+4. **Time window.** If you only just enabled flow logging, give
+   it a few minutes — at low event rates the first flush waits
+   for the 5 s ticker to fire after the first event arrives.
 
 ## Trade-offs
 

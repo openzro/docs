@@ -322,6 +322,157 @@ Operators on alternative controllers don't need this workaround:
 For those operators, `signal.ingress.enabled: true` is the simpler
 path.
 
+## Management gRPC — bidi streaming and the FlowService trap
+
+The `signal` story above is a **server-streaming** gRPC RPC — the
+first response chunk a peer expects (after the initial metadata)
+is `x-wiretrustee-peer-registered`. The same ingress-nginx bug
+affects **bidi-streaming** RPCs even more aggressively. The
+canonical example in the chart is `flow.FlowService.Events`, the
+RPC peers use to push per-flow telemetry to the management when
+**Settings → Network Traffic Logs** is enabled.
+
+The shape that breaks:
+
+```
+Peer (gRPC client)                    Management (gRPC server)
+  ──────────────────                    ─────────────────────
+  open Events stream  ──────────────►   Events handler runs
+  call stream.Header()                  stream.Recv()  ──┐
+  (blocks on initial                                     │ blocks until
+   response metadata)                                    │ first peer event
+                                                         │
+  ↑                                                      ▼
+  ingress-nginx upstream buffer holds                 (no DATA frame
+  the response HEADERS frame waiting                  emitted yet)
+  for a DATA frame to come along
+```
+
+Result: peers hang in `WaitToBeOnlineAndSubscribe` indefinitely
+and log the now-famous
+
+```
+flow receiver sent no headers
+receive failed: check header: should have headers
+```
+
+Confirmed by tcpdump on the management pod (HEADERS frame is sent
+by the binary but never lands at the gRPC client) and by the
+control test of pointing `Flow.URI` at the in-cluster
+`openzro-management-grpc.openzro.svc.cluster.local:33073`
+(plain HTTP/2 without ingress-nginx in the path) — events flow
+end-to-end as expected.
+
+**`proxy-buffering: off` doesn't fix it.** Verified at the production
+admin cluster — annotation lands on the Ingress and gets reflected
+in the rendered nginx config, but the failure mode persists. The
+upstream request body buffer isn't the only buffer that matters;
+HTTP/2 frame-level batching at the upstream connection still
+clobbers the HEADERS frame ordering.
+
+### The fix: `management.grpcProxy`
+
+Same shape as `signal.tls` and `relay.tls` — a dedicated nginx
+Deployment in front of the management gRPC port, with
+`proxy_buffering off` + `proxy_request_buffering off` set
+**locally** (the cluster ingress-nginx can't safely flip these
+globally without breaking other workloads). LoadBalancer Service
+in front of the proxy, TLS terminated by the proxy itself via
+cert-manager, peers route there for FlowService.Events while
+zt.example.com (the main host) keeps serving Login / Sync /
+dashboard / Dex / `/api` through the cluster ingress unchanged.
+
+```yaml
+management:
+  grpcProxy:
+    enabled: true
+    publicHostname: mgmt-grpc.example.com   # new DNS, peer-facing
+    replicas: 2
+    service:
+      type: LoadBalancer
+      port: 443
+    tls:
+      certManager:
+        enabled: true
+        issuerRef:
+          kind: ClusterIssuer
+          name: letsencrypt-prod
+```
+
+After `helm upgrade`:
+
+1. **Get the LB IP** allocated by the cloud:
+   ```bash
+   kubectl -n openzro get svc <release>-openzro-management-grpc-proxy
+   ```
+2. **Create the DNS A record** `mgmt-grpc.example.com → <IP>`.
+3. **Wait for cert-manager** to issue the certificate
+   (`Ready: True` on the Certificate CRD).
+4. The chart auto-derives `management.config.flow.uri` to
+   `mgmt-grpc.example.com:443` and embeds it in `management.json`.
+5. Peers receive the new Flow.URI via their next Sync update and
+   open the FlowService stream against the proxy.
+
+Why peers don't need to be reconfigured: the management hands the
+Flow URL down to peers in every Sync response (`FlowConfig.URL`),
+and the peer's openzro client uses it for the flow gRPC dial.
+There's no per-peer config of `--flow-url`. Operators changing
+the Flow URI just redeploy the chart; peers pick it up
+automatically on their next Sync.
+
+### Why not enable `management.tls` directly on the binary?
+
+The chart **does** support TLS on the management binary itself
+(`management.tls.enabled: true`, `management.publicGrpcHostname`),
+mirroring the relay/signal pattern even more closely. Most
+operators should still pick `grpcProxy` instead because:
+
+- **Single shared Ingress.** The bundled `ingress.openzro` Ingress
+  serves `/`, `/dex` and (optionally) `/api` on the same hostname.
+  ingress-nginx applies `backend-protocol` per-Ingress, not
+  per-path — so flipping the management binary to TLS would
+  require setting `backend-protocol: HTTPS` on the bundled
+  Ingress, breaking dashboard and Dex (which don't terminate TLS
+  at their backends).
+- **Backwards compatibility.** Existing peers stay registered
+  with `--management-url=https://example.com`. They reach
+  `Login` / `Sync` through the cluster ingress as today; only
+  the flow data path moves out.
+- **Simpler debugging.** A standalone nginx pod with one location
+  block is trivial to `kubectl exec` into and inspect. The same
+  is harder when management is doing TLS termination + content
+  negotiation + gRPC + HTTP API on the same listener.
+
+`management.tls` is documented as the alternative for operators
+who run with split Ingresses (one Ingress per service) and don't
+care about the dashboard footgun. Most should not pick it.
+
+### Why this exists at all
+
+The trade-off is deliberate. The cluster ingress-nginx serves
+many other workloads with their own buffering / streaming
+characteristics. Flipping `proxy-buffering: off` cluster-wide
+hurts every HTTP/1.1 webhook / REST API in the cluster that
+benefits from buffered responses. The dedicated proxy serves
+**one** route, so it can be tuned aggressively without
+collateral damage.
+
+### Alternatives the chart does not bundle
+
+If your cluster already runs one of these, point peers at it
+instead and skip `grpcProxy.enabled: true` entirely:
+
+| Alternative | Notes |
+|---|---|
+| **HAProxy ingress controller** | gRPC streaming works out of the box. Common pattern in shops that already use HAProxy. |
+| **Envoy Gateway** | Modern Gateway API + GRPCRoute. Cleanest if you're greenfield. |
+| **Contour** (Envoy-based) | Same Envoy lineage, packaged for VMware Tanzu / Bitnami stacks. |
+| **GKE Gateway API + HTTPS LB** | Native to GCP. Works well for GKE-only deploys; ties you to Google. |
+
+The `grpcProxy` path is the lowest-friction option for operators
+already running ingress-nginx and not looking to introduce
+another controller for one route.
+
 ## Operations — verifying HA
 
 ### Cluster broker is up
