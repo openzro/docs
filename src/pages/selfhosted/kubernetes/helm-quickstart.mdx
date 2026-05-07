@@ -138,12 +138,19 @@ management:
         domain: "openzro.example.com"
         authorizationEndpoint: "https://openzro.example.com/dex/auth"
         tokenEndpoint: "https://openzro.example.com/dex/token"
-        scope: "openid profile email offline_access"
+        # `groups` here AND in dashboard.env.AUTH_SUPPORTED_SCOPES are
+        # what gates JWT Group Sync (Settings → Groups). Cheap to leave
+        # on even when no upstream connector emits groups — Dex just
+        # omits the claim. See the "JWT Group Sync" section below.
+        scope: "openid profile email offline_access groups"
         redirectURLs:
           - "http://localhost:53000/"
           - "http://localhost:54000/"
           - "http://localhost:55000/"
-        useIDToken: false
+        # Dex puts groups in id_token only (access_token is minimal by
+        # design). The `openzro` CLI must use id_token as Bearer or the
+        # management never sees the claim. Same reason as the dashboard.
+        useIDToken: true
     deviceAuthorizationFlow:
       provider: hosted
       providerConfig:
@@ -152,8 +159,8 @@ management:
         domain: "openzro.example.com"
         tokenEndpoint: "https://openzro.example.com/dex/token"
         deviceAuthEndpoint: "https://openzro.example.com/dex/device/code"
-        scope: "openid profile email offline_access"
-        useIDToken: false
+        scope: "openid profile email offline_access groups"
+        useIDToken: true
   ingress:
     enabled: false            # consolidated Ingress carries /api
   ingressGrpc:
@@ -271,7 +278,7 @@ dashboard:
     AUTH_AUTHORITY: "https://openzro.example.com/dex"
     AUTH_CLIENT_ID: "openzro-dashboard"
     AUTH_CLIENT_SECRET: ""
-    AUTH_SUPPORTED_SCOPES: "openid profile email offline_access"
+    AUTH_SUPPORTED_SCOPES: "openid profile email offline_access groups"
     AUTH_AUDIENCE: "openzro-dashboard"
     AUTH_REDIRECT_URI: "/auth"
     AUTH_SILENT_REDIRECT_URI: "/silent-auth"
@@ -344,6 +351,52 @@ admin email + the password you put behind the bcrypt hash. From
 **Settings → Identity Providers** wire your corporate IdP
 (Microsoft Entra, Google Workspace, Okta, Keycloak, generic OIDC)
 at runtime.
+
+## JWT Group Sync (when using an upstream IdP)
+
+When you wire a corporate IdP (Keycloak, Microsoft Entra, Google
+Workspace, Okta, generic OIDC) under **Settings → Identity Providers**,
+groups from the upstream can flow into openZro Groups and be used
+in Policies — but only if four moving parts line up:
+
+1. **Upstream IdP emits `groups` in the OIDC token.** For Keycloak
+   this is the *Group Membership* mapper on the `groups` client
+   scope, with `Add to ID token: On` and `Token Claim Name: groups`.
+   See the [Keycloak guide](/selfhosted/identity-providers/keycloak#configuring-jwt-groups-claim).
+
+2. **Dex requests groups from upstream and re-emits them.** When
+   you add the IdP via the dashboard, openZro creates a Dex OIDC
+   connector with `insecureEnableGroups: true`, `scopes`
+   including `groups`, and `getUserInfo: false`. The
+   `getUserInfo: false` matters: with `true`, Dex calls the
+   upstream `/userinfo` endpoint after token exchange and
+   *overwrites* the claims — and Keycloak's userinfo doesn't carry
+   groups by default, so the claim disappears.
+
+3. **The dashboard requests `groups` and uses the id_token.** Both
+   are in the example values above:
+   ```yaml
+   dashboard:
+     env:
+       AUTH_SUPPORTED_SCOPES: "openid profile email offline_access groups"
+       OPENZRO_TOKEN_SOURCE: "idToken"
+   ```
+   Dex puts `groups` in the **id_token only** — the access_token
+   is minimal by design, so `OPENZRO_TOKEN_SOURCE: idToken`
+   is required for the management to ever see the claim.
+
+4. **JWT Group Sync is enabled at the account level.** In the
+   dashboard go to **Settings → Groups** and turn on **Enable JWT
+   group sync**, with **JWT claim** set to `groups`. Without this
+   the management ignores the claim even if it's present in the JWT.
+
+After all four are aligned, log out and log back in. The groups
+appear in **Team → Groups** auto-created, and the user gets them
+as `auto_groups`. Empty groups list after a fresh login is a
+strong signal that step 2 or 3 is misaligned — inspect the
+id_token in the browser DevTools (Application → Storage → look
+for `oidc.user:...`) to confirm whether the claim made it into
+the token.
 
 ## Optional: GitOps with argocd-vault-plugin
 

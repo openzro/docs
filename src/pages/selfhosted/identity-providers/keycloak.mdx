@@ -208,6 +208,50 @@ To sync Keycloak groups with openZro, you need to create a client scope with a g
 If **Full group path** is enabled, group names will include the path (e.g., `/admins` or `/parent/child`). Disable it for cleaner names like `admins`.
 </Note>
 
+#### Step 6: Verify the dashboard requests the `groups` scope
+
+JWT Group Sync only fires if the JWT actually carries `groups`. On
+Kubernetes deployments, the chart's `dashboard.env.AUTH_SUPPORTED_SCOPES`
+must include `groups` and `dashboard.env.OPENZRO_TOKEN_SOURCE` must
+be `idToken` — Dex puts `groups` in the id_token only, never in
+the access_token. The
+[Helm Quickstart](/selfhosted/kubernetes/helm-quickstart#jwt-group-sync-when-using-an-upstream-idp)
+spells out the four moving parts.
+
+For Docker Compose deploys, set in `setup.env`:
+
+```shell
+OPENZRO_AUTH_SUPPORTED_SCOPES="openid profile email offline_access groups"
+OPENZRO_TOKEN_SOURCE="idToken"
+```
+
+After updating either, log out + log back in fresh. Browser session
+caches the old (group-less) token until you re-authenticate.
+
+#### Troubleshooting: groups visible in Dex log but not in dashboard
+
+Check the Dex pod log on a fresh login. A successful upstream sync
+looks like:
+
+```
+level=INFO msg="login successful" connector_id=keycloak ...
+  groups="[admins developers ...]"
+```
+
+If `groups=[]` despite Keycloak emitting them in the id_token (verify
+via a direct password-grant `curl` against
+`/realms/<realm>/protocol/openid-connect/token`), the Dex OIDC
+connector likely has `getUserInfo: true`. With that enabled, Dex
+calls Keycloak's `/userinfo` endpoint after the token exchange and
+overwrites the claims — and the userinfo response does not carry
+`groups` by default. Set `getUserInfo: false` and `insecureEnableGroups: true`
+on the connector and restart the Dex pods.
+
+If `groups` appears in the Dex log but not in **Team → Groups**, the
+likely missing piece is the dashboard requesting the `groups` scope
+(Step 6 above) — without it, Dex omits the claim from the id_token
+even though the upstream returned them.
+
 ---
 
 ## Standalone Setup (Advanced)
