@@ -122,6 +122,15 @@ Access control policies define which peers can access which resources based on s
   If you skip adding policies in the Access Control tab, a confirmation dialog will warn you that the resource will not be accessible by any peers without an access control policy.
 </Note>
 
+<Note>
+  **Migrating from Network Routes?** The two systems handle ACL defaults differently and the gotcha is easy to miss:
+
+  - Legacy **Network Routes** with an empty `Access Control Groups` field receive an implicit `0.0.0.0/0 → route ALLOW ALL` permit at the firewall layer. A route with no policy attached just works.
+  - **Networks/Resources** are strictly policy-driven. A resource without an attached policy is unreachable, even if the routing peer has IP connectivity to it.
+
+  This is intentional — it aligns the new feature with the zero-trust default — but it surprises operators who replicate a working Network Routes setup as a Network and find the resource silently dropped at the firewall. Always attach at least one policy per resource (source = peer group, destination = the resource's group, scope = the protocols/ports the resource serves).
+</Note>
+
 Example policy allowing the `Berlin Office` group to access the internal CRM system:
 
 <p>
@@ -165,6 +174,12 @@ To enable DNS wildcard routing, go to **Settings** > **Networks** > **Enable DNS
 
 <Note>
     DNS wildcard routing requires routing peers and clients running version 0.35.0 or later. After enabling this feature, restart your routing peers and clients to apply the changes.
+</Note>
+
+<Note>
+  **Watch out when your infra shares one LoadBalancer IP.** A common K8s deployment pattern (nginx-ingress + path-routing) puts every public hostname under your apex domain — `mgmt`, `dash`, `signal`, `relay`, plus your apps — on a single shared LB IP. When DNS Wildcard Routing is enabled and a client adds a hostname Resource that resolves to that shared IP, the routing peer's NAT rule scopes itself to the resource's domain set. Sibling hostnames sharing the same IP whose firewall behind the LB is stricter (e.g. allow-internal-source-only) may stall on the routing peer because the NAT scope doesn't fire for them.
+
+  Two ways to deal with it: (1) keep DNS Wildcard Routing **disabled**, which falls back to a permissive NAT rule on the routing peer and works as a generic egress for whatever the resource captures; or (2) split your infra so the routed app hostnames live on a different LB IP than the openZro control plane. See [ADR-0015](https://github.com/openzro/openzro/blob/main/docs/adr/0015-hostname-network-resources-and-acl.md) for the full diagnostic and trade-offs.
 </Note>
 
 <Note>
