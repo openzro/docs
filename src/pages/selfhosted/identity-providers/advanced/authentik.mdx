@@ -6,17 +6,29 @@ import {Note} from "@/components/mdx";
 
 ## Standalone Setup (Advanced)
 
-<Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+This guide wires Authentik as openZro's *only* identity provider —
+Dex is disabled and the management daemon talks directly to
+Authentik for both token validation and user lifecycle. Choose
+this path **only** if all three apply:
 
-We highly recommend using the simpler setup that adds Authentik as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/authentik#management-setup-recommended) section in the main Authentik documentation.
+1. **Authentik is the source of truth for user lifecycle.** You
+   want openZro to call Authentik's API to list, invite, and
+   delete users — so deleting a user in openZro removes them
+   from Authentik too. The recommended setup
+   ([Management Setup](/selfhosted/identity-providers/authentik#management-setup-recommended))
+   only consumes tokens; it cannot write back.
+2. **You need just one IdP, and it's Authentik.** This path
+   doesn't support multiple upstreams — there's no Dex to
+   aggregate them.
+3. **You're willing to give up the bootstrap admin fallback.** No
+   embedded local user store. If Authentik is down or
+   misconfigured, nobody can log into the dashboard.
 
-The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Authentik administrators who need full control over authentication and user management.
-</Note>
-
-Use Authentik as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Authentik administrators as it also requires additional setup and ongoing maintenance.
-
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For everyone else — multi-IdP shops, anyone wanting a static
+admin fallback, or operators who only need authentication (not
+user lifecycle writeback) — use the
+[Management Setup (Recommended)](/selfhosted/identity-providers/authentik#management-setup-recommended)
+in the main Authentik documentation instead.
 
 <Note>
 If you prefer not to self-host an Identity and Access Management solution, you could use a managed alternative like [Auth0](/selfhosted/identity-providers/managed/auth0).

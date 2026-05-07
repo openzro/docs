@@ -151,11 +151,33 @@ PocketID restricts OIDC client access based on group membership. Only users in g
 
 ## Standalone Setup (Advanced)
 
-Use PocketID as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced PocketID administrators as it also requires additional setup and ongoing maintenance.
+The standalone setup wires PocketID as openZro's *only* identity
+provider — Dex is disabled and the management daemon talks
+directly to PocketID for token validation. Choose this path
+**only** if all three apply:
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+1. **You want to skip the Dex layer entirely.** Unlike Keycloak
+   or Zitadel, PocketID does not expose a writeback API to
+   openZro — the management cannot list, invite, or delete
+   users in PocketID. The standalone path's only motivation is
+   removing one component (Dex) at the cost of multi-IdP
+   support and the static admin fallback.
+2. **You need just one IdP, and it's PocketID.** The standalone
+   path doesn't support multiple upstreams — there's no Dex to
+   aggregate them.
+3. **You're willing to give up the bootstrap admin fallback.** No
+   embedded local user store. If PocketID is down or
+   misconfigured, nobody can log into the dashboard.
 
-For detailed instructions on the standalone setup, see the [PocketID SSO with openZro Self-Hosted (Advanced)](/selfhosted/identity-providers/advanced/pocketid) documentation.
+For everyone else — multi-IdP shops, anyone wanting a static
+admin fallback, or anyone unsure whether they'll outgrow
+PocketID later — stick with the
+[Management Setup (Recommended)](#management-setup-recommended)
+above. It runs Dex in front of PocketID and makes a future
+swap to a different IdP painless.
+
+For detailed standalone instructions, see
+[PocketID SSO with openZro Self-Hosted (Advanced)](/selfhosted/identity-providers/advanced/pocketid).
 
 ---
 

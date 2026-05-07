@@ -147,11 +147,31 @@ Authentik returns group names (not IDs) in the `groups` claim. Groups are synced
 
 ## Standalone Setup (Advanced)
 
-Use Authentik as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Authentik administrators as it also requires additional setup and ongoing maintenance.
+The standalone setup wires Authentik as openZro's *only* identity
+provider — Dex is disabled and the management daemon talks
+directly to Authentik for both token validation and user
+lifecycle. Choose this path **only** if all three apply:
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+1. **Authentik is the source of truth for user lifecycle.** You
+   want openZro to call Authentik's API to list, invite,
+   and delete users — so deleting a user in openZro removes them
+   from Authentik too. The recommended setup above only consumes
+   tokens; it cannot write back.
+2. **You need just one IdP, and it's Authentik.** The standalone
+   path doesn't support multiple upstreams — there's no Dex to
+   aggregate them.
+3. **You're willing to give up the bootstrap admin fallback.** No
+   embedded local user store. If Authentik is down or
+   misconfigured, nobody can log into the dashboard.
 
-For detailed instructions on the standalone setup, see the [Authentik SSO with openZro Self-Hosted (Advanced)](/selfhosted/identity-providers/advanced/authentik) documentation.
+For everyone else — multi-IdP shops, anyone wanting a static
+admin fallback, or operators who only need authentication (not
+user lifecycle writeback) — stick with the
+[Management Setup (Recommended)](#management-setup-recommended)
+above.
+
+For detailed standalone instructions, see
+[Authentik SSO with openZro Self-Hosted (Advanced)](/selfhosted/identity-providers/advanced/authentik).
 
 <Note>
 If you prefer not to self-host an Identity and Access Management solution, you could use a managed alternative like [Auth0](/selfhosted/identity-providers/managed/auth0).
