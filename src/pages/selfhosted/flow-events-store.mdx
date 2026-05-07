@@ -168,6 +168,82 @@ For Medium-tier deployments, plan for ~50 GB/month of flow data
 per 1k peers as a rough order of magnitude — partitions make this
 trivial to drop in one transaction once retention kicks in.
 
+## Trimming volume: client-side port filter
+
+A typical workstation joining the mesh emits thousands of events per
+hour from "device A is here" chatter — SSDP/UPnP, mDNS/Bonjour,
+NetBIOS, LLMNR. Those events are noise: no audit policy cares about
+them and they crowd the dashboard's Network Traffic page with churn
+that makes it harder to spot real connections.
+
+openZro ships a **default skip list** the client applies before
+queueing events for management. The defaults target the universally
+"discovery noise" UDP ports — anything an enterprise VPN almost
+certainly does not want logged:
+
+| Port | Protocol | Service                           |
+|------|----------|-----------------------------------|
+| 137  | UDP      | NetBIOS Name Service              |
+| 138  | UDP      | NetBIOS Datagram Service          |
+| 1900 | UDP      | SSDP / UPnP                       |
+| 5353 | UDP      | mDNS (Bonjour, Avahi)             |
+| 5355 | UDP      | LLMNR                             |
+
+DNS (53), DHCP (67/68), NTP (123) and SIP (5060) deliberately stay
+**off** the default list — those are real connections an audit might
+want to see; turn them off explicitly via the operator override
+below if your environment doesn't need them.
+
+### Operator overrides
+
+Two account-level toggles, exposed under
+`PUT /api/accounts/{id}` → `settings.extra` and rolled out to every
+peer on the next Sync:
+
+- **`network_traffic_disable_default_port_filter`** (boolean,
+  default `false`) — flips the built-in skip list **off**. Use this
+  when you actually want discovery traffic captured (incident
+  response into a compromised IoT segment, threat hunt, etc).
+
+- **`network_traffic_excluded_ports`** (array of `{port, protocol}`)
+  — extra `(port, protocol)` pairs to drop on top of the built-in
+  list (or **instead of** it when default-filter is disabled).
+  `protocol` is `"tcp"`, `"udp"`, `"any"` or `""` (matches both).
+  Useful for environments with internal heartbeats, custom
+  multicast, or app-specific service-discovery traffic on
+  non-IANA ports.
+
+Example — keep the defaults and additionally drop a custom heartbeat
+on TCP/8500:
+
+```bash
+curl -X PUT https://mgmt.example.com/api/accounts/$ACCOUNT_ID \
+  -H "Authorization: Token $PAT" -H "Content-Type: application/json" \
+  -d '{
+    "settings": {
+      "peer_login_expiration_enabled": true,
+      "peer_login_expiration": 86400,
+      "peer_inactivity_expiration_enabled": false,
+      "peer_inactivity_expiration": 0,
+      "regular_users_view_blocked": false,
+      "extra": {
+        "peer_approval_enabled": false,
+        "network_traffic_logs_enabled": true,
+        "network_traffic_packet_counter_enabled": false,
+        "network_traffic_excluded_ports": [
+          {"port": 8500, "protocol": "tcp"}
+        ]
+      }
+    }
+  }'
+```
+
+The filter runs on the peer, before the event reaches the gRPC send
+queue — excluded events never spend client CPU, never use uplink
+bandwidth, and never touch the management process. The cost of an
+overzealous filter is real: trim the noise, leave the audit-relevant
+ports alone.
+
 ## Related
 
 - [Traffic Events Logging](/manage/activity/traffic-events-logging) —
