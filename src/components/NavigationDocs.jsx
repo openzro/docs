@@ -522,6 +522,10 @@ export const docsNavigation = [
                 href: '/selfhosted/maintenance/scaling/set-up-external-relays',
               },
               {
+                title: 'Multi-region Relays & Locality',
+                href: '/selfhosted/maintenance/scaling/multi-region-relays',
+              },
+              {
                 title: 'Migrate SQLite to PostgreSQL',
                 href: '/selfhosted/maintenance/scaling/migrate-sqlite-to-postgresql',
               },

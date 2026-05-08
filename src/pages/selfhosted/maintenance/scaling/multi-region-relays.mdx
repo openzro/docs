@@ -1,0 +1,226 @@
+# Multi-region relays and locality-based routing
+
+import {Note, Warning} from "@/components/mdx";
+
+Once your fleet outgrows a single region — peers in São Paulo, peers in
+Frankfurt, peers in Singapore — a single relay placed in one corner of
+the world becomes the latency tax everybody pays. Multi-region relays
+fix that, but the way openZro picks between them has nuances every
+operator should know before deploying.
+
+This guide covers:
+
+- What the relay does (so you know when to add more)
+- How the client chooses between configured relays
+- The "sticky picker" behaviour and its operational implications
+- A recommended bring-up order for adding regional relays without
+  disrupting an existing fleet
+
+For the basic "deploy one external relay" walkthrough, see the
+[Set Up External Relay Servers](./set-up-external-relays) page first
+— this guide assumes you already have at least one working relay and
+want to add more in different geographies.
+
+## What the relay does (and doesn't)
+
+The relay is **only used when peers can't establish a direct WireGuard
+session**. Most peer-to-peer flows in a healthy openZro mesh are P2P
+direct: ICE candidates negotiated through the signal server, NAT
+punching does the rest, and traffic flows host-to-host with no relay
+in the path.
+
+The relay enters the picture when:
+
+- Both peers sit behind symmetric NAT (no punching possible)
+- Corporate firewall outbound only (often blocks UDP entirely)
+- Network conditions prevent direct UDP between peers (rare, but
+  common on flight Wi-Fi, hotel networks, etc.)
+
+When that happens, both peers send their traffic to a relay
+they've connected to, and the relay forwards bytes between them.
+**Each peer connects to ONE relay (the home relay)**; if peer A's
+home relay differs from peer B's home relay, the peers exchange
+traffic via [foreign-relay
+dialing](https://github.com/openzro/openzro/blob/main/relay/client/dialer/ws/ws.go),
+which means the path is:
+
+```
+peer A  ──>  home relay A  ──>  home relay B  ──>  peer B
+```
+
+Two relay hops. Bandwidth and latency stack — which is exactly
+what you don't want for a peer in São Paulo talking to a peer
+in São Paulo, both forced through a relay in Iowa.
+
+## How the client picks a relay
+
+The management distributes a list of relay URLs to every peer via the
+Sync stream. At session start, the openZro client opens TCP
+connections in **parallel** to every configured relay (up to 7) and
+keeps the **first one that completes the TLS handshake**:
+
+```
+peer in SP → relay-us:    300 ms (TLS done)
+peer in SP → relay-br:     30 ms (TLS done first → WIN)
+peer in SP → relay-eu:    420 ms (TLS done)
+```
+
+Race-to-first-handshake. Closer relay typically wins because TCP +
+TLS round-trips are RTT-bound. **No manual region pinning** — the
+client picks the lowest-RTT relay automatically.
+
+This works well when:
+
+- Relays serve roughly the regions where peers are concentrated
+  (one per major region: NA, EU, SA, APAC)
+- Relays expose realistic public addresses that don't get
+  re-routed through corporate proxies (more on this below)
+- Relays handshake fast — bloated cert chains or slow TLS
+  termination skews the race
+
+It works poorly when:
+
+- A peer's outbound is intercepted by a corporate proxy (Netskope,
+  Zscaler, etc.) that funnels TLS to the proxy's POP first; the
+  picker then sees latencies as `peer → POP → relay` instead of
+  the geographic line. Symptom: peer in SP, POP in US, picker
+  picks the US relay because the SP relay roundtrip *through the
+  US POP* is longer than the US relay roundtrip *also through the
+  US POP*.
+
+The fix for proxy-distorted picking is on the proxy side: ask the
+operator to bypass the openZro process (or the relay hostnames /
+IPs) so traffic exits direct.
+
+## The sticky picker: planning your relay rollout
+
+The picker runs **once** at daemon start. The relay choice is
+durable until either:
+
+1. The daemon restarts (full re-pick on next boot)
+2. The TCP connection to the chosen relay actually drops AND the
+   URL was removed from the management's distribution list
+
+Network blips, mgmt restarts, signal disconnects — none of these
+trigger a re-pick. The
+[Guard](https://github.com/openzro/openzro/blob/main/relay/client/guard.go)
+tries to reconnect to the **same** relay first.
+
+This sticky behaviour is intentional (avoids fragmenting in-flight
+peer-to-peer relayed connections every time the network blinks),
+but it means **adding a closer relay does not migrate existing
+peers automatically.** A peer that picked the US relay when no SA
+relay existed will keep using the US relay even after you bring a
+new SA relay online — until that peer's daemon is restarted.
+
+### Recommended bring-up order
+
+When introducing a regional relay to an existing fleet, plan the
+sequence so the picker race actually fires for the peers that
+should benefit:
+
+1. **Provision the new relay**, verify its TLS handshake works
+   from a test client in the target region (`openssl s_client` +
+   `curl -I` against `/relay`). Confirm the cert SAN list covers
+   any cluster-headless DNS names you publish (peers may connect
+   via a DNS that round-robins to the actual relay IPs; the cert
+   needs both the per-host name AND the cluster name).
+2. **Add the new relay to `management.relay.addresses`** alongside
+   the existing entries. Pushing this through the management
+   triggers a Sync update; peers learn about the new URL but stay
+   on whatever they already picked.
+3. **Restart the openzro daemon on peers that should re-pick** —
+   typically every routing peer in the target region, plus the
+   workstations of users physically in that region. A rolling
+   `systemctl restart openzro` works; the WireGuard peer
+   identity is unchanged so other peers see no churn beyond a
+   brief reconnect.
+4. **Validate** with `openzro status --detail` on a sample peer:
+   the `Relay server address` field should show the new URL.
+   Cross-region peers (e.g. a US peer) should still show the US
+   relay — the picker's regional preference is observable here.
+
+Step 3 is the easy-to-miss one. Without it, the new relay sits
+underutilised and operators wonder why latency didn't drop.
+
+## Cluster-headless naming for HA per region
+
+If you run more than one relay process per region (for HA), publish
+a single multi-A DNS record that resolves to every relay's public
+IP, and put THAT name in `management.relay.addresses`:
+
+```
+relay-cluster-br.example.com.  IN A  34.95.249.1
+relay-cluster-br.example.com.  IN A  34.95.135.229
+```
+
+Peers connecting to `relay-cluster-br.example.com` round-robin
+between the two via DNS. Within the cluster, the relays use the
+[ADR-0014 fabric](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md)
+to forward peer state across pods, so a peer connected to relay
+node 1 can reach a peer connected to relay node 2 without going
+through a foreign relay hop.
+
+For this to work, **every relay's TLS cert needs both names as
+SANs**:
+
+- The per-host FQDN (`relay-br-1.example.com`) — for direct
+  connections, log lines, operator clarity
+- The cluster headless name (`relay-cluster-br.example.com`) —
+  what the management distributes to peers
+
+A cert with only the per-host SAN will fail TLS validation when a
+peer connects via the cluster headless name, picker quietly drops
+that relay from consideration, and the peer falls back to a more
+distant relay. With certbot, this is a single
+`-d <per-host> -d <cluster-headless>` invocation.
+
+## Validating from the operator's seat
+
+Periodic spot-checks worth scripting:
+
+```bash
+# What relay is each peer using right now?
+sudo openzro status --detail | grep -E "FQDN|Relay server address"
+
+# Cluster-headless DNS publishes all members?
+dig +short relay-cluster-br.example.com
+
+# Cert SANs cover both the per-host and cluster names?
+echo | openssl s_client \
+    -connect relay-cluster-br.example.com:443 \
+    -servername relay-cluster-br.example.com 2>/dev/null \
+  | openssl x509 -noout -ext subjectAltName
+```
+
+If any of these surfaces a surprise, it's better to find out
+during a routine check than during an incident.
+
+## Limitations to be aware of
+
+- **No latency-based re-pick today.** A peer that picked sub-
+  optimally at boot stays sub-optimal until it restarts. Tracked
+  upstream as
+  [issue #15](https://github.com/openzro/openzro/issues/15) —
+  proposed feature is periodic re-evaluation gated by a hysteresis
+  threshold, default off.
+- **Cross-region foreign-relay dialing adds two relay hops.**
+  Two peers in regions without a shared relay double-hop. The
+  picker doesn't know about peer B when it picks peer A's home
+  relay; you can't optimise this case purely with picker logic.
+  Workaround is to ensure each region's peers keep traffic
+  in-region (P2P direct + same-relay fallback).
+- **Proxy intermediaries break locality assumptions.** A
+  corporate egress proxy that homes traffic to one POP makes
+  every relay look equidistant from the peer's perspective.
+  Not solvable in openZro alone — needs a proxy bypass for the
+  daemon process or destination hostnames.
+
+## Related
+
+- [Set Up External Relay Servers](./set-up-external-relays) —
+  the per-relay deployment walkthrough
+- [Scaling Your Self-Hosted Deployment](./scaling-your-self-hosted-deployment) —
+  the parent doc this slots into
+- [ADR-0014: Coordinated multi-pod relay](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md) —
+  the cluster fabric internals
