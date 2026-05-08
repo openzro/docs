@@ -11,14 +11,35 @@ This guide outlines the steps to configure Management with the GeoLite2 database
 ## Downloading the databases
 
 Upon openZro Application startup, our management checks if the GeoLite2 databases exist in its data directory. If not present, the
-databases will be downloaded from the following URLs:
+databases will be downloaded from the [`openzro/geolocation-dbs`](https://github.com/openzro/geolocation-dbs) mirror:
 
-- GeoLite2 City Database: [Download Link](https://github.com/openzro/openzro/releases/latest)
-- GeoLite2 City Database (SHA256): [Download Link](https://github.com/openzro/openzro/releases/latest)
-- GeoLite2 City CSV Database: [Download Link](https://github.com/openzro/openzro/releases/latest)
-- GeoLite2 City CSV Database (SHA256): [Download Link](https://github.com/openzro/openzro/releases/latest)
+- GeoLite2 City Database: [Download Link](https://github.com/openzro/geolocation-dbs/releases/latest/download/GeoLite2-City.tar.gz)
+- GeoLite2 City Database (SHA256): [Download Link](https://github.com/openzro/geolocation-dbs/releases/latest/download/GeoLite2-City.tar.gz.sha256)
+- GeoLite2 City CSV Database: [Download Link](https://github.com/openzro/geolocation-dbs/releases/latest/download/GeoLite2-City-CSV.zip)
+- GeoLite2 City CSV Database (SHA256): [Download Link](https://github.com/openzro/geolocation-dbs/releases/latest/download/GeoLite2-City-CSV.zip.sha256)
 
 After downloading, the management system prepares the databases for use. If the databases already exist, the system will load and utilize the existing ones.
+
+### Bypassing the openZro mirror
+
+Operators with stricter compliance requirements ("no third-party
+mirrors") can pass a MaxMind GeoLite2 license key, in which case the
+management server fetches the archives directly from
+`download.maxmind.com` and the openZro mirror is never contacted:
+
+```bash
+# Sign up for a free key at https://www.maxmind.com/en/geolite2/signup
+openzro-mgmt --maxmind-license-key="$MAXMIND_LICENSE_KEY"
+```
+
+Or via the combined config file:
+
+```yaml
+maxmindLicenseKey: "<your-key-here>"
+```
+
+Either path produces the same on-disk database; only the source
+endpoint differs.
 
 ## Updating the GeoLite2 Database
 
@@ -64,14 +85,12 @@ admins don't fall into the "empty dropdown" trap.
 
 ## Troubleshooting: GeoLite2 download fails in restricted networks
 
-In some network environments, the automatic download of the GeoLite2 database from `github.com/openzro/openzro/releases` may fail.
+In some network environments, the automatic download of the GeoLite2 database from `github.com/openzro/geolocation-dbs` may fail.
 This commonly happens when:
 
 - Corporate firewalls perform **deep packet inspection (DPI)**, intercepting HTTPS traffic and re-signing certificates with internal certificate authorities. The management server cannot verify these intercepted certificates, causing TLS errors during the download.
-- Outbound access to `github.com/openzro/openzro/releases` is **blocked by firewall rules** or proxy restrictions.
+- Outbound access to `github.com` (or its release-asset CDN, `objects.githubusercontent.com`) is **blocked by firewall rules** or proxy restrictions.
 - The server has **no internet access** at all (air-gapped environments).
-
-See [openzro/openzro#5216](https://github.com/openzro/openzro/pull/5216) for more context on this issue.
 
 If you are affected, you can manually provide the GeoLite2 database file instead of relying on the automatic download:
 
