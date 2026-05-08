@@ -35,6 +35,7 @@ Roles wrap the native packages and add the operational glue:
 | `openzro_management` | Installs `openzro-management`, renders `/etc/openzro/management.json`, wires Postgres/SQLite, OIDC, cluster coordinator |
 | `openzro_signal` | Installs `openzro-signal`, env file, systemd |
 | `openzro_relay` | Installs `openzro-relay`, exposed-address config |
+| `openzro_routing_peer` | Installs the `openzro` client as a routing peer (subnet gateway / exit node) — runs `openzro up` with a vault-encrypted setup key, sets v4/v6 forwarding sysctls. Exposed CIDRs are configured at the management side via Network Resources |
 | `openzro_dashboard` | Container today (apt package on the openZro roadmap) |
 | `openzro_nginx` | Reverse proxy + TLS (certbot HTTP-01 / DNS-01 / BYO / self-signed) |
 | `openzro_nats_cluster` | Optional standalone NATS for HA management coordinator |
@@ -50,6 +51,10 @@ Playbooks under `playbooks/`:
 - **`management.yml`** / **`signal.yml`** / **`relay.yml`** /
   **`dashboard.yml`** — per-component, useful for component-specific
   upgrades or splitting deployments
+- **`routing_peer.yml`** — provisions one or more routing peers
+  (subnet gateways / exit nodes) into an existing mesh. Targets
+  hosts grouped under `routing_peers` in inventory; safe to run
+  against an arbitrary number of replicas in different regions
 
 ## Section contents
 
@@ -72,11 +77,6 @@ blockers but worth knowing before you commit:
 - **`openzro_redis_cluster` ships as master/replica with manual
   promotion** — no Sentinel-based auto-failover. For real HA Redis
   use a managed service (Elasticache, Memorystore).
-- **`openzro_routing_peer` not yet shipped.** Routing peers
-  (gateways, exit nodes) are tracked on the
-  [roadmap](https://github.com/openzro/openzro/blob/main/docs/ROADMAP.md);
-  for K8s, the [operator's](/selfhosted/operator/crds) `OZRoutingPeer`
-  CRD covers this case today.
 
 <Note>
 The Ansible flow targets the same production-shape as the Helm
