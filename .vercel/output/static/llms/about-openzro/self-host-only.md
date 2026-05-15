@@ -1,0 +1,116 @@
+# Why self-host only
+
+Source: https://docs.netbird.io/about-openzro/self-host-only
+
+---
+
+# Why self-host only
+
+openZro is a self-host BSD-3 fork of NetBird, taken at the last
+pre-AGPL upstream commit (`v0.52.2`). There is no openZro
+"cloud", no managed tier, no `app.openzro.io`. Every binary lives
+on [GitHub Releases](https://github.com/openzro/openzro/releases);
+every dashboard is the operator's own.
+
+This page explains *why* — for engineers evaluating openZro
+alongside the NetBird Cloud product, or operators trying to
+predict whether the project's posture might change.
+
+## License posture
+
+openZro the project is committed to BSD-3-Clause **forever**.
+That commitment is operational, not aspirational:
+
+- The fork-point (`v0.52.2`) is the last upstream commit before
+  NetBird relicensed the main repo to AGPLv3.
+- Code from `netbirdio/netbird` post-`v0.53.0` is **never**
+  copied, paraphrased, or translated into openZro. Security
+  backports for advisories that affect the fork are
+  re-implemented clean-room from the public CVE / GHSA prose,
+  with the commit message documenting the public sources used
+  and confirming no AGPL diff was consulted.
+- All `LICENSE` and `AUTHORS` files (root, `dashboard/`,
+  `signal/dispatcher/`, the docs site) are preserved verbatim.
+  Upstream contributors keep their attribution.
+
+This document is not legal advice — but the posture is plain:
+the binary you ship from `make build` is BSD-3-licensed.
+
+See [ADR-0001](https://github.com/openzro/openzro/blob/main/docs/adr/0001-openzro-foundation.md)
+for the long-form rationale.
+
+## Why no managed cloud
+
+A managed cloud would mean three things openZro chooses not to
+take on:
+
+- **A control plane the project operates on behalf of users.**
+  That requires SOC2, ISO 27001, DPAs, billing, on-call
+  rotations, fraud, abuse, GDPR responses, sub-processor
+  reviews. Each is a real responsibility, not a checkbox.
+- **A commercial counterparty for users.** Self-host operators
+  are responsible for their own compliance posture (Bacen,
+  HIPAA, FedRAMP, GDPR, etc.); a managed cloud changes that
+  contract.
+- **A fork point that drifts from upstream.** A managed product
+  hardens features (billing, multi-tenancy isolation, fraud
+  detection) that wouldn't exist in upstream. Maintaining both
+  flavors compounds maintenance forever.
+
+Self-host fits a tighter scope: ship a clean BSD-3 build of the
+mesh + management + dashboard, and let operators run it inside
+their own boundary of trust.
+
+## What "self-host only" means in practice
+
+- **Binaries** live on [GitHub Releases](https://github.com/openzro/openzro/releases).
+  No `pkgs.openzro.io`, no `download.openzro.io` — those hostnames
+  do not exist for the project. The
+  [installation pages](/get-started/install) point operators at
+  Releases.
+- **Dashboard** runs at the operator's own URL — it is part of
+  the management binary, not a hosted property. Documentation
+  uses `https://your-management.example.com` as a placeholder
+  whenever a dashboard URL appears.
+- **Identity Providers** are operator-supplied — Okta, Microsoft
+  Entra, Auth0, Zitadel, Keycloak, Authentik, JumpCloud, Google
+  Workspace are all integrated as
+  [self-host identity providers](/selfhosted/identity-providers).
+  No "openZro account" exists.
+- **Updates** are self-applied. A new release lands on GitHub;
+  the operator decides when to roll forward. The version
+  notification in the management server log points at GitHub
+  Releases, not a hosted update channel.
+- **Telemetry / analytics** in the docs site are off by default
+  in a fresh deploy. To enable, set
+  `NEXT_PUBLIC_MATOMO_CONTAINER_URL` or
+  `NEXT_PUBLIC_GTM_ID` at build time with your own IDs. The
+  upstream's hardcoded NetBird container IDs were removed in
+  the visual rebrand.
+
+## What this means for compliance
+
+The compliance posture follows operator boundary, not project
+boundary:
+
+- Bacen / DORA / NYDFS / PCI-DSS / SOC2 / ISO27001 — all of
+  these regimes apply to whoever **runs** the management
+  server. The project provides the controls (Device Admission,
+  audit log, encryption, policy gating, posture checks); the
+  operator wears them.
+- See [Bacen 4.893 → openZro](/compliance/bacen-4893) for the
+  per-control mapping in the Brazilian fintech context.
+
+## Forks of forks
+
+The BSD-3-Clause license explicitly grants the right to fork.
+You can:
+
+- Maintain a private fork with proprietary additions, as long
+  as you preserve the openZro / NetBird `LICENSE` and `AUTHORS`
+  attributions.
+- Contribute changes back via GitHub PR.
+- Stand up a managed product based on openZro — the license
+  permits commercial redistribution. Coordinate with the
+  project (open a Discussion) so the rebrand and trademark
+  posture are clean.

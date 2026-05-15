@@ -1,0 +1,70 @@
+# Report bugs and issues
+
+Source: https://docs.netbird.io/help/report-bug-issues
+
+---
+
+# Report bugs and issues
+openZro offers different ways to report bugs and issues. For prompt and effective assistance, please provide detailed information as outlined in our bug/issue [reporting template](#reporting-template).
+
+For cloud users, you can report bugs and issues via email by sending an email to [support@openzro.io](mailto:support@openzro.io), via [Github issues](https://github.com/openzro/openzro/issues/new/choose) or by joining our [Slack Channel](/slack-url).
+
+For on-premise users, you can report bugs and issues via [Github issues](https://github.com/openzro/openzro/issues/new/choose) or by joining our [Slack Channel](/slack-url).
+
+## Reporting Template
+When reporting bugs and issues, please ensure you provide the following information:
+
+**Describe the problem**
+
+A clear and concise description of what the problem is.
+
+**To Reproduce**
+
+Steps to reproduce the behavior:
+1. Go to '...'
+2. Click on '....'
+3. Scroll down to '....'
+4. See error
+
+**Have you performed any debugging steps?**
+Learn more at [troubleshooting guide](/help/troubleshooting-client)
+
+**Expected behavior**
+
+A clear and concise description of what you expected to happen.
+
+**Are you using openZro Cloud?**
+
+Please specify whether you use openZro Cloud or self-host openZro's control plane.
+
+**openZro version**
+
+`openzro version`
+
+**Is any other VPN software installed?**
+
+If yes, which one?
+
+**Debug output**
+
+To help us resolve the problem, please attach the following anonymized status output
+
+  openzro status -d
+
+Create and upload a debug bundle, and share the returned file key:
+
+  openzro debug for 1m -S -U
+
+*Uploaded files are automatically deleted after 30 days.*
+
+Alternatively, create the file only and attach it here manually:
+
+  openzro debug for 1m -S
+
+**Screenshots**
+
+If applicable, add screenshots to help explain your problem.
+
+**Additional context**
+
+Add any other context about the problem here.

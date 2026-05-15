@@ -1,0 +1,891 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Self-Hosted Deployment Configuration Files Reference - openZro Docs</title><meta name="description" data-next-head=""/><link rel="icon" type="image/svg+xml" href="/docs-static/img/openzro-icon.svg"/><link rel="icon" type="image/x-icon" href="/docs-static/img/favicon.ico"/><link rel="apple-touch-icon" href="/docs-static/img/apple-touch-icon.png"/><link rel="preload" href="/_next/static/css/5b227bfd76e92c43.css" as="style"/><style data-next-head="">:root, :host {
+  --fa-font-solid: normal 900 1em/1 "Font Awesome 6 Free";
+  --fa-font-regular: normal 400 1em/1 "Font Awesome 6 Free";
+  --fa-font-light: normal 300 1em/1 "Font Awesome 6 Pro";
+  --fa-font-thin: normal 100 1em/1 "Font Awesome 6 Pro";
+  --fa-font-duotone: normal 900 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-regular: normal 400 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-light: normal 300 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-thin: normal 100 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-brands: normal 400 1em/1 "Font Awesome 6 Brands";
+  --fa-font-sharp-solid: normal 900 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-regular: normal 400 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-light: normal 300 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-thin: normal 100 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-duotone-solid: normal 900 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-regular: normal 400 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-light: normal 300 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-thin: normal 100 1em/1 "Font Awesome 6 Sharp Duotone";
+}
+
+svg:not(:root).svg-inline--fa, svg:not(:host).svg-inline--fa {
+  overflow: visible;
+  box-sizing: content-box;
+}
+
+.svg-inline--fa {
+  display: var(--fa-display, inline-block);
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+.svg-inline--fa.fa-2xs {
+  vertical-align: 0.1em;
+}
+.svg-inline--fa.fa-xs {
+  vertical-align: 0em;
+}
+.svg-inline--fa.fa-sm {
+  vertical-align: -0.0714285705em;
+}
+.svg-inline--fa.fa-lg {
+  vertical-align: -0.2em;
+}
+.svg-inline--fa.fa-xl {
+  vertical-align: -0.25em;
+}
+.svg-inline--fa.fa-2xl {
+  vertical-align: -0.3125em;
+}
+.svg-inline--fa.fa-pull-left {
+  margin-right: var(--fa-pull-margin, 0.3em);
+  width: auto;
+}
+.svg-inline--fa.fa-pull-right {
+  margin-left: var(--fa-pull-margin, 0.3em);
+  width: auto;
+}
+.svg-inline--fa.fa-li {
+  width: var(--fa-li-width, 2em);
+  top: 0.25em;
+}
+.svg-inline--fa.fa-fw {
+  width: var(--fa-fw-width, 1.25em);
+}
+
+.fa-layers svg.svg-inline--fa {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.fa-layers-counter, .fa-layers-text {
+  display: inline-block;
+  position: absolute;
+  text-align: center;
+}
+
+.fa-layers {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  text-align: center;
+  vertical-align: -0.125em;
+  width: 1em;
+}
+.fa-layers svg.svg-inline--fa {
+  transform-origin: center center;
+}
+
+.fa-layers-text {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+.fa-layers-counter {
+  background-color: var(--fa-counter-background-color, #ff253a);
+  border-radius: var(--fa-counter-border-radius, 1em);
+  box-sizing: border-box;
+  color: var(--fa-inverse, #fff);
+  line-height: var(--fa-counter-line-height, 1);
+  max-width: var(--fa-counter-max-width, 5em);
+  min-width: var(--fa-counter-min-width, 1.5em);
+  overflow: hidden;
+  padding: var(--fa-counter-padding, 0.25em 0.5em);
+  right: var(--fa-right, 0);
+  text-overflow: ellipsis;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-counter-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-bottom-right {
+  bottom: var(--fa-bottom, 0);
+  right: var(--fa-right, 0);
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom right;
+}
+
+.fa-layers-bottom-left {
+  bottom: var(--fa-bottom, 0);
+  left: var(--fa-left, 0);
+  right: auto;
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom left;
+}
+
+.fa-layers-top-right {
+  top: var(--fa-top, 0);
+  right: var(--fa-right, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-top-left {
+  left: var(--fa-left, 0);
+  right: auto;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top left;
+}
+
+.fa-1x {
+  font-size: 1em;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-6x {
+  font-size: 6em;
+}
+
+.fa-7x {
+  font-size: 7em;
+}
+
+.fa-8x {
+  font-size: 8em;
+}
+
+.fa-9x {
+  font-size: 9em;
+}
+
+.fa-10x {
+  font-size: 10em;
+}
+
+.fa-2xs {
+  font-size: 0.625em;
+  line-height: 0.1em;
+  vertical-align: 0.225em;
+}
+
+.fa-xs {
+  font-size: 0.75em;
+  line-height: 0.0833333337em;
+  vertical-align: 0.125em;
+}
+
+.fa-sm {
+  font-size: 0.875em;
+  line-height: 0.0714285718em;
+  vertical-align: 0.0535714295em;
+}
+
+.fa-lg {
+  font-size: 1.25em;
+  line-height: 0.05em;
+  vertical-align: -0.075em;
+}
+
+.fa-xl {
+  font-size: 1.5em;
+  line-height: 0.0416666682em;
+  vertical-align: -0.125em;
+}
+
+.fa-2xl {
+  font-size: 2em;
+  line-height: 0.03125em;
+  vertical-align: -0.1875em;
+}
+
+.fa-fw {
+  text-align: center;
+  width: 1.25em;
+}
+
+.fa-ul {
+  list-style-type: none;
+  margin-left: var(--fa-li-margin, 2.5em);
+  padding-left: 0;
+}
+.fa-ul > li {
+  position: relative;
+}
+
+.fa-li {
+  left: calc(-1 * var(--fa-li-width, 2em));
+  position: absolute;
+  text-align: center;
+  width: var(--fa-li-width, 2em);
+  line-height: inherit;
+}
+
+.fa-border {
+  border-color: var(--fa-border-color, #eee);
+  border-radius: var(--fa-border-radius, 0.1em);
+  border-style: var(--fa-border-style, solid);
+  border-width: var(--fa-border-width, 0.08em);
+  padding: var(--fa-border-padding, 0.2em 0.25em 0.15em);
+}
+
+.fa-pull-left {
+  float: left;
+  margin-right: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-pull-right {
+  float: right;
+  margin-left: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-beat {
+  animation-name: fa-beat;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-bounce {
+  animation-name: fa-bounce;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1));
+}
+
+.fa-fade {
+  animation-name: fa-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-beat-fade {
+  animation-name: fa-beat-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-flip {
+  animation-name: fa-flip;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-shake {
+  animation-name: fa-shake;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin {
+  animation-name: fa-spin;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 2s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin-reverse {
+  --fa-animation-direction: reverse;
+}
+
+.fa-pulse,
+.fa-spin-pulse {
+  animation-name: fa-spin;
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, steps(8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat,
+.fa-bounce,
+.fa-fade,
+.fa-beat-fade,
+.fa-flip,
+.fa-pulse,
+.fa-shake,
+.fa-spin,
+.fa-spin-pulse {
+    animation-delay: -1ms;
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+    transition-delay: 0s;
+    transition-duration: 0s;
+  }
+}
+@keyframes fa-beat {
+  0%, 90% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+@keyframes fa-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0);
+  }
+  30% {
+    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em));
+  }
+  50% {
+    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0);
+  }
+  57% {
+    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em));
+  }
+  64% {
+    transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+@keyframes fa-fade {
+  50% {
+    opacity: var(--fa-fade-opacity, 0.4);
+  }
+}
+@keyframes fa-beat-fade {
+  0%, 100% {
+    opacity: var(--fa-beat-fade-opacity, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(var(--fa-beat-fade-scale, 1.125));
+  }
+}
+@keyframes fa-flip {
+  50% {
+    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg));
+  }
+}
+@keyframes fa-shake {
+  0% {
+    transform: rotate(-15deg);
+  }
+  4% {
+    transform: rotate(15deg);
+  }
+  8%, 24% {
+    transform: rotate(-18deg);
+  }
+  12%, 28% {
+    transform: rotate(18deg);
+  }
+  16% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(22deg);
+  }
+  32% {
+    transform: rotate(-12deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  40%, 100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.fa-rotate-270 {
+  transform: rotate(270deg);
+}
+
+.fa-flip-horizontal {
+  transform: scale(-1, 1);
+}
+
+.fa-flip-vertical {
+  transform: scale(1, -1);
+}
+
+.fa-flip-both,
+.fa-flip-horizontal.fa-flip-vertical {
+  transform: scale(-1, -1);
+}
+
+.fa-rotate-by {
+  transform: rotate(var(--fa-rotate-angle, 0));
+}
+
+.fa-stack {
+  display: inline-block;
+  vertical-align: middle;
+  height: 2em;
+  position: relative;
+  width: 2.5em;
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: var(--fa-stack-z-index, auto);
+}
+
+.svg-inline--fa.fa-stack-1x {
+  height: 1em;
+  width: 1.25em;
+}
+.svg-inline--fa.fa-stack-2x {
+  height: 2em;
+  width: 2.5em;
+}
+
+.fa-inverse {
+  color: var(--fa-inverse, #fff);
+}
+
+.sr-only,
+.fa-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:not(:focus),
+.fa-sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.svg-inline--fa .fa-primary {
+  fill: var(--fa-primary-color, currentColor);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa .fa-secondary {
+  fill: var(--fa-secondary-color, currentColor);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-primary {
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-secondary {
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa mask .fa-primary,
+.svg-inline--fa mask .fa-secondary {
+  fill: black;
+}</style><script>
+  let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+  updateMode()
+  darkModeMediaQuery.addEventListener('change', updateModeWithoutTransitions)
+  window.addEventListener('storage', updateModeWithoutTransitions)
+
+  function updateMode() {
+    let isSystemDarkMode = darkModeMediaQuery.matches
+    let isDarkMode = window.localStorage.isDarkMode === 'true' || (!('isDarkMode' in window.localStorage) && isSystemDarkMode)
+
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+
+    if (isDarkMode === isSystemDarkMode) {
+      delete window.localStorage.isDarkMode
+    }
+  }
+
+  function disableTransitionsTemporarily() {
+    document.documentElement.classList.add('[&_*]:!transition-none')
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('[&_*]:!transition-none')
+    }, 0)
+  }
+
+  function updateModeWithoutTransitions() {
+    disableTransitionsTemporarily()
+    updateMode()
+  }
+</script><link rel="stylesheet" href="/_next/static/css/5b227bfd76e92c43.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-345555e3c489773c.js" defer=""></script><script src="/_next/static/chunks/framework-34a8c4228d7fd161.js" defer=""></script><script src="/_next/static/chunks/main-c502755b4d857e5f.js" defer=""></script><script src="/_next/static/chunks/pages/_app-43bbbd7999c053e8.js" defer=""></script><script src="/_next/static/chunks/pages/selfhosted/configuration-files-abd23776edd4546b.js" defer=""></script><script src="/_next/static/h-OXItx1RfkS1sxjBXlaK/_buildManifest.js" defer=""></script><script src="/_next/static/h-OXItx1RfkS1sxjBXlaK/_ssgManifest.js" defer=""></script></head><body class="bg-white antialiased dark:bg-[#181A1D]"><link rel="preload" as="image" href="/docs-static/img/logo/openzro-icon.svg"/><div id="__next"><div class="absolute inset-0 -z-10 mx-0 max-w-none overflow-hidden"><div class="absolute inset-0 hidden dark:block z-0" style="background-color:#181A1D"><svg aria-hidden="true" class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"><defs><pattern id="_R_pm_" width="72" height="56" patternUnits="userSpaceOnUse" x="-12" y="4"><path d="M.5 56V.5H72" fill="none"></path></pattern></defs><rect width="100%" height="100%" stroke-width="0" fill="url(#_R_pm_)"></rect><svg x="-12" y="4" class="overflow-visible"><rect stroke-width="0" width="73" height="57" x="288" y="168"></rect><rect stroke-width="0" width="73" height="57" x="144" y="56"></rect><rect stroke-width="0" width="73" height="57" x="504" y="168"></rect><rect stroke-width="0" width="73" height="57" x="720" y="336"></rect></svg></svg></div><div class="absolute inset-x-0 top-0 h-[25rem] dark:[mask-image:linear-gradient(white,transparent)] pointer-events-none z-10"><svg viewBox="0 0 1113 440" preserveAspectRatio="xMidYMin slice" aria-hidden="true" class="absolute left-1/2 top-0 -translate-x-1/2 w-full min-w-[69.5625rem] h-full fill-white blur-[26px] dark:hidden"><path d="M.016 439.5s-9.5-300 434-300S882.516 20 882.516 20V0h230.004v439.5H.016Z"></path></svg></div></div><div class="relative mx-auto flex max-w-8xl sm:px-2 lg:px-8 xl:px-12 lg:ml-72 xl:ml-80" style="padding-top:0"><header class="contents lg:pointer-events-none lg:fixed lg:inset-0 lg:z-40 lg:flex" style="top:0"><div class="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:dark:border-neutral-700/50 lg:px-6 lg:pb-8 lg:pt-4 lg:bg-white/70 lg:dark:bg-[#181A1D]/95 lg:backdrop-blur-lg xl:w-80 lg:overflow-x-visible sidebar-scroll"><div class="hidden lg:flex"><a aria-label="Home" href="/"><span class="inline-flex items-center gap-2 select-none"><img src="/docs-static/img/logo/openzro-icon.svg" alt="" height="28" width="28" class="h-7 w-7"/><span class="font-semibold text-zinc-900 dark:text-white tracking-[-0.025em] leading-none text-lg" style="font-family:Geist, ui-sans-serif, system-ui, sans-serif">open<span class="font-bold text-violet-600 dark:text-violet-400">Z</span>ro</span></span></a></div><nav class="hidden lg:mt-10 lg:block"><ul role="list"><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://openzro.io/">Home</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/">Docs</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/api">API</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://openzro.io/knowledge-hub/">Learn</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://github.com/openzro/openzro">Github</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/slack-url">Support</a></li><div class="outer-wrapper-0"><li class="relative md:mt-0 mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="ABOUT" data-nb-active="0">ABOUT</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="How openZro Works" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/how-openzro-works"><span class="truncate">How openZro Works</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="openZro vs. Traditional VPN" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/openzro-vs-traditional-vpn"><span class="truncate">openZro vs. Traditional VPN</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Understanding NAT and Connectivity" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/understanding-nat-and-connectivity"><span class="truncate">Understanding NAT and Connectivity</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Why WireGuard with openZro" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/why-wireguard-with-openzro"><span class="truncate">Why WireGuard with openZro</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Browser Client Architecture" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/browser-client-architecture"><span class="truncate">Browser Client Architecture</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Why self-host only" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/self-host-only"><span class="truncate">Why self-host only</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="FAQ" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/faq"><span class="truncate">FAQ</span></a></div></li></ul></div></li></div><div class="outer-wrapper-1"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="GET STARTED" data-nb-active="0">GET STARTED</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Quickstart Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started"><span class="truncate">Quickstart Guide</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Install openZro" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started/install"><span class="truncate">Install openZro</span></a><ul role="list"><li class="relative"><div class="relative"><a data-nb-link="0" title="Linux" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/linux"><span class="truncate">Linux</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Windows" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/windows"><span class="truncate">Windows</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="MacOS" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/macos"><span class="truncate">MacOS</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Docker" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/docker"><span class="truncate">Docker</span></a></div></li></ul></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Platforms" data-nb-active="0">Platforms<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="CLI" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started/cli"><span class="truncate">CLI</span></a></div></li></ul></div></li></div><div class="outer-wrapper-2"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="MANAGE NETBIRD" data-nb-active="0">MANAGE NETBIRD</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Control Center" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/manage/control-center"><span class="truncate">Control Center</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Peers" data-nb-active="0">Peers<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Access Control" data-nb-active="0">Access Control<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Networks" data-nb-active="0">Networks<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Network Routes" data-nb-active="0">Network Routes<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Reverse Proxy" data-nb-active="0">Reverse Proxy<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="DNS" data-nb-active="0">DNS<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Team" data-nb-active="0">Team<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Activity" data-nb-active="0">Activity<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Settings" data-nb-active="0">Settings<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Integrations" data-nb-active="0">Integrations<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Public API" data-nb-active="0">Public API<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-3"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="SELF-HOST OPENZRO" data-nb-active="0">SELF-HOST OPENZRO</h2><div class="relative mt-3 pl-2"><div class="absolute inset-x-0 top-0 bg-zinc-800/2.5 will-change-transform dark:bg-white/2.5" style="border-radius:8px;height:32px;top:0;opacity:0"></div><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><div class="absolute left-2 h-6 w-px bg-violet-500" style="top:0;opacity:1"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Quickstart Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/selfhosted-quickstart"><span class="truncate">Quickstart Guide</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Maintenance" data-nb-active="1">Maintenance<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Authentication" data-nb-active="0">Authentication<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Advanced Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/selfhosted-guide"><span class="truncate">Advanced Guide</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Troubleshooting" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/troubleshooting"><span class="truncate">Troubleshooting</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Migration Guides" data-nb-active="0">Migration Guides<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-4"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="CLIENT" data-nb-active="0">CLIENT</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Profiles" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/client/profiles"><span class="truncate">Profiles</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Environment Variables" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/client/environment-variables"><span class="truncate">Environment Variables</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Settings" data-nb-active="0">Settings<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-5"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="USE CASES" data-nb-active="0">USE CASES</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Overview" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/use-cases"><span class="truncate">Overview</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Remote Access" data-nb-active="0">Remote Access<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Homelab" data-nb-active="0">Homelab<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Security" data-nb-active="0">Security<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-6"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="COMPLIANCE" data-nb-active="0">COMPLIANCE</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Overview" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/compliance"><span class="truncate">Overview</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Bacen 4.893 (Brazil)" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/compliance/bacen-4893"><span class="truncate">Bacen 4.893 (Brazil)</span></a></div></li></ul></div></li></div><div class="outer-wrapper-7"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="GET MORE HELP" data-nb-active="0">GET MORE HELP</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Troubleshooting client issues" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/help/troubleshooting-client"><span class="truncate">Troubleshooting client issues</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Report bugs and issues" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/help/report-bug-issues"><span class="truncate">Report bugs and issues</span></a></div></li></ul></div></li></div><li class="sticky bottom-0 z-10 mt-6 min-[416px]:hidden"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-900 py-1 px-3 text-white hover:bg-zinc-700 dark:bg-openzro dark:text-white dark:hover:bg-openzro-dark w-full" href="https://app.openzro.io/">Sign in</a></li></ul></nav></div><div class="fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-3 px-5 transition h-[64px] lg:left-72 lg:z-50 lg:px-8 xl:left-80 min-h-[64px] lg:pointer-events-auto backdrop-blur-lg bg-white/70 dark:bg-[#181A1D]/95 lg:left-72 xl:left-80" style="top:0"><div class="absolute inset-x-0 top-full h-px transition border-b border-transparent border-zinc-900/10 dark:border-neutral-700/50"></div><div class="hidden lg:block lg:max-w-md lg:flex-auto"><button type="button" class="hidden h-8 w-full items-center gap-2 rounded-full bg-white pl-2 pr-3 text-sm text-zinc-500 ring-1 ring-zinc-900/10 transition hover:ring-zinc-900/20 dark:bg-white/5 dark:text-zinc-400 dark:ring-inset dark:ring-white/10 dark:hover:ring-white/20 lg:flex focus:[&amp;:not(:focus-visible)]:outline-none"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"></path></svg>Search...<kbd class="ml-auto text-2xs text-zinc-400 dark:text-zinc-500"><kbd class="font-sans"></kbd><kbd class="font-sans">K</kbd></kbd></button></div><div class="flex items-center gap-2 lg:hidden"><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5" aria-label="Toggle navigation"><svg viewBox="0 0 10 9" fill="none" stroke-linecap="round" aria-hidden="true" class="w-2.5 stroke-zinc-900 dark:stroke-white"><path d="M.5 1h9M.5 8h9M.5 4.5h9"></path></svg></button><a aria-label="Home" href="/"><span class="inline-flex items-center gap-2 select-none"><img src="/docs-static/img/logo/openzro-icon.svg" alt="" height="28" width="28" class="h-7 w-7"/><span class="font-semibold text-zinc-900 dark:text-white tracking-[-0.025em] leading-none text-lg" style="font-family:Geist, ui-sans-serif, system-ui, sans-serif">open<span class="font-bold text-violet-600 dark:text-violet-400">Z</span>ro</span></span></a></div><div class="flex items-center gap-3 xl:gap-2"><nav class="hidden md:block"><ul role="list" class="flex items-center gap-3 xl:gap-2 m-0 p-0 list-none"><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="/">Docs</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="/api">API</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="https://github.com/openzro/openzro">GitHub</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="https://github.com/openzro/openzro/discussions">Support</a></li></ul></nav><div class="hidden md:block md:h-5 md:w-px md:bg-zinc-900/10 md:dark:bg-neutral-500/20"></div><div class="flex gap-2"><div class="contents lg:hidden"><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 lg:hidden focus:[&amp;:not(:focus-visible)]:outline-none" aria-label="Search..."><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-zinc-900 dark:stroke-white"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"></path></svg></button></div><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5" aria-label="Toggle dark mode"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-zinc-900 dark:hidden"><path d="M12.5 10a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"></path><path stroke-linecap="round" d="M10 5.5v-1M13.182 6.818l.707-.707M14.5 10h1M13.182 13.182l.707.707M10 15.5v-1M6.11 13.889l.708-.707M4.5 10h1M6.11 6.111l.708.707"></path></svg><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="hidden h-5 w-5 stroke-white dark:block"><path d="M15.224 11.724a5.5 5.5 0 0 1-6.949-6.949 5.5 5.5 0 1 0 6.949 6.949Z"></path></svg></button></div><div class="hidden min-[416px]:contents"><div class="relative inline-flex group transition-all"><span class="absolute h-full w-full left-0 top-0 blur-sm bg-openzro z-0 transition-all duration-200 transform-gpu opacity-0 group-hover:opacity-100 pointer-events-none"></span><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-[5px] bg-openzro text-white border-0 border-transparent duration-300 relative overflow-hidden group !py-1.5 !px-3 text-xs" target="_blank" href="https://github.com/openzro/openzro/releases/latest"><span class="absolute h-full w-full left-0 top-0 z-10 bg-gradient-to-br from-openzro to-openzro-dark transition-all duration-200 transform-gpu opacity-0 group-hover:opacity-100 pointer-events-none"></span><span class="z-20 relative flex gap-2 items-center transition-all">Get openZro</span></a></div></div></div></div></header><div class="min-w-0 max-w-2xl flex-auto px-4 py-16 lg:max-w-none lg:pl-8 lg:pr-0 xl:px-5"><main class="py-16"><article class="prose dark:prose-invert"><h1>Self-Hosted Deployment Configuration Files Reference</h1>
+<p>This page provides a comprehensive reference for all configuration files used when self-hosting openZro with the <code>getting-started.sh</code> deployment method. Understanding these files helps you customize your deployment, troubleshoot issues, and integrate with existing infrastructure.</p>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Configuration files are <strong>generated automatically</strong> by the <code>getting-started.sh</code> script. Modifying files directly is only necessary for advanced customization after initial setup.</p></div></div>
+<h2 id="overview" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#overview"><div>Overview</div></a></h2>
+<p>A standard openZro self-hosted deployment uses the following configuration files:</p>
+<table><thead><tr><th>File</th><th>Purpose</th></tr></thead><tbody><tr><td><code>docker-compose.yml</code></td><td>Defines all services (dashboard, openzro-server, optionally traefik), their Docker images, port mappings, volumes, and startup order. Structure varies depending on the reverse proxy option chosen during setup.</td></tr><tr><td><code>config.yaml</code></td><td>Unified server configuration for the combined openZro server: listen addresses, STUN, relay authentication, embedded IdP, and database settings. Replaces the old <code>management.json</code> and <code>relay.env</code> files.</td></tr><tr><td><code>dashboard.env</code></td><td>Configures the web dashboard including API endpoints, OAuth2/OIDC settings, and optional SSL settings for standalone deployments without a reverse proxy.</td></tr></tbody></table>
+<h3 id="file-locations" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#file-locations"><div>File Locations</div></a></h3>
+<p>After running the installation script, configuration files are located in the directory where you ran the script (typically <code>~/openzro/</code> or the current working directory):</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code>./
+├── docker-compose.yml
+├── config.yaml
+├── dashboard.env
+└── nginx-openzro.conf      # Only when using Nginx reverse proxy
+    npm-advanced-config.txt  # Only when using Nginx Proxy Manager
+    caddyfile-openzro.txt    # Only when using Caddy reverse proxy
+</code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<hr/>
+<h2 id="docker-compose-yml" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#docker-compose-yml"><div>docker-compose.yml</div></a></h2>
+<p>The Docker Compose file defines all openZro services, their dependencies, networking, and volumes.</p>
+<h3 id="services-overview" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#services-overview"><div>Services Overview</div></a></h3>
+<table><thead><tr><th>Service</th><th>Image</th><th>Internal Port</th><th>External (Exposed)</th><th>Description</th></tr></thead><tbody><tr><td><code>traefik</code></td><td><code>traefik:v3.6</code></td><td>80, 443</td><td>80:80, 443:443</td><td>Handles TLS termination via Let&#x27;s Encrypt and routes incoming HTTPS requests to the appropriate openZro services. Only included when using the built-in Traefik option (option 0).</td></tr><tr><td><code>dashboard</code></td><td><code>openzro/dashboard</code></td><td>80</td><td>8080:80</td><td>The web-based management console where administrators configure networks, manage peers, create access policies, and view activity logs. Includes an embedded nginx server for serving the UI.</td></tr><tr><td><code>openzro-server</code></td><td><code>openzro/openzro-server</code></td><td>80, 3478/udp</td><td>8081:80, 3478:3478/udp</td><td>Combined server that includes management, signal, relay, and embedded STUN in a single container. Configured via <code>config.yaml</code>.</td></tr></tbody></table>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p><strong>Internal vs External ports</strong>: Internal ports are what services listen on inside their containers. External (Exposed) ports show the host-to-container mapping used when running without the built-in Traefik (e.g., with Nginx or other reverse proxies). When using the default Traefik deployment, only Traefik exposes ports externally.</p></div></div>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The <code>openzro-server</code> container combines what were previously separate management, signal, relay, and STUN containers into a single service. This simplifies the deployment architecture while maintaining the same functionality.</p></div></div>
+<h3 id="traefik-service" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#traefik-service"><div>Traefik Service</div></a></h3>
+<p>The Traefik service is only present when using the built-in reverse proxy option (option 0 during setup). It handles automatic TLS certificate provisioning via Let&#x27;s Encrypt and routes requests to the correct backend services.</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">traefik</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">image</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">traefik:v3.6</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">container_name</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">openzro-traefik</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">restart</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">unless-stopped</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">networks</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> [</span><span style="color: var(--shiki-token-string)">openzro</span><span style="color: var(--shiki-color-text)">]</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">command</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--providers.docker=true&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--providers.docker.exposedbydefault=false&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--providers.docker.network=openzro&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--entrypoints.web.address=:80&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--entrypoints.websecure.address=:443&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--entrypoints.websecure.transport.respondingTimeouts.readTimeout=0&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--entrypoints.web.http.redirections.entrypoint.to=websecure&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--entrypoints.web.http.redirections.entrypoint.scheme=https&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--certificatesresolvers.letsencrypt.acme.tlschallenge=true&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&quot;--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">ports</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&#39;443:443&#39;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&#39;80:80&#39;</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">volumes</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">/var/run/docker.sock:/var/run/docker.sock:ro</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">openzro_traefik_letsencrypt:/letsencrypt</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">logging</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">driver</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;json-file&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">options</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">max-size</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;500m&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">max-file</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;2&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The <code>readTimeout=0</code> setting on the websecure entrypoint disables read timeouts, which is required for long-lived gRPC and WebSocket connections used by the signal and relay services.</p></div></div>
+<h3 id="dashboard-service" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#dashboard-service"><div>Dashboard Service</div></a></h3>
+<p><strong>With built-in Traefik (default):</strong></p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">dashboard</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">image</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">openzro/dashboard:latest</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">container_name</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">openzro-dashboard</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">restart</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">unless-stopped</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">networks</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> [</span><span style="color: var(--shiki-token-string)">openzro</span><span style="color: var(--shiki-color-text)">]</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">env_file</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">./dashboard.env</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">labels</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.enable=true</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-dashboard.rule=Host(`openzro.example.com`)</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-dashboard.entrypoints=websecure</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-dashboard.tls=true</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-dashboard.tls.certresolver=letsencrypt</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-dashboard.priority=1</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.services.openzro-dashboard.loadbalancer.server.port=80</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">logging</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">driver</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;json-file&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">options</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">max-size</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;500m&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">max-file</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;2&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The dashboard service is configured via the <code>dashboard.env</code> file. See the <a href="/selfhosted/configuration-files#dashboardenv">dashboard.env section</a> for the full list of environment variables. When using the built-in Traefik, no ports are exposed directly from the dashboard container; Traefik routes traffic to it internally via Docker labels.</p></div></div>
+<h3 id="open-zro-server-service" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#open-zro-server-service"><div>openZro Server Service</div></a></h3>
+<p>The combined server runs management, signal, relay, and STUN in a single container, configured by <code>config.yaml</code>.</p>
+<p><strong>With built-in Traefik (default):</strong></p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">openzro-server</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">image</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">openzro/openzro-server:latest</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">container_name</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">openzro-server</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">restart</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">unless-stopped</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">networks</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> [</span><span style="color: var(--shiki-token-string)">openzro</span><span style="color: var(--shiki-color-text)">]</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">ports</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&#39;3478:3478/udp&#39;</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">volumes</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">openzro_data:/var/lib/openzro</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">./config.yaml:/etc/openzro/config.yaml</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">command</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> [</span><span style="color: var(--shiki-token-string-expression)">&quot;--config&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;/etc/openzro/config.yaml&quot;</span><span style="color: var(--shiki-color-text)">]</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">labels</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.enable=true</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># gRPC router (needs h2c backend for HTTP/2 cleartext)</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># The /management.ProxyService/ path is only required if the reverse proxy</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># container (openzro/reverse-proxy) connects through Traefik — i.e., it</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># runs on a separate host or a different Docker network. If the proxy is on</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># the same Docker network as openzro-server, it connects directly and this</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># path prefix can be omitted.</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-grpc.rule=Host(`openzro.example.com`) &amp;&amp; (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-grpc.entrypoints=websecure</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-grpc.tls=true</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-grpc.tls.certresolver=letsencrypt</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-grpc.service=openzro-server-h2c</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># Backend router (relay, WebSocket, API, OAuth2)</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-backend.rule=Host(`openzro.example.com`) &amp;&amp; (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-backend.entrypoints=websecure</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-backend.tls=true</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-backend.tls.certresolver=letsencrypt</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.routers.openzro-backend.service=openzro-server</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># Services</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.services.openzro-server.loadbalancer.server.port=80</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.services.openzro-server-h2c.loadbalancer.server.port=80</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">traefik.http.services.openzro-server-h2c.loadbalancer.server.scheme=h2c</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">logging</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">driver</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;json-file&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">options</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">max-size</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;500m&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">max-file</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;2&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p><strong>With external reverse proxy (exposed ports):</strong></p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">openzro-server</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">image</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">openzro/openzro-server:latest</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">container_name</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">openzro-server</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">restart</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">unless-stopped</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">networks</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> [</span><span style="color: var(--shiki-token-string)">openzro</span><span style="color: var(--shiki-color-text)">]</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">ports</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&#39;127.0.0.1:8081:80&#39;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&#39;3478:3478/udp&#39;</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">volumes</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">openzro_data:/var/lib/openzro</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">./config.yaml:/etc/openzro/config.yaml</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">command</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> [</span><span style="color: var(--shiki-token-string-expression)">&quot;--config&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;/etc/openzro/config.yaml&quot;</span><span style="color: var(--shiki-color-text)">]</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">logging</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">driver</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;json-file&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">options</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">max-size</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;500m&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">max-file</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;2&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<h4 id="traefik-routing-labels" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#traefik-routing-labels"><div>Traefik Routing Labels</div></a></h4>
+<p>When using the built-in Traefik, the <code>openzro-server</code> service uses two routers to handle different traffic types:</p>
+<table><thead><tr><th>Router</th><th>Path Prefixes</th><th>Backend Service</th><th>Purpose</th></tr></thead><tbody><tr><td><code>openzro-grpc</code></td><td><code>/signalexchange.SignalExchange/</code>, <code>/management.ManagementService/</code>, <code>/management.ProxyService/</code></td><td><code>openzro-server-h2c</code> (h2c scheme)</td><td>gRPC traffic for signal exchange, management API, and the <a href="/manage/reverse-proxy">Reverse Proxy feature</a>. Uses HTTP/2 cleartext (h2c) backend because gRPC requires HTTP/2. The <code>/management.ProxyService/</code> path is only needed if the reverse proxy container connects through Traefik (see comment in the snippet above).</td></tr><tr><td><code>openzro-backend</code></td><td><code>/relay</code>, <code>/ws-proxy/</code>, <code>/api</code>, <code>/oauth2</code></td><td><code>openzro-server</code> (http scheme)</td><td>HTTP traffic for relay connections, WebSocket proxying, REST API, and OAuth2/OIDC endpoints.</td></tr></tbody></table>
+<p>The dashboard router has <code>priority=1</code> (lowest), so it acts as a catch-all for requests that don&#x27;t match the more specific server routes.</p>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The STUN port (3478/udp) must always be exposed publicly, regardless of reverse proxy configuration. STUN uses UDP for NAT detection and cannot be proxied through HTTP reverse proxies. The STUN server is embedded in the combined <code>openzro-server</code> container and configured via the <code>server.stunPorts</code> field in <code>config.yaml</code>.</p></div></div>
+<h3 id="volume-configuration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#volume-configuration"><div>Volume Configuration</div></a></h3>
+<table><thead><tr><th>Volume</th><th>Mount Point</th><th>Purpose</th></tr></thead><tbody><tr><td><code>openzro_data</code></td><td><code>/var/lib/openzro</code></td><td>Stores the management database (SQLite by default), encryption keys, and persistent state. Back up this volume regularly to preserve your accounts, peers, policies, and setup keys.</td></tr><tr><td><code>openzro_traefik_letsencrypt</code></td><td><code>/letsencrypt</code></td><td>Stores Traefik&#x27;s Let&#x27;s Encrypt TLS certificates. Only used when deploying with the built-in Traefik reverse proxy (option 0). Preserve this volume to maintain TLS certificates across restarts.</td></tr></tbody></table>
+<hr/>
+<h2 id="config-yaml" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#config-yaml"><div>config.yaml</div></a></h2>
+<p>The unified configuration file controls the combined openZro server. It replaces the separate <code>management.json</code> and <code>relay.env</code> files from older deployments.
+See an example <code>config.yaml</code> file in the <a href="https://github.com/openzro/openzro/blob/main/combined/config.yaml.example">openZro GitHub repository</a>.</p>
+<h3 id="complete-structure" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#complete-structure"><div>Complete Structure</div></a></h3>
+<p>Below are the main sections of the <code>config.yaml</code> file.
+See an example <code>config.yaml</code> file in the <a href="https://github.com/openzro/openzro/blob/main/combined/config.yaml.example">openZro GitHub repository</a> for a complete configuration example.</p>
+<h3 id="server-settings" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#server-settings"><div>Server Settings</div></a></h3>
+<div class="my-6"><ul role="list" class="m-0 max-w-[calc(theme(maxWidth.lg)-theme(spacing.8))] list-none divide-y divide-zinc-900/5 p-0 dark:divide-white/5"><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.listenAddress</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The address and port the combined server listens on inside the container. Default: <code>:80</code>. TLS is handled by the reverse proxy.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.exposedAddress</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The public-facing URL where peers connect to the server. Format: <code>https://hostname:port</code>. This address is distributed to peers and must be reachable from all clients.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.stunPorts</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">array</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>List of UDP ports for the embedded STUN server. Default: <code>[3478]</code>. These ports must be exposed in <code>docker-compose.yml</code> and reachable through firewalls.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.metricsPort</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">number</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Port to expose Prometheus metrics endpoint. Default: <code>9090</code>. Metrics are available at <code>/metrics</code> for monitoring.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.healthcheckAddress</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Address for health check endpoint. Default: <code>:9000</code>. Exposes <code>/health</code> for container orchestration and load balancer health probes.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.logLevel</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Controls log verbosity. Options: <code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code>. Default: <code>info</code>. Use <code>debug</code> for troubleshooting connection issues.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.logFile</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Where to write log output. Use <code>console</code> for Docker logging (recommended) or specify a file path. Default: <code>console</code>.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.authSecret</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Shared secret for relay authentication. Auto-generated by the setup script. This secret is used internally by the combined server for relay credential validation.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.dataDir</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Data directory path where the server stores its database and state files. Default: <code>/var/lib/openzro</code>. Maps to the <code>openzro_data</code> Docker volume.</p></dd></dl></li></ul></div>
+<h3 id="authentication-settings" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#authentication-settings"><div>Authentication Settings</div></a></h3>
+<p>Configures the built-in identity provider (embedded IdP) that handles user authentication and management.</p>
+<div class="my-6"><ul role="list" class="m-0 max-w-[calc(theme(maxWidth.lg)-theme(spacing.8))] list-none divide-y divide-zinc-900/5 p-0 dark:divide-white/5"><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.auth.issuer</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The issuer URL for OAuth2/OIDC tokens. Format: <code>https://your-domain/oauth2</code>. This URL is used to validate JWT tokens and must be accessible to clients.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.auth.localAuthDisabled</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">boolean</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Disables the embedded local identity provider. Default: <code>false</code>. Set to <code>true</code> when using an external OIDC provider exclusively and you want to prevent local authentication.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.auth.signKeyRefreshEnabled</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">boolean</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Enables automatic refresh of IdP signing keys. Recommended: <code>true</code>. Ensures tokens remain valid by periodically rotating signing keys.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.auth.dashboardRedirectURIs</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">array</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Allowed redirect URIs for OAuth2 authorization flow. Must include the dashboard authentication callbacks, typically <code>/nb-auth</code> and <code>/nb-silent-auth</code> on your domain.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.auth.cliRedirectURIs</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">array</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Redirect URIs for CLI-based authentication. Default: <code>[&quot;http://localhost:53000/&quot;]</code>. Used when authenticating via the <code>openzro</code> CLI tool.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.auth.owner.email</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Email address for the initial admin user. Optional. When set together with <code>owner.password</code>, the server creates this user on first startup with admin privileges.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.auth.owner.password</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Password for the initial admin user. Optional. Used together with <code>owner.email</code> to bootstrap the first admin account on initial deployment.</p></dd></dl></li></ul></div>
+<p>When the embedded IdP is active, the server automatically hosts these OIDC endpoints:</p>
+<ul>
+<li><strong>Discovery</strong>: <code>https://your-domain/oauth2/.well-known/openid-configuration</code></li>
+<li><strong>JWKS (signing keys)</strong>: <code>https://your-domain/oauth2/keys</code></li>
+<li><strong>Token issuance</strong>: <code>https://your-domain/oauth2/token</code></li>
+<li><strong>Device authorization</strong>: <code>https://your-domain/oauth2/device/authorize</code></li>
+</ul>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>openZro also supports integration with external OIDC-compatible identity providers for Single Sign-On (SSO), Multi-Factor Authentication (MFA), and centralized user management. See the <a href="/selfhosted/identity-providers">Authentication &amp; IdPs page</a> for configuration details.</p></div></div>
+<h3 id="store-settings" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#store-settings"><div>Store Settings</div></a></h3>
+<p>Configures the database backend for storing all openZro management data including accounts, peers, groups, access policies, routes, DNS configuration, setup keys, and activity logs.</p>
+<div class="my-6"><ul role="list" class="m-0 max-w-[calc(theme(maxWidth.lg)-theme(spacing.8))] list-none divide-y divide-zinc-900/5 p-0 dark:divide-white/5"><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.store.engine</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Database engine. Options: <code>sqlite</code>, <code>postgres</code>, <code>mysql</code>. Default: <code>sqlite</code>.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.store.dsn</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Connection string for postgres or mysql engines. For postgres: <code>host=localhost user=openzro password=secret dbname=openzro port=5432</code>. Alternatively, use the <code>NETBIRD_STORE_ENGINE_POSTGRES_DSN</code> or <code>NETBIRD_STORE_ENGINE_MYSQL_DSN</code> environment variables.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.store.encryptionKey</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>base64 string of a 32-byte (256-bit) encryption key for sensitive data at rest. Used to encrypt setup keys, API tokens, and other secrets stored in the database. Auto-generated by the setup script.</p></dd></dl></li></ul></div>
+<p><strong>What data is stored?</strong></p>
+<ul>
+<li><strong>Accounts and users</strong> - User accounts, roles, and permissions</li>
+<li><strong>Peers</strong> - Registered devices, their WireGuard keys, IP assignments, and metadata</li>
+<li><strong>Groups</strong> - Peer groupings used for access control</li>
+<li><strong>Access policies</strong> - Network access rules</li>
+<li><strong>Routes</strong> - Network routes for external subnets</li>
+<li><strong>DNS configuration</strong> - Custom DNS settings</li>
+<li><strong>Setup keys</strong> - Keys for automated peer enrollment</li>
+<li><strong>Activity logs</strong> - Audit trail</li>
+</ul>
+<table><thead><tr><th>Engine</th><th>Storage</th><th>Notes</th></tr></thead><tbody><tr><td>SQLite (default)</td><td><code>/var/lib/openzro/</code> volume</td><td>File-based database stored in the <code>openzro_data</code> Docker volume. Zero configuration required, but does not support concurrent writes or running multiple management instances. Best for testing or small deployments.</td></tr><tr><td>PostgreSQL</td><td>External database server</td><td>Recommended for production deployments. Supports concurrent access, enabling multiple management instances for high availability.</td></tr><tr><td>MySQL</td><td>External database server</td><td>Alternative to PostgreSQL for organizations that have standardized on MySQL/MariaDB. Provides similar benefits including concurrent access.</td></tr></tbody></table>
+<p>For PostgreSQL or MySQL, set the connection string via the <code>server.store.dsn</code> field in <code>config.yaml</code> or environment variables on the <code>openzro-server</code> container. See <a href="/selfhosted/configuration-files#using-an-external-database">Using an External Database</a> below.</p>
+<p>See <a href="/selfhosted/postgres-store">Management Postgres Store</a> for detailed PostgreSQL setup.</p>
+<div class="my-6 flex gap-2.5 rounded-l border border-red-500/20 bg-red-50/50 p-4 leading-6 text-red-900 dark:border-red-500/30 dark:bg-red-500/5 dark:text-red-200 dark:[--tw-prose-links-hover:theme(colors.red.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-red-500 stroke-white dark:fill-red-200/20 dark:stroke-red-200"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 3.5L3.5 12.5h9L8 3.5z"></path><circle cx="8" cy="9" r=".5" fill="none"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 6.5v1"></path></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Keep <code>server.store.encryptionKey</code> secure and backed up. This key encrypts sensitive data in your database, including setup keys and API tokens. Losing this key means losing access to encrypted data, and you will need to regenerate all setup keys and API tokens.</p></div></div>
+<h3 id="activity-events-store-settings" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#activity-events-store-settings"><div>Activity Events Store Settings</div></a></h3>
+<p>Configures the database backend for storing activity events (audit trail). By default, activity events are stored in a separate SQLite database in the data directory.</p>
+<div class="my-6"><ul role="list" class="m-0 max-w-[calc(theme(maxWidth.lg)-theme(spacing.8))] list-none divide-y divide-zinc-900/5 p-0 dark:divide-white/5"><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.activityStore.engine</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Database engine for activity events. Options: <code>sqlite</code>, <code>postgres</code>. Default: <code>sqlite</code>.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.activityStore.dsn</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Connection string for postgres engine. Example: <code>host=localhost port=5432 user=postgres password=postgres dbname=openzro_activity sslmode=disable</code>.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.activityStore.file</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Custom SQLite file path. Optional, defaults to <code>{dataDir}/events.db</code>.</p></dd></dl></li></ul></div>
+<h3 id="auth-store-settings" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#auth-store-settings"><div>Auth Store Settings</div></a></h3>
+<p>Configures the database backend for the embedded identity provider (Dex). By default, auth data is stored in a separate SQLite database in the data directory.</p>
+<div class="my-6"><ul role="list" class="m-0 max-w-[calc(theme(maxWidth.lg)-theme(spacing.8))] list-none divide-y divide-zinc-900/5 p-0 dark:divide-white/5"><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.authStore.engine</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Database engine for the embedded IdP. Options: <code>sqlite3</code>, <code>postgres</code>. Default: <code>sqlite3</code>.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.authStore.dsn</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Connection string for postgres engine. Example: <code>host=localhost port=5432 user=postgres password=postgres dbname=openzro_idp sslmode=disable</code>.</p></dd></dl></li><li class="m-0 px-0 py-4 first:pt-0 last:pb-0"><dl class="m-0 flex flex-wrap items-center gap-x-3 gap-y-2"><dt class="sr-only">Name</dt><dd><code>server.authStore.file</code></dd><dt class="sr-only">Type</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">string</dd><dt class="sr-only">Required</dt><dd class="font-mono text-xs text-zinc-400 dark:text-zinc-500">optional</dd><dt class="sr-only">Enum</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"></dd><dt class="sr-only">Description</dt><dd class="w-full flex-none [&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Custom SQLite file path. Optional, defaults to <code>{dataDir}/idp.db</code>.</p></dd></dl></li></ul></div>
+<hr/>
+<h2 id="dashboard-env" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#dashboard-env"><div>dashboard.env</div></a></h2>
+<p>Environment configuration for the dashboard service.</p>
+<h3 id="dashboard-architecture" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#dashboard-architecture"><div>Dashboard Architecture</div></a></h3>
+<p>The openZro dashboard container includes an <strong>embedded nginx server</strong> that serves the dashboard web pages. This nginx instance is built into the container image and handles serving the static web UI files.</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-comment)"># Endpoints</span></span>
+<span><span style="color: var(--shiki-color-text)">NETBIRD_MGMT_API_ENDPOINT</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">https://openzro.example.com</span></span>
+<span><span style="color: var(--shiki-color-text)">NETBIRD_MGMT_GRPC_API_ENDPOINT</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">https://openzro.example.com</span></span>
+<span></span>
+<span><span style="color: var(--shiki-token-comment)"># OIDC - using embedded IdP</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_AUDIENCE</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">openzro-dashboard</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_CLIENT_ID</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">openzro-dashboard</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_CLIENT_SECRET</span><span style="color: var(--shiki-token-keyword)">=</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_AUTHORITY</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">https://openzro.example.com/oauth2</span></span>
+<span><span style="color: var(--shiki-color-text)">USE_AUTH0</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-constant)">false</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_SUPPORTED_SCOPES</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">openid</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-function)">profile</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">email</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">groups</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_REDIRECT_URI</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">/nb-auth</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_SILENT_REDIRECT_URI</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">/nb-silent-auth</span></span>
+<span></span>
+<span><span style="color: var(--shiki-token-comment)"># SSL - disabled when behind reverse proxy (Traefik handles TLS)</span></span>
+<span><span style="color: var(--shiki-color-text)">NGINX_SSL_PORT</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-constant)">443</span></span>
+<span><span style="color: var(--shiki-color-text)">LETSENCRYPT_DOMAIN</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">none</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>When using the built-in Traefik or an external reverse proxy, set <code>LETSENCRYPT_DOMAIN=none</code> because the reverse proxy handles TLS termination. Only set a domain here if running the dashboard standalone without a reverse proxy.</p></div></div>
+<h3 id="endpoint-configuration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#endpoint-configuration"><div>Endpoint Configuration</div></a></h3>
+<table><thead><tr><th>Variable</th><th>Description</th></tr></thead><tbody><tr><td><code>NETBIRD_MGMT_API_ENDPOINT</code></td><td>The URL where the dashboard makes REST API calls to the management server (e.g., <code>https://openzro.example.com</code>). Must be accessible from users&#x27; browsers since API calls are made client-side.</td></tr><tr><td><code>NETBIRD_MGMT_GRPC_API_ENDPOINT</code></td><td>The URL for gRPC communication with the management server. Usually the same as the REST endpoint. Used for in-browser SSH and RDP clients, as well as surfacing management links for client config instructions.</td></tr></tbody></table>
+<h3 id="authentication-configuration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#authentication-configuration"><div>Authentication Configuration</div></a></h3>
+<table><thead><tr><th>Variable</th><th>Description</th></tr></thead><tbody><tr><td><code>AUTH_AUDIENCE</code></td><td>The expected audience claim in OAuth2 tokens. Must match the audience configured in your IdP. For embedded IdP, use <code>openzro-dashboard</code>.</td></tr><tr><td><code>AUTH_CLIENT_ID</code></td><td>The OAuth2 client identifier for the dashboard application. For embedded IdP deployments, this is <code>openzro-dashboard</code>. Must match the client ID registered with your identity provider.</td></tr><tr><td><code>AUTH_CLIENT_SECRET</code></td><td>OAuth2 client secret for confidential clients. Leave empty for public clients (the default for browser-based apps like the dashboard).</td></tr><tr><td><code>AUTH_AUTHORITY</code></td><td>The OAuth2/OIDC issuer URL (e.g., <code>https://openzro.example.com/oauth2</code> for embedded IdP). The dashboard fetches OIDC discovery metadata from <code>{AUTH_AUTHORITY}/.well-known/openid-configuration</code>.</td></tr><tr><td><code>USE_AUTH0</code></td><td>Set to <code>true</code> only when using Auth0 as your identity provider. Leave as <code>false</code> for embedded IdP or other OIDC providers.</td></tr><tr><td><code>AUTH_SUPPORTED_SCOPES</code></td><td>Space-separated list of OAuth2 scopes to request during login. Standard value is <code>openid profile email groups</code>.</td></tr><tr><td><code>AUTH_REDIRECT_URI</code></td><td>The path where the IdP redirects after authentication (e.g., <code>/nb-auth</code>). Must match a redirect URI registered with your identity provider.</td></tr><tr><td><code>AUTH_SILENT_REDIRECT_URI</code></td><td>The path for silent token refresh (e.g., <code>/nb-silent-auth</code>). Used by the dashboard to refresh tokens in the background without user interaction.</td></tr></tbody></table>
+<h3 id="embedded-nginx-configuration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#embedded-nginx-configuration"><div>Embedded Nginx Configuration</div></a></h3>
+<p>The dashboard container&#x27;s embedded nginx server can be configured using these environment variables. These settings control how the dashboard serves its web UI.</p>
+<table><thead><tr><th>Variable</th><th>Default</th><th>Description</th></tr></thead><tbody><tr><td><code>NGINX_SSL_PORT</code></td><td><code>443</code></td><td>The HTTPS port for the dashboard&#x27;s embedded nginx server. Only relevant in standalone mode without an external reverse proxy.</td></tr><tr><td><code>LETSENCRYPT_DOMAIN</code></td><td>-</td><td>The domain name for automatic Let&#x27;s Encrypt certificate provisioning. Set to <code>none</code> when using an external reverse proxy that handles TLS.</td></tr><tr><td><code>LETSENCRYPT_EMAIL</code></td><td>-</td><td>Email address for Let&#x27;s Encrypt account registration and certificate expiry notifications. Required when <code>LETSENCRYPT_DOMAIN</code> is set to an actual domain.</td></tr></tbody></table>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The <code>NGINX_SSL_PORT</code> and Let&#x27;s Encrypt variables are <strong>only necessary when running the dashboard standalone</strong> without an external reverse proxy. For most installations using the built-in Traefik or an external reverse proxy, set <code>LETSENCRYPT_DOMAIN=none</code> and the embedded nginx will serve on HTTP (port 80) internally while your reverse proxy handles HTTPS.</p></div></div>
+<hr/>
+<h2 id="common-configuration-scenarios" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#common-configuration-scenarios"><div>Common Configuration Scenarios</div></a></h2>
+<h3 id="using-an-external-database" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#using-an-external-database"><div>Using an External Database</div></a></h3>
+<p>To use PostgreSQL instead of SQLite:</p>
+<ol>
+<li>Update <code>config.yaml</code>:</li>
+</ol>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">server</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">store</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">engine</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;postgres&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">dsn</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;host=db-server user=openzro password=secret dbname=openzro port=5432&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Alternatively, you can use an environment variable instead of putting the DSN in the config file:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">openzro-server</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">environment</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">NETBIRD_STORE_ENGINE_POSTGRES_DSN=host=db-server user=openzro password=secret dbname=openzro port=5432</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># Or for MySQL:</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-comment)"># - NETBIRD_STORE_ENGINE_MYSQL_DSN=user:password@tcp(host:3306)/openzro</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>See <a href="/selfhosted/postgres-store">Management Postgres Store</a> for detailed setup.</p>
+<h3 id="changing-log-level" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#changing-log-level"><div>Changing Log Level</div></a></h3>
+<p>Update <code>server.logLevel</code> in <code>config.yaml</code>:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">server</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">logLevel</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;debug&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Options: <code>debug</code>, <code>info</code>, <code>warn</code>, <code>error</code>. Use <code>debug</code> for troubleshooting connection issues.</p>
+<h3 id="custom-stun-ports" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#custom-stun-ports"><div>Custom STUN Ports</div></a></h3>
+<p>To use multiple STUN ports, update <code>config.yaml</code>:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">server</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">stunPorts</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-constant)">3478</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-constant)">3479</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Make sure to expose all ports in <code>docker-compose.yml</code>:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">openzro-server</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">ports</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&#39;3478:3478/udp&#39;</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-string-expression)">&#39;3479:3479/udp&#39;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<h3 id="behind-a-reverse-proxy" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#behind-a-reverse-proxy"><div>Behind a Reverse Proxy</div></a></h3>
+<p>When running behind your own reverse proxy (Nginx, Caddy, Nginx Proxy Manager, etc.) instead of the built-in Traefik:</p>
+<ol>
+<li>Set <code>LETSENCRYPT_DOMAIN=none</code> in <code>dashboard.env</code></li>
+<li>Use the exposed-ports variant of <code>docker-compose.yml</code> (the setup script generates this automatically for options 1-4)</li>
+<li>Configure your reverse proxy to route traffic to the correct containers and ports:<!-- -->
+<ul>
+<li>Dashboard: <code>127.0.0.1:8080</code> (HTTP)</li>
+<li>openZro Server: <code>127.0.0.1:8081</code> (HTTP), with gRPC paths using h2c (HTTP/2 cleartext)</li>
+</ul>
+</li>
+</ol>
+<p>See <a href="/selfhosted/external-reverse-proxy">External Reverse Proxy Configuration</a> for detailed templates for Nginx, Caddy, and other proxies.</p>
+<h3 id="using-external-services-advanced" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#using-external-services-advanced"><div>Using External Services (Advanced)</div></a></h3>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>The default openZro deployment includes embedded relay, signal, and STUN services. External services are only needed for advanced use cases.</p></div></div>
+<p>To use external STUN, relay, or signal servers, add overrides to <code>config.yaml</code>:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-yaml"><span><span style="color: var(--shiki-token-keyword)">server</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-comment)"># ... basic settings ...</span></span>
+<span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-comment)"># Optional: Use external STUN servers</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">stuns</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    - </span><span style="color: var(--shiki-token-keyword)">uri</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;stun:stun.example.com:3478&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">      </span><span style="color: var(--shiki-token-keyword)">proto</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;udp&quot;</span></span>
+<span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-comment)"># Optional: Use external relay servers</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">relays</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">addresses</span><span style="color: var(--shiki-token-keyword)">:</span></span>
+<span><span style="color: var(--shiki-color-text)">      - </span><span style="color: var(--shiki-token-string-expression)">&quot;rels://relay.example.com:443&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">secret</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;relay-auth-secret&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">credentialsTTL</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;24h&quot;</span></span>
+<span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-comment)"># Optional: Use external signal server</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">signalUri</span><span style="color: var(--shiki-token-keyword)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;https://signal.example.com:443&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>See the <a href="/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment">Scaling Your Self-Hosted Deployment</a> guide for more details on configuring external services.</p>
+<hr/>
+<h2 id="see-also" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/configuration-files#see-also"><div>See Also</div></a></h2>
+<ul>
+<li><a href="/selfhosted/selfhosted-quickstart">Self-hosting Quickstart Guide</a> - Get started quickly with default settings</li>
+<li><a href="/selfhosted/external-reverse-proxy">External Reverse Proxy Configuration</a> - Nginx, Caddy, NPM, HAProxy setup</li>
+<li><a href="/selfhosted/sqlite-store">Management SQLite Store</a> - SQLite database details</li>
+<li><a href="/selfhosted/postgres-store">Management Postgres Store</a> - PostgreSQL setup</li>
+</ul></article></main><footer class="mx-auto max-w-2xl space-y-10 pb-16 lg:max-w-5xl"><div class="relative h-8"><form class="absolute inset-0 flex items-center justify-center gap-6 md:justify-start"><p class="text-sm text-zinc-600 dark:text-zinc-400">Was this page helpful?</p><div class="group grid h-8 grid-cols-[1fr,1px,1fr] overflow-hidden rounded-full border border-zinc-900/10 dark:border-white/10"><button type="submit" class="px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-900/2.5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white" data-response="yes">Yes</button><div class="bg-zinc-900/10 dark:bg-white/10"></div><button type="submit" class="px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-900/2.5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white" data-response="no">No</button></div></form></div><div class="flex"><div class="flex flex-col items-start gap-3"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-100 py-1 px-3 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-400 dark:ring-1 dark:ring-inset dark:ring-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-300" aria-label="Previous: Quickstart Guide" href="/selfhosted/selfhosted-quickstart"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 h-5 w-5 -ml-1 rotate-180"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11.5 6.5 3 3.5m0 0-3 3.5m3-3.5h-9"></path></svg>Previous</a><a tabindex="-1" aria-hidden="true" class="text-base font-semibold text-zinc-900 transition hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300" href="/selfhosted/selfhosted-quickstart">Quickstart Guide</a></div><div class="ml-auto flex flex-col items-end gap-3"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-100 py-1 px-3 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-400 dark:ring-1 dark:ring-inset dark:ring-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-300" aria-label="Next: Scaling Your Deployment" href="/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment">Next<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 h-5 w-5 -mr-1"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11.5 6.5 3 3.5m0 0-3 3.5m3-3.5h-9"></path></svg></a><a tabindex="-1" aria-hidden="true" class="text-base font-semibold text-zinc-900 transition hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300" href="/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment">Scaling Your Deployment</a></div></div><div class="flex flex-col items-center justify-between gap-5 border-t border-zinc-900/5 pt-8 dark:border-white/5 sm:flex-row"><p class="text-xs text-zinc-600 dark:text-zinc-400">© Copyright <!-- -->2026<!-- -->. All rights reserved.</p><div class="flex gap-4"><a class="group" href="https://github.com/openzro/openzro"><span class="sr-only">openZro on GitHub</span><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-900 dark:group-hover:fill-zinc-500"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.667c-4.605 0-8.334 3.823-8.334 8.544 0 3.78 2.385 6.974 5.698 8.106.417.075.573-.182.573-.406 0-.203-.011-.875-.011-1.592-2.093.397-2.635-.522-2.802-1.002-.094-.246-.5-1.005-.854-1.207-.291-.16-.708-.556-.01-.567.656-.01 1.124.62 1.281.876.75 1.292 1.948.93 2.427.705.073-.555.291-.93.531-1.143-1.854-.213-3.791-.95-3.791-4.218 0-.929.322-1.698.854-2.296-.083-.214-.375-1.09.083-2.265 0 0 .698-.224 2.292.876a7.576 7.576 0 0 1 2.083-.288c.709 0 1.417.096 2.084.288 1.593-1.11 2.291-.875 2.291-.875.459 1.174.167 2.05.084 2.263.53.599.854 1.357.854 2.297 0 3.278-1.948 4.005-3.802 4.219.302.266.563.78.563 1.58 0 1.143-.011 2.061-.011 2.35 0 .224.156.491.573.405a8.365 8.365 0 0 0 4.11-3.116 8.707 8.707 0 0 0 1.567-4.99c0-4.721-3.73-8.545-8.334-8.545Z"></path></svg></a><a class="group" href="https://github.com/openzro/openzro/discussions"><span class="sr-only">Discussions</span><svg viewBox="56 56 160 160" aria-hidden="true" class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-900 dark:group-hover:fill-zinc-500"><g><g><path d="M99.4,151.2c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h12.9V151.2z"></path><path d="M105.9,151.2c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v32.3c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9 C105.9,183.5,105.9,151.2,105.9,151.2z"></path></g><g><path d="M118.8,99.4c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v12.9H118.8z"></path><path d="M118.8,105.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H86.5c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9 C86.5,105.9,118.8,105.9,118.8,105.9z"></path></g><g><path d="M170.6,118.8c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9h-12.9V118.8z"></path><path d="M164.1,118.8c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9V86.5c0-7.1,5.8-12.9,12.9-12.9 c7.1,0,12.9,5.8,12.9,12.9V118.8z"></path></g><g><path d="M151.2,170.6c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9v-12.9H151.2z"></path><path d="M151.2,164.1c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h32.3c7.1,0,12.9,5.8,12.9,12.9 c0,7.1-5.8,12.9-12.9,12.9H151.2z"></path></g></g></svg></a></div></div></footer></div><div class="hidden xl:sticky xl:top-[4.5rem] xl:-mr-6 xl:block xl:h-[calc(100vh-4.5rem)] xl:flex-none xl:overflow-y-auto xl:py-16 xl:pr-6 pl-12" style="top:calc(0px + 4.5rem)"><ol role="list" class="mt-4 space-y-3 text-sm mb-8"><li><button style="display:inline;min-width:90px;text-align:left;justify-content:center;align-items:center" class="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal&#x27;"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paperclip" class="svg-inline--fa fa-paperclip icon pr-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="font-size:18px"><path fill="currentColor" d="M364.2 83.8c-24.4-24.4-64-24.4-88.4 0l-184 184c-42.1 42.1-42.1 110.3 0 152.4s110.3 42.1 152.4 0l152-152c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-152 152c-64 64-167.6 64-231.6 0s-64-167.6 0-231.6l184-184c46.3-46.3 121.3-46.3 167.6 0s46.3 121.3 0 167.6l-176 176c-28.6 28.6-75 28.6-103.6 0s-28.6-75 0-103.6l144-144c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-144 144c-6.7 6.7-6.7 17.7 0 24.4s17.7 6.7 24.4 0l176-176c24.4-24.4 24.4-64 0-88.4z"></path></svg><span>Copy link</span></button></li><li><a class="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal&#x27;" style="display:flex;align-items:center" href="https://github.com/openzro/docs/tree/main/src/pages/selfhosted/configuration-files.mdx"><svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" class="svg-inline--fa fa-github icon pr-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" style="font-size:18px"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><span>Edit on Github</span></a></li></ol><nav aria-labelledby="on-this-page-title" class="w-80"><div class="flex items-center justify-between mb-4"><h2 id="on-this-page-title" class="font-display text-sm font-medium text-slate-900 dark:text-white">On this page</h2></div><ol role="list" class="mt-4 space-y-3 text-sm"><li><h3><a class="text-violet-500" href="/selfhosted/configuration-files#overview">Overview</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#file-locations">File Locations</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/configuration-files#docker-compose-yml">docker-compose.yml</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#services-overview">Services Overview</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#traefik-service">Traefik Service</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#dashboard-service">Dashboard Service</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#open-zro-server-service">openZro Server Service</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#volume-configuration">Volume Configuration</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/configuration-files#config-yaml">config.yaml</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#complete-structure">Complete Structure</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#server-settings">Server Settings</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#authentication-settings">Authentication Settings</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#store-settings">Store Settings</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#activity-events-store-settings">Activity Events Store Settings</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#auth-store-settings">Auth Store Settings</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/configuration-files#dashboard-env">dashboard.env</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#dashboard-architecture">Dashboard Architecture</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#endpoint-configuration">Endpoint Configuration</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#authentication-configuration">Authentication Configuration</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#embedded-nginx-configuration">Embedded Nginx Configuration</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/configuration-files#common-configuration-scenarios">Common Configuration Scenarios</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#using-an-external-database">Using an External Database</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#changing-log-level">Changing Log Level</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#custom-stun-ports">Custom STUN Ports</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#behind-a-reverse-proxy">Behind a Reverse Proxy</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/configuration-files#using-external-services-advanced">Using External Services (Advanced)</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/configuration-files#see-also">See Also</a></h3></li></ol></nav></div></div><div class="Toastify"></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"sections":[{"title":"Overview","id":"overview","tagName":"h2"},{"title":"File Locations","id":"file-locations","tagName":"h3"},{"title":"docker-compose.yml","id":"docker-compose-yml","tagName":"h2"},{"title":"Services Overview","id":"services-overview","tagName":"h3"},{"title":"Traefik Service","id":"traefik-service","tagName":"h3"},{"title":"Dashboard Service","id":"dashboard-service","tagName":"h3"},{"title":"openZro Server Service","id":"open-zro-server-service","tagName":"h3"},{"title":"Traefik Routing Labels","id":"traefik-routing-labels","tagName":"h4"},{"title":"Volume Configuration","id":"volume-configuration","tagName":"h3"},{"title":"config.yaml","id":"config-yaml","tagName":"h2"},{"title":"Complete Structure","id":"complete-structure","tagName":"h3"},{"title":"Server Settings","id":"server-settings","tagName":"h3"},{"title":"Authentication Settings","id":"authentication-settings","tagName":"h3"},{"title":"Store Settings","id":"store-settings","tagName":"h3"},{"title":"Activity Events Store Settings","id":"activity-events-store-settings","tagName":"h3"},{"title":"Auth Store Settings","id":"auth-store-settings","tagName":"h3"},{"title":"dashboard.env","id":"dashboard-env","tagName":"h2"},{"title":"Dashboard Architecture","id":"dashboard-architecture","tagName":"h3"},{"title":"Endpoint Configuration","id":"endpoint-configuration","tagName":"h3"},{"title":"Authentication Configuration","id":"authentication-configuration","tagName":"h3"},{"title":"Embedded Nginx Configuration","id":"embedded-nginx-configuration","tagName":"h3"},{"title":"Common Configuration Scenarios","id":"common-configuration-scenarios","tagName":"h2"},{"title":"Using an External Database","id":"using-an-external-database","tagName":"h3"},{"title":"Changing Log Level","id":"changing-log-level","tagName":"h3"},{"title":"Custom STUN Ports","id":"custom-stun-ports","tagName":"h3"},{"title":"Behind a Reverse Proxy","id":"behind-a-reverse-proxy","tagName":"h3"},{"title":"Using External Services (Advanced)","id":"using-external-services-advanced","tagName":"h3"},{"title":"See Also","id":"see-also","tagName":"h2"}],"title":"Self-Hosted Deployment Configuration Files Reference"},"__N_SSG":true},"page":"/selfhosted/configuration-files","query":{},"buildId":"h-OXItx1RfkS1sxjBXlaK","isFallback":false,"gsp":true,"scriptLoader":[]}</script></body></html>

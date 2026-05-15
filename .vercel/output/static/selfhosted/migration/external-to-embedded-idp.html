@@ -1,0 +1,866 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Migration Guide: External IdP to Embedded IdP - openZro Docs</title><meta name="description" content="Migrate a self-hosted openZro deployment from an external identity provider to the embedded IdP introduced in v0.62.0." data-next-head=""/><link rel="icon" type="image/svg+xml" href="/docs-static/img/openzro-icon.svg"/><link rel="icon" type="image/x-icon" href="/docs-static/img/favicon.ico"/><link rel="apple-touch-icon" href="/docs-static/img/apple-touch-icon.png"/><link rel="preload" href="/_next/static/css/5b227bfd76e92c43.css" as="style"/><style data-next-head="">:root, :host {
+  --fa-font-solid: normal 900 1em/1 "Font Awesome 6 Free";
+  --fa-font-regular: normal 400 1em/1 "Font Awesome 6 Free";
+  --fa-font-light: normal 300 1em/1 "Font Awesome 6 Pro";
+  --fa-font-thin: normal 100 1em/1 "Font Awesome 6 Pro";
+  --fa-font-duotone: normal 900 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-regular: normal 400 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-light: normal 300 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-thin: normal 100 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-brands: normal 400 1em/1 "Font Awesome 6 Brands";
+  --fa-font-sharp-solid: normal 900 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-regular: normal 400 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-light: normal 300 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-thin: normal 100 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-duotone-solid: normal 900 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-regular: normal 400 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-light: normal 300 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-thin: normal 100 1em/1 "Font Awesome 6 Sharp Duotone";
+}
+
+svg:not(:root).svg-inline--fa, svg:not(:host).svg-inline--fa {
+  overflow: visible;
+  box-sizing: content-box;
+}
+
+.svg-inline--fa {
+  display: var(--fa-display, inline-block);
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+.svg-inline--fa.fa-2xs {
+  vertical-align: 0.1em;
+}
+.svg-inline--fa.fa-xs {
+  vertical-align: 0em;
+}
+.svg-inline--fa.fa-sm {
+  vertical-align: -0.0714285705em;
+}
+.svg-inline--fa.fa-lg {
+  vertical-align: -0.2em;
+}
+.svg-inline--fa.fa-xl {
+  vertical-align: -0.25em;
+}
+.svg-inline--fa.fa-2xl {
+  vertical-align: -0.3125em;
+}
+.svg-inline--fa.fa-pull-left {
+  margin-right: var(--fa-pull-margin, 0.3em);
+  width: auto;
+}
+.svg-inline--fa.fa-pull-right {
+  margin-left: var(--fa-pull-margin, 0.3em);
+  width: auto;
+}
+.svg-inline--fa.fa-li {
+  width: var(--fa-li-width, 2em);
+  top: 0.25em;
+}
+.svg-inline--fa.fa-fw {
+  width: var(--fa-fw-width, 1.25em);
+}
+
+.fa-layers svg.svg-inline--fa {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.fa-layers-counter, .fa-layers-text {
+  display: inline-block;
+  position: absolute;
+  text-align: center;
+}
+
+.fa-layers {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  text-align: center;
+  vertical-align: -0.125em;
+  width: 1em;
+}
+.fa-layers svg.svg-inline--fa {
+  transform-origin: center center;
+}
+
+.fa-layers-text {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+.fa-layers-counter {
+  background-color: var(--fa-counter-background-color, #ff253a);
+  border-radius: var(--fa-counter-border-radius, 1em);
+  box-sizing: border-box;
+  color: var(--fa-inverse, #fff);
+  line-height: var(--fa-counter-line-height, 1);
+  max-width: var(--fa-counter-max-width, 5em);
+  min-width: var(--fa-counter-min-width, 1.5em);
+  overflow: hidden;
+  padding: var(--fa-counter-padding, 0.25em 0.5em);
+  right: var(--fa-right, 0);
+  text-overflow: ellipsis;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-counter-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-bottom-right {
+  bottom: var(--fa-bottom, 0);
+  right: var(--fa-right, 0);
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom right;
+}
+
+.fa-layers-bottom-left {
+  bottom: var(--fa-bottom, 0);
+  left: var(--fa-left, 0);
+  right: auto;
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom left;
+}
+
+.fa-layers-top-right {
+  top: var(--fa-top, 0);
+  right: var(--fa-right, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-top-left {
+  left: var(--fa-left, 0);
+  right: auto;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top left;
+}
+
+.fa-1x {
+  font-size: 1em;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-6x {
+  font-size: 6em;
+}
+
+.fa-7x {
+  font-size: 7em;
+}
+
+.fa-8x {
+  font-size: 8em;
+}
+
+.fa-9x {
+  font-size: 9em;
+}
+
+.fa-10x {
+  font-size: 10em;
+}
+
+.fa-2xs {
+  font-size: 0.625em;
+  line-height: 0.1em;
+  vertical-align: 0.225em;
+}
+
+.fa-xs {
+  font-size: 0.75em;
+  line-height: 0.0833333337em;
+  vertical-align: 0.125em;
+}
+
+.fa-sm {
+  font-size: 0.875em;
+  line-height: 0.0714285718em;
+  vertical-align: 0.0535714295em;
+}
+
+.fa-lg {
+  font-size: 1.25em;
+  line-height: 0.05em;
+  vertical-align: -0.075em;
+}
+
+.fa-xl {
+  font-size: 1.5em;
+  line-height: 0.0416666682em;
+  vertical-align: -0.125em;
+}
+
+.fa-2xl {
+  font-size: 2em;
+  line-height: 0.03125em;
+  vertical-align: -0.1875em;
+}
+
+.fa-fw {
+  text-align: center;
+  width: 1.25em;
+}
+
+.fa-ul {
+  list-style-type: none;
+  margin-left: var(--fa-li-margin, 2.5em);
+  padding-left: 0;
+}
+.fa-ul > li {
+  position: relative;
+}
+
+.fa-li {
+  left: calc(-1 * var(--fa-li-width, 2em));
+  position: absolute;
+  text-align: center;
+  width: var(--fa-li-width, 2em);
+  line-height: inherit;
+}
+
+.fa-border {
+  border-color: var(--fa-border-color, #eee);
+  border-radius: var(--fa-border-radius, 0.1em);
+  border-style: var(--fa-border-style, solid);
+  border-width: var(--fa-border-width, 0.08em);
+  padding: var(--fa-border-padding, 0.2em 0.25em 0.15em);
+}
+
+.fa-pull-left {
+  float: left;
+  margin-right: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-pull-right {
+  float: right;
+  margin-left: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-beat {
+  animation-name: fa-beat;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-bounce {
+  animation-name: fa-bounce;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1));
+}
+
+.fa-fade {
+  animation-name: fa-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-beat-fade {
+  animation-name: fa-beat-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-flip {
+  animation-name: fa-flip;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-shake {
+  animation-name: fa-shake;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin {
+  animation-name: fa-spin;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 2s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin-reverse {
+  --fa-animation-direction: reverse;
+}
+
+.fa-pulse,
+.fa-spin-pulse {
+  animation-name: fa-spin;
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, steps(8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat,
+.fa-bounce,
+.fa-fade,
+.fa-beat-fade,
+.fa-flip,
+.fa-pulse,
+.fa-shake,
+.fa-spin,
+.fa-spin-pulse {
+    animation-delay: -1ms;
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+    transition-delay: 0s;
+    transition-duration: 0s;
+  }
+}
+@keyframes fa-beat {
+  0%, 90% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+@keyframes fa-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0);
+  }
+  30% {
+    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em));
+  }
+  50% {
+    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0);
+  }
+  57% {
+    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em));
+  }
+  64% {
+    transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+@keyframes fa-fade {
+  50% {
+    opacity: var(--fa-fade-opacity, 0.4);
+  }
+}
+@keyframes fa-beat-fade {
+  0%, 100% {
+    opacity: var(--fa-beat-fade-opacity, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(var(--fa-beat-fade-scale, 1.125));
+  }
+}
+@keyframes fa-flip {
+  50% {
+    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg));
+  }
+}
+@keyframes fa-shake {
+  0% {
+    transform: rotate(-15deg);
+  }
+  4% {
+    transform: rotate(15deg);
+  }
+  8%, 24% {
+    transform: rotate(-18deg);
+  }
+  12%, 28% {
+    transform: rotate(18deg);
+  }
+  16% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(22deg);
+  }
+  32% {
+    transform: rotate(-12deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  40%, 100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.fa-rotate-270 {
+  transform: rotate(270deg);
+}
+
+.fa-flip-horizontal {
+  transform: scale(-1, 1);
+}
+
+.fa-flip-vertical {
+  transform: scale(1, -1);
+}
+
+.fa-flip-both,
+.fa-flip-horizontal.fa-flip-vertical {
+  transform: scale(-1, -1);
+}
+
+.fa-rotate-by {
+  transform: rotate(var(--fa-rotate-angle, 0));
+}
+
+.fa-stack {
+  display: inline-block;
+  vertical-align: middle;
+  height: 2em;
+  position: relative;
+  width: 2.5em;
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: var(--fa-stack-z-index, auto);
+}
+
+.svg-inline--fa.fa-stack-1x {
+  height: 1em;
+  width: 1.25em;
+}
+.svg-inline--fa.fa-stack-2x {
+  height: 2em;
+  width: 2.5em;
+}
+
+.fa-inverse {
+  color: var(--fa-inverse, #fff);
+}
+
+.sr-only,
+.fa-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:not(:focus),
+.fa-sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.svg-inline--fa .fa-primary {
+  fill: var(--fa-primary-color, currentColor);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa .fa-secondary {
+  fill: var(--fa-secondary-color, currentColor);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-primary {
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-secondary {
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa mask .fa-primary,
+.svg-inline--fa mask .fa-secondary {
+  fill: black;
+}</style><script>
+  let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+  updateMode()
+  darkModeMediaQuery.addEventListener('change', updateModeWithoutTransitions)
+  window.addEventListener('storage', updateModeWithoutTransitions)
+
+  function updateMode() {
+    let isSystemDarkMode = darkModeMediaQuery.matches
+    let isDarkMode = window.localStorage.isDarkMode === 'true' || (!('isDarkMode' in window.localStorage) && isSystemDarkMode)
+
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+
+    if (isDarkMode === isSystemDarkMode) {
+      delete window.localStorage.isDarkMode
+    }
+  }
+
+  function disableTransitionsTemporarily() {
+    document.documentElement.classList.add('[&_*]:!transition-none')
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('[&_*]:!transition-none')
+    }, 0)
+  }
+
+  function updateModeWithoutTransitions() {
+    disableTransitionsTemporarily()
+    updateMode()
+  }
+</script><link rel="stylesheet" href="/_next/static/css/5b227bfd76e92c43.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-345555e3c489773c.js" defer=""></script><script src="/_next/static/chunks/framework-34a8c4228d7fd161.js" defer=""></script><script src="/_next/static/chunks/main-c502755b4d857e5f.js" defer=""></script><script src="/_next/static/chunks/pages/_app-43bbbd7999c053e8.js" defer=""></script><script src="/_next/static/chunks/pages/selfhosted/migration/external-to-embedded-idp-e2b3b12215f566c9.js" defer=""></script><script src="/_next/static/h-OXItx1RfkS1sxjBXlaK/_buildManifest.js" defer=""></script><script src="/_next/static/h-OXItx1RfkS1sxjBXlaK/_ssgManifest.js" defer=""></script></head><body class="bg-white antialiased dark:bg-[#181A1D]"><link rel="preload" as="image" href="/docs-static/img/logo/openzro-icon.svg"/><div id="__next"><div class="absolute inset-0 -z-10 mx-0 max-w-none overflow-hidden"><div class="absolute inset-0 hidden dark:block z-0" style="background-color:#181A1D"><svg aria-hidden="true" class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"><defs><pattern id="_R_pm_" width="72" height="56" patternUnits="userSpaceOnUse" x="-12" y="4"><path d="M.5 56V.5H72" fill="none"></path></pattern></defs><rect width="100%" height="100%" stroke-width="0" fill="url(#_R_pm_)"></rect><svg x="-12" y="4" class="overflow-visible"><rect stroke-width="0" width="73" height="57" x="288" y="168"></rect><rect stroke-width="0" width="73" height="57" x="144" y="56"></rect><rect stroke-width="0" width="73" height="57" x="504" y="168"></rect><rect stroke-width="0" width="73" height="57" x="720" y="336"></rect></svg></svg></div><div class="absolute inset-x-0 top-0 h-[25rem] dark:[mask-image:linear-gradient(white,transparent)] pointer-events-none z-10"><svg viewBox="0 0 1113 440" preserveAspectRatio="xMidYMin slice" aria-hidden="true" class="absolute left-1/2 top-0 -translate-x-1/2 w-full min-w-[69.5625rem] h-full fill-white blur-[26px] dark:hidden"><path d="M.016 439.5s-9.5-300 434-300S882.516 20 882.516 20V0h230.004v439.5H.016Z"></path></svg></div></div><div class="relative mx-auto flex max-w-8xl sm:px-2 lg:px-8 xl:px-12 lg:ml-72 xl:ml-80" style="padding-top:0"><header class="contents lg:pointer-events-none lg:fixed lg:inset-0 lg:z-40 lg:flex" style="top:0"><div class="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:dark:border-neutral-700/50 lg:px-6 lg:pb-8 lg:pt-4 lg:bg-white/70 lg:dark:bg-[#181A1D]/95 lg:backdrop-blur-lg xl:w-80 lg:overflow-x-visible sidebar-scroll"><div class="hidden lg:flex"><a aria-label="Home" href="/"><span class="inline-flex items-center gap-2 select-none"><img src="/docs-static/img/logo/openzro-icon.svg" alt="" height="28" width="28" class="h-7 w-7"/><span class="font-semibold text-zinc-900 dark:text-white tracking-[-0.025em] leading-none text-lg" style="font-family:Geist, ui-sans-serif, system-ui, sans-serif">open<span class="font-bold text-violet-600 dark:text-violet-400">Z</span>ro</span></span></a></div><nav class="hidden lg:mt-10 lg:block"><ul role="list"><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://openzro.io/">Home</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/">Docs</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/api">API</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://openzro.io/knowledge-hub/">Learn</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://github.com/openzro/openzro">Github</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/slack-url">Support</a></li><div class="outer-wrapper-0"><li class="relative md:mt-0 mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="ABOUT" data-nb-active="0">ABOUT</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="How openZro Works" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/how-openzro-works"><span class="truncate">How openZro Works</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="openZro vs. Traditional VPN" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/openzro-vs-traditional-vpn"><span class="truncate">openZro vs. Traditional VPN</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Understanding NAT and Connectivity" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/understanding-nat-and-connectivity"><span class="truncate">Understanding NAT and Connectivity</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Why WireGuard with openZro" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/why-wireguard-with-openzro"><span class="truncate">Why WireGuard with openZro</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Browser Client Architecture" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/browser-client-architecture"><span class="truncate">Browser Client Architecture</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Why self-host only" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/self-host-only"><span class="truncate">Why self-host only</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="FAQ" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/faq"><span class="truncate">FAQ</span></a></div></li></ul></div></li></div><div class="outer-wrapper-1"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="GET STARTED" data-nb-active="0">GET STARTED</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Quickstart Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started"><span class="truncate">Quickstart Guide</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Install openZro" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started/install"><span class="truncate">Install openZro</span></a><ul role="list"><li class="relative"><div class="relative"><a data-nb-link="0" title="Linux" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/linux"><span class="truncate">Linux</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Windows" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/windows"><span class="truncate">Windows</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="MacOS" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/macos"><span class="truncate">MacOS</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Docker" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/docker"><span class="truncate">Docker</span></a></div></li></ul></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Platforms" data-nb-active="0">Platforms<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="CLI" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started/cli"><span class="truncate">CLI</span></a></div></li></ul></div></li></div><div class="outer-wrapper-2"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="MANAGE NETBIRD" data-nb-active="0">MANAGE NETBIRD</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Control Center" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/manage/control-center"><span class="truncate">Control Center</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Peers" data-nb-active="0">Peers<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Access Control" data-nb-active="0">Access Control<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Networks" data-nb-active="0">Networks<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Network Routes" data-nb-active="0">Network Routes<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Reverse Proxy" data-nb-active="0">Reverse Proxy<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="DNS" data-nb-active="0">DNS<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Team" data-nb-active="0">Team<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Activity" data-nb-active="0">Activity<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Settings" data-nb-active="0">Settings<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Integrations" data-nb-active="0">Integrations<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Public API" data-nb-active="0">Public API<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-3"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="SELF-HOST OPENZRO" data-nb-active="0">SELF-HOST OPENZRO</h2><div class="relative mt-3 pl-2"><div class="absolute inset-x-0 top-0 bg-zinc-800/2.5 will-change-transform dark:bg-white/2.5" style="border-radius:8px;height:32px;top:0;opacity:0"></div><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><div class="absolute left-2 h-6 w-px bg-violet-500" style="top:0;opacity:1"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Quickstart Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/selfhosted-quickstart"><span class="truncate">Quickstart Guide</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Maintenance" data-nb-active="0">Maintenance<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Authentication" data-nb-active="0">Authentication<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Advanced Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/selfhosted-guide"><span class="truncate">Advanced Guide</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Troubleshooting" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/troubleshooting"><span class="truncate">Troubleshooting</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Migration Guides" data-nb-active="1">Migration Guides<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-4"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="CLIENT" data-nb-active="0">CLIENT</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Profiles" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/client/profiles"><span class="truncate">Profiles</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Environment Variables" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/client/environment-variables"><span class="truncate">Environment Variables</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Settings" data-nb-active="0">Settings<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-5"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="USE CASES" data-nb-active="0">USE CASES</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Overview" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/use-cases"><span class="truncate">Overview</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Remote Access" data-nb-active="0">Remote Access<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Homelab" data-nb-active="0">Homelab<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Security" data-nb-active="0">Security<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-6"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="COMPLIANCE" data-nb-active="0">COMPLIANCE</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Overview" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/compliance"><span class="truncate">Overview</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Bacen 4.893 (Brazil)" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/compliance/bacen-4893"><span class="truncate">Bacen 4.893 (Brazil)</span></a></div></li></ul></div></li></div><div class="outer-wrapper-7"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="GET MORE HELP" data-nb-active="0">GET MORE HELP</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Troubleshooting client issues" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/help/troubleshooting-client"><span class="truncate">Troubleshooting client issues</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Report bugs and issues" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/help/report-bug-issues"><span class="truncate">Report bugs and issues</span></a></div></li></ul></div></li></div><li class="sticky bottom-0 z-10 mt-6 min-[416px]:hidden"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-900 py-1 px-3 text-white hover:bg-zinc-700 dark:bg-openzro dark:text-white dark:hover:bg-openzro-dark w-full" href="https://app.openzro.io/">Sign in</a></li></ul></nav></div><div class="fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-3 px-5 transition h-[64px] lg:left-72 lg:z-50 lg:px-8 xl:left-80 min-h-[64px] lg:pointer-events-auto backdrop-blur-lg bg-white/70 dark:bg-[#181A1D]/95 lg:left-72 xl:left-80" style="top:0"><div class="absolute inset-x-0 top-full h-px transition border-b border-transparent border-zinc-900/10 dark:border-neutral-700/50"></div><div class="hidden lg:block lg:max-w-md lg:flex-auto"><button type="button" class="hidden h-8 w-full items-center gap-2 rounded-full bg-white pl-2 pr-3 text-sm text-zinc-500 ring-1 ring-zinc-900/10 transition hover:ring-zinc-900/20 dark:bg-white/5 dark:text-zinc-400 dark:ring-inset dark:ring-white/10 dark:hover:ring-white/20 lg:flex focus:[&amp;:not(:focus-visible)]:outline-none"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"></path></svg>Search...<kbd class="ml-auto text-2xs text-zinc-400 dark:text-zinc-500"><kbd class="font-sans"></kbd><kbd class="font-sans">K</kbd></kbd></button></div><div class="flex items-center gap-2 lg:hidden"><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5" aria-label="Toggle navigation"><svg viewBox="0 0 10 9" fill="none" stroke-linecap="round" aria-hidden="true" class="w-2.5 stroke-zinc-900 dark:stroke-white"><path d="M.5 1h9M.5 8h9M.5 4.5h9"></path></svg></button><a aria-label="Home" href="/"><span class="inline-flex items-center gap-2 select-none"><img src="/docs-static/img/logo/openzro-icon.svg" alt="" height="28" width="28" class="h-7 w-7"/><span class="font-semibold text-zinc-900 dark:text-white tracking-[-0.025em] leading-none text-lg" style="font-family:Geist, ui-sans-serif, system-ui, sans-serif">open<span class="font-bold text-violet-600 dark:text-violet-400">Z</span>ro</span></span></a></div><div class="flex items-center gap-3 xl:gap-2"><nav class="hidden md:block"><ul role="list" class="flex items-center gap-3 xl:gap-2 m-0 p-0 list-none"><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="/">Docs</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="/api">API</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="https://github.com/openzro/openzro">GitHub</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="https://github.com/openzro/openzro/discussions">Support</a></li></ul></nav><div class="hidden md:block md:h-5 md:w-px md:bg-zinc-900/10 md:dark:bg-neutral-500/20"></div><div class="flex gap-2"><div class="contents lg:hidden"><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 lg:hidden focus:[&amp;:not(:focus-visible)]:outline-none" aria-label="Search..."><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-zinc-900 dark:stroke-white"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"></path></svg></button></div><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5" aria-label="Toggle dark mode"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-zinc-900 dark:hidden"><path d="M12.5 10a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"></path><path stroke-linecap="round" d="M10 5.5v-1M13.182 6.818l.707-.707M14.5 10h1M13.182 13.182l.707.707M10 15.5v-1M6.11 13.889l.708-.707M4.5 10h1M6.11 6.111l.708.707"></path></svg><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="hidden h-5 w-5 stroke-white dark:block"><path d="M15.224 11.724a5.5 5.5 0 0 1-6.949-6.949 5.5 5.5 0 1 0 6.949 6.949Z"></path></svg></button></div><div class="hidden min-[416px]:contents"><div class="relative inline-flex group transition-all"><span class="absolute h-full w-full left-0 top-0 blur-sm bg-openzro z-0 transition-all duration-200 transform-gpu opacity-0 group-hover:opacity-100 pointer-events-none"></span><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-[5px] bg-openzro text-white border-0 border-transparent duration-300 relative overflow-hidden group !py-1.5 !px-3 text-xs" target="_blank" href="https://github.com/openzro/openzro/releases/latest"><span class="absolute h-full w-full left-0 top-0 z-10 bg-gradient-to-br from-openzro to-openzro-dark transition-all duration-200 transform-gpu opacity-0 group-hover:opacity-100 pointer-events-none"></span><span class="z-20 relative flex gap-2 items-center transition-all">Get openZro</span></a></div></div></div></div></header><div class="min-w-0 max-w-2xl flex-auto px-4 py-16 lg:max-w-none lg:pl-8 lg:pr-0 xl:px-5"><main class="py-16"><article class="prose dark:prose-invert"><h1>Migration Guide: External IdP to Embedded IdP</h1>
+<p>This guide walks through migrating a self-hosted openZro deployment from an external identity provider to the embedded IdP introduced in v0.62.0.</p>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p><strong>Who is this guide for?</strong> This migration guide is for users who:</p><ul>
+<li>Have an existing self-hosted deployment using an <strong>external IdP</strong></li>
+<li>Want to move to the <strong>embedded Dex-based IdP</strong> for a simpler, self-contained authentication setup</li>
+</ul></div></div>
+<h2 id="overview" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#overview"><div>Overview</div></a></h2>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Migrating to the embedded IdP also unlocks the <a href="/selfhosted/migration/combined-container">Combined Container Setup migration</a>, which consolidates management, signal, relay, and STUN into a single container. If you plan to simplify your deployment, complete this IdP migration first, then follow the combined container guide.</p></div></div>
+<p>The migration tool does two things:</p>
+<ol>
+<li><strong>Re-encodes user IDs</strong> in the database to include the external connector ID, so Dex can route returning users to the correct external provider.</li>
+<li><strong>Generates a new <code>management.json</code></strong> that replaces <code>IdpManagerConfig</code> with <code>EmbeddedIdP</code> and updates OAuth2 endpoints to the embedded Dex issuer.</li>
+</ol>
+<p>After migration, existing users keep logging in through the same external provider — Dex acts as a broker in front of it. No passwords or credentials change.</p>
+<hr/>
+<h2 id="before-you-begin" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#before-you-begin"><div>Before You Begin</div></a></h2>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>This guide assumes you&#x27;re using Docker and everything is run in the same bash session, if you&#x27;re using a different setup, adjust the commands accordingly.</p></div></div>
+<h3 id="prerequisites" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#prerequisites"><div>Prerequisites</div></a></h3>
+<table><thead><tr><th>Requirement</th><th>Details</th></tr></thead><tbody><tr><td>openZro version</td><td>v0.67.2 or later</td></tr><tr><td>Config access</td><td>You can read and write <code>management.json</code></td></tr><tr><td>Server downtime</td><td>The management server <strong>must be stopped</strong> during migration</td></tr><tr><td>Backups</td><td>Back up your database and config before starting</td></tr></tbody></table>
+<h3 id="flags-and-environment-variables" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#flags-and-environment-variables"><div>Flags and Environment variables</div></a></h3>
+<table><thead><tr><th>Flag</th><th>Environment variable</th><th>Description</th><th>Expected format</th></tr></thead><tbody><tr><td><code>--domain</code></td><td><code>NETBIRD_DOMAIN</code></td><td>Domain for both dashboard and API</td><td>example.com</td></tr><tr><td><code>--dashboard-url</code></td><td><code>NETBIRD_DASHBOARD_URL</code></td><td>Dashboard domain (will override --domain)</td><td>example.com or example.com:33073 or <a href="https://example.com">https://example.com</a></td></tr><tr><td><code>--api-url</code></td><td><code>NETBIRD_API_URL</code></td><td>API domain (will override --domain)</td><td>example.com or example.com:33073 or <a href="https://example.com">https://example.com</a></td></tr><tr><td><code>--config</code></td><td><code>NETBIRD_CONFIG_PATH</code></td><td>Path to management.json (required)</td><td>/path/to/management.json</td></tr><tr><td><code>--datadir</code></td><td><code>NETBIRD_DATA_DIR</code></td><td>Override data directory from config (store.db path will be derived from this)</td><td>/path/to/datadir</td></tr><tr><td><code>--idp-seed-info</code></td><td><code>NETBIRD_IDP_SEED_INFO</code></td><td>Base64-encoded connector JSON</td><td>base64-encoded JSON string</td></tr><tr><td><code>--dry-run</code></td><td><code>NETBIRD_DRY_RUN</code></td><td>Preview changes without writing</td><td>true or false</td></tr><tr><td><code>--force</code></td><td><code>NETBIRD_FORCE</code></td><td>Skip confirmation prompt</td><td>true or false</td></tr><tr><td><code>--skip-config</code></td><td><code>NETBIRD_SKIP_CONFIG</code></td><td>Skip config generation (DB migration only)</td><td>true or false</td></tr><tr><td><code>--skip-populate-user-info</code></td><td><code>NETBIRD_SKIP_POPULATE_USER_INFO</code></td><td>Skip populating user info (user id migration only)</td><td>true or false</td></tr><tr><td><code>--log-level</code></td><td><code>NETBIRD_LOG_LEVEL</code></td><td>Log level: debug, info, warn, error (default &quot;info&quot;)</td><td>debug, info, warn, error</td></tr></tbody></table>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>When to use --domain vs --dashboard-domain vs --api-domain:</p><ul>
+<li>If you have a single domain for both dashboard and API, use --domain</li>
+<li>If you don&#x27;t have a reverse proxy in front of dashboard and API, make sure you use the domain + port combination for each.
+For example, <code>--dashboard-domain demo.openzro.io</code> and <code>--api-domain demo.openzro.io:33073</code></li>
+</ul></div></div>
+<hr/>
+<h2 id="step-1-prepare-your-management-server" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#step-1-prepare-your-management-server"><div>Step 1: Prepare your Management Server</div></a></h2>
+<p>Make sure your management server is on the latest version, otherwise management will not be able to properly parse the new <code>management.json</code> file generated by this migration tool.</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">docker</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">compose</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">pull</span></span>
+<span><span style="color: var(--shiki-token-function)">docker</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">compose</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">up</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">-d</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">management</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<div class="my-6 flex gap-2.5 rounded-l border border-red-500/20 bg-red-50/50 p-4 leading-6 text-red-900 dark:border-red-500/30 dark:bg-red-500/5 dark:text-red-200 dark:[--tw-prose-links-hover:theme(colors.red.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-red-500 stroke-white dark:fill-red-200/20 dark:stroke-red-200"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 3.5L3.5 12.5h9L8 3.5z"></path><circle cx="8" cy="9" r=".5" fill="none"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 6.5v1"></path></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Before starting the migration, it&#x27;s also a good idea to log out of the dashboard, as you might get a &quot;stale&quot; token from the old IdP which can cause 401 errors.</p></div></div>
+<hr/>
+<h2 id="step-2-get-the-migration-tool" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#step-2-get-the-migration-tool"><div>Step 2: Get the Migration Tool</div></a></h2>
+<p><strong>Option A — Download a pre-built binary:</strong></p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-comment)"># Replace VERSION with the release tag, and adjust the architecture as needed</span></span>
+<span><span style="color: var(--shiki-token-function)">curl</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">-L</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">-o</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">openzro-idp-migrate.tar.gz</span><span style="color: var(--shiki-color-text)"> \</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-string)">https://github.com/openzro/openzro/releases/download/v0.67.2/openzro-idp-migrate_0.67.2_linux_amd64.tar.gz</span></span>
+<span><span style="color: var(--shiki-token-function)">tar</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">xzf</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">openzro-idp-migrate.tar.gz</span></span>
+<span><span style="color: var(--shiki-token-function)">chmod</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">+x</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">openzro-idp-migrate</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Available architectures: <code>linux_amd64</code>, <code>linux_arm64</code>, <code>linux_arm</code>.</p>
+<p><strong>Option B — Build from source</strong> (requires Go 1.25+ and a C compiler for CGO/SQLite):</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">go</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">build</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">-o</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">openzro-idp-migrate</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">./tools/idp-migrate/</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Copy the binary to the management server host if you built it elsewhere.</p>
+<hr/>
+<h2 id="step-3-prepare-your-provider" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#step-3-prepare-your-provider"><div>Step 3: Prepare Your Provider</div></a></h2>
+<p>The new embedded IdP made the generation of the OIDC connector config easier, that&#x27;s why we recommend generating a new application for your provider.</p>
+<p>When following the guides to generate the application, make sure you store the client ID and client Secret somewhere safe. You&#x27;ll need them later.</p>
+<p>To spare details in this guide, you can use the following guides to create the OIDC connector configuration for your provider:</p>
+<ul>
+<li>
+<a href="/selfhosted/identity-providers/managed/auth0" target="_blank">Auth0</a>
+</li>
+<li>
+<a href="/selfhosted/identity-providers/managed/microsoft-entra-id" target="_blank">Azure AD</a>
+</li>
+<li>
+<a href="/selfhosted/identity-providers/keycloak" target="_blank">Keycloak</a>
+</li>
+<li>
+<a href="/selfhosted/identity-providers/managed/okta" target="_blank">Okta</a>
+</li>
+<li>
+<a href="/selfhosted/identity-providers/authentik" target="_blank">Authentik</a>
+</li>
+<li>
+<a href="/selfhosted/identity-providers/pocketid" target="_blank">PocketID</a>
+</li>
+<li>
+<a href="/selfhosted/identity-providers/managed/google-workspace" target="_blank">Google Workspace</a>
+</li>
+<li>
+<a href="/selfhosted/identity-providers/managed/jumpcloud" target="_blank">JumpCloud</a>
+</li>
+<li>
+<a href="/selfhosted/identity-providers/zitadel" target="_blank">Zitadel</a>
+</li>
+</ul>
+<h3 id="creating-the-id-p-seed-info" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#creating-the-id-p-seed-info"><div>Creating the IdP Seed info</div></a></h3>
+<p>With the client id and client secret from the previous step, you can create the <code>idp-seed-info</code> for the tool, which will be used to generate the OIDC connector config.</p>
+<ol>
+<li>We&#x27;ll create a new file &quot;connector.json&quot; with the following contents, make sure you remember where you save it:</li>
+</ol>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-json"><span><span style="color: var(--shiki-color-text)">{</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">&quot;type&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;oidc&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">&quot;name&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;My Provider&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">&quot;id&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;my-provider&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">  </span><span style="color: var(--shiki-token-keyword)">&quot;config&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> {</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;issuer&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;https://idp.example.com&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;clientID&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;my-client-id&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;clientSecret&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;my-client-secret&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">  }</span></span>
+<span><span style="color: var(--shiki-color-text)">}</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Using Zitadel as an example, the JSON should have the following values:</p><ul>
+<li>&quot;issuer&quot;: is the root domain of your zitadel instance, make sure you don&#x27;t have any trailing slashes (e.g. <a href="https://zitadel.example.com">https://zitadel.example.com</a>)</li>
+<li>&quot;clientID&quot; and &quot;clientSecret&quot;: are the values you copy when creating the OAuth app</li>
+</ul></div></div>
+<ol start="2">
+<li>Encode and store it in the <code>NETBIRD_IDP_SEED_INFO</code> environment variable:</li>
+</ol>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-keyword)">export</span><span style="color: var(--shiki-color-text)"> NETBIRD_IDP_SEED_INFO</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string-expression)">$(</span><span style="color: var(--shiki-token-function)">base64</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-keyword)">&lt;</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-string)">connector.json</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-keyword)">|</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-function)">tr</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-string)">-d</span><span style="color: var(--shiki-token-string-expression)"> &#39;\n&#39;)</span><span style="color: var(--shiki-color-text)"> </span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<hr/>
+<h2 id="step-4-stop-the-management-server" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#step-4-stop-the-management-server"><div>Step 4: Stop the Management Server</div></a></h2>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">docker</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">compose</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">stop</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">management</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<hr/>
+<h2 id="step-5-back-up-your-data" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#step-5-back-up-your-data"><div>Step 5: Back Up Your Data</div></a></h2>
+<p>The tool creates <code>management.json.bak</code> automatically, but always make your own backups.</p>
+<div class="my-6 flex gap-2.5 rounded-l border border-red-500/20 bg-red-50/50 p-4 leading-6 text-red-900 dark:border-red-500/30 dark:bg-red-500/5 dark:text-red-200 dark:[--tw-prose-links-hover:theme(colors.red.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-red-500 stroke-white dark:fill-red-200/20 dark:stroke-red-200"><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 3.5L3.5 12.5h9L8 3.5z"></path><circle cx="8" cy="9" r=".5" fill="none"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 6.5v1"></path></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Do not skip this step. The migration modifies user IDs in the database. A manual backup is your only recovery path if something goes wrong.</p></div></div>
+<p><strong>Docker Compose (SQLite in a named volume):</strong></p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-comment)"># Identify the volume name</span></span>
+<span><span style="color: var(--shiki-color-text)">VOLUME_NAME</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string-expression)">$(</span><span style="color: var(--shiki-token-function)">docker</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-string)">volume</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-string)">ls</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-string)">--format</span><span style="color: var(--shiki-token-string-expression)"> &#39;{{ .Name }}&#39; </span><span style="color: var(--shiki-token-keyword)">|</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-function)">grep</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-string)">-Ei</span><span style="color: var(--shiki-token-string-expression)"> &#39;management|mgmt&#39;)</span></span>
+<span><span style="color: var(--shiki-token-function)">echo</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;Volume: $VOLUME_NAME&quot;</span></span>
+<span></span>
+<span><span style="color: var(--shiki-token-comment)"># Get the host path</span></span>
+<span><span style="color: var(--shiki-token-keyword)">export</span><span style="color: var(--shiki-color-text)"> NETBIRD_DATA_DIR</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string-expression)">$(</span><span style="color: var(--shiki-token-function)">docker</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-string)">volume</span><span style="color: var(--shiki-token-string-expression)"> </span><span style="color: var(--shiki-token-string)">inspect</span><span style="color: var(--shiki-token-string-expression)"> &quot;$VOLUME_NAME&quot; </span><span style="color: var(--shiki-token-string)">--format</span><span style="color: var(--shiki-token-string-expression)"> &#39;{{ .Mountpoint }}&#39;)</span></span>
+<span><span style="color: var(--shiki-token-function)">echo</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;Path: $NETBIRD_DATA_DIR&quot;</span></span>
+<span></span>
+<span><span style="color: var(--shiki-token-comment)"># (SQLite only) Verify store.db exists, then back up</span></span>
+<span><span style="color: var(--shiki-token-function)">sudo</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">ls</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;$NETBIRD_DATA_DIR/store.db&quot;</span></span>
+<span><span style="color: var(--shiki-token-function)">sudo</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">cp</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;$NETBIRD_DATA_DIR/store.db&quot;</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;$NETBIRD_DATA_DIR/store.db.bak&quot;</span></span>
+<span></span>
+<span><span style="color: var(--shiki-token-comment)"># Verify management.json exists, the path will vary based on your setup, then back up</span></span>
+<span><span style="color: var(--shiki-token-keyword)">export</span><span style="color: var(--shiki-color-text)"> NETBIRD_CONFIG_PATH</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string-expression)">&quot;&lt;path-to-config&gt;/management.json&quot;</span></span>
+<span><span style="color: var(--shiki-token-function)">cat</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;$NETBIRD_CONFIG_PATH&quot;</span></span>
+<span></span>
+<span><span style="color: var(--shiki-token-function)">cp</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;$NETBIRD_CONFIG_PATH&quot;</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;$NETBIRD_CONFIG_PATH.bak&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<hr/>
+<h2 id="step-6-run-the-migration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#step-6-run-the-migration"><div>Step 6: Run the Migration</div></a></h2>
+<h3 id="validate-required-env-vars-flags" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#validate-required-env-vars-flags"><div>Validate required env vars / flags</div></a></h3>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">echo</span><span style="color: var(--shiki-color-text)"> $NETBIRD_CONFIG_PATH</span></span>
+<span><span style="color: var(--shiki-token-function)">echo</span><span style="color: var(--shiki-color-text)"> $NETBIRD_DATA_DIR</span></span>
+<span><span style="color: var(--shiki-token-function)">echo</span><span style="color: var(--shiki-color-text)"> $NETBIRD_IDP_SEED_INFO </span><span style="color: var(--shiki-token-keyword)">|</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-function)">base64</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">-d</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>You should expect to see an output similar to this:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code>/etc/openzro/management.json
+/var/lib/docker/volumes/management_data/_data
+{
+  "type": "oidc",
+  "name": "my-provider",
+  "id": "my-provider",
+  "config": {
+    "issuer": "https://idp.example.com",
+    "clientID": "my-client-id",
+    "clientSecret": "my-client-secret",
+  }
+}
+</code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<h3 id="postgre-sql-only-verify-that-the-database-env-var-is-set" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#postgre-sql-only-verify-that-the-database-env-var-is-set"><div>(PostgreSQL only) Verify that the database env var is set</div></a></h3>
+<p>The postgres store engine requires the postgres container to expose the port over the host
+so that the migration tool can connect to it. You can set the env var in your shell:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-comment)"># This should match the same env var content that is passed to the management server</span></span>
+<span><span style="color: var(--shiki-token-keyword)">export</span><span style="color: var(--shiki-color-text)"> NB_STORE_ENGINE_POSTGRES_DSN</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string-expression)">&quot;host=localhost port=5432 user=postgres password=postgres dbname=openzro sslmode=disable&quot;</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>If you don&#x27;t see the expected output, please make sure you followed the steps in this guide, or that you use
+the correct flags while running the tool.</p>
+<h3 id="dry-run-always-do-this-first" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#dry-run-always-do-this-first"><div>Dry run (always do this first)</div></a></h3>
+<p>Assuming that you&#x27;ve followed the steps in this guide, you should be able to run the tool with the following command:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">./openzro-idp-migrate</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">--domain</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">mgmt.example.com</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">--dry-run</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>If the env vars are not set, you can use the flags listed at the <a href="/selfhosted/migration/external-to-embedded-idp#flags-and-environment-variables">Flags and Environment variables</a> section.</p></div></div>
+<p>After running the dry run command you should see output like:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code>INFO resolved connector: type=oidc, id=auth0, name=auth0
+INFO found 12 total users: 12 pending migration, 0 already migrated
+INFO [DRY RUN] would migrate user abc123 -> CgZhYmMxMjMSB3ppdGFkZWw (account: acct-1)
+...
+INFO [DRY RUN] migration summary: 12 users would be migrated, 0 already migrated
+INFO derived domain for embedded IdP: mgmt.example.com
+INFO [DRY RUN] new management.json would be:
+{ ... }
+</code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Verify before proceeding:</p>
+<ul>
+<li>Connector type and ID match your provider.</li>
+<li>User count matches what you expect.</li>
+<li>Generated config has the correct domain and endpoints.</li>
+</ul>
+<h3 id="execute-the-migration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#execute-the-migration"><div>Execute the migration</div></a></h3>
+<p>Run the same command without <code>--dry-run</code>:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">./openzro-idp-migrate</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">--domain</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">mgmt.example.com</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>The tool will show a summary and prompt for confirmation:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code>About to migrate 12 users. This cannot be easily undone. Continue? [y/N]
+</code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Type <code>y</code> and press Enter.</p>
+<h3 id="review-the-new-config" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#review-the-new-config"><div>Review the new config</div></a></h3>
+<p>Your <code>management.json</code> should be significantly smaller now, and the OIDC connector config should be present in <code>StaticConnectors</code>.
+Make sure you verify the following:</p>
+<ul>
+<li><code>IdpManagerConfig</code> is <strong>removed</strong>.</li>
+<li><code>EmbeddedIdP</code> is present with <code>&quot;Enabled&quot;: true</code> and your connector in <code>StaticConnectors</code>.</li>
+</ul>
+<hr/>
+<h2 id="step-7-post-migration-configuration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#step-7-post-migration-configuration"><div>Step 7: Post-Migration Configuration</div></a></h2>
+<h3 id="update-your-reverse-proxy" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#update-your-reverse-proxy"><div>Update your reverse proxy</div></a></h3>
+<p>The embedded Dex IdP is served under <code>/oauth2/</code>. Your reverse proxy must route this path to the management server.</p>
+<p><strong>Caddy</strong> — add to your <code>Caddyfile</code> inside the site block for your management domain:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code>reverse_proxy /oauth2/* management:80
+</code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Place it alongside existing <code>/api/*</code> and <code>/management.ManagementService/*</code> routes, then reload:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">docker</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">compose</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">restart</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">caddy</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p><strong>Nginx:</strong></p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-nginx"><span><span style="color: var(--shiki-token-keyword)">location</span><span style="color: var(--shiki-color-text)"> /oauth2/ {</span></span>
+<span><span style="color: var(--shiki-color-text)">   </span><span style="color: var(--shiki-token-keyword)"> proxy_pass </span><span style="color: var(--shiki-color-text)">http://management:80;</span></span>
+<span><span style="color: var(--shiki-color-text)">   </span><span style="color: var(--shiki-token-keyword)"> proxy_set_header </span><span style="color: var(--shiki-color-text)">Host $host;</span></span>
+<span><span style="color: var(--shiki-color-text)">   </span><span style="color: var(--shiki-token-keyword)"> proxy_set_header </span><span style="color: var(--shiki-color-text)">X-Real-IP $remote_addr;</span></span>
+<span><span style="color: var(--shiki-color-text)">   </span><span style="color: var(--shiki-token-keyword)"> proxy_set_header </span><span style="color: var(--shiki-color-text)">X-Forwarded-For $proxy_add_x_forwarded_for;</span></span>
+<span><span style="color: var(--shiki-color-text)">   </span><span style="color: var(--shiki-token-keyword)"> proxy_set_header </span><span style="color: var(--shiki-color-text)">X-Forwarded-Proto $scheme;</span></span>
+<span><span style="color: var(--shiki-color-text)">}</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Reload nginx after adding the route.</p>
+<p><strong>Traefik:</strong> Add a route matching the <code>/oauth2/</code> path prefix, forwarding to the management service.</p>
+<p><strong>Verify the route works:</strong></p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">curl</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">-s</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">https://</span><span style="color: var(--shiki-token-keyword)">&lt;</span><span style="color: var(--shiki-token-string)">your-domai</span><span style="color: var(--shiki-color-text)">n</span><span style="color: var(--shiki-token-keyword)">&gt;</span><span style="color: var(--shiki-token-string)">/oauth2/.well-known/openid-configuration</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-keyword)">|</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-function)">head</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">-5</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>Expected: a JSON response with <code>&quot;issuer&quot;: &quot;https://&lt;your-domain&gt;/oauth2&quot;</code>.</p>
+<h3 id="update-dashboard-environment" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#update-dashboard-environment"><div>Update dashboard environment</div></a></h3>
+<p>Your dashboard should also be updated to use the embedded IdP configuration, for this, make sure you update the
+<code>dashboard.env</code> or environment variables (check docker compose file for reference).</p>
+<p>Your env vars should have the following values:</p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-color-text)">AUTH_AUDIENCE</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">openzro-dashboard</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_CLIENT_ID</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">openzro-dashboard</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_AUTHORITY</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">https://</span><span style="color: var(--shiki-token-keyword)">&lt;</span><span style="color: var(--shiki-token-string)">your-domai</span><span style="color: var(--shiki-color-text)">n</span><span style="color: var(--shiki-token-keyword)">&gt;</span><span style="color: var(--shiki-token-string)">/oauth2</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_SUPPORTED_SCOPES</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">openid</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-function)">profile</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">email</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">groups</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_REDIRECT_URI</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">/nb-auth</span></span>
+<span><span style="color: var(--shiki-color-text)">AUTH_SILENT_REDIRECT_URI</span><span style="color: var(--shiki-token-keyword)">=</span><span style="color: var(--shiki-token-string)">/nb-silent-auth</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>If you&#x27;re using docker, make sure to recreate the dashboard container to apply the new environment variables with <code>docker compose up -d dashboard</code></p>
+<hr/>
+<h2 id="step-8-start-and-verify" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#step-8-start-and-verify"><div>Step 8: Start and Verify</div></a></h2>
+<h3 id="start-the-management-server" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#start-the-management-server"><div>Start the management server</div></a></h3>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-bash"><span><span style="color: var(--shiki-token-function)">docker</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">compose</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">up</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">-d</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string)">management</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<h3 id="verify-everything-works" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#verify-everything-works"><div>Verify everything works</div></a></h3>
+<ol>
+<li><strong>OIDC discovery:</strong> Open <code>https://&lt;your-domain&gt;/oauth2/.well-known/openid-configuration</code> — it should return valid JSON.</li>
+<li><strong>Dashboard login:</strong> Log in to the dashboard — you should be redirected through your external IdP as before.</li>
+<li><strong>Data integrity:</strong> Check that peers are visible and policies are intact.</li>
+</ol>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>Use an incognito/private browser window or clear cookies for your first login. Stale tokens from the old IdP will fail validation.</p></div></div>
+<hr/>
+<h2 id="troubleshooting" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#troubleshooting"><div>Troubleshooting</div></a></h2>
+<h3 id="store-does-not-support-migration-operations" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#store-does-not-support-migration-operations"><div>&quot;store does not support migration operations&quot;</div></a></h3>
+<p>The store implementation is missing the required <code>ListUsers</code>/<code>UpdateUserID</code> methods. Upgrade to v0.67.2+ binaries.</p>
+<h3 id="could-not-open-activity-store" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#could-not-open-activity-store"><div>&quot;could not open activity store&quot;</div></a></h3>
+<p>This is a <strong>warning</strong>, not an error. If <code>events.db</code> doesn&#x27;t exist (e.g., fresh install), activity event migration is skipped. User ID migration in the main database still proceeds normally.</p>
+<h3 id="no-connector-configuration-found" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#no-connector-configuration-found"><div>&quot;no connector configuration found&quot;</div></a></h3>
+<p>No IdP configuration was detected. Provide it explicitly with <code>--idp-seed-info</code>, or set the <code>IDP_SEED_INFO</code> env var.</p>
+<h3 id="errors-app-not-found-from-zitadel-after-migration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#errors-app-not-found-from-zitadel-after-migration"><div>&quot;Errors.App.NotFound&quot; from Zitadel after migration</div></a></h3>
+<p>The dashboard is still redirecting to Zitadel&#x27;s <code>/oauth/v2/</code> endpoint instead of the management server&#x27;s <code>/oauth2</code> endpoint. Set <code>AUTH_AUTHORITY=https://&lt;your-domain&gt;/oauth2</code> in your dashboard environment — see <a href="/selfhosted/migration/external-to-embedded-idp#update-dashboard-environment">Update dashboard environment</a>.</p>
+<h3 id="oidc-discovery-returns-404" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#oidc-discovery-returns-404"><div>OIDC discovery returns 404</div></a></h3>
+<p>The <code>/oauth2/</code> path is not being routed to the management server. Add a reverse proxy route — see <a href="/selfhosted/migration/external-to-embedded-idp#update-your-reverse-proxy">Update your reverse proxy</a>.</p>
+<h3 id="jumpcloud-does-not-have-a-supported-dex-connector-type" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#jumpcloud-does-not-have-a-supported-dex-connector-type"><div>&quot;jumpcloud does not have a supported Dex connector type&quot;</div></a></h3>
+<p>JumpCloud has no native Dex connector. Configure a generic OIDC connector manually with <code>--idp-seed-info</code> — see <a href="/selfhosted/migration/external-to-embedded-idp#other-providers-auth0-azure-ad-keycloak-okta-authentik-pocketid-google-jumpcloud-etc">Other Providers</a> in Step 3.</p>
+<h3 id="failed-to-create-embedded-idp-service-cannot-disable-local-authentication" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#failed-to-create-embedded-idp-service-cannot-disable-local-authentication"><div>&quot;failed to create embedded IDP service: cannot disable local authentication...&quot;</div></a></h3>
+<p>The embedded IdP didn&#x27;t support <code>StaticConnectors</code> in this config version. Upgrade to v0.67.2+ which includes this fix.</p>
+<h3 id="partial-failure-re-running" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#partial-failure-re-running"><div>Partial failure / re-running</div></a></h3>
+<p>The migration is <strong>idempotent</strong>. Already-migrated users are detected and skipped. If the tool fails partway through, fix the underlying issue and re-run — it picks up where it left off.</p>
+<hr/>
+<h2 id="rolling-back" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/selfhosted/migration/external-to-embedded-idp#rolling-back"><div>Rolling Back</div></a></h2>
+<p>If something goes wrong after migration:</p>
+<ol>
+<li><strong>Stop</strong> the management server: <code>docker compose stop management</code></li>
+<li><strong>Restore the database:</strong>
+<ul>
+<li>SQLite (Docker volume): <code>sudo cp $NETBIRD_DATA_DIR/store.db.bak $NETBIRD_DATA_DIR/store.db</code></li>
+<li>PostgreSQL: restore from your <code>pg_dump</code> backup</li>
+</ul>
+</li>
+<li><strong>Restore the config:</strong> <code>cp $NETBIRD_CONFIG_PATH.bak $NETBIRD_CONFIG_PATH</code></li>
+<li><strong>Revert</strong> any reverse proxy or dashboard env changes.</li>
+<li><strong>Start</strong> the management server: <code>docker compose up -d management</code></li>
+</ol></article></main><footer class="mx-auto max-w-2xl space-y-10 pb-16 lg:max-w-5xl"><div class="relative h-8"><form class="absolute inset-0 flex items-center justify-center gap-6 md:justify-start"><p class="text-sm text-zinc-600 dark:text-zinc-400">Was this page helpful?</p><div class="group grid h-8 grid-cols-[1fr,1px,1fr] overflow-hidden rounded-full border border-zinc-900/10 dark:border-white/10"><button type="submit" class="px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-900/2.5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white" data-response="yes">Yes</button><div class="bg-zinc-900/10 dark:bg-white/10"></div><button type="submit" class="px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-900/2.5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white" data-response="no">No</button></div></form></div><div class="flex"><div class="flex flex-col items-start gap-3"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-100 py-1 px-3 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-400 dark:ring-1 dark:ring-inset dark:ring-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-300" aria-label="Previous: Enable Reverse Proxy" href="/selfhosted/migration/enable-reverse-proxy"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 h-5 w-5 -ml-1 rotate-180"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11.5 6.5 3 3.5m0 0-3 3.5m3-3.5h-9"></path></svg>Previous</a><a tabindex="-1" aria-hidden="true" class="text-base font-semibold text-zinc-900 transition hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300" href="/selfhosted/migration/enable-reverse-proxy">Enable Reverse Proxy</a></div><div class="ml-auto flex flex-col items-end gap-3"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-100 py-1 px-3 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-400 dark:ring-1 dark:ring-inset dark:ring-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-300" aria-label="Next: Profiles" href="/client/profiles">Next<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 h-5 w-5 -mr-1"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11.5 6.5 3 3.5m0 0-3 3.5m3-3.5h-9"></path></svg></a><a tabindex="-1" aria-hidden="true" class="text-base font-semibold text-zinc-900 transition hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300" href="/client/profiles">Profiles</a></div></div><div class="flex flex-col items-center justify-between gap-5 border-t border-zinc-900/5 pt-8 dark:border-white/5 sm:flex-row"><p class="text-xs text-zinc-600 dark:text-zinc-400">© Copyright <!-- -->2026<!-- -->. All rights reserved.</p><div class="flex gap-4"><a class="group" href="https://github.com/openzro/openzro"><span class="sr-only">openZro on GitHub</span><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-900 dark:group-hover:fill-zinc-500"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.667c-4.605 0-8.334 3.823-8.334 8.544 0 3.78 2.385 6.974 5.698 8.106.417.075.573-.182.573-.406 0-.203-.011-.875-.011-1.592-2.093.397-2.635-.522-2.802-1.002-.094-.246-.5-1.005-.854-1.207-.291-.16-.708-.556-.01-.567.656-.01 1.124.62 1.281.876.75 1.292 1.948.93 2.427.705.073-.555.291-.93.531-1.143-1.854-.213-3.791-.95-3.791-4.218 0-.929.322-1.698.854-2.296-.083-.214-.375-1.09.083-2.265 0 0 .698-.224 2.292.876a7.576 7.576 0 0 1 2.083-.288c.709 0 1.417.096 2.084.288 1.593-1.11 2.291-.875 2.291-.875.459 1.174.167 2.05.084 2.263.53.599.854 1.357.854 2.297 0 3.278-1.948 4.005-3.802 4.219.302.266.563.78.563 1.58 0 1.143-.011 2.061-.011 2.35 0 .224.156.491.573.405a8.365 8.365 0 0 0 4.11-3.116 8.707 8.707 0 0 0 1.567-4.99c0-4.721-3.73-8.545-8.334-8.545Z"></path></svg></a><a class="group" href="https://github.com/openzro/openzro/discussions"><span class="sr-only">Discussions</span><svg viewBox="56 56 160 160" aria-hidden="true" class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-900 dark:group-hover:fill-zinc-500"><g><g><path d="M99.4,151.2c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h12.9V151.2z"></path><path d="M105.9,151.2c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v32.3c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9 C105.9,183.5,105.9,151.2,105.9,151.2z"></path></g><g><path d="M118.8,99.4c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v12.9H118.8z"></path><path d="M118.8,105.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H86.5c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9 C86.5,105.9,118.8,105.9,118.8,105.9z"></path></g><g><path d="M170.6,118.8c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9h-12.9V118.8z"></path><path d="M164.1,118.8c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9V86.5c0-7.1,5.8-12.9,12.9-12.9 c7.1,0,12.9,5.8,12.9,12.9V118.8z"></path></g><g><path d="M151.2,170.6c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9v-12.9H151.2z"></path><path d="M151.2,164.1c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h32.3c7.1,0,12.9,5.8,12.9,12.9 c0,7.1-5.8,12.9-12.9,12.9H151.2z"></path></g></g></svg></a></div></div></footer></div><div class="hidden xl:sticky xl:top-[4.5rem] xl:-mr-6 xl:block xl:h-[calc(100vh-4.5rem)] xl:flex-none xl:overflow-y-auto xl:py-16 xl:pr-6 pl-12" style="top:calc(0px + 4.5rem)"><ol role="list" class="mt-4 space-y-3 text-sm mb-8"><li><button style="display:inline;min-width:90px;text-align:left;justify-content:center;align-items:center" class="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal&#x27;"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paperclip" class="svg-inline--fa fa-paperclip icon pr-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="font-size:18px"><path fill="currentColor" d="M364.2 83.8c-24.4-24.4-64-24.4-88.4 0l-184 184c-42.1 42.1-42.1 110.3 0 152.4s110.3 42.1 152.4 0l152-152c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-152 152c-64 64-167.6 64-231.6 0s-64-167.6 0-231.6l184-184c46.3-46.3 121.3-46.3 167.6 0s46.3 121.3 0 167.6l-176 176c-28.6 28.6-75 28.6-103.6 0s-28.6-75 0-103.6l144-144c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-144 144c-6.7 6.7-6.7 17.7 0 24.4s17.7 6.7 24.4 0l176-176c24.4-24.4 24.4-64 0-88.4z"></path></svg><span>Copy link</span></button></li><li><a class="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal&#x27;" style="display:flex;align-items:center" href="https://github.com/openzro/docs/tree/main/src/pages/selfhosted/migration/external-to-embedded-idp.mdx"><svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" class="svg-inline--fa fa-github icon pr-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" style="font-size:18px"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><span>Edit on Github</span></a></li></ol><nav aria-labelledby="on-this-page-title" class="w-80"><div class="flex items-center justify-between mb-4"><h2 id="on-this-page-title" class="font-display text-sm font-medium text-slate-900 dark:text-white">On this page</h2></div><ol role="list" class="mt-4 space-y-3 text-sm"><li><h3><a class="text-violet-500" href="/selfhosted/migration/external-to-embedded-idp#overview">Overview</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#before-you-begin">Before You Begin</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#prerequisites">Prerequisites</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#flags-and-environment-variables">Flags and Environment variables</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#step-1-prepare-your-management-server">Step 1: Prepare your Management Server</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#step-2-get-the-migration-tool">Step 2: Get the Migration Tool</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#step-3-prepare-your-provider">Step 3: Prepare Your Provider</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#creating-the-id-p-seed-info">Creating the IdP Seed info</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#step-4-stop-the-management-server">Step 4: Stop the Management Server</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#step-5-back-up-your-data">Step 5: Back Up Your Data</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#step-6-run-the-migration">Step 6: Run the Migration</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#validate-required-env-vars-flags">Validate required env vars / flags</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#postgre-sql-only-verify-that-the-database-env-var-is-set">(PostgreSQL only) Verify that the database env var is set</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#dry-run-always-do-this-first">Dry run (always do this first)</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#execute-the-migration">Execute the migration</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#review-the-new-config">Review the new config</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#step-7-post-migration-configuration">Step 7: Post-Migration Configuration</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#update-your-reverse-proxy">Update your reverse proxy</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#update-dashboard-environment">Update dashboard environment</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#step-8-start-and-verify">Step 8: Start and Verify</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#start-the-management-server">Start the management server</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#verify-everything-works">Verify everything works</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#troubleshooting">Troubleshooting</a></h3><ol role="list" class="mt-2 space-y-3 pl-5 text-slate-500 dark:text-slate-400"><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#store-does-not-support-migration-operations">&quot;store does not support migration operations&quot;</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#could-not-open-activity-store">&quot;could not open activity store&quot;</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#no-connector-configuration-found">&quot;no connector configuration found&quot;</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#errors-app-not-found-from-zitadel-after-migration">&quot;Errors.App.NotFound&quot; from Zitadel after migration</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#oidc-discovery-returns-404">OIDC discovery returns 404</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#jumpcloud-does-not-have-a-supported-dex-connector-type">&quot;jumpcloud does not have a supported Dex connector type&quot;</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#failed-to-create-embedded-idp-service-cannot-disable-local-authentication">&quot;failed to create embedded IDP service: cannot disable local authentication...&quot;</a></li><li><a class="hover:text-slate-600 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#partial-failure-re-running">Partial failure / re-running</a></li></ol></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/selfhosted/migration/external-to-embedded-idp#rolling-back">Rolling Back</a></h3></li></ol></nav></div></div><div class="Toastify"></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"description":"Migrate a self-hosted openZro deployment from an external identity provider to the embedded IdP introduced in v0.62.0.","sections":[{"title":"Overview","id":"overview","tagName":"h2"},{"title":"Before You Begin","id":"before-you-begin","tagName":"h2"},{"title":"Prerequisites","id":"prerequisites","tagName":"h3"},{"title":"Flags and Environment variables","id":"flags-and-environment-variables","tagName":"h3"},{"title":"Step 1: Prepare your Management Server","id":"step-1-prepare-your-management-server","tagName":"h2"},{"title":"Step 2: Get the Migration Tool","id":"step-2-get-the-migration-tool","tagName":"h2"},{"title":"Step 3: Prepare Your Provider","id":"step-3-prepare-your-provider","tagName":"h2"},{"title":"Creating the IdP Seed info","id":"creating-the-id-p-seed-info","tagName":"h3"},{"title":"Step 4: Stop the Management Server","id":"step-4-stop-the-management-server","tagName":"h2"},{"title":"Step 5: Back Up Your Data","id":"step-5-back-up-your-data","tagName":"h2"},{"title":"Step 6: Run the Migration","id":"step-6-run-the-migration","tagName":"h2"},{"title":"Validate required env vars / flags","id":"validate-required-env-vars-flags","tagName":"h3"},{"title":"(PostgreSQL only) Verify that the database env var is set","id":"postgre-sql-only-verify-that-the-database-env-var-is-set","tagName":"h3"},{"title":"Dry run (always do this first)","id":"dry-run-always-do-this-first","tagName":"h3"},{"title":"Execute the migration","id":"execute-the-migration","tagName":"h3"},{"title":"Review the new config","id":"review-the-new-config","tagName":"h3"},{"title":"Step 7: Post-Migration Configuration","id":"step-7-post-migration-configuration","tagName":"h2"},{"title":"Update your reverse proxy","id":"update-your-reverse-proxy","tagName":"h3"},{"title":"Update dashboard environment","id":"update-dashboard-environment","tagName":"h3"},{"title":"Step 8: Start and Verify","id":"step-8-start-and-verify","tagName":"h2"},{"title":"Start the management server","id":"start-the-management-server","tagName":"h3"},{"title":"Verify everything works","id":"verify-everything-works","tagName":"h3"},{"title":"Troubleshooting","id":"troubleshooting","tagName":"h2"},{"title":"\"store does not support migration operations\"","id":"store-does-not-support-migration-operations","tagName":"h3"},{"title":"\"could not open activity store\"","id":"could-not-open-activity-store","tagName":"h3"},{"title":"\"no connector configuration found\"","id":"no-connector-configuration-found","tagName":"h3"},{"title":"\"Errors.App.NotFound\" from Zitadel after migration","id":"errors-app-not-found-from-zitadel-after-migration","tagName":"h3"},{"title":"OIDC discovery returns 404","id":"oidc-discovery-returns-404","tagName":"h3"},{"title":"\"jumpcloud does not have a supported Dex connector type\"","id":"jumpcloud-does-not-have-a-supported-dex-connector-type","tagName":"h3"},{"title":"\"failed to create embedded IDP service: cannot disable local authentication...\"","id":"failed-to-create-embedded-idp-service-cannot-disable-local-authentication","tagName":"h3"},{"title":"Partial failure / re-running","id":"partial-failure-re-running","tagName":"h3"},{"title":"Rolling Back","id":"rolling-back","tagName":"h2"}],"title":"Migration Guide: External IdP to Embedded IdP"},"__N_SSG":true},"page":"/selfhosted/migration/external-to-embedded-idp","query":{},"buildId":"h-OXItx1RfkS1sxjBXlaK","isFallback":false,"gsp":true,"scriptLoader":[]}</script></body></html>

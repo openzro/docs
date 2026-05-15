@@ -1,0 +1,205 @@
+# Zitadel SSO with openZro Self-Hosted (Advanced)
+
+Source: https://docs.netbird.io/selfhosted/identity-providers/advanced/zitadel
+
+---
+
+# Zitadel SSO with openZro Self-Hosted (Advanced)
+
+[Zitadel](https://zitadel.com) is an open-source identity infrastructure platform designed for cloud-native environments. It provides multi-tenancy, customizable branding, passwordless authentication, and supports protocols like OpenID Connect, OAuth2, SAML2, and LDAP.
+
+> **Note:** Zitadel was previously used in the openZro quickstart script. If you have an existing Zitadel deployment, you can continue using it as a standalone IdP or migrate to the embedded IdP with Zitadel as an external IdP directly in the openZro Management Dashboard.
+
+## Standalone Setup (Advanced)
+
+> **Note:** openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+
+We highly recommend using the simpler setup that adds Zitadel as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/zitadel#management-setup-recommended) section in the main Zitadel documentation.
+
+The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Zitadel administrators who need full control over authentication and user management.
+
+Use Zitadel as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Zitadel administrators as it also requires additional setup and ongoing maintenance.
+
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+
+> **Note:** If you prefer not to self-host, Zitadel offers a managed cloud option at [zitadel.com](https://zitadel.com/).
+
+### Prerequisites
+
+- Zitadel instance (cloud or self-hosted) with SSL
+- Docker and Docker Compose for openZro
+
+### Step 1: Create and Configure Zitadel Application
+
+1. Navigate to Zitadel console
+2. Click **Projects** at the top menu, then click **Create New Project**
+3. Fill in:
+   - **Name**: `NETBIRD`
+
+    
+
+4. Click **Projects** and select **NETBIRD** project
+5. Click **New** in **Applications** section
+6. Fill in:
+   - **Name**: `openzro`
+   - **Type of Application**: `User Agent`
+
+    
+
+7. Click **Continue** and set:
+   - **Authentication Method**: `PKCE`
+
+    
+
+8. Click **Continue** and configure:
+   - **Redirect URIs**: 
+     - `https://<domain>/auth`
+     - `https://<domain>/silent-auth`
+     - `http://localhost:53000`
+   - **Post Logout URIs**: `https://<domain>/`
+
+    
+
+9. Click **Create** and then **Close**
+10. Under **Grant Types**, select `Authorization Code`, `Device Code`, and `Refresh Token`
+11. Click **Save**
+
+    
+
+12. Copy **Client ID** for later use
+
+### Step 2: Configure Token Settings
+
+1. Select the **openzro** application
+2. Click **Token Settings** in the left menu
+3. Configure:
+   - **Auth Token Type**: `JWT`
+   - Check **Add user roles to the access token**
+4. Click **Save**
+
+    
+
+### Step 3: Configure Redirect Settings (Development Only)
+
+> **Note:** This step is only for development mode without SSL.
+
+1. Click **Redirect Settings** in the left menu
+2. Toggle **Development Mode**
+3. Click **Save**
+
+    
+
+### Step 4: Create Service User
+
+1. Click **Users** in the top menu
+2. Select **Service Users** tab
+3. Click **New**
+4. Fill in:
+   - **User Name**: `openzro`
+   - **Name**: `openzro`
+   - **Description**: `openZro Service User`
+   - **Access Token Type**: `JWT`
+5. Click **Create**
+
+    
+
+6. Click **Actions** in the top right corner
+7. Click **Generate Client Secret**
+8. Copy **ClientSecret** for later use
+
+    
+
+### Step 5: Grant User Manager Role
+
+1. Click **Organization** in the top menu
+2. Click **+** in the top right corner
+3. Search for `openzro` service user
+4. Check **Org User Manager** checkbox
+5. Click **Add**
+
+    
+
+### Step 6: Configure openZro
+
+Your authority OIDC configuration will be available at:
+
+```bash
+https://<YOUR_ZITADEL_HOST_AND_PORT>/.well-known/openid-configuration
+```
+
+> **Note:** Double-check if the endpoint returns a JSON response by calling it from your browser.
+
+Set properties in the `setup.env` file:
+
+```shell
+NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<YOUR_ZITADEL_HOST_AND_PORT>/.well-known/openid-configuration"
+NETBIRD_USE_AUTH0=false
+NETBIRD_AUTH_CLIENT_ID="<CLIENT_ID>"
+NETBIRD_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api"
+NETBIRD_AUTH_AUDIENCE="<CLIENT_ID>"
+NETBIRD_AUTH_REDIRECT_URI="/auth"
+NETBIRD_AUTH_SILENT_REDIRECT_URI="/silent-auth"
+
+NETBIRD_AUTH_DEVICE_AUTH_PROVIDER="hosted"
+NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID="<CLIENT_ID>"
+NETBIRD_AUTH_DEVICE_AUTH_AUDIENCE="<CLIENT_ID>"
+
+NETBIRD_MGMT_IDP="zitadel"
+NETBIRD_IDP_MGMT_CLIENT_ID="openzro"
+NETBIRD_IDP_MGMT_CLIENT_SECRET="<CLIENT_SECRET>"
+NETBIRD_IDP_MGMT_EXTRA_MANAGEMENT_ENDPOINT="https://<YOUR_ZITADEL_HOST_AND_PORT>/management/v1"
+NETBIRD_MGMT_IDP_SIGNKEY_REFRESH=true
+```
+
+### Step 7: Continue with openZro Setup
+
+You've configured all required resources in Zitadel. Continue with the [openZro Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
+
+---
+
+## Migrating from Zitadel Quickstart
+
+If you deployed openZro using the previous quickstart script with Zitadel:
+
+**Option A - Keep using Zitadel standalone**: Continue with your existing setup. No changes needed.
+
+**Option B - Add Zitadel as external IdP directly in openZro Management Dashboard**:
+1. Deploy new openZro version with embedded IdP
+2. Add your existing Zitadel as an external IdP directly in the openZro Management Dashboard (follow Management Setup above)
+3. Users can continue logging in with Zitadel
+4. Optionally create local user accounts as fallback
+
+**Option C - Migrate fully to embedded IdP**:
+1. Export user list from Zitadel
+2. Deploy new openZro version with embedded IdP
+3. Recreate users in openZro Dashboard
+4. Decommission Zitadel when ready
+
+---
+
+## Troubleshooting
+
+### "Token validation failed" error
+
+- Verify the issuer URL is correct
+- Ensure **User Info inside ID Token** is enabled
+- Check that the audience matches your client ID
+
+### Service user authentication fails
+
+- Verify the client secret was copied correctly
+- Ensure the service user has **Org User Manager** role
+
+### Device auth not working
+
+- Ensure **Device Code** grant type is enabled
+- Verify PKCE is configured for the application
+
+---
+
+## Related Resources
+
+- [Zitadel Documentation](https://zitadel.com/docs)
+- [Zitadel GitHub](https://github.com/zitadel/zitadel)
+- [Embedded IdP Overview](/selfhosted/identity-providers/local)
+- [Migration Guide](/selfhosted/identity-providers#migration-guide)

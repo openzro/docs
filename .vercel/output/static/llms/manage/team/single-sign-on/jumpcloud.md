@@ -1,0 +1,43 @@
+# JumpCloud on openZro Cloud
+
+Source: https://docs.netbird.io/manage/team/single-sign-on/jumpcloud
+
+---
+
+# JumpCloud on openZro Cloud 
+
+You can use JumpCloud as your Identity Provider with openZro, but it will require some additional configuration steps. JumpCloud is a cloud-based directory platform that provides identity, access, and device management in a unified solution. It offers single sign-on, multi-factor authentication, directory services, device management, and network access control, providing a comprehensive approach to managing users, devices, and applications from a single platform.
+
+1. Access the JumpCloud and navigate to USER AUTHENTICATION > SSO Applications
+
+2. Click + Add New Application, select Custom Application and click Next
+
+3. Enable Manage Single Sign-On (SSO), select Configure SSO with OIDC and click Next
+
+    
+
+4. Add openZro as Display Label and click Next. Optionally, you can enter a Description, adjust the User Portal Image and choose to hide or Show in User Portal.
+
+5. Review the application setting and click Configure Application to proceed
+
+    
+
+6. On the New Application screen, go to the SSO tab and under Endpoint Configuration set the following values:
+
+- Redirect URIs: https://login.openzro.io/login/callback
+
+- Login URL: https://your-management.example.com
+
+7. Under Attribute Mapping enable Email and Profile scopes
+
+> **Note:** Sometimes, the Jumpcloud application configuration will add duplicate attributes, like email and email_verified. The duplicates should be removed.
+
+8. Go to the User Groups and select the list of groups to which you want to give access to the application and then click activate
+
+9. Record the Client ID and Client Secret that JumpCloud generates for your application.
+
+10. Share your Client ID, and Client Secret with our team. Please use a secure method for sharing this information.
+
+> **Note:** We recommend using a secure channel to share the Client’s secret. You can send a separate email and use a secret sharing service like: 
+- https://onetimesecret.com/en/ 
+- https://password.link/en

@@ -1,0 +1,164 @@
+# Authentik SSO with openZro Self-Hosted (Advanced)
+
+Source: https://docs.netbird.io/selfhosted/identity-providers/advanced/authentik
+
+---
+
+# Authentik SSO with openZro Self-Hosted (Advanced)
+
+[Authentik](https://goauthentik.io) is an open-source identity provider focused on flexibility and security. It serves as a self-hosted alternative to commercial solutions like Okta and Auth0, providing single sign-on (SSO), multi-factor authentication (MFA), access policies, user management, and support for SAML and OIDC protocols.
+
+## Standalone Setup (Advanced)
+
+> **Note:** openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+
+We highly recommend using the simpler setup that adds Authentik as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/authentik#management-setup-recommended) section in the main Authentik documentation.
+
+The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Authentik administrators who need full control over authentication and user management.
+
+Use Authentik as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Authentik administrators as it also requires additional setup and ongoing maintenance.
+
+For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+
+> **Note:** If you prefer not to self-host an Identity and Access Management solution, you could use a managed alternative like [Auth0](/selfhosted/identity-providers/managed/auth0).
+
+### Prerequisites
+
+- Authentik instance running with SSL
+- Docker and Docker Compose installed for openZro
+
+### Step 1: Create OAuth2/OpenID Provider in Authentik
+
+1. Navigate to Authentik admin interface
+2. Click **Applications** on the left menu, then click **Providers**
+3. Click **Create** to create a new provider
+4. Select **OAuth2/OpenID Provider** and click **Next**
+
+    
+
+5. Fill in the form with the following values:
+   - **Name**: `openZro`
+   - **Authorization Flow**: `default-provider-authorization-explicit-consent (Authorize Application)`
+   - **Client type**: `Public`
+   - **Redirect URIs/Origins (RegEx)**:
+     - Regex: `https://<domain>/.*`
+     - Strict: `http://localhost:53000`
+   - **Advanced protocol settings**:
+     - Access code validity: `minutes=10`
+     - Subject mode: `Based on the User's ID`
+   - **Signing Key**: Select any cert present, e.g., `authentik Self-signed Certificate`
+
+    
+
+6. Click **Finish**
+7. Note the **Client ID** for later use
+
+### Step 2: Create Application in Authentik
+
+1. Click **Applications** on the left menu, then click **Applications**
+2. Click **Create** to create a new application
+3. Fill in the form:
+   - **Name**: `openZro`
+   - **Slug**: `openzro`
+   - **Provider**: Select the `openZro` provider you created
+4. Click **Create**
+
+    
+
+### Step 3: Create Service Account
+
+1. Navigate to Authentik admin interface
+2. Click **Directory** on the left menu, then click **Users**
+3. Click **Create Service Account**
+4. Fill in the form:
+   - **Username**: `openZro`
+   - **Create Group**: Disable
+5. Click **Create**
+
+    
+
+6. Note the service account username
+7. Create an app password: Go to **Directory** → **Tokens and App passwords**
+8. Create a new app password, selecting the openZro service account as the **User**
+9. Save the app password for later use
+
+### Step 4: Add Service Account to Admin Group
+
+1. Click **Directory** on the left menu, then click **Groups**
+2. Click **authentik Admins** from the list and select **Users** tab
+3. Click **Add existing user** and click **+** button
+4. Select **openZro** and click **Add**
+5. Disable **Hide service-accounts** and verify the user is added
+
+    
+
+### Step 5: Create Device Code Flow
+
+1. Click **Flows and Stages** on the left menu, then click **Flows** → **Create**
+2. Fill in the form:
+   - **Name**: `default-device-code-flow`
+   - **Title**: `Device Code Flow`
+   - **Designation**: `Stage Configuration`
+   - **Authentication**: `Require authentication`
+3. Click **Create**
+
+    
+
+4. Click **System** on the left menu, then click **Brands**
+5. Click edit on **authentik-default**
+6. Under **Default flows**, set **Device code flow** to `default-device-code-flow`
+7. Click **Update**
+
+    
+
+### Step 6: Configure openZro
+
+Your authority OIDC configuration will be available at:
+
+```bash
+https://<YOUR_AUTHENTIK_HOST_AND_PORT>/application/o/openzro/.well-known/openid-configuration
+```
+
+> **Note:** Double-check if the endpoint returns a JSON response by calling it from your browser.
+
+Set properties in the `setup.env` file:
+
+```shell
+NETBIRD_AUTH_OIDC_CONFIGURATION_ENDPOINT="https://<YOUR_AUTHENTIK_HOST_AND_PORT>/application/o/openzro/.well-known/openid-configuration"
+NETBIRD_USE_AUTH0=false
+NETBIRD_AUTH_CLIENT_ID="<PROVIDER_CLIENT_ID>"
+NETBIRD_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api"
+NETBIRD_AUTH_AUDIENCE="<PROVIDER_CLIENT_ID>"
+NETBIRD_AUTH_DEVICE_AUTH_CLIENT_ID="<PROVIDER_CLIENT_ID>"
+NETBIRD_AUTH_DEVICE_AUTH_AUDIENCE="<PROVIDER_CLIENT_ID>"
+NETBIRD_AUTH_REDIRECT_URI="/auth"
+NETBIRD_AUTH_SILENT_REDIRECT_URI="/silent-auth"
+
+NETBIRD_MGMT_IDP="authentik"
+NETBIRD_IDP_MGMT_CLIENT_ID="<PROVIDER_CLIENT_ID>"
+NETBIRD_IDP_MGMT_EXTRA_USERNAME="openZro"
+NETBIRD_IDP_MGMT_EXTRA_PASSWORD="<SERVICE_ACCOUNT_PASSWORD>"
+
+# Needs disabling due to issue with IdP. Learn more: https://github.com/openzro/openzro/issues/3654
+NETBIRD_AUTH_PKCE_DISABLE_PROMPT_LOGIN=true
+```
+
+### Step 7: Continue with openZro Setup
+
+You've configured all required resources in Authentik. Continue with the [openZro Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
+
+---
+
+## Troubleshooting
+
+### Service account authentication fails
+
+- Ensure you're using the app password, not the account password
+- Verify the service account is in the authentik Admins group
+
+---
+
+## Related Resources
+
+- [Authentik Documentation](https://goauthentik.io/docs/)
+- [Embedded IdP Overview](/selfhosted/identity-providers/local)

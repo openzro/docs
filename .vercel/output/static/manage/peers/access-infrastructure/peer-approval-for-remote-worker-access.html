@@ -1,0 +1,679 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Peer Approval for Remote Worker Access with openZro - openZro Docs</title><meta name="description" data-next-head=""/><link rel="icon" type="image/svg+xml" href="/docs-static/img/openzro-icon.svg"/><link rel="icon" type="image/x-icon" href="/docs-static/img/favicon.ico"/><link rel="apple-touch-icon" href="/docs-static/img/apple-touch-icon.png"/><link rel="preload" href="/_next/static/css/5b227bfd76e92c43.css" as="style"/><style data-next-head="">:root, :host {
+  --fa-font-solid: normal 900 1em/1 "Font Awesome 6 Free";
+  --fa-font-regular: normal 400 1em/1 "Font Awesome 6 Free";
+  --fa-font-light: normal 300 1em/1 "Font Awesome 6 Pro";
+  --fa-font-thin: normal 100 1em/1 "Font Awesome 6 Pro";
+  --fa-font-duotone: normal 900 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-regular: normal 400 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-light: normal 300 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-thin: normal 100 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-brands: normal 400 1em/1 "Font Awesome 6 Brands";
+  --fa-font-sharp-solid: normal 900 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-regular: normal 400 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-light: normal 300 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-thin: normal 100 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-duotone-solid: normal 900 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-regular: normal 400 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-light: normal 300 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-thin: normal 100 1em/1 "Font Awesome 6 Sharp Duotone";
+}
+
+svg:not(:root).svg-inline--fa, svg:not(:host).svg-inline--fa {
+  overflow: visible;
+  box-sizing: content-box;
+}
+
+.svg-inline--fa {
+  display: var(--fa-display, inline-block);
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+.svg-inline--fa.fa-2xs {
+  vertical-align: 0.1em;
+}
+.svg-inline--fa.fa-xs {
+  vertical-align: 0em;
+}
+.svg-inline--fa.fa-sm {
+  vertical-align: -0.0714285705em;
+}
+.svg-inline--fa.fa-lg {
+  vertical-align: -0.2em;
+}
+.svg-inline--fa.fa-xl {
+  vertical-align: -0.25em;
+}
+.svg-inline--fa.fa-2xl {
+  vertical-align: -0.3125em;
+}
+.svg-inline--fa.fa-pull-left {
+  margin-right: var(--fa-pull-margin, 0.3em);
+  width: auto;
+}
+.svg-inline--fa.fa-pull-right {
+  margin-left: var(--fa-pull-margin, 0.3em);
+  width: auto;
+}
+.svg-inline--fa.fa-li {
+  width: var(--fa-li-width, 2em);
+  top: 0.25em;
+}
+.svg-inline--fa.fa-fw {
+  width: var(--fa-fw-width, 1.25em);
+}
+
+.fa-layers svg.svg-inline--fa {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.fa-layers-counter, .fa-layers-text {
+  display: inline-block;
+  position: absolute;
+  text-align: center;
+}
+
+.fa-layers {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  text-align: center;
+  vertical-align: -0.125em;
+  width: 1em;
+}
+.fa-layers svg.svg-inline--fa {
+  transform-origin: center center;
+}
+
+.fa-layers-text {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+.fa-layers-counter {
+  background-color: var(--fa-counter-background-color, #ff253a);
+  border-radius: var(--fa-counter-border-radius, 1em);
+  box-sizing: border-box;
+  color: var(--fa-inverse, #fff);
+  line-height: var(--fa-counter-line-height, 1);
+  max-width: var(--fa-counter-max-width, 5em);
+  min-width: var(--fa-counter-min-width, 1.5em);
+  overflow: hidden;
+  padding: var(--fa-counter-padding, 0.25em 0.5em);
+  right: var(--fa-right, 0);
+  text-overflow: ellipsis;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-counter-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-bottom-right {
+  bottom: var(--fa-bottom, 0);
+  right: var(--fa-right, 0);
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom right;
+}
+
+.fa-layers-bottom-left {
+  bottom: var(--fa-bottom, 0);
+  left: var(--fa-left, 0);
+  right: auto;
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom left;
+}
+
+.fa-layers-top-right {
+  top: var(--fa-top, 0);
+  right: var(--fa-right, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-top-left {
+  left: var(--fa-left, 0);
+  right: auto;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top left;
+}
+
+.fa-1x {
+  font-size: 1em;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-6x {
+  font-size: 6em;
+}
+
+.fa-7x {
+  font-size: 7em;
+}
+
+.fa-8x {
+  font-size: 8em;
+}
+
+.fa-9x {
+  font-size: 9em;
+}
+
+.fa-10x {
+  font-size: 10em;
+}
+
+.fa-2xs {
+  font-size: 0.625em;
+  line-height: 0.1em;
+  vertical-align: 0.225em;
+}
+
+.fa-xs {
+  font-size: 0.75em;
+  line-height: 0.0833333337em;
+  vertical-align: 0.125em;
+}
+
+.fa-sm {
+  font-size: 0.875em;
+  line-height: 0.0714285718em;
+  vertical-align: 0.0535714295em;
+}
+
+.fa-lg {
+  font-size: 1.25em;
+  line-height: 0.05em;
+  vertical-align: -0.075em;
+}
+
+.fa-xl {
+  font-size: 1.5em;
+  line-height: 0.0416666682em;
+  vertical-align: -0.125em;
+}
+
+.fa-2xl {
+  font-size: 2em;
+  line-height: 0.03125em;
+  vertical-align: -0.1875em;
+}
+
+.fa-fw {
+  text-align: center;
+  width: 1.25em;
+}
+
+.fa-ul {
+  list-style-type: none;
+  margin-left: var(--fa-li-margin, 2.5em);
+  padding-left: 0;
+}
+.fa-ul > li {
+  position: relative;
+}
+
+.fa-li {
+  left: calc(-1 * var(--fa-li-width, 2em));
+  position: absolute;
+  text-align: center;
+  width: var(--fa-li-width, 2em);
+  line-height: inherit;
+}
+
+.fa-border {
+  border-color: var(--fa-border-color, #eee);
+  border-radius: var(--fa-border-radius, 0.1em);
+  border-style: var(--fa-border-style, solid);
+  border-width: var(--fa-border-width, 0.08em);
+  padding: var(--fa-border-padding, 0.2em 0.25em 0.15em);
+}
+
+.fa-pull-left {
+  float: left;
+  margin-right: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-pull-right {
+  float: right;
+  margin-left: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-beat {
+  animation-name: fa-beat;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-bounce {
+  animation-name: fa-bounce;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1));
+}
+
+.fa-fade {
+  animation-name: fa-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-beat-fade {
+  animation-name: fa-beat-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-flip {
+  animation-name: fa-flip;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-shake {
+  animation-name: fa-shake;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin {
+  animation-name: fa-spin;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 2s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin-reverse {
+  --fa-animation-direction: reverse;
+}
+
+.fa-pulse,
+.fa-spin-pulse {
+  animation-name: fa-spin;
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, steps(8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat,
+.fa-bounce,
+.fa-fade,
+.fa-beat-fade,
+.fa-flip,
+.fa-pulse,
+.fa-shake,
+.fa-spin,
+.fa-spin-pulse {
+    animation-delay: -1ms;
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+    transition-delay: 0s;
+    transition-duration: 0s;
+  }
+}
+@keyframes fa-beat {
+  0%, 90% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+@keyframes fa-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0);
+  }
+  30% {
+    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em));
+  }
+  50% {
+    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0);
+  }
+  57% {
+    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em));
+  }
+  64% {
+    transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+@keyframes fa-fade {
+  50% {
+    opacity: var(--fa-fade-opacity, 0.4);
+  }
+}
+@keyframes fa-beat-fade {
+  0%, 100% {
+    opacity: var(--fa-beat-fade-opacity, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(var(--fa-beat-fade-scale, 1.125));
+  }
+}
+@keyframes fa-flip {
+  50% {
+    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg));
+  }
+}
+@keyframes fa-shake {
+  0% {
+    transform: rotate(-15deg);
+  }
+  4% {
+    transform: rotate(15deg);
+  }
+  8%, 24% {
+    transform: rotate(-18deg);
+  }
+  12%, 28% {
+    transform: rotate(18deg);
+  }
+  16% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(22deg);
+  }
+  32% {
+    transform: rotate(-12deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  40%, 100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.fa-rotate-270 {
+  transform: rotate(270deg);
+}
+
+.fa-flip-horizontal {
+  transform: scale(-1, 1);
+}
+
+.fa-flip-vertical {
+  transform: scale(1, -1);
+}
+
+.fa-flip-both,
+.fa-flip-horizontal.fa-flip-vertical {
+  transform: scale(-1, -1);
+}
+
+.fa-rotate-by {
+  transform: rotate(var(--fa-rotate-angle, 0));
+}
+
+.fa-stack {
+  display: inline-block;
+  vertical-align: middle;
+  height: 2em;
+  position: relative;
+  width: 2.5em;
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: var(--fa-stack-z-index, auto);
+}
+
+.svg-inline--fa.fa-stack-1x {
+  height: 1em;
+  width: 1.25em;
+}
+.svg-inline--fa.fa-stack-2x {
+  height: 2em;
+  width: 2.5em;
+}
+
+.fa-inverse {
+  color: var(--fa-inverse, #fff);
+}
+
+.sr-only,
+.fa-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:not(:focus),
+.fa-sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.svg-inline--fa .fa-primary {
+  fill: var(--fa-primary-color, currentColor);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa .fa-secondary {
+  fill: var(--fa-secondary-color, currentColor);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-primary {
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-secondary {
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa mask .fa-primary,
+.svg-inline--fa mask .fa-secondary {
+  fill: black;
+}</style><script>
+  let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+  updateMode()
+  darkModeMediaQuery.addEventListener('change', updateModeWithoutTransitions)
+  window.addEventListener('storage', updateModeWithoutTransitions)
+
+  function updateMode() {
+    let isSystemDarkMode = darkModeMediaQuery.matches
+    let isDarkMode = window.localStorage.isDarkMode === 'true' || (!('isDarkMode' in window.localStorage) && isSystemDarkMode)
+
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+
+    if (isDarkMode === isSystemDarkMode) {
+      delete window.localStorage.isDarkMode
+    }
+  }
+
+  function disableTransitionsTemporarily() {
+    document.documentElement.classList.add('[&_*]:!transition-none')
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('[&_*]:!transition-none')
+    }, 0)
+  }
+
+  function updateModeWithoutTransitions() {
+    disableTransitionsTemporarily()
+    updateMode()
+  }
+</script><link rel="stylesheet" href="/_next/static/css/5b227bfd76e92c43.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-345555e3c489773c.js" defer=""></script><script src="/_next/static/chunks/framework-34a8c4228d7fd161.js" defer=""></script><script src="/_next/static/chunks/main-c502755b4d857e5f.js" defer=""></script><script src="/_next/static/chunks/pages/_app-43bbbd7999c053e8.js" defer=""></script><script src="/_next/static/chunks/pages/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access-da31f331d4537c64.js" defer=""></script><script src="/_next/static/h-OXItx1RfkS1sxjBXlaK/_buildManifest.js" defer=""></script><script src="/_next/static/h-OXItx1RfkS1sxjBXlaK/_ssgManifest.js" defer=""></script></head><body class="bg-white antialiased dark:bg-[#181A1D]"><link rel="preload" as="image" href="/docs-static/img/logo/openzro-icon.svg"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-0-01.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-0-02.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-0-03.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-02.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-03.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-04.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-05.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-06.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-07.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-08.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-09.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-10.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-11.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-12.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-13.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-16.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-17.png"/><link rel="preload" as="image" href="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-18.png"/><div id="__next"><div class="absolute inset-0 -z-10 mx-0 max-w-none overflow-hidden"><div class="absolute inset-0 hidden dark:block z-0" style="background-color:#181A1D"><svg aria-hidden="true" class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"><defs><pattern id="_R_pm_" width="72" height="56" patternUnits="userSpaceOnUse" x="-12" y="4"><path d="M.5 56V.5H72" fill="none"></path></pattern></defs><rect width="100%" height="100%" stroke-width="0" fill="url(#_R_pm_)"></rect><svg x="-12" y="4" class="overflow-visible"><rect stroke-width="0" width="73" height="57" x="288" y="168"></rect><rect stroke-width="0" width="73" height="57" x="144" y="56"></rect><rect stroke-width="0" width="73" height="57" x="504" y="168"></rect><rect stroke-width="0" width="73" height="57" x="720" y="336"></rect></svg></svg></div><div class="absolute inset-x-0 top-0 h-[25rem] dark:[mask-image:linear-gradient(white,transparent)] pointer-events-none z-10"><svg viewBox="0 0 1113 440" preserveAspectRatio="xMidYMin slice" aria-hidden="true" class="absolute left-1/2 top-0 -translate-x-1/2 w-full min-w-[69.5625rem] h-full fill-white blur-[26px] dark:hidden"><path d="M.016 439.5s-9.5-300 434-300S882.516 20 882.516 20V0h230.004v439.5H.016Z"></path></svg></div></div><div class="relative mx-auto flex max-w-8xl sm:px-2 lg:px-8 xl:px-12 lg:ml-72 xl:ml-80" style="padding-top:0"><header class="contents lg:pointer-events-none lg:fixed lg:inset-0 lg:z-40 lg:flex" style="top:0"><div class="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:dark:border-neutral-700/50 lg:px-6 lg:pb-8 lg:pt-4 lg:bg-white/70 lg:dark:bg-[#181A1D]/95 lg:backdrop-blur-lg xl:w-80 lg:overflow-x-visible sidebar-scroll"><div class="hidden lg:flex"><a aria-label="Home" href="/"><span class="inline-flex items-center gap-2 select-none"><img src="/docs-static/img/logo/openzro-icon.svg" alt="" height="28" width="28" class="h-7 w-7"/><span class="font-semibold text-zinc-900 dark:text-white tracking-[-0.025em] leading-none text-lg" style="font-family:Geist, ui-sans-serif, system-ui, sans-serif">open<span class="font-bold text-violet-600 dark:text-violet-400">Z</span>ro</span></span></a></div><nav class="hidden lg:mt-10 lg:block"><ul role="list"><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://openzro.io/">Home</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/">Docs</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/api">API</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://openzro.io/knowledge-hub/">Learn</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://github.com/openzro/openzro">Github</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/slack-url">Support</a></li><div class="outer-wrapper-0"><li class="relative md:mt-0 mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="ABOUT" data-nb-active="0">ABOUT</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="How openZro Works" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/how-openzro-works"><span class="truncate">How openZro Works</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="openZro vs. Traditional VPN" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/openzro-vs-traditional-vpn"><span class="truncate">openZro vs. Traditional VPN</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Understanding NAT and Connectivity" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/understanding-nat-and-connectivity"><span class="truncate">Understanding NAT and Connectivity</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Why WireGuard with openZro" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/why-wireguard-with-openzro"><span class="truncate">Why WireGuard with openZro</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Browser Client Architecture" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/browser-client-architecture"><span class="truncate">Browser Client Architecture</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Why self-host only" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/self-host-only"><span class="truncate">Why self-host only</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="FAQ" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/faq"><span class="truncate">FAQ</span></a></div></li></ul></div></li></div><div class="outer-wrapper-1"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="GET STARTED" data-nb-active="0">GET STARTED</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Quickstart Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started"><span class="truncate">Quickstart Guide</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Install openZro" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started/install"><span class="truncate">Install openZro</span></a><ul role="list"><li class="relative"><div class="relative"><a data-nb-link="0" title="Linux" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/linux"><span class="truncate">Linux</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Windows" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/windows"><span class="truncate">Windows</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="MacOS" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/macos"><span class="truncate">MacOS</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Docker" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/docker"><span class="truncate">Docker</span></a></div></li></ul></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Platforms" data-nb-active="0">Platforms<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="CLI" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started/cli"><span class="truncate">CLI</span></a></div></li></ul></div></li></div><div class="outer-wrapper-2"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="MANAGE NETBIRD" data-nb-active="0">MANAGE NETBIRD</h2><div class="relative mt-3 pl-2"><div class="absolute inset-x-0 top-0 bg-zinc-800/2.5 will-change-transform dark:bg-white/2.5" style="border-radius:8px;height:32px;top:0;opacity:0"></div><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><div class="absolute left-2 h-6 w-px bg-violet-500" style="top:0;opacity:1"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Control Center" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/manage/control-center"><span class="truncate">Control Center</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Peers" data-nb-active="1">Peers<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Access Control" data-nb-active="0">Access Control<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Networks" data-nb-active="0">Networks<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Network Routes" data-nb-active="0">Network Routes<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Reverse Proxy" data-nb-active="0">Reverse Proxy<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="DNS" data-nb-active="0">DNS<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Team" data-nb-active="0">Team<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Activity" data-nb-active="0">Activity<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Settings" data-nb-active="0">Settings<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Integrations" data-nb-active="0">Integrations<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Public API" data-nb-active="0">Public API<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-3"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="SELF-HOST OPENZRO" data-nb-active="0">SELF-HOST OPENZRO</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Quickstart Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/selfhosted-quickstart"><span class="truncate">Quickstart Guide</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Maintenance" data-nb-active="0">Maintenance<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Authentication" data-nb-active="0">Authentication<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Advanced Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/selfhosted-guide"><span class="truncate">Advanced Guide</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Troubleshooting" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/troubleshooting"><span class="truncate">Troubleshooting</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Migration Guides" data-nb-active="0">Migration Guides<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-4"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="CLIENT" data-nb-active="0">CLIENT</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Profiles" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/client/profiles"><span class="truncate">Profiles</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Environment Variables" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/client/environment-variables"><span class="truncate">Environment Variables</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Settings" data-nb-active="0">Settings<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-5"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="USE CASES" data-nb-active="0">USE CASES</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Overview" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/use-cases"><span class="truncate">Overview</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Remote Access" data-nb-active="0">Remote Access<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Homelab" data-nb-active="0">Homelab<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Security" data-nb-active="0">Security<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-6"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="COMPLIANCE" data-nb-active="0">COMPLIANCE</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Overview" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/compliance"><span class="truncate">Overview</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Bacen 4.893 (Brazil)" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/compliance/bacen-4893"><span class="truncate">Bacen 4.893 (Brazil)</span></a></div></li></ul></div></li></div><div class="outer-wrapper-7"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="GET MORE HELP" data-nb-active="0">GET MORE HELP</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Troubleshooting client issues" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/help/troubleshooting-client"><span class="truncate">Troubleshooting client issues</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Report bugs and issues" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/help/report-bug-issues"><span class="truncate">Report bugs and issues</span></a></div></li></ul></div></li></div><li class="sticky bottom-0 z-10 mt-6 min-[416px]:hidden"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-900 py-1 px-3 text-white hover:bg-zinc-700 dark:bg-openzro dark:text-white dark:hover:bg-openzro-dark w-full" href="https://app.openzro.io/">Sign in</a></li></ul></nav></div><div class="fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-3 px-5 transition h-[64px] lg:left-72 lg:z-50 lg:px-8 xl:left-80 min-h-[64px] lg:pointer-events-auto backdrop-blur-lg bg-white/70 dark:bg-[#181A1D]/95 lg:left-72 xl:left-80" style="top:0"><div class="absolute inset-x-0 top-full h-px transition border-b border-transparent border-zinc-900/10 dark:border-neutral-700/50"></div><div class="hidden lg:block lg:max-w-md lg:flex-auto"><button type="button" class="hidden h-8 w-full items-center gap-2 rounded-full bg-white pl-2 pr-3 text-sm text-zinc-500 ring-1 ring-zinc-900/10 transition hover:ring-zinc-900/20 dark:bg-white/5 dark:text-zinc-400 dark:ring-inset dark:ring-white/10 dark:hover:ring-white/20 lg:flex focus:[&amp;:not(:focus-visible)]:outline-none"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"></path></svg>Search...<kbd class="ml-auto text-2xs text-zinc-400 dark:text-zinc-500"><kbd class="font-sans"></kbd><kbd class="font-sans">K</kbd></kbd></button></div><div class="flex items-center gap-2 lg:hidden"><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5" aria-label="Toggle navigation"><svg viewBox="0 0 10 9" fill="none" stroke-linecap="round" aria-hidden="true" class="w-2.5 stroke-zinc-900 dark:stroke-white"><path d="M.5 1h9M.5 8h9M.5 4.5h9"></path></svg></button><a aria-label="Home" href="/"><span class="inline-flex items-center gap-2 select-none"><img src="/docs-static/img/logo/openzro-icon.svg" alt="" height="28" width="28" class="h-7 w-7"/><span class="font-semibold text-zinc-900 dark:text-white tracking-[-0.025em] leading-none text-lg" style="font-family:Geist, ui-sans-serif, system-ui, sans-serif">open<span class="font-bold text-violet-600 dark:text-violet-400">Z</span>ro</span></span></a></div><div class="flex items-center gap-3 xl:gap-2"><nav class="hidden md:block"><ul role="list" class="flex items-center gap-3 xl:gap-2 m-0 p-0 list-none"><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="/">Docs</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="/api">API</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="https://github.com/openzro/openzro">GitHub</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="https://github.com/openzro/openzro/discussions">Support</a></li></ul></nav><div class="hidden md:block md:h-5 md:w-px md:bg-zinc-900/10 md:dark:bg-neutral-500/20"></div><div class="flex gap-2"><div class="contents lg:hidden"><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 lg:hidden focus:[&amp;:not(:focus-visible)]:outline-none" aria-label="Search..."><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-zinc-900 dark:stroke-white"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"></path></svg></button></div><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5" aria-label="Toggle dark mode"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-zinc-900 dark:hidden"><path d="M12.5 10a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"></path><path stroke-linecap="round" d="M10 5.5v-1M13.182 6.818l.707-.707M14.5 10h1M13.182 13.182l.707.707M10 15.5v-1M6.11 13.889l.708-.707M4.5 10h1M6.11 6.111l.708.707"></path></svg><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="hidden h-5 w-5 stroke-white dark:block"><path d="M15.224 11.724a5.5 5.5 0 0 1-6.949-6.949 5.5 5.5 0 1 0 6.949 6.949Z"></path></svg></button></div><div class="hidden min-[416px]:contents"><div class="relative inline-flex group transition-all"><span class="absolute h-full w-full left-0 top-0 blur-sm bg-openzro z-0 transition-all duration-200 transform-gpu opacity-0 group-hover:opacity-100 pointer-events-none"></span><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-[5px] bg-openzro text-white border-0 border-transparent duration-300 relative overflow-hidden group !py-1.5 !px-3 text-xs" target="_blank" href="https://github.com/openzro/openzro/releases/latest"><span class="absolute h-full w-full left-0 top-0 z-10 bg-gradient-to-br from-openzro to-openzro-dark transition-all duration-200 transform-gpu opacity-0 group-hover:opacity-100 pointer-events-none"></span><span class="z-20 relative flex gap-2 items-center transition-all">Get openZro</span></a></div></div></div></div></header><div class="min-w-0 max-w-2xl flex-auto px-4 py-16 lg:max-w-none lg:pl-8 lg:pr-0 xl:px-5"><main class="py-16"><article class="prose dark:prose-invert"><h1>Peer Approval for Remote Worker Access with openZro</h1>
+<p>For organizations embracing remote work, ensuring secure network access for distributed teams is a paramount challenge. Traditionally, VPNs and remote desktop solutions have been the standard for granting access to company resources. However, these methods often fall short in today&#x27;s dynamic work environment, especially when dealing with freelancers and temporary workers.</p>
+<p>The conventional approach to remote worker access presents several security and operational challenges:</p>
+<ul>
+<li><strong>Increased Security Risks</strong>: Granting blanket access to network resources can expose sensitive data to potential breaches, especially when dealing with external collaborators.</li>
+<li><strong>Device Management Complexity</strong>: Ensuring that only authorized and secure devices connect to the network becomes increasingly difficult as the number of remote workers grows.</li>
+<li><strong>Lack of Granular Control</strong>: Traditional solutions often lack the flexibility to implement fine-grained access policies based on user roles and device trust levels.</li>
+<li><strong>Scalability Issues</strong>: As teams expand and contract, managing access for a fluctuating workforce can become a time-consuming and error-prone process.</li>
+</ul>
+<p>This guide introduces openZro&#x27;s Peer Approval as a robust solution for secure remote worker access by:</p>
+<ul>
+<li><strong>Implementing Zero-Trust Principles</strong>: Ensuring that every device and user is verified before granting network access, regardless of their location.</li>
+<li><strong>Simplifying Device Trust Management</strong>: Providing a streamlined process for approving and managing trusted devices within the network.</li>
+<li><strong>Enhancing Access Control</strong>: Offering granular control over network resources, allowing organizations to tailor access based on user roles and device status.</li>
+<li><strong>Improving Scalability</strong>: Facilitating easy onboarding and offboarding of remote workers, including freelancers, without compromising network security.</li>
+</ul>
+<p>Let&#x27;s explore the step-by-step process of implementing <a href="/manage/peers/approve-peers">Peer Approval with openZro</a> to ensure that only trusted devices can access your network.</p>
+<h2 id="prerequisites" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#prerequisites"><div>Prerequisites</div></a></h2>
+<p>To replicate this use case, you&#x27;ll need the following prerequisites:</p>
+<ul>
+<li>An main <a href="https://your-management.example.com/">openZro account</a> with administrative privileges.</li>
+<li>A secondary email address not linked to any openZro account to simulate the freelancer&#x27;s email.</li>
+<li><a href="/get-started/install">openZro installed</a> on the main device.</li>
+</ul>
+<p>With these prerequisites in place, you&#x27;re ready to simulate granting network access to a temporary remote worker using openZro&#x27;s Peer Approval feature by:</p>
+<ol>
+<li>Setting up openZro&#x27;s access control policies for enhanced security</li>
+<li>Enabling peer approval</li>
+<li>Inviting users to join your network</li>
+<li>Installing openZro on the remote worker device</li>
+<li>Approving peers</li>
+<li>Automating peer approval with EDR integration (optional)</li>
+</ol>
+<h2 id="1-setting-up-open-zros-access-control-policies-for-enhanced-security" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#1-setting-up-open-zros-access-control-policies-for-enhanced-security"><div>1. Setting Up openZro&#x27;s Access Control Policies For Enhanced Security</div></a></h2>
+<p>Before onboarding remote workers, ensure your organization has appropriate <a href="/manage/access-control/manage-network-access">access control policies</a> in place. Adhering to zero-trust principles, create or modify policies to grant new users access only to necessary resources.</p>
+<p>Navigate to <code>Access Control &gt; Policies</code> in the openZro admin console, then click <code>Add Policy</code> or edit an existing one to define these restrictions. Here&#x27;s a sample policy that grant any member of the <code>Freelancers</code> group access to the resources in the group <code>On-Premise-DB</code>.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-0-01.png" alt="openZro Freelancer Access Control Policy"/></p>
+<p>If necessary, you can also set <a href="/manage/access-control/posture-checks">posture checks</a> for this policy.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-0-02.png" alt="openZro Freelancer Posture Check"/></p>
+<p>Moreover, it is a best practice to disable the <code>Default</code> policy to enforce only restrictive, custom-defined access controls.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-0-03.png" alt="openZro Access Policy View"/></p>
+<p>With appropriate access policies in place, you&#x27;re ready to enable openZro&#x27;s Peer Approval feature.</p>
+<h2 id="2-enabling-peer-approval" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#2-enabling-peer-approval"><div>2. Enabling Peer Approval</div></a></h2>
+<p>To enable peer approval, go to <code>Settings &gt; Authentication</code> and activate the <code>Peer approval</code> toggle, then click <code>Save Changes</code>.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-02.png" alt="openZro Freelancer Device Dashboard"/></p>
+<p>With <code>Peer Approval</code> activated, new members will see an <code>Approval required</code> message when joining. Administrators must grant access, ensuring only vetted users enter the openZro network, thus enhancing overall security.</p>
+<h2 id="3-inviting-users-to-join-your-network" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#3-inviting-users-to-join-your-network"><div>3. Inviting Users to Join Your Network</div></a></h2>
+<p>To invite a new user to join your openZro network, go to <code>Team &gt; Users</code> and click the <code>Invite User</code> button.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-03.png" alt="openZro Invite Users"/></p>
+<p>A pop-up window appears for new user registration. Enter the user&#x27;s name, email address, and select the <code>Freelancers</code> group from the dropdown menu. openZro&#x27;s auto-assignment feature instantly links the new user to the <code>Freelancers</code> group upon network entry, automatically applying the associated access policy you just created.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-04.png" alt="openZro Invite User Pop Up"/></p>
+<p>After clicking <code>Send Invitation</code>, you&#x27;ll return to the <code>Users</code> dashboard. Here, the new user appears with a <code>Pending</code> status, awaiting their acceptance of the invitation and any required approvals.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-05.png" alt="openZro New User Pending"/></p>
+<h2 id="4-installing-open-zro-on-the-remote-worker-device" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#4-installing-open-zro-on-the-remote-worker-device"><div>4. Installing openZro On The Remote Worker Device</div></a></h2>
+<p>Access the secondary email account used to mimic the freelancer. In the inbox, locate the invitation email from openZro. This email contains a secure link to join your organization&#x27;s openZro network, initiating the freelancer&#x27;s onboarding process.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-06.png" alt="Email openZro Invitation"/></p>
+<p>After clicking the invitation link, you&#x27;ll be directed to openZro&#x27;s secure account creation page. Follow the on-screen instructions to create a new password.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-07.png" alt="openZro Login"/></p>
+<p>Upon logging in, you&#x27;ll arrive at openZro&#x27;s Peers dashboard. Locate and click the <code>Add Peer</code> button to initiate the <a href="/get-started">Getting Started</a> Wizard, which guides you through the process of adding a new device to the network.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-08.png" alt="openZro Freelancer Peers Dashboard"/></p>
+<p>The wizard will detect your operating system and provide detailed step-by-step instructions on how to <a href="/get-started/install">install openZro</a>.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-09.png" alt="openZro Freelancer Install Client"/></p>
+<p>During your initial connection to openZro, a system dialog will appear requesting authorization. This prompt asks for permission to access your profile and email information, which is necessary for openZro to establish your account and network access.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-10.png" alt="openZro Authorize App"/></p>
+<p>After completing the installation, your device will appear in the Peers dashboard. Hover over the <code>+1</code> in the <code>Assigned Groups</code> column to confirm the device has automaticaclly assigned to the <code>Freelancers</code> group as expected.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-11.png" alt="openZro Freelancer Peers Listed"/></p>
+<h2 id="5-approving-peers" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#5-approving-peers"><div>5. Approving Peers</div></a></h2>
+<p>Back to your primary account, you&#x27;ll notice the newly added user&#x27;s status is now displayed as <code>Active</code> in the <code>Users</code> dashboard. This status update confirms that the device has successfully added to the openZro network and is ready for secure communication.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-12.png" alt="openZro Peers Dashboard"/></p>
+<p>However, your approval is required before the user&#x27;s device can fully connect to the openZro network. To grant network access:</p>
+<ul>
+<li>Navigate to the <code>Peers</code> dashboard</li>
+<li>Locate the newly added device</li>
+<li>Click the <code>Approve</code> button next to the device</li>
+<li>Confirm the action when prompted</li>
+</ul>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-13.png" alt="openZro Approve New Peer"/></p>
+<p>After approval, the device is granted full access to network resources allocated to the <code>Freelancers</code> group. The freelancer can now view all accessible network resources in their <code>Peers</code> dashboard:</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-16.png" alt="openZro Freelancer Peers View"/></p>
+<p>Likewise, as an administrator, you can click on the user&#x27;s device to see which resources and peers the freelancer has access to.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-17.png" alt="openZro Main Account Peers View"/></p>
+<h2 id="6-automating-peer-approval-with-edr-integration-optional" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#6-automating-peer-approval-with-edr-integration-optional"><div>6. Automating Peer Approval with EDR Integration (optional)</div></a></h2>
+<p>openZro&#x27;s EDR (Endpoint Detection and Response) integration enhances network security by restricting access to devices managed by your organization&#x27;s IT department. This feature synchronizes the list of devices managed by the EDR platform via API and verifies the presence of the EDR agent on each device. If the agent is not installed, access to the network is blocked.</p>
+<p>Key aspects of openZro&#x27;s EDR integration:</p>
+<ul>
+<li>Supports <a href="https://www.crowdstrike.com/products">CrowdStrike Falcon</a></li>
+<li>Allows selective application of EDR checks to specific device groups</li>
+<li>Automates peer approval process for trusted devices</li>
+<li>Available only in the cloud version of openZro</li>
+</ul>
+<p>To activate this feature, navigate to <code>Integrations &gt; EDR</code> and activate the CrowdStrike integration toggle.</p>
+<p><img src="/docs-static/img/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access/peer-a-18.png" alt="openZro EDR Integration"/></p>
+<p>For more information regarding openZro&#x27;s EDR integration, refer to the <a href="/manage/access-control/endpoint-detection-and-response">documentation</a></p></article></main><footer class="mx-auto max-w-2xl space-y-10 pb-16 lg:max-w-5xl"><div class="relative h-8"><form class="absolute inset-0 flex items-center justify-center gap-6 md:justify-start"><p class="text-sm text-zinc-600 dark:text-zinc-400">Was this page helpful?</p><div class="group grid h-8 grid-cols-[1fr,1px,1fr] overflow-hidden rounded-full border border-zinc-900/10 dark:border-white/10"><button type="submit" class="px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-900/2.5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white" data-response="yes">Yes</button><div class="bg-zinc-900/10 dark:bg-white/10"></div><button type="submit" class="px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-900/2.5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white" data-response="no">No</button></div></form></div><div class="flex"><div class="flex flex-col items-start gap-3"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-100 py-1 px-3 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-400 dark:ring-1 dark:ring-inset dark:ring-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-300" aria-label="Previous: Access from Kubernetes" href="/manage/peers/access-infrastructure/access-internal-resources-from-autoscaled-environments"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 h-5 w-5 -ml-1 rotate-180"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11.5 6.5 3 3.5m0 0-3 3.5m3-3.5h-9"></path></svg>Previous</a><a tabindex="-1" aria-hidden="true" class="text-base font-semibold text-zinc-900 transition hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300" href="/manage/peers/access-infrastructure/access-internal-resources-from-autoscaled-environments">Access from Kubernetes</a></div><div class="ml-auto flex flex-col items-end gap-3"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-100 py-1 px-3 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-400 dark:ring-1 dark:ring-inset dark:ring-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-300" aria-label="Next: Auto Update" href="/manage/peers/auto-update">Next<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 h-5 w-5 -mr-1"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11.5 6.5 3 3.5m0 0-3 3.5m3-3.5h-9"></path></svg></a><a tabindex="-1" aria-hidden="true" class="text-base font-semibold text-zinc-900 transition hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300" href="/manage/peers/auto-update">Auto Update</a></div></div><div class="flex flex-col items-center justify-between gap-5 border-t border-zinc-900/5 pt-8 dark:border-white/5 sm:flex-row"><p class="text-xs text-zinc-600 dark:text-zinc-400">© Copyright <!-- -->2026<!-- -->. All rights reserved.</p><div class="flex gap-4"><a class="group" href="https://github.com/openzro/openzro"><span class="sr-only">openZro on GitHub</span><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-900 dark:group-hover:fill-zinc-500"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.667c-4.605 0-8.334 3.823-8.334 8.544 0 3.78 2.385 6.974 5.698 8.106.417.075.573-.182.573-.406 0-.203-.011-.875-.011-1.592-2.093.397-2.635-.522-2.802-1.002-.094-.246-.5-1.005-.854-1.207-.291-.16-.708-.556-.01-.567.656-.01 1.124.62 1.281.876.75 1.292 1.948.93 2.427.705.073-.555.291-.93.531-1.143-1.854-.213-3.791-.95-3.791-4.218 0-.929.322-1.698.854-2.296-.083-.214-.375-1.09.083-2.265 0 0 .698-.224 2.292.876a7.576 7.576 0 0 1 2.083-.288c.709 0 1.417.096 2.084.288 1.593-1.11 2.291-.875 2.291-.875.459 1.174.167 2.05.084 2.263.53.599.854 1.357.854 2.297 0 3.278-1.948 4.005-3.802 4.219.302.266.563.78.563 1.58 0 1.143-.011 2.061-.011 2.35 0 .224.156.491.573.405a8.365 8.365 0 0 0 4.11-3.116 8.707 8.707 0 0 0 1.567-4.99c0-4.721-3.73-8.545-8.334-8.545Z"></path></svg></a><a class="group" href="https://github.com/openzro/openzro/discussions"><span class="sr-only">Discussions</span><svg viewBox="56 56 160 160" aria-hidden="true" class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-900 dark:group-hover:fill-zinc-500"><g><g><path d="M99.4,151.2c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h12.9V151.2z"></path><path d="M105.9,151.2c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v32.3c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9 C105.9,183.5,105.9,151.2,105.9,151.2z"></path></g><g><path d="M118.8,99.4c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v12.9H118.8z"></path><path d="M118.8,105.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H86.5c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9 C86.5,105.9,118.8,105.9,118.8,105.9z"></path></g><g><path d="M170.6,118.8c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9h-12.9V118.8z"></path><path d="M164.1,118.8c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9V86.5c0-7.1,5.8-12.9,12.9-12.9 c7.1,0,12.9,5.8,12.9,12.9V118.8z"></path></g><g><path d="M151.2,170.6c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9v-12.9H151.2z"></path><path d="M151.2,164.1c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h32.3c7.1,0,12.9,5.8,12.9,12.9 c0,7.1-5.8,12.9-12.9,12.9H151.2z"></path></g></g></svg></a></div></div></footer></div><div class="hidden xl:sticky xl:top-[4.5rem] xl:-mr-6 xl:block xl:h-[calc(100vh-4.5rem)] xl:flex-none xl:overflow-y-auto xl:py-16 xl:pr-6 pl-12" style="top:calc(0px + 4.5rem)"><ol role="list" class="mt-4 space-y-3 text-sm mb-8"><li><button style="display:inline;min-width:90px;text-align:left;justify-content:center;align-items:center" class="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal&#x27;"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paperclip" class="svg-inline--fa fa-paperclip icon pr-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="font-size:18px"><path fill="currentColor" d="M364.2 83.8c-24.4-24.4-64-24.4-88.4 0l-184 184c-42.1 42.1-42.1 110.3 0 152.4s110.3 42.1 152.4 0l152-152c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-152 152c-64 64-167.6 64-231.6 0s-64-167.6 0-231.6l184-184c46.3-46.3 121.3-46.3 167.6 0s46.3 121.3 0 167.6l-176 176c-28.6 28.6-75 28.6-103.6 0s-28.6-75 0-103.6l144-144c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-144 144c-6.7 6.7-6.7 17.7 0 24.4s17.7 6.7 24.4 0l176-176c24.4-24.4 24.4-64 0-88.4z"></path></svg><span>Copy link</span></button></li><li><a class="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal&#x27;" style="display:flex;align-items:center" href="https://github.com/openzro/docs/tree/main/src/pages/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access.mdx"><svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" class="svg-inline--fa fa-github icon pr-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" style="font-size:18px"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><span>Edit on Github</span></a></li></ol><nav aria-labelledby="on-this-page-title" class="w-80"><div class="flex items-center justify-between mb-4"><h2 id="on-this-page-title" class="font-display text-sm font-medium text-slate-900 dark:text-white">On this page</h2></div><ol role="list" class="mt-4 space-y-3 text-sm"><li><h3><a class="text-violet-500" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#prerequisites">Prerequisites</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#1-setting-up-open-zros-access-control-policies-for-enhanced-security">1. Setting Up openZro&#x27;s Access Control Policies For Enhanced Security</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#2-enabling-peer-approval">2. Enabling Peer Approval</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#3-inviting-users-to-join-your-network">3. Inviting Users to Join Your Network</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#4-installing-open-zro-on-the-remote-worker-device">4. Installing openZro On The Remote Worker Device</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#5-approving-peers">5. Approving Peers</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access#6-automating-peer-approval-with-edr-integration-optional">6. Automating Peer Approval with EDR Integration (optional)</a></h3></li></ol></nav></div></div><div class="Toastify"></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"sections":[{"title":"Prerequisites","id":"prerequisites","tagName":"h2"},{"title":"1. Setting Up openZro's Access Control Policies For Enhanced Security","id":"1-setting-up-open-zros-access-control-policies-for-enhanced-security","tagName":"h2"},{"title":"2. Enabling Peer Approval","id":"2-enabling-peer-approval","tagName":"h2"},{"title":"3. Inviting Users to Join Your Network","id":"3-inviting-users-to-join-your-network","tagName":"h2"},{"title":"4. Installing openZro On The Remote Worker Device","id":"4-installing-open-zro-on-the-remote-worker-device","tagName":"h2"},{"title":"5. Approving Peers","id":"5-approving-peers","tagName":"h2"},{"title":"6. Automating Peer Approval with EDR Integration (optional)","id":"6-automating-peer-approval-with-edr-integration-optional","tagName":"h2"}],"title":"Peer Approval for Remote Worker Access with openZro"},"__N_SSG":true},"page":"/manage/peers/access-infrastructure/peer-approval-for-remote-worker-access","query":{},"buildId":"h-OXItx1RfkS1sxjBXlaK","isFallback":false,"gsp":true,"scriptLoader":[]}</script></body></html>

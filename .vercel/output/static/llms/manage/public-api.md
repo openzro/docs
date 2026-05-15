@@ -1,0 +1,68 @@
+# Use service users and tokens to access openZro's public API
+
+Source: https://docs.netbird.io/manage/public-api
+
+---
+
+# Use service users and tokens to access openZro's public API   
+
+## Service Users
+
+Service users are non-interactive accounts that are used to create tokens to access resources and perform actions within your organization's network using [openZro's public API](/api).
+
+Service users provide additional security by allowing you to limit the scope of access granted to the service user and void losing automated access to critical systems when employees leave the company.
+
+### What can you use openZro service users and access tokens for? 
+
+Most network management operations administrators do in the [openZro Dashboard](https://your-management.example.com) can also be done via openZro API using service users' access tokens.
+
+The most common usage scenarios:
+
+- **Automated scripts**: if you need to run automated scripts or infrastructure as code tools like Ansible or Terraform that configure your openZro network.
+- **Third-party integrations**: if you want to integrate openZro with a third-party service, you can use a service user to provide access to your data without giving the third-party service access to your personal account.
+- **Command-line tools**: if you use command-line tools like cUrl to interact with your openZro network.
+
+### Creating a service user
+
+To create a service user, you'll need to log in to your organization's account at https://your-management.example.com and navigate to the "Team" -> "Service Users" section of your account.
+
+    
+
+From there, you can create a new service user and specify a role that the user should have.
+User role allows read-only access, use the admin for write access.
+
+    
+
+> **Note:** It's important to keep your service users secure, as they can provide access to sensitive data and actions within your organization. You should treat your service users like you would treat your own personal account and limit the scope of access granted to the service user.
+
+### Creating an access token
+
+To create an access token, you'll need to log in to your account and navigate to the "Team" section and look for your user or create a [service user](#service-users) to use for your API requests.
+
+    
+
+From there, you can create a new token and specify expiration for the token. You won't be able to modify your token.
+
+    
+
+After the token was generated successfully you will see a plain version of your token to copy and store in a secure place.
+Be aware that once you close the popup it is impossible to see the plain version of the token again as openZro only stores a hashed version of the token.
+
+    
+
+> **Note:** It's important to keep your personal access tokens secure, as they can provide access to sensitive data and actions within your account. You should treat your personal access tokens like you would treat your password and never share them with anyone else.
+
+### Using access tokens
+
+Once you have created an access token, you can use it to authenticate API requests to openZro. See [openZro API](/api/introduction) documentation for detailed usage.
+
+> **Note:** For the cloud solution we are limiting the usage to 120 requests per minute with burst of 1200 requests. If your workload requires more requests, please contact us at [support@openzro.io](mailto:support@openzro.io).
+
+For example, if you were using the API, you might include your personal access token like this:
+
+```bash {{ title: 'Example request with personal access token' }}
+curl https://api.openzro.io/api/users \
+  -H "Authorization: Token {token}"
+```
+
+With this header included, the openZro API would authenticate your request using your personal access token and grant you access to the resources that your user has been authorized to.

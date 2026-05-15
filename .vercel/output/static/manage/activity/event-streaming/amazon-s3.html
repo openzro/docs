@@ -1,0 +1,689 @@
+<!DOCTYPE html><html lang="en"><head><meta charSet="utf-8" data-next-head=""/><meta name="viewport" content="width=device-width" data-next-head=""/><title data-next-head="">Stream Network Activity to Amazon S3 - openZro Docs</title><meta name="description" data-next-head=""/><link rel="icon" type="image/svg+xml" href="/docs-static/img/openzro-icon.svg"/><link rel="icon" type="image/x-icon" href="/docs-static/img/favicon.ico"/><link rel="apple-touch-icon" href="/docs-static/img/apple-touch-icon.png"/><link rel="preload" href="/_next/static/css/5b227bfd76e92c43.css" as="style"/><style data-next-head="">:root, :host {
+  --fa-font-solid: normal 900 1em/1 "Font Awesome 6 Free";
+  --fa-font-regular: normal 400 1em/1 "Font Awesome 6 Free";
+  --fa-font-light: normal 300 1em/1 "Font Awesome 6 Pro";
+  --fa-font-thin: normal 100 1em/1 "Font Awesome 6 Pro";
+  --fa-font-duotone: normal 900 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-regular: normal 400 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-light: normal 300 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-duotone-thin: normal 100 1em/1 "Font Awesome 6 Duotone";
+  --fa-font-brands: normal 400 1em/1 "Font Awesome 6 Brands";
+  --fa-font-sharp-solid: normal 900 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-regular: normal 400 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-light: normal 300 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-thin: normal 100 1em/1 "Font Awesome 6 Sharp";
+  --fa-font-sharp-duotone-solid: normal 900 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-regular: normal 400 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-light: normal 300 1em/1 "Font Awesome 6 Sharp Duotone";
+  --fa-font-sharp-duotone-thin: normal 100 1em/1 "Font Awesome 6 Sharp Duotone";
+}
+
+svg:not(:root).svg-inline--fa, svg:not(:host).svg-inline--fa {
+  overflow: visible;
+  box-sizing: content-box;
+}
+
+.svg-inline--fa {
+  display: var(--fa-display, inline-block);
+  height: 1em;
+  overflow: visible;
+  vertical-align: -0.125em;
+}
+.svg-inline--fa.fa-2xs {
+  vertical-align: 0.1em;
+}
+.svg-inline--fa.fa-xs {
+  vertical-align: 0em;
+}
+.svg-inline--fa.fa-sm {
+  vertical-align: -0.0714285705em;
+}
+.svg-inline--fa.fa-lg {
+  vertical-align: -0.2em;
+}
+.svg-inline--fa.fa-xl {
+  vertical-align: -0.25em;
+}
+.svg-inline--fa.fa-2xl {
+  vertical-align: -0.3125em;
+}
+.svg-inline--fa.fa-pull-left {
+  margin-right: var(--fa-pull-margin, 0.3em);
+  width: auto;
+}
+.svg-inline--fa.fa-pull-right {
+  margin-left: var(--fa-pull-margin, 0.3em);
+  width: auto;
+}
+.svg-inline--fa.fa-li {
+  width: var(--fa-li-width, 2em);
+  top: 0.25em;
+}
+.svg-inline--fa.fa-fw {
+  width: var(--fa-fw-width, 1.25em);
+}
+
+.fa-layers svg.svg-inline--fa {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+}
+
+.fa-layers-counter, .fa-layers-text {
+  display: inline-block;
+  position: absolute;
+  text-align: center;
+}
+
+.fa-layers {
+  display: inline-block;
+  height: 1em;
+  position: relative;
+  text-align: center;
+  vertical-align: -0.125em;
+  width: 1em;
+}
+.fa-layers svg.svg-inline--fa {
+  transform-origin: center center;
+}
+
+.fa-layers-text {
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  transform-origin: center center;
+}
+
+.fa-layers-counter {
+  background-color: var(--fa-counter-background-color, #ff253a);
+  border-radius: var(--fa-counter-border-radius, 1em);
+  box-sizing: border-box;
+  color: var(--fa-inverse, #fff);
+  line-height: var(--fa-counter-line-height, 1);
+  max-width: var(--fa-counter-max-width, 5em);
+  min-width: var(--fa-counter-min-width, 1.5em);
+  overflow: hidden;
+  padding: var(--fa-counter-padding, 0.25em 0.5em);
+  right: var(--fa-right, 0);
+  text-overflow: ellipsis;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-counter-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-bottom-right {
+  bottom: var(--fa-bottom, 0);
+  right: var(--fa-right, 0);
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom right;
+}
+
+.fa-layers-bottom-left {
+  bottom: var(--fa-bottom, 0);
+  left: var(--fa-left, 0);
+  right: auto;
+  top: auto;
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: bottom left;
+}
+
+.fa-layers-top-right {
+  top: var(--fa-top, 0);
+  right: var(--fa-right, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top right;
+}
+
+.fa-layers-top-left {
+  left: var(--fa-left, 0);
+  right: auto;
+  top: var(--fa-top, 0);
+  transform: scale(var(--fa-layers-scale, 0.25));
+  transform-origin: top left;
+}
+
+.fa-1x {
+  font-size: 1em;
+}
+
+.fa-2x {
+  font-size: 2em;
+}
+
+.fa-3x {
+  font-size: 3em;
+}
+
+.fa-4x {
+  font-size: 4em;
+}
+
+.fa-5x {
+  font-size: 5em;
+}
+
+.fa-6x {
+  font-size: 6em;
+}
+
+.fa-7x {
+  font-size: 7em;
+}
+
+.fa-8x {
+  font-size: 8em;
+}
+
+.fa-9x {
+  font-size: 9em;
+}
+
+.fa-10x {
+  font-size: 10em;
+}
+
+.fa-2xs {
+  font-size: 0.625em;
+  line-height: 0.1em;
+  vertical-align: 0.225em;
+}
+
+.fa-xs {
+  font-size: 0.75em;
+  line-height: 0.0833333337em;
+  vertical-align: 0.125em;
+}
+
+.fa-sm {
+  font-size: 0.875em;
+  line-height: 0.0714285718em;
+  vertical-align: 0.0535714295em;
+}
+
+.fa-lg {
+  font-size: 1.25em;
+  line-height: 0.05em;
+  vertical-align: -0.075em;
+}
+
+.fa-xl {
+  font-size: 1.5em;
+  line-height: 0.0416666682em;
+  vertical-align: -0.125em;
+}
+
+.fa-2xl {
+  font-size: 2em;
+  line-height: 0.03125em;
+  vertical-align: -0.1875em;
+}
+
+.fa-fw {
+  text-align: center;
+  width: 1.25em;
+}
+
+.fa-ul {
+  list-style-type: none;
+  margin-left: var(--fa-li-margin, 2.5em);
+  padding-left: 0;
+}
+.fa-ul > li {
+  position: relative;
+}
+
+.fa-li {
+  left: calc(-1 * var(--fa-li-width, 2em));
+  position: absolute;
+  text-align: center;
+  width: var(--fa-li-width, 2em);
+  line-height: inherit;
+}
+
+.fa-border {
+  border-color: var(--fa-border-color, #eee);
+  border-radius: var(--fa-border-radius, 0.1em);
+  border-style: var(--fa-border-style, solid);
+  border-width: var(--fa-border-width, 0.08em);
+  padding: var(--fa-border-padding, 0.2em 0.25em 0.15em);
+}
+
+.fa-pull-left {
+  float: left;
+  margin-right: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-pull-right {
+  float: right;
+  margin-left: var(--fa-pull-margin, 0.3em);
+}
+
+.fa-beat {
+  animation-name: fa-beat;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-bounce {
+  animation-name: fa-bounce;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.28, 0.84, 0.42, 1));
+}
+
+.fa-fade {
+  animation-name: fa-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-beat-fade {
+  animation-name: fa-beat-fade;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, cubic-bezier(0.4, 0, 0.6, 1));
+}
+
+.fa-flip {
+  animation-name: fa-flip;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
+}
+
+.fa-shake {
+  animation-name: fa-shake;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin {
+  animation-name: fa-spin;
+  animation-delay: var(--fa-animation-delay, 0s);
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 2s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, linear);
+}
+
+.fa-spin-reverse {
+  --fa-animation-direction: reverse;
+}
+
+.fa-pulse,
+.fa-spin-pulse {
+  animation-name: fa-spin;
+  animation-direction: var(--fa-animation-direction, normal);
+  animation-duration: var(--fa-animation-duration, 1s);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-timing-function: var(--fa-animation-timing, steps(8));
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat,
+.fa-bounce,
+.fa-fade,
+.fa-beat-fade,
+.fa-flip,
+.fa-pulse,
+.fa-shake,
+.fa-spin,
+.fa-spin-pulse {
+    animation-delay: -1ms;
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+    transition-delay: 0s;
+    transition-duration: 0s;
+  }
+}
+@keyframes fa-beat {
+  0%, 90% {
+    transform: scale(1);
+  }
+  45% {
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+@keyframes fa-bounce {
+  0% {
+    transform: scale(1, 1) translateY(0);
+  }
+  10% {
+    transform: scale(var(--fa-bounce-start-scale-x, 1.1), var(--fa-bounce-start-scale-y, 0.9)) translateY(0);
+  }
+  30% {
+    transform: scale(var(--fa-bounce-jump-scale-x, 0.9), var(--fa-bounce-jump-scale-y, 1.1)) translateY(var(--fa-bounce-height, -0.5em));
+  }
+  50% {
+    transform: scale(var(--fa-bounce-land-scale-x, 1.05), var(--fa-bounce-land-scale-y, 0.95)) translateY(0);
+  }
+  57% {
+    transform: scale(1, 1) translateY(var(--fa-bounce-rebound, -0.125em));
+  }
+  64% {
+    transform: scale(1, 1) translateY(0);
+  }
+  100% {
+    transform: scale(1, 1) translateY(0);
+  }
+}
+@keyframes fa-fade {
+  50% {
+    opacity: var(--fa-fade-opacity, 0.4);
+  }
+}
+@keyframes fa-beat-fade {
+  0%, 100% {
+    opacity: var(--fa-beat-fade-opacity, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(var(--fa-beat-fade-scale, 1.125));
+  }
+}
+@keyframes fa-flip {
+  50% {
+    transform: rotate3d(var(--fa-flip-x, 0), var(--fa-flip-y, 1), var(--fa-flip-z, 0), var(--fa-flip-angle, -180deg));
+  }
+}
+@keyframes fa-shake {
+  0% {
+    transform: rotate(-15deg);
+  }
+  4% {
+    transform: rotate(15deg);
+  }
+  8%, 24% {
+    transform: rotate(-18deg);
+  }
+  12%, 28% {
+    transform: rotate(18deg);
+  }
+  16% {
+    transform: rotate(-22deg);
+  }
+  20% {
+    transform: rotate(22deg);
+  }
+  32% {
+    transform: rotate(-12deg);
+  }
+  36% {
+    transform: rotate(12deg);
+  }
+  40%, 100% {
+    transform: rotate(0deg);
+  }
+}
+@keyframes fa-spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+.fa-rotate-90 {
+  transform: rotate(90deg);
+}
+
+.fa-rotate-180 {
+  transform: rotate(180deg);
+}
+
+.fa-rotate-270 {
+  transform: rotate(270deg);
+}
+
+.fa-flip-horizontal {
+  transform: scale(-1, 1);
+}
+
+.fa-flip-vertical {
+  transform: scale(1, -1);
+}
+
+.fa-flip-both,
+.fa-flip-horizontal.fa-flip-vertical {
+  transform: scale(-1, -1);
+}
+
+.fa-rotate-by {
+  transform: rotate(var(--fa-rotate-angle, 0));
+}
+
+.fa-stack {
+  display: inline-block;
+  vertical-align: middle;
+  height: 2em;
+  position: relative;
+  width: 2.5em;
+}
+
+.fa-stack-1x,
+.fa-stack-2x {
+  bottom: 0;
+  left: 0;
+  margin: auto;
+  position: absolute;
+  right: 0;
+  top: 0;
+  z-index: var(--fa-stack-z-index, auto);
+}
+
+.svg-inline--fa.fa-stack-1x {
+  height: 1em;
+  width: 1.25em;
+}
+.svg-inline--fa.fa-stack-2x {
+  height: 2em;
+  width: 2.5em;
+}
+
+.fa-inverse {
+  color: var(--fa-inverse, #fff);
+}
+
+.sr-only,
+.fa-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:not(:focus),
+.fa-sr-only-focusable:not(:focus) {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.svg-inline--fa .fa-primary {
+  fill: var(--fa-primary-color, currentColor);
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa .fa-secondary {
+  fill: var(--fa-secondary-color, currentColor);
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-primary {
+  opacity: var(--fa-secondary-opacity, 0.4);
+}
+
+.svg-inline--fa.fa-swap-opacity .fa-secondary {
+  opacity: var(--fa-primary-opacity, 1);
+}
+
+.svg-inline--fa mask .fa-primary,
+.svg-inline--fa mask .fa-secondary {
+  fill: black;
+}</style><script>
+  let darkModeMediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
+
+  updateMode()
+  darkModeMediaQuery.addEventListener('change', updateModeWithoutTransitions)
+  window.addEventListener('storage', updateModeWithoutTransitions)
+
+  function updateMode() {
+    let isSystemDarkMode = darkModeMediaQuery.matches
+    let isDarkMode = window.localStorage.isDarkMode === 'true' || (!('isDarkMode' in window.localStorage) && isSystemDarkMode)
+
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
+
+    if (isDarkMode === isSystemDarkMode) {
+      delete window.localStorage.isDarkMode
+    }
+  }
+
+  function disableTransitionsTemporarily() {
+    document.documentElement.classList.add('[&_*]:!transition-none')
+    window.setTimeout(() => {
+      document.documentElement.classList.remove('[&_*]:!transition-none')
+    }, 0)
+  }
+
+  function updateModeWithoutTransitions() {
+    disableTransitionsTemporarily()
+    updateMode()
+  }
+</script><link rel="stylesheet" href="/_next/static/css/5b227bfd76e92c43.css" data-n-g=""/><noscript data-n-css=""></noscript><script defer="" noModule="" src="/_next/static/chunks/polyfills-42372ed130431b0a.js"></script><script src="/_next/static/chunks/webpack-345555e3c489773c.js" defer=""></script><script src="/_next/static/chunks/framework-34a8c4228d7fd161.js" defer=""></script><script src="/_next/static/chunks/main-c502755b4d857e5f.js" defer=""></script><script src="/_next/static/chunks/pages/_app-43bbbd7999c053e8.js" defer=""></script><script src="/_next/static/chunks/pages/manage/activity/event-streaming/amazon-s3-9541ad5b9548d757.js" defer=""></script><script src="/_next/static/h-OXItx1RfkS1sxjBXlaK/_buildManifest.js" defer=""></script><script src="/_next/static/h-OXItx1RfkS1sxjBXlaK/_ssgManifest.js" defer=""></script></head><body class="bg-white antialiased dark:bg-[#181A1D]"><link rel="preload" as="image" href="/docs-static/img/logo/openzro-icon.svg"/><link rel="preload" as="image" href="/docs-static/img/manage/activity/event-streaming/event-streaming-integration.png"/><link rel="preload" as="image" href="/docs-static/img/manage/activity/event-streaming/amazon-s3/s3-region-select.png"/><link rel="preload" as="image" href="/docs-static/img/manage/activity/event-streaming/amazon-s3/s3-bucket-name.png"/><link rel="preload" as="image" href="/docs-static/img/manage/activity/event-streaming/amazon-s3/s3-iam-credentials.png"/><link rel="preload" as="image" href="/docs-static/img/manage/activity/event-streaming/amazon-s3/verify-amazon-s3-integration.png"/><div id="__next"><div class="absolute inset-0 -z-10 mx-0 max-w-none overflow-hidden"><div class="absolute inset-0 hidden dark:block z-0" style="background-color:#181A1D"><svg aria-hidden="true" class="absolute inset-x-0 inset-y-[-50%] h-[200%] w-full skew-y-[-18deg] fill-black/40 stroke-black/50 mix-blend-overlay dark:fill-white/2.5 dark:stroke-white/5"><defs><pattern id="_R_pm_" width="72" height="56" patternUnits="userSpaceOnUse" x="-12" y="4"><path d="M.5 56V.5H72" fill="none"></path></pattern></defs><rect width="100%" height="100%" stroke-width="0" fill="url(#_R_pm_)"></rect><svg x="-12" y="4" class="overflow-visible"><rect stroke-width="0" width="73" height="57" x="288" y="168"></rect><rect stroke-width="0" width="73" height="57" x="144" y="56"></rect><rect stroke-width="0" width="73" height="57" x="504" y="168"></rect><rect stroke-width="0" width="73" height="57" x="720" y="336"></rect></svg></svg></div><div class="absolute inset-x-0 top-0 h-[25rem] dark:[mask-image:linear-gradient(white,transparent)] pointer-events-none z-10"><svg viewBox="0 0 1113 440" preserveAspectRatio="xMidYMin slice" aria-hidden="true" class="absolute left-1/2 top-0 -translate-x-1/2 w-full min-w-[69.5625rem] h-full fill-white blur-[26px] dark:hidden"><path d="M.016 439.5s-9.5-300 434-300S882.516 20 882.516 20V0h230.004v439.5H.016Z"></path></svg></div></div><div class="relative mx-auto flex max-w-8xl sm:px-2 lg:px-8 xl:px-12 lg:ml-72 xl:ml-80" style="padding-top:0"><header class="contents lg:pointer-events-none lg:fixed lg:inset-0 lg:z-40 lg:flex" style="top:0"><div class="contents lg:pointer-events-auto lg:block lg:w-72 lg:overflow-y-auto lg:border-r lg:border-zinc-900/10 lg:dark:border-neutral-700/50 lg:px-6 lg:pb-8 lg:pt-4 lg:bg-white/70 lg:dark:bg-[#181A1D]/95 lg:backdrop-blur-lg xl:w-80 lg:overflow-x-visible sidebar-scroll"><div class="hidden lg:flex"><a aria-label="Home" href="/"><span class="inline-flex items-center gap-2 select-none"><img src="/docs-static/img/logo/openzro-icon.svg" alt="" height="28" width="28" class="h-7 w-7"/><span class="font-semibold text-zinc-900 dark:text-white tracking-[-0.025em] leading-none text-lg" style="font-family:Geist, ui-sans-serif, system-ui, sans-serif">open<span class="font-bold text-violet-600 dark:text-violet-400">Z</span>ro</span></span></a></div><nav class="hidden lg:mt-10 lg:block"><ul role="list"><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://openzro.io/">Home</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/">Docs</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/api">API</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://openzro.io/knowledge-hub/">Learn</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="https://github.com/openzro/openzro">Github</a></li><li class="md:hidden"><a class="block py-1 text-sm text-zinc-600 transition hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white" href="/slack-url">Support</a></li><div class="outer-wrapper-0"><li class="relative md:mt-0 mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="ABOUT" data-nb-active="0">ABOUT</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="How openZro Works" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/how-openzro-works"><span class="truncate">How openZro Works</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="openZro vs. Traditional VPN" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/openzro-vs-traditional-vpn"><span class="truncate">openZro vs. Traditional VPN</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Understanding NAT and Connectivity" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/understanding-nat-and-connectivity"><span class="truncate">Understanding NAT and Connectivity</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Why WireGuard with openZro" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/why-wireguard-with-openzro"><span class="truncate">Why WireGuard with openZro</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Browser Client Architecture" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/browser-client-architecture"><span class="truncate">Browser Client Architecture</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Why self-host only" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/self-host-only"><span class="truncate">Why self-host only</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="FAQ" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/about-openzro/faq"><span class="truncate">FAQ</span></a></div></li></ul></div></li></div><div class="outer-wrapper-1"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="GET STARTED" data-nb-active="0">GET STARTED</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Quickstart Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started"><span class="truncate">Quickstart Guide</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Install openZro" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started/install"><span class="truncate">Install openZro</span></a><ul role="list"><li class="relative"><div class="relative"><a data-nb-link="0" title="Linux" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/linux"><span class="truncate">Linux</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Windows" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/windows"><span class="truncate">Windows</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="MacOS" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/macos"><span class="truncate">MacOS</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Docker" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-7" href="/get-started/install/docker"><span class="truncate">Docker</span></a></div></li></ul></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Platforms" data-nb-active="0">Platforms<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="CLI" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/get-started/cli"><span class="truncate">CLI</span></a></div></li></ul></div></li></div><div class="outer-wrapper-2"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="MANAGE NETBIRD" data-nb-active="0">MANAGE NETBIRD</h2><div class="relative mt-3 pl-2"><div class="absolute inset-x-0 top-0 bg-zinc-800/2.5 will-change-transform dark:bg-white/2.5" style="border-radius:8px;height:32px;top:0;opacity:0"></div><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><div class="absolute left-2 h-6 w-px bg-violet-500" style="top:0;opacity:1"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Control Center" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/manage/control-center"><span class="truncate">Control Center</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Peers" data-nb-active="0">Peers<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Access Control" data-nb-active="0">Access Control<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Networks" data-nb-active="0">Networks<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Network Routes" data-nb-active="0">Network Routes<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Reverse Proxy" data-nb-active="0">Reverse Proxy<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="DNS" data-nb-active="0">DNS<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Team" data-nb-active="0">Team<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Activity" data-nb-active="1">Activity<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Settings" data-nb-active="0">Settings<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Integrations" data-nb-active="0">Integrations<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Public API" data-nb-active="0">Public API<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-3"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="SELF-HOST OPENZRO" data-nb-active="0">SELF-HOST OPENZRO</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Quickstart Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/selfhosted-quickstart"><span class="truncate">Quickstart Guide</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Maintenance" data-nb-active="0">Maintenance<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Authentication" data-nb-active="0">Authentication<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Advanced Guide" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/selfhosted-guide"><span class="truncate">Advanced Guide</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Troubleshooting" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/selfhosted/troubleshooting"><span class="truncate">Troubleshooting</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Migration Guides" data-nb-active="0">Migration Guides<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-4"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="CLIENT" data-nb-active="0">CLIENT</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Profiles" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/client/profiles"><span class="truncate">Profiles</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Environment Variables" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/client/environment-variables"><span class="truncate">Environment Variables</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Settings" data-nb-active="0">Settings<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-5"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="USE CASES" data-nb-active="0">USE CASES</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Overview" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/use-cases"><span class="truncate">Overview</span></a></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Remote Access" data-nb-active="0">Remote Access<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Homelab" data-nb-active="0">Homelab<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li><li class="relative ml-4"><h2 class="group flex items-center justify-between gap-2 cursor-pointer select-none py-1 pr-3 text-sm font-medium text-zinc-700 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white" data-nb-link="Security" data-nb-active="0">Security<svg xmlns="http://www.w3.org/2000/svg" height="10" width="10" viewBox="0 0 512 512" class="fill-zinc-700 group-hover:fill-zinc-900 dark:fill-zinc-300 dark:group-hover:fill-white transition" fill="white"><path d="M233.4 406.6c12.5 12.5 32.8 12.5 45.3 0l192-192c12.5-12.5 12.5-32.8 0-45.3s-32.8-12.5-45.3 0L256 338.7 86.6 169.4c-12.5-12.5-32.8-12.5-45.3 0s-12.5 32.8 0 45.3l192 192z"></path></svg></h2><div class="relative"></div></li></ul></div></li></div><div class="outer-wrapper-6"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="COMPLIANCE" data-nb-active="0">COMPLIANCE</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Overview" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/compliance"><span class="truncate">Overview</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Bacen 4.893 (Brazil)" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/compliance/bacen-4893"><span class="truncate">Bacen 4.893 (Brazil)</span></a></div></li></ul></div></li></div><div class="outer-wrapper-7"><li class="relative mt-6"><h2 class="group flex items-center justify-between gap-2 text-xs font-semibold text-zinc-900 dark:text-white" data-nb-link="GET MORE HELP" data-nb-active="0">GET MORE HELP</h2><div class="relative mt-3 pl-2"><div class="absolute inset-y-0 left-2 w-px bg-zinc-900/10 dark:bg-white/5"></div><ul role="list" class="border-l border-transparent" style="opacity:1"><li class="relative"><div class="relative"><a data-nb-link="0" title="Troubleshooting client issues" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/help/troubleshooting-client"><span class="truncate">Troubleshooting client issues</span></a></div></li><li class="relative"><div class="relative"><a data-nb-link="0" title="Report bugs and issues" class="flex justify-between gap-2 py-1 pr-3 text-sm transition pl-4 text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white pl-4" href="/help/report-bug-issues"><span class="truncate">Report bugs and issues</span></a></div></li></ul></div></li></div><li class="sticky bottom-0 z-10 mt-6 min-[416px]:hidden"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-900 py-1 px-3 text-white hover:bg-zinc-700 dark:bg-openzro dark:text-white dark:hover:bg-openzro-dark w-full" href="https://app.openzro.io/">Sign in</a></li></ul></nav></div><div class="fixed inset-x-0 top-0 z-40 flex items-center justify-between gap-3 px-5 transition h-[64px] lg:left-72 lg:z-50 lg:px-8 xl:left-80 min-h-[64px] lg:pointer-events-auto backdrop-blur-lg bg-white/70 dark:bg-[#181A1D]/95 lg:left-72 xl:left-80" style="top:0"><div class="absolute inset-x-0 top-full h-px transition border-b border-transparent border-zinc-900/10 dark:border-neutral-700/50"></div><div class="hidden lg:block lg:max-w-md lg:flex-auto"><button type="button" class="hidden h-8 w-full items-center gap-2 rounded-full bg-white pl-2 pr-3 text-sm text-zinc-500 ring-1 ring-zinc-900/10 transition hover:ring-zinc-900/20 dark:bg-white/5 dark:text-zinc-400 dark:ring-inset dark:ring-white/10 dark:hover:ring-white/20 lg:flex focus:[&amp;:not(:focus-visible)]:outline-none"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-current"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"></path></svg>Search...<kbd class="ml-auto text-2xs text-zinc-400 dark:text-zinc-500"><kbd class="font-sans"></kbd><kbd class="font-sans">K</kbd></kbd></button></div><div class="flex items-center gap-2 lg:hidden"><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5" aria-label="Toggle navigation"><svg viewBox="0 0 10 9" fill="none" stroke-linecap="round" aria-hidden="true" class="w-2.5 stroke-zinc-900 dark:stroke-white"><path d="M.5 1h9M.5 8h9M.5 4.5h9"></path></svg></button><a aria-label="Home" href="/"><span class="inline-flex items-center gap-2 select-none"><img src="/docs-static/img/logo/openzro-icon.svg" alt="" height="28" width="28" class="h-7 w-7"/><span class="font-semibold text-zinc-900 dark:text-white tracking-[-0.025em] leading-none text-lg" style="font-family:Geist, ui-sans-serif, system-ui, sans-serif">open<span class="font-bold text-violet-600 dark:text-violet-400">Z</span>ro</span></span></a></div><div class="flex items-center gap-3 xl:gap-2"><nav class="hidden md:block"><ul role="list" class="flex items-center gap-3 xl:gap-2 m-0 p-0 list-none"><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="/">Docs</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="/api">API</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="https://github.com/openzro/openzro">GitHub</a></li><li class="block text-[12px] lg:text-[13.5px] m-0 p-0 leading-none"><a class="px-2 lg:px-3 py-1 lg:py-2 opacity-60 hover:opacity-100 hover:bg-zinc-900/5 dark:hover:bg-neutral-900/60 hover:border-zinc-900/10 dark:hover:border-neutral-800 border border-transparent rounded-md leading-none transition-all duration-200 text-zinc-900 dark:text-white inline-flex items-center" href="https://github.com/openzro/openzro/discussions">Support</a></li></ul></nav><div class="hidden md:block md:h-5 md:w-px md:bg-zinc-900/10 md:dark:bg-neutral-500/20"></div><div class="flex gap-2"><div class="contents lg:hidden"><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5 lg:hidden focus:[&amp;:not(:focus-visible)]:outline-none" aria-label="Search..."><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-zinc-900 dark:stroke-white"><path stroke-linecap="round" stroke-linejoin="round" d="M12.01 12a4.25 4.25 0 1 0-6.02-6 4.25 4.25 0 0 0 6.02 6Zm0 0 3.24 3.25"></path></svg></button></div><button type="button" class="flex h-6 w-6 items-center justify-center rounded-md transition hover:bg-zinc-900/5 dark:hover:bg-white/5" aria-label="Toggle dark mode"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="h-5 w-5 stroke-zinc-900 dark:hidden"><path d="M12.5 10a2.5 2.5 0 1 1-5 0 2.5 2.5 0 0 1 5 0Z"></path><path stroke-linecap="round" d="M10 5.5v-1M13.182 6.818l.707-.707M14.5 10h1M13.182 13.182l.707.707M10 15.5v-1M6.11 13.889l.708-.707M4.5 10h1M6.11 6.111l.708.707"></path></svg><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="hidden h-5 w-5 stroke-white dark:block"><path d="M15.224 11.724a5.5 5.5 0 0 1-6.949-6.949 5.5 5.5 0 1 0 6.949 6.949Z"></path></svg></button></div><div class="hidden min-[416px]:contents"><div class="relative inline-flex group transition-all"><span class="absolute h-full w-full left-0 top-0 blur-sm bg-openzro z-0 transition-all duration-200 transform-gpu opacity-0 group-hover:opacity-100 pointer-events-none"></span><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-[5px] bg-openzro text-white border-0 border-transparent duration-300 relative overflow-hidden group !py-1.5 !px-3 text-xs" target="_blank" href="https://github.com/openzro/openzro/releases/latest"><span class="absolute h-full w-full left-0 top-0 z-10 bg-gradient-to-br from-openzro to-openzro-dark transition-all duration-200 transform-gpu opacity-0 group-hover:opacity-100 pointer-events-none"></span><span class="z-20 relative flex gap-2 items-center transition-all">Get openZro</span></a></div></div></div></div></header><div class="min-w-0 max-w-2xl flex-auto px-4 py-16 lg:max-w-none lg:pl-8 lg:pr-0 xl:px-5"><main class="py-16"><article class="prose dark:prose-invert"><h1>Stream Network Activity to Amazon S3</h1>
+<p><a href="https://aws.amazon.com/s3/">Amazon Simple Storage Service (Amazon S3)</a> is a scalable, high-speed, web-based cloud storage service.
+You can use Amazon S3 to store and analyze large amounts of data, including network activity events from openZro.</p>
+<p>openZro integrates with Amazon S3 and sends activity events to an S3 bucket in real-time once they occur. For every event,
+openZro creates a new object in the S3 bucket, which you can then analyze, filter, and query using Amazon tools.</p>
+<p>Storing one event per object is not the most efficient way to save data in S3, therefore openZro provides an
+<a href="/manage/activity/event-streaming/amazon-firehose">alternative integration</a> that uses Amazon Data Firehose for a more efficient
+data ingestion.</p>
+<div class="my-6 flex gap-2.5 rounded-l border border-violet-500/20 bg-violet-50/50 p-4 leading-6 text-violet-900 dark:border-violet-500/30 dark:bg-violet-500/5 dark:text-violet-200 dark:[--tw-prose-links-hover:theme(colors.violet.300)] dark:[--tw-prose-links:theme(colors.white)]"><svg viewBox="0 0 16 16" aria-hidden="true" class="mt-1 h-4 w-4 flex-none fill-violet-500 stroke-white dark:fill-violet-200/20 dark:stroke-violet-200"><circle cx="8" cy="8" r="8" stroke-width="0"></circle><path fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6.75 7.75h1.5v3.5"></path><circle cx="8" cy="4" r=".5" fill="none"></circle></svg><div class="[&amp;&gt;:first-child]:mt-0 [&amp;&gt;:last-child]:mb-0"><p>This feature is only available in the cloud version of openZro.</p></div></div>
+<h2 id="prerequisites" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/activity/event-streaming/amazon-s3#prerequisites"><div>Prerequisites</div></a></h2>
+<p>Before you start creating and configuring an Amazon S3 event streaming integration, ensure that you have the following:</p>
+<ul>
+<li>An AWS account with the permissions to create and manage S3 buckets.</li>
+<li>Permissions to create and manage IAM users, roles and policies.</li>
+</ul>
+<p>If you don&#x27;t have the required permissions, ask your AWS administrator to grant them to you.</p>
+<h2 id="create-an-s3-bucket" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/activity/event-streaming/amazon-s3#create-an-s3-bucket"><div>Create an S3 Bucket</div></a></h2>
+<ul>
+<li>Navigate to the <a href="https://console.aws.amazon.com/s3/home">S3 dashboard</a></li>
+<li>Select the correct region in the top menu</li>
+<li>Click <code>Create bucket</code></li>
+<li>Give it a descriptive name like <code>openzro-activity-events</code></li>
+<li>(Optional) Change bucket configurations to your needs</li>
+<li>Click <code>Create bucket</code></li>
+</ul>
+<h2 id="create-an-iam-user" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/activity/event-streaming/amazon-s3#create-an-iam-user"><div>Create an IAM User</div></a></h2>
+<ul>
+<li>Navigate to the <a href="https://console.aws.amazon.com/iam/home">IAM Dashboard</a></li>
+<li>Create an IAM User (for details see the <a href="https://docs.aws.amazon.com/IAM/latest/UserGuide/id_users_create.html">Amazon Docs</a>)</li>
+<li>Create a custom policy with the following permissions:</li>
+</ul>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-json"><span><span style="color: var(--shiki-color-text)">{</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;Version&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;2012-10-17&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;Statement&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> [</span></span>
+<span><span style="color: var(--shiki-color-text)">        {</span></span>
+<span><span style="color: var(--shiki-color-text)">            </span><span style="color: var(--shiki-token-keyword)">&quot;Effect&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;Allow&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">            </span><span style="color: var(--shiki-token-keyword)">&quot;Action&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> [</span></span>
+<span><span style="color: var(--shiki-color-text)">                </span><span style="color: var(--shiki-token-string-expression)">&quot;s3:PutObject&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">                </span><span style="color: var(--shiki-token-string-expression)">&quot;s3:PutObjectAcl&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">            ]</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">            </span><span style="color: var(--shiki-token-keyword)">&quot;Resource&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;arn:aws:s3:::openzro-activity-events/*&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">        }</span></span>
+<span><span style="color: var(--shiki-color-text)">    ]</span></span>
+<span><span style="color: var(--shiki-color-text)">}</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<ul>
+<li>Attach the policy to the IAM user</li>
+<li>Select the user and navigate to the <code>Security credentials</code> tab</li>
+<li>Click <code>Create access key</code></li>
+<li>Select <code>Third-party service</code> and click <code>Next</code></li>
+<li>Give it a description</li>
+<li>Store <code>Access key</code> and <code>Secret access key</code> in a secure place. You will need these when configuring an integration in openZro.</li>
+</ul>
+<h2 id="create-an-integration-in-open-zro" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/activity/event-streaming/amazon-s3#create-an-integration-in-open-zro"><div>Create an Integration in openZro</div></a></h2>
+<ul>
+<li>Navigate to the <a href="https://preview.openzro.io/integrations">Integrations » Event Streaming</a> tab in the openZro dashboard</li>
+</ul>
+<p><img src="/docs-static/img/manage/activity/event-streaming/event-streaming-integration.png" alt="event-streaming-integration" class="imagewrapper-big"/></p>
+<ul>
+<li>Enable and configure the <code>Amazon S3</code> integration</li>
+<li>First select the region your S3 bucket is created in</li>
+</ul>
+<p><img src="/docs-static/img/manage/activity/event-streaming/amazon-s3/s3-region-select.png" alt="s3-region-select" class="imagewrapper"/></p>
+<ul>
+<li>Then enter the S3 bucket name you created in <a href="/manage/activity/event-streaming/amazon-s3#step-1-create-an-s3-bucket">Step 1</a> and click <code>Next</code></li>
+</ul>
+<p><img src="/docs-static/img/manage/activity/event-streaming/amazon-s3/s3-bucket-name.png" alt="s3-bucket-name" class="imagewrapper"/></p>
+<ul>
+<li>Enter the <code>Access key</code> and <code>Secret access key</code> you created in <a href="/manage/activity/event-streaming/amazon-s3#step-2-create-an-iam-user">Step 2</a> and click <code>Connect</code></li>
+</ul>
+<p><img src="/docs-static/img/manage/activity/event-streaming/amazon-s3/s3-iam-credentials.png" alt="s3-iam-credentials" class="imagewrapper"/></p>
+<h2 id="verify-the-integration" class="scroll-mt-24"><a class="group text-inherit no-underline hover:text-inherit" href="/manage/activity/event-streaming/amazon-s3#verify-the-integration"><div>Verify the Integration</div></a></h2>
+<p>After configuring the integration in openZro, you can verify that the integration is working correctly by checking
+the S3 bucket for newly created objects. If the integration is successful, you should see two <code>.json</code> files in your bucket
+containing the following events:</p>
+<ul>
+<li><code>integration test</code></li>
+<li><code>integration created</code></li>
+</ul>
+<p><img src="/docs-static/img/manage/activity/event-streaming/amazon-s3/verify-amazon-s3-integration.png" alt="verify-amazon-s3-integration" class="imagewrapper-big"/></p>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-json"><span><span style="color: var(--shiki-color-text)">{</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;timestamp&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;2024-04-11T19:01:05.381074+02:00&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;message&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;integration test&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;id&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-constant)">0</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;initiator_id&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;openzro&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;target_id&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;openzro&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;meta&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-constant)">null</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;reference&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">}</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<div class="not-prose my-6 overflow-hidden rounded bg-zinc-50 ring-1 ring-black/10 dark:bg-zinc-900 shadow-md dark:ring-1 dark:ring-white/10"><div class="group dark:bg-white/2.5"><div class="relative"><pre class="overflow-x-auto p-4 text-xs dark:text-white text-black"><code class="language-json"><span><span style="color: var(--shiki-color-text)">{</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;timestamp&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;2024-04-11T19:01:08.769292+02:00&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;message&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;integration created&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;id&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-constant)">0</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;initiator_id&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;openzro&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;target_id&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;openzro&quot;</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;meta&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-constant)">null</span><span style="color: var(--shiki-token-punctuation)">,</span></span>
+<span><span style="color: var(--shiki-color-text)">    </span><span style="color: var(--shiki-token-keyword)">&quot;reference&quot;</span><span style="color: var(--shiki-token-punctuation)">:</span><span style="color: var(--shiki-color-text)"> </span><span style="color: var(--shiki-token-string-expression)">&quot;&quot;</span></span>
+<span><span style="color: var(--shiki-color-text)">}</span></span>
+<span></span></code></pre><button type="button" class="group/button absolute right-4 top-3.5 overflow-hidden rounded-full py-1 pl-2 pr-3 text-2xs font-medium opacity-0 backdrop-blur transition focus:opacity-100 group-hover:opacity-100 bg-black/5 dark:bg-white/5 hover:bg-black/7.5 dark:hover:bg-white/7.5 dark:bg-white/2.5 dark:hover:bg-white/5"><span aria-hidden="false" class="pointer-events-none flex items-center gap-0.5 text-zinc-400 transition duration-300"><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-500/20 stroke-zinc-500 transition-colors group-hover/button:stroke-zinc-400"><path stroke-width="0" d="M5.5 13.5v-5a2 2 0 0 1 2-2l.447-.894A2 2 0 0 1 9.737 4.5h.527a2 2 0 0 1 1.789 1.106l.447.894a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2Z"></path><path fill="none" stroke-linejoin="round" d="M12.5 6.5a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-5a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2m5 0-.447-.894a2 2 0 0 0-1.79-1.106h-.527a2 2 0 0 0-1.789 1.106L7.5 6.5m5 0-1 1h-3l-1-1"></path></svg>Copy</span><span aria-hidden="true" class="pointer-events-none absolute inset-0 flex items-center justify-center text-violet-400 transition duration-300 translate-y-1.5 opacity-0">Copied!</span></button></div></div></div>
+<p>The integration test event is sent to validate whether the provided credentials are correct and openZro can stream events.
+The integration created event is sent when the integration is successfully created.</p>
+<p>The integration is now set up and ready to stream network activity events to Amazon S3.</p></article></main><footer class="mx-auto max-w-2xl space-y-10 pb-16 lg:max-w-5xl"><div class="relative h-8"><form class="absolute inset-0 flex items-center justify-center gap-6 md:justify-start"><p class="text-sm text-zinc-600 dark:text-zinc-400">Was this page helpful?</p><div class="group grid h-8 grid-cols-[1fr,1px,1fr] overflow-hidden rounded-full border border-zinc-900/10 dark:border-white/10"><button type="submit" class="px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-900/2.5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white" data-response="yes">Yes</button><div class="bg-zinc-900/10 dark:bg-white/10"></div><button type="submit" class="px-3 text-sm font-medium text-zinc-600 transition hover:bg-zinc-900/2.5 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-white/5 dark:hover:text-white" data-response="no">No</button></div></form></div><div class="flex"><div class="flex flex-col items-start gap-3"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-100 py-1 px-3 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-400 dark:ring-1 dark:ring-inset dark:ring-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-300" aria-label="Previous: Datadog" href="/manage/activity/event-streaming/datadog"><svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 h-5 w-5 -ml-1 rotate-180"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11.5 6.5 3 3.5m0 0-3 3.5m3-3.5h-9"></path></svg>Previous</a><a tabindex="-1" aria-hidden="true" class="text-base font-semibold text-zinc-900 transition hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300" href="/manage/activity/event-streaming/datadog">Datadog</a></div><div class="ml-auto flex flex-col items-end gap-3"><a class="inline-flex gap-0.5 justify-center text-[12px] md:text-xs px-3 py-2 md:px-3 md:py-2 lg:px-4 lg:py-2.5 font-medium transition whitespace-nowrap items-center rounded-full bg-zinc-100 py-1 px-3 text-zinc-900 hover:bg-zinc-200 dark:bg-zinc-800/40 dark:text-zinc-400 dark:ring-1 dark:ring-inset dark:ring-zinc-800 dark:hover:bg-zinc-800 dark:hover:text-zinc-300" aria-label="Next: Amazon Firehose" href="/manage/activity/event-streaming/amazon-firehose">Next<svg viewBox="0 0 20 20" fill="none" aria-hidden="true" class="mt-0.5 h-5 w-5 -mr-1"><path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" d="m11.5 6.5 3 3.5m0 0-3 3.5m3-3.5h-9"></path></svg></a><a tabindex="-1" aria-hidden="true" class="text-base font-semibold text-zinc-900 transition hover:text-zinc-600 dark:text-white dark:hover:text-zinc-300" href="/manage/activity/event-streaming/amazon-firehose">Amazon Firehose</a></div></div><div class="flex flex-col items-center justify-between gap-5 border-t border-zinc-900/5 pt-8 dark:border-white/5 sm:flex-row"><p class="text-xs text-zinc-600 dark:text-zinc-400">© Copyright <!-- -->2026<!-- -->. All rights reserved.</p><div class="flex gap-4"><a class="group" href="https://github.com/openzro/openzro"><span class="sr-only">openZro on GitHub</span><svg viewBox="0 0 20 20" aria-hidden="true" class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-900 dark:group-hover:fill-zinc-500"><path fill-rule="evenodd" clip-rule="evenodd" d="M10 1.667c-4.605 0-8.334 3.823-8.334 8.544 0 3.78 2.385 6.974 5.698 8.106.417.075.573-.182.573-.406 0-.203-.011-.875-.011-1.592-2.093.397-2.635-.522-2.802-1.002-.094-.246-.5-1.005-.854-1.207-.291-.16-.708-.556-.01-.567.656-.01 1.124.62 1.281.876.75 1.292 1.948.93 2.427.705.073-.555.291-.93.531-1.143-1.854-.213-3.791-.95-3.791-4.218 0-.929.322-1.698.854-2.296-.083-.214-.375-1.09.083-2.265 0 0 .698-.224 2.292.876a7.576 7.576 0 0 1 2.083-.288c.709 0 1.417.096 2.084.288 1.593-1.11 2.291-.875 2.291-.875.459 1.174.167 2.05.084 2.263.53.599.854 1.357.854 2.297 0 3.278-1.948 4.005-3.802 4.219.302.266.563.78.563 1.58 0 1.143-.011 2.061-.011 2.35 0 .224.156.491.573.405a8.365 8.365 0 0 0 4.11-3.116 8.707 8.707 0 0 0 1.567-4.99c0-4.721-3.73-8.545-8.334-8.545Z"></path></svg></a><a class="group" href="https://github.com/openzro/openzro/discussions"><span class="sr-only">Discussions</span><svg viewBox="56 56 160 160" aria-hidden="true" class="h-5 w-5 fill-zinc-700 transition group-hover:fill-zinc-900 dark:group-hover:fill-zinc-500"><g><g><path d="M99.4,151.2c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h12.9V151.2z"></path><path d="M105.9,151.2c0-7.1,5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v32.3c0,7.1-5.8,12.9-12.9,12.9s-12.9-5.8-12.9-12.9 C105.9,183.5,105.9,151.2,105.9,151.2z"></path></g><g><path d="M118.8,99.4c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9s12.9,5.8,12.9,12.9v12.9H118.8z"></path><path d="M118.8,105.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9H86.5c-7.1,0-12.9-5.8-12.9-12.9s5.8-12.9,12.9-12.9 C86.5,105.9,118.8,105.9,118.8,105.9z"></path></g><g><path d="M170.6,118.8c0-7.1,5.8-12.9,12.9-12.9c7.1,0,12.9,5.8,12.9,12.9s-5.8,12.9-12.9,12.9h-12.9V118.8z"></path><path d="M164.1,118.8c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9V86.5c0-7.1,5.8-12.9,12.9-12.9 c7.1,0,12.9,5.8,12.9,12.9V118.8z"></path></g><g><path d="M151.2,170.6c7.1,0,12.9,5.8,12.9,12.9c0,7.1-5.8,12.9-12.9,12.9c-7.1,0-12.9-5.8-12.9-12.9v-12.9H151.2z"></path><path d="M151.2,164.1c-7.1,0-12.9-5.8-12.9-12.9c0-7.1,5.8-12.9,12.9-12.9h32.3c7.1,0,12.9,5.8,12.9,12.9 c0,7.1-5.8,12.9-12.9,12.9H151.2z"></path></g></g></svg></a></div></div></footer></div><div class="hidden xl:sticky xl:top-[4.5rem] xl:-mr-6 xl:block xl:h-[calc(100vh-4.5rem)] xl:flex-none xl:overflow-y-auto xl:py-16 xl:pr-6 pl-12" style="top:calc(0px + 4.5rem)"><ol role="list" class="mt-4 space-y-3 text-sm mb-8"><li><button style="display:inline;min-width:90px;text-align:left;justify-content:center;align-items:center" class="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal&#x27;"><svg aria-hidden="true" focusable="false" data-prefix="fas" data-icon="paperclip" class="svg-inline--fa fa-paperclip icon pr-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" style="font-size:18px"><path fill="currentColor" d="M364.2 83.8c-24.4-24.4-64-24.4-88.4 0l-184 184c-42.1 42.1-42.1 110.3 0 152.4s110.3 42.1 152.4 0l152-152c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-152 152c-64 64-167.6 64-231.6 0s-64-167.6 0-231.6l184-184c46.3-46.3 121.3-46.3 167.6 0s46.3 121.3 0 167.6l-176 176c-28.6 28.6-75 28.6-103.6 0s-28.6-75 0-103.6l144-144c10.9-10.9 28.7-10.9 39.6 0s10.9 28.7 0 39.6l-144 144c-6.7 6.7-6.7 17.7 0 24.4s17.7 6.7 24.4 0l176-176c24.4-24.4 24.4-64 0-88.4z"></path></svg><span>Copy link</span></button></li><li><a class="dark:hover:text-slate-300 dark:text-slate-400 text-slate-500 hover:text-slate-700 font-normal&#x27;" style="display:flex;align-items:center" href="https://github.com/openzro/docs/tree/main/src/pages/manage/activity/event-streaming/amazon-s3.mdx"><svg aria-hidden="true" focusable="false" data-prefix="fab" data-icon="github" class="svg-inline--fa fa-github icon pr-1" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512" style="font-size:18px"><path fill="currentColor" d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg><span>Edit on Github</span></a></li></ol><nav aria-labelledby="on-this-page-title" class="w-80"><div class="flex items-center justify-between mb-4"><h2 id="on-this-page-title" class="font-display text-sm font-medium text-slate-900 dark:text-white">On this page</h2></div><ol role="list" class="mt-4 space-y-3 text-sm"><li><h3><a class="text-violet-500" href="/manage/activity/event-streaming/amazon-s3#prerequisites">Prerequisites</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/activity/event-streaming/amazon-s3#create-an-s3-bucket">Create an S3 Bucket</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/activity/event-streaming/amazon-s3#create-an-iam-user">Create an IAM User</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/activity/event-streaming/amazon-s3#create-an-integration-in-open-zro">Create an Integration in openZro</a></h3></li><li><h3><a class="font-normal text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-300" href="/manage/activity/event-streaming/amazon-s3#verify-the-integration">Verify the Integration</a></h3></li></ol></nav></div></div><div class="Toastify"></div></div><script id="__NEXT_DATA__" type="application/json">{"props":{"pageProps":{"sections":[{"title":"Prerequisites","id":"prerequisites","tagName":"h2"},{"title":"Create an S3 Bucket","id":"create-an-s3-bucket","tagName":"h2"},{"title":"Create an IAM User","id":"create-an-iam-user","tagName":"h2"},{"title":"Create an Integration in openZro","id":"create-an-integration-in-open-zro","tagName":"h2"},{"title":"Verify the Integration","id":"verify-the-integration","tagName":"h2"}],"title":"Stream Network Activity to Amazon S3"},"__N_SSG":true},"page":"/manage/activity/event-streaming/amazon-s3","query":{},"buildId":"h-OXItx1RfkS1sxjBXlaK","isFallback":false,"gsp":true,"scriptLoader":[]}</script></body></html>

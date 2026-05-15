@@ -1,0 +1,171 @@
+# Duo SSO with openZro Self-Hosted
+
+Source: https://docs.netbird.io/selfhosted/identity-providers/managed/duo
+
+---
+
+# Duo SSO with openZro Self-Hosted
+
+[Duo](https://duo.com/) is a cloud-based identity and access management platform by Cisco that provides single sign-on (SSO), multi-factor authentication (MFA), and adaptive access policies. Duo Single Sign-On acts as an OpenID provider (OP), authenticating your users and prompting for two-factor authentication before permitting access.
+
+## Management Setup
+
+Add Duo as an external IdP directly in the openZro Management Dashboard. This is the simplest approach and recommended for most deployments.
+
+### Prerequisites
+
+- openZro self-hosted with embedded IdP enabled
+- Duo account with admin permissions (Duo Premier, Duo Advantage, or Duo Essentials plan)
+- Duo Single Sign-On [configured with an authentication source](https://duo.com/docs/sso#configure-duo-single-sign-on)
+
+### Step 1: Create OIDC Application in Duo
+
+1. Log in to the [Duo Admin Panel](https://admin.duosecurity.com/)
+2. Navigate to **Applications** → **Application Catalog**
+
+    
+
+3. Search for **Generic OIDC Relying Party** (look for the "SSO" label)
+4. Click the **+ Add** button
+
+    
+
+5. Give the application a name such as `openZro SSO`
+6. Under **User access**, grant access to users in selected Duo groups or to all users
+7. Scroll down to the **Metadata** section and note the following values (you'll need these in Step 3):
+    - **Client ID**
+    - **Client Secret**
+    - **Issuer**
+
+    
+
+8. Keep this tab open and proceed to Step 2
+
+### Step 2: Get Redirect URL from openZro
+
+1. Open a new tab or window and log in to your openZro Dashboard
+2. Navigate to **Settings** → **Identity Providers**
+3. Click **Add Identity Provider**
+4. Fill in the fields:
+
+| Field | Value |
+|-------|-------|
+| Type | Generic OIDC |
+| Name | Duo (or your preferred display name) |
+| Issuer | From Duo Metadata |
+| Client ID | From Duo application Metadata (will fill after Step 3) |
+| Client Secret | From Duo application Metadata (will fill after Step 3) |
+
+> **Note:** **Important:** Copy the Issuer URL exactly as shown in Duo's Metadata section. The format is `https://sso-{your-id}.sso.duosecurity.com/oidc/{application-id}`.
+
+5. **Copy the Redirect URL** that openZro displays (but don't click **Add Provider** yet)
+
+    
+
+### Step 3: Complete Duo Application Setup
+
+1. Return to the Duo Admin Panel tab
+2. Scroll down to the **Relying Party** section
+3. Under **Sign-In Redirect URLs**, enter the redirect URL you copied from openZro (e.g., `https://openzro.example.com/oauth2/callback`)
+
+    
+
+4. Under **Scopes**, ensure the following are enabled:
+    - **openid** (required, cannot be disabled)
+    - **profile** (check the box)
+    - **email** (check the box)
+
+    
+
+5. Scroll down and click **Save**
+
+### Step 4: Complete openZro Setup
+
+1. Return to the openZro tab
+2. Fill in the **Client ID** and **Client Secret** from Duo's Metadata section
+
+    
+
+3. Click **Add Provider**
+
+### Step 5: Test the Connection
+
+1. Log out of openZro Dashboard
+2. On the login page, you should see a "Duo" button
+3. Click it and authenticate with your Duo credentials
+4. Complete Duo two-factor authentication when prompted
+5. You should be redirected back to openZro and logged in. Unless your user approval settings were changed, you will need to log back into your local admin account to approve the user.
+
+> **Note:** Duo Single Sign-On requires users to complete two-factor authentication. Make sure your users have enrolled in Duo MFA before attempting to log in.
+
+### Configuring JWT 'groups' Claim
+
+To sync Duo groups with openZro, you need to add a custom scope with group claims in your Duo OIDC application. This will require a [custom attribute](https://duo.com/docs/user-attributes#overview) for the groups.
+
+#### Step 1: Add Custom Group Scope in Duo
+
+1. In [Duo Admin Panel](https://admin.duosecurity.com/), go to **Applications**
+2. Select your openZro (Generic OIDC Relying Party) application
+3. Scroll down to the **OIDC Response** section
+4. Click **Add Custom Scope**
+5. Enter the scope name: `groups`
+6. Click **Add Claim** under the new scope
+7. Configure the claim:
+    - **IdP Attribute**: Select or enter your group attribute from your authentication source
+    - **Claim**: `groups`
+
+8. Click **Save**
+
+> **Note:** The group attribute name depends on your Duo authentication source. For Active Directory, this is typically the group membership attribute. For SAML IdPs, verify your IdP sends group information in the expected attribute.
+
+#### Step 2: Enable JWT Group Sync in openZro
+
+1. In openZro Dashboard, go to **Settings** → **Groups**
+2. Enable **JWT group sync**
+3. Set **JWT claim** to `groups`
+4. Optionally configure **JWT allow groups** to restrict access
+
+---
+
+## Troubleshooting
+
+### "Connector failed to initialize" error
+
+- Ensure the **Issuer** URL is copied exactly from Duo's Metadata section
+- Verify both **profile** and **email** scopes are enabled in Duo
+- Check that the **Redirect URL** in Duo exactly matches the URL from openZro
+- Make sure the application is saved and you have the correct **Client ID** and **Client Secret**
+- Confirm your Duo authentication source is properly configured
+
+### "Invalid redirect URI" error
+
+- Ensure the redirect URI is configured in Duo's **Sign-In Redirect URLs**
+- Check for trailing slashes — the URL must match exactly
+- Verify URLs use HTTPS
+
+### Users can't complete authentication
+
+- Verify users have access to the application in Duo (check **User access** settings)
+- Ensure users are enrolled in Duo MFA
+- Check that users belong to a group with access to the application
+
+### Two-factor authentication issues
+
+- Duo requires MFA for all SSO logins — ensure users have set up their Duo authentication methods
+- Check Duo's [authentication policy](/docs/policy) settings for your application
+- Verify the user's device is registered in Duo
+
+### Groups not syncing
+
+- Verify the custom `groups` scope is configured with the correct claim
+- Check that your authentication source (AD or SAML IdP) is sending group information
+- For Active Directory, ensure the group attribute is properly mapped
+
+---
+
+## Related Resources
+
+- [Duo Single Sign-On Documentation](https://duo.com/docs/sso)
+- [Duo Admin Panel](https://admin.duosecurity.com/)
+- [Duo Generic OIDC Documentation](https://duo.com/docs/sso-oidc-generic)
+- [Embedded IdP Overview](/selfhosted/identity-providers/local)

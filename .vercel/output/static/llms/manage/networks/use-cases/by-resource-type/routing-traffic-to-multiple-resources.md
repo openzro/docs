@@ -1,0 +1,110 @@
+# Routing traffic to multiple IP resources
+
+Source: https://docs.netbird.io/manage/networks/use-cases/by-resource-type/routing-traffic-to-multiple-resources
+
+---
+
+# Routing traffic to multiple IP resources
+
+This guide shows how to route traffic to multiple IP resources using openZro [Networks](/manage/networks) with [IP resources](/manage/networks#resources). This is a common scenario for DevOps and Platform teams who need to provide differentiated access to on-premises or cloud infrastructure.
+
+## Example scenario
+
+In this example, you will configure access to an internal network (`172.16.0.0/15`) with these requirements:
+- All users need access to DNS servers at `172.16.30.2` and `172.17.100.2` (UDP port 53 only)
+- The DevOps team needs full access to the entire network range
+
+Traffic will be routed through [routing peers](/manage/networks#routing-peers) running inside the network.
+
+### Create a network
+
+Navigate to `Networks` > `Networks` in the openZro dashboard:
+
+    
+
+Click `Add Network` to open the setup wizard. Enter a name and description for the network, then click `Continue`:
+
+    
+
+### Add a routing peer
+
+Click `Add routing peer` and select a peer from your network:
+
+    
+
+Click `Continue`, then accept the defaults and click `Add Routing Peer`:
+
+    
+
+### Add the network resource
+
+Click `Add Resource` to open the resource modal. In the **Resource** tab:
+1. Enter `Office network` as the name
+2. Enter `172.16.0.0/15` as the address
+3. Expand **Additional Options** and assign the resource group `office-network` — this group will be used in the access policy for the DevOps team
+4. Click **Continue** to proceed to the **Access Control** tab
+
+    
+
+### Create an access policy for the network resource
+
+In the **Access Control** tab, click **Add Policy** to create a policy that grants the `DevOps` group full access to the `office-network` resource group.
+
+Configure the policy fields as shown:
+
+    
+
+Click `Continue` twice, then click `Add Policy`:
+
+    
+
+Click **Add Resource** to save the resource with its policy.
+
+### Add the DNS server resources
+
+Add the first DNS server as a resource. Click `Add Resource` and in the **Resource** tab:
+1. Enter the DNS server name and IP address `172.16.30.2`
+2. Expand **Additional Options** and assign the resource group `office-dns-servers`
+3. Click **Continue** to proceed to the **Access Control** tab
+4. Skip adding a policy for now — click **Add Resource** to save without a policy (you will create a shared policy after adding both DNS servers)
+
+    
+
+Repeat the same steps for the second DNS server at `172.17.100.2`, assigning it to the same `office-dns-servers` group:
+
+    
+
+### Create an access policy for DNS servers
+
+Now that both DNS servers share the `office-dns-servers` resource group, create a single policy for both. From the network view, click **Add Policy** next to one of the DNS server resources.
+
+Create a policy that grants the `All users` group access to the `office-dns-servers` resource group on UDP port 53 only:
+
+    
+
+Click `Continue` twice, then click `Add Policy`. Use a generic policy name to cover both DNS server addresses:
+
+    
+
+### View the network
+
+After completing the wizard, the network appears in the Networks list:
+
+    
+
+Click the network name to view details:
+
+    
+
+From this view, you can edit or add resources and routing peers using the `Edit` buttons in each section.
+
+You have now created a network with multiple resources that provide different access levels to different user groups within your organization.
+
+## Get started
+
+    
+
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
+- Join our [Slack Channel](/slack-url)
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

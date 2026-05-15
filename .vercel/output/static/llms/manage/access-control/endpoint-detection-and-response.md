@@ -1,0 +1,52 @@
+# Integrate openZro with MDM & EDR Platforms
+
+Source: https://docs.netbird.io/manage/access-control/endpoint-detection-and-response
+
+---
+
+# Integrate openZro with MDM & EDR Platforms
+
+![Endpoint Detection and Response](/docs-static/img/manage/access-control/endpoint-detection-and-response/edr-integrations.png)
+
+## What is EDR and MDM?
+Endpoint Detection and Response (EDR) is a cybersecurity technology designed to help organizations detect, investigate,
+and respond to threats on endpoint devices. An endpoint is any device that is connected to a network, such as laptops,
+desktops, smartphones, tablets, servers, and even some IoT (Internet of Things) devices.
+
+MDM stands for Mobile Device Management. It's a type of security software that
+enables organizations to monitor, manage, and secure their employees' mobile devices, including smartphones, tablets, and laptops,
+across various service providers and operating system.
+
+MDM focuses on managing and securing mobile devices, while EDR focuses on detecting and responding to threats on various
+endpoints, including desktops, laptops, and servers.
+
+## openZro's EDR and MDM Integration
+With the rise of remote work, endpoints often operate outside the traditional corporate network perimeter,
+making them more vulnerable to attacks. EDR provides a layer of security that is not dependent on the physical location
+of the endpoint, thus extending protection to remote workers and their devices.
+
+openZro integrates with major EDR and MDM platforms to restrict network access only to devices managed by the company's IT department.
+With the integration enabled, openZro synchronizes the list of devices managed by the MDM or EDR platform via the API and
+checks the presence of the MDM or EDR agent on the device, blocking access to the network if the agent is not installed or
+not compliant with the organization's security policies.
+
+openZro doesn't apply the MDM and EDR checks to all devices in the network. Instead, you can select specific groups of devices for
+the checks to apply.
+
+> **Note:** This feature is only available in the cloud version of openZro.
+
+## Supported EDR Platforms
+
+openZro integrates with the following EDR and MDM platforms:
+
+* [CrowdStrike Falcon](/manage/access-control/endpoint-detection-and-response/crowdstrike-edr)
+* [FleetDM](/manage/access-control/endpoint-detection-and-response/fleetdm-edr)
+* [Huntress](/manage/access-control/endpoint-detection-and-response/huntress-edr)
+* [Microsoft Intune](/manage/access-control/endpoint-detection-and-response/intune-mdm)
+* [SentinelOne Singularity](/manage/access-control/endpoint-detection-and-response/sentinelone-edr)
+
+## Managing Exceptions
+
+In some cases, you may need to grant network access to devices that don't meet EDR compliance requirements. openZro provides a compliance bypass mechanism for these scenarios:
+
+* [Bypass Compliance for Non-Compliant Peers](/manage/access-control/endpoint-detection-and-response/bypass-compliance)

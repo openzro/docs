@@ -1,0 +1,1380 @@
+# External Reverse Proxy Setup for Self-Hosted openZro
+
+Source: https://docs.netbird.io/selfhosted/external-reverse-proxy
+
+---
+
+# External Reverse Proxy Setup for Self-Hosted openZro
+
+openZro includes a built-in Traefik reverse proxy that handles TLS certificates automatically via Let's Encrypt. However, if you already have an existing reverse proxy (Nginx, Caddy, etc.), you can configure openZro to work with it instead.
+
+> **Note:** This is not to be confused with the openZro reverse proxy service that launched with v0.65.0. The openZro reverse proxy feature is only compatible with Traefik because it requires TLS passthrough, which Traefik supports natively. To learn more about using openZro as a reverse proxy, see the [openZro Proxy documentation](/manage/reverse-proxy).
+
+Not all reverse proxies are supported as openZro uses *gRPC* for various components. Your reverse proxy must support HTTP/2 and gRPC proxying.
+
+Starting with **v0.65.0**, new openZro installations use a **combined container** (`openzro/openzro-server`) that merges management, signal, and relay into a single service. This simplifies reverse proxy configuration because all traffic routes to one backend. The templates on this page cover both setups:
+
+- **[Combined container (v0.65.0+)](#combined-container-setup-v0-65-0)** -- the default for new installations. All backend services run in a single container on one port.
+- **[Multi-container (legacy)](#multi-container-setup-legacy)** -- for installations that predate v0.65.0, where management, signal, and relay run as separate containers.
+
+## Quick Setup
+
+### New Deployments
+
+The `getting-started.sh` script supports multiple reverse proxy configurations. During initial deployment, you'll be prompted to select your reverse proxy:
+
+```
+Which reverse proxy will you use?
+  [0] Traefik (recommended - automatic TLS, included in Docker Compose)
+  [1] Existing Traefik (labels for external Traefik instance)
+  [2] Nginx (generates config template)
+  [3] Nginx Proxy Manager (generates config + instructions)
+  [4] External Caddy (generates Caddyfile snippet)
+  [5] Other/Manual (displays setup documentation)
+```
+
+The script will generate the appropriate configuration files and provide setup instructions for your chosen proxy.
+
+> **Note:** This option is only available during initial setup with `getting-started.sh`. For existing deployments, use the manual configuration templates below.
+
+### Existing Deployments
+
+For existing openZro installations, use the configuration templates in the sections below to manually configure your reverse proxy.
+
+---
+
+## Combined Container Setup (v0.65.0+)
+
+Starting with v0.65.0, new openZro deployments use the `openzro/openzro-server` image, which combines management, signal, and relay into a single container. All backend traffic routes to one service on a single port, which simplifies reverse proxy configuration significantly.
+
+> **Note:** UDP port **3478** (STUN) must be publicly accessible and **cannot** be proxied through your reverse proxy. HTTP reverse proxies only handle TCP traffic; STUN requires direct UDP access. Ensure your firewall allows inbound UDP on port 3478 and that this port is published directly from the container (e.g. `3478:3478/udp`), bypassing the reverse proxy entirely.
+
+### Required Routing Endpoints (Combined)
+
+All reverse proxy configurations for the combined container must route the following endpoints to the single `openzro-server` container:
+
+| Path | Protocol | Target | Notes |
+|------|----------|--------|-------|
+| `/relay*` | WebSocket | openzro-server:80 | WebSocket upgrade required |
+| `/ws-proxy/signal*` | WebSocket | openzro-server:80 | WebSocket upgrade required |
+| `/ws-proxy/management*` | WebSocket | openzro-server:80 | WebSocket upgrade required |
+| `/signalexchange.SignalExchange/*` | gRPC | openzro-server:80 | HTTP/2 (h2c) required |
+| `/management.ManagementService/*` | gRPC | openzro-server:80 | HTTP/2 (h2c) required |
+| `/api/*` | HTTP | openzro-server:80 | REST API |
+| `/oauth2/*` | HTTP | openzro-server:80 | Embedded IdP |
+| `/*` | HTTP | dashboard:80 | Catch-all for dashboard |
+
+> **Note:** The combined container includes an embedded STUN server that still needs to be directly accessible on UDP port 3478.
+
+### Docker Compose for External Proxy (Combined)
+
+When using an external reverse proxy with the combined container, expose the following ports:
+
+```yaml
+services:
+  dashboard:
+    image: openzro/dashboard:latest
+    ports:
+      - '127.0.0.1:8080:80'
+    # ... other config
+
+  openzro-server:
+    image: openzro/openzro-server:latest
+    ports:
+      - '127.0.0.1:8081:80'
+      - '3478:3478/udp'
+    volumes:
+      - openzro_data:/var/lib/openzro
+      - ./config.yaml:/etc/openzro/config.yaml
+    command: ["--config", "/etc/openzro/config.yaml"]
+    # ... other config
+```
+
+> **Note:** Binding to `127.0.0.1` is recommended when your reverse proxy runs on the same host. This prevents direct access to the containers and ensures all traffic goes through the proxy.
+
+#### Container Port Reference (Combined)
+
+| Service | Host Port | Container Port | Protocol |
+|---------|-----------|----------------|----------|
+| Dashboard | 8080 | 80 | HTTP |
+| openZro Server | 8081 | 80 | HTTP/gRPC/WebSocket |
+| STUN (UDP) | 3478 | 3478 | UDP |
+
+---
+
+### Configuration Templates (Combined)
+
+#### Traefik (Combined)
+
+For Traefik with the combined container, you only need two routers: one for gRPC (which requires an `h2c` backend) and one for everything else (WebSocket, REST API, OAuth2). The dashboard uses a separate low-priority catch-all router.
+
+Replace `openzro.example.com` with your domain, `websecure` with your HTTPS entrypoint, and `letsencrypt` with your certificate resolver name.
+
+```yaml
+services:
+  dashboard:
+    image: openzro/dashboard:latest
+    networks: [traefik-network]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.openzro-dashboard.rule=Host(`openzro.example.com`)
+      - traefik.http.routers.openzro-dashboard.entrypoints=websecure
+      - traefik.http.routers.openzro-dashboard.tls=true
+      - traefik.http.routers.openzro-dashboard.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-dashboard.priority=1
+      - traefik.http.services.openzro-dashboard.loadbalancer.server.port=80
+
+  openzro-server:
+    image: openzro/openzro-server:latest
+    networks: [traefik-network]
+    ports:
+      - '3478:3478/udp'
+    volumes:
+      - openzro_data:/var/lib/openzro
+      - ./config.yaml:/etc/openzro/config.yaml
+    command: ["--config", "/etc/openzro/config.yaml"]
+    labels:
+      - traefik.enable=true
+      # gRPC router (needs h2c backend for HTTP/2 cleartext)
+      - traefik.http.routers.openzro-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`))
+      - traefik.http.routers.openzro-grpc.entrypoints=websecure
+      - traefik.http.routers.openzro-grpc.tls=true
+      - traefik.http.routers.openzro-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-grpc.service=openzro-server-h2c
+      - traefik.http.routers.openzro-grpc.priority=100
+      # Backend router (relay, WebSocket, API, OAuth2)
+      - traefik.http.routers.openzro-backend.rule=Host(`openzro.example.com`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))
+      - traefik.http.routers.openzro-backend.entrypoints=websecure
+      - traefik.http.routers.openzro-backend.tls=true
+      - traefik.http.routers.openzro-backend.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-backend.service=openzro-server
+      - traefik.http.routers.openzro-backend.priority=100
+      # Services
+      - traefik.http.services.openzro-server.loadbalancer.server.port=80
+      - traefik.http.services.openzro-server-h2c.loadbalancer.server.port=80
+      - traefik.http.services.openzro-server-h2c.loadbalancer.server.scheme=h2c
+
+networks:
+  traefik-network:
+    external: true
+
+volumes:
+  openzro_data:
+```
+
+> **Note:** The combined container requires two Traefik service definitions pointing to the same port: `openzro-server` for standard HTTP/WebSocket traffic and `openzro-server-h2c` with `scheme=h2c` for gRPC traffic.
+
+---
+
+#### Nginx (Combined)
+
+##### Nginx running in Docker (Combined)
+
+If Nginx runs in Docker on the same network as the openZro containers, use the container names directly:
+
+```nginx
+# openZro Nginx Configuration (Combined Container - Docker network)
+
+upstream openzro_dashboard {
+    server openzro-dashboard:80;
+    keepalive 10;
+}
+upstream openzro_server {
+    server openzro-server:80;
+}
+
+server {
+    listen 80;
+    server_name openzro.example.com;
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name openzro.example.com;
+
+    ssl_certificate /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
+
+    # Required for long-lived gRPC connections
+    client_header_timeout 1d;
+    client_body_timeout 1d;
+
+    # Common proxy headers
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Scheme $scheme;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-Host $host;
+    grpc_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    # WebSocket connections (relay, signal, management)
+    location ~ ^/(relay|ws-proxy/) {
+        proxy_pass http://openzro_server;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 1d;
+    }
+
+    # Native gRPC (signal + management)
+    location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
+        grpc_pass grpc://openzro_server;
+        grpc_read_timeout 1d;
+        grpc_send_timeout 1d;
+        grpc_socket_keepalive on;
+    }
+
+    # HTTP routes (API + OAuth2)
+    location ~ ^/(api|oauth2)/ {
+        proxy_pass http://openzro_server;
+        proxy_set_header Host $host;
+    }
+
+    # Dashboard (catch-all)
+    location / {
+        proxy_pass http://openzro_dashboard;
+    }
+}
+```
+
+##### Nginx running on host (Combined)
+
+If Nginx is installed directly on the host, use localhost addresses:
+
+```nginx
+# openZro Nginx Configuration (Combined Container - Host)
+
+upstream openzro_dashboard {
+    server 127.0.0.1:8080;
+    keepalive 10;
+}
+upstream openzro_server {
+    server 127.0.0.1:8081;
+}
+
+server {
+    listen 80;
+    server_name openzro.example.com;
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name openzro.example.com;
+
+    ssl_certificate /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
+
+    # Required for long-lived gRPC connections
+    client_header_timeout 1d;
+    client_body_timeout 1d;
+
+    # Common proxy headers
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Scheme $scheme;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-Host $host;
+    grpc_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    # WebSocket connections (relay, signal, management)
+    location ~ ^/(relay|ws-proxy/) {
+        proxy_pass http://openzro_server;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 1d;
+    }
+
+    # Native gRPC (signal + management)
+    location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
+        grpc_pass grpc://openzro_server;
+        grpc_read_timeout 1d;
+        grpc_send_timeout 1d;
+        grpc_socket_keepalive on;
+    }
+
+    # HTTP routes (API + OAuth2)
+    location ~ ^/(api|oauth2)/ {
+        proxy_pass http://openzro_server;
+        proxy_set_header Host $host;
+    }
+
+    # Dashboard (catch-all)
+    location / {
+        proxy_pass http://openzro_dashboard;
+    }
+}
+```
+
+---
+
+#### Caddy (Combined)
+
+##### Caddy running in Docker (Combined)
+
+If Caddy runs in Docker on the same network as openZro, use container names:
+
+```
+openzro.example.com {
+    # Native gRPC (needs HTTP/2 cleartext to backend)
+    @grpc header Content-Type application/grpc*
+    reverse_proxy @grpc h2c://openzro-server:80
+
+    # Combined server paths (relay, signal, management, OAuth2)
+    @backend path /relay* /ws-proxy/* /api/* /oauth2/*
+    reverse_proxy @backend openzro-server:80
+
+    # Dashboard (everything else)
+    reverse_proxy /* openzro-dashboard:80
+}
+```
+
+##### Caddy running on host (Combined)
+
+If Caddy is installed directly on the host, use localhost addresses:
+
+```
+openzro.example.com {
+    # Native gRPC (needs HTTP/2 cleartext to backend)
+    @grpc header Content-Type application/grpc*
+    reverse_proxy @grpc h2c://127.0.0.1:8081
+
+    # Combined server paths (relay, signal, management, OAuth2)
+    @backend path /relay* /ws-proxy/* /api/* /oauth2/*
+    reverse_proxy @backend 127.0.0.1:8081
+
+    # Dashboard (everything else)
+    reverse_proxy /* 127.0.0.1:8080
+}
+```
+
+---
+
+#### Nginx Proxy Manager (Combined)
+
+With the combined container, NPM configuration is simpler because all backend traffic routes to the same service.
+
+> **Note:** NPM requires backend services to be running before you can create proxy hosts. Start the openZro containers first, then configure NPM.
+
+##### NPM running in Docker (Combined)
+
+**1. Create a Proxy Host in NPM:**
+- Domain: `openzro.example.com`
+- Forward Hostname/IP: `openzro-dashboard`
+- Forward Port: `80`
+- Block Common Exploits: enabled
+
+**2. SSL tab:**
+- Request or select existing certificate
+- **Enable "HTTP/2 Support"** (required for gRPC)
+
+**3. Advanced tab - paste this configuration:**
+
+```nginx
+# Required for long-lived connections (gRPC and WebSocket)
+client_header_timeout 1d;
+client_body_timeout 1d;
+
+# WebSocket connections (relay, signal, management)
+location ~ ^/(relay|ws-proxy/) {
+    proxy_pass http://openzro-server:80;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1d;
+}
+
+# Native gRPC (signal + management)
+location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
+    grpc_pass grpc://openzro-server:80;
+    grpc_read_timeout 1d;
+    grpc_send_timeout 1d;
+    grpc_socket_keepalive on;
+}
+
+# HTTP routes (API + OAuth2)
+location ~ ^/(api|oauth2)/ {
+    proxy_pass http://openzro-server:80;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+##### NPM running on host (Combined)
+
+**1. Create a Proxy Host in NPM:**
+- Domain: `openzro.example.com`
+- Forward Hostname/IP: `127.0.0.1`
+- Forward Port: `8080`
+- Block Common Exploits: enabled
+
+**2. SSL tab:**
+- Request or select existing certificate
+- **Enable "HTTP/2 Support"** (required for gRPC)
+
+**3. Advanced tab - paste this configuration:**
+
+```nginx
+# Required for long-lived connections (gRPC and WebSocket)
+client_header_timeout 1d;
+client_body_timeout 1d;
+
+# WebSocket connections (relay, signal, management)
+location ~ ^/(relay|ws-proxy/) {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1d;
+}
+
+# Native gRPC (signal + management)
+location ~ ^/(signalexchange\.SignalExchange|management\.ManagementService)/ {
+    grpc_pass grpc://127.0.0.1:8081;
+    grpc_read_timeout 1d;
+    grpc_send_timeout 1d;
+    grpc_socket_keepalive on;
+}
+
+# HTTP routes (API + OAuth2)
+location ~ ^/(api|oauth2)/ {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+```
+
+---
+
+## Multi-Container Setup (Legacy)
+
+The following sections apply to openZro installations from before v0.65.0 that use separate containers for management, signal, and relay. If you are running a new installation, use the [combined container templates above](#combined-container-setup-v0650).
+
+> **Note:** UDP port **3478** (STUN/TURN via coturn) must be publicly accessible and **cannot** be proxied through your reverse proxy. HTTP reverse proxies only handle TCP traffic; STUN/TURN requires direct UDP access. Ensure your firewall allows inbound UDP on port 3478 and that the coturn container publishes this port directly, bypassing the reverse proxy entirely.
+
+### Required Routing Endpoints (Multi-Container)
+
+All reverse proxy configurations must route the following endpoints:
+
+| Path | Protocol | Target | Notes |
+|------|----------|--------|-------|
+| `/relay*` | WebSocket | relay:80 | WebSocket upgrade required |
+| `/ws-proxy/signal*` | WebSocket | signal:80 | WebSocket upgrade required |
+| `/signalexchange.SignalExchange/*` | gRPC | signal:10000 | HTTP/2 (h2c) required |
+| `/api/*` | HTTP | management:80 | REST API |
+| `/ws-proxy/management*` | WebSocket | management:80 | WebSocket upgrade required |
+| `/management.ManagementService/*` | gRPC | management:80 | HTTP/2 (h2c) required |
+| `/management.ProxyService/*` | gRPC | management:80 | HTTP/2 (h2c) required. Only needed if using the [Reverse Proxy feature](/manage/reverse-proxy). |
+| `/oauth2/*` | HTTP | management:80 | Embedded IdP |
+| `/*` | HTTP | dashboard:80 | Catch-all for dashboard |
+
+> **Note:** The `coturn` service still needs to be directly accessible on UDP port 3478 as it handles STUN/TURN traffic.
+
+### Docker Compose for External Proxy (Multi-Container)
+
+When using an external reverse proxy, expose the openZro container ports to the host:
+
+```yaml
+services:
+  dashboard:
+    image: openzro/dashboard:latest
+    ports:
+      - '127.0.0.1:8080:80'
+    # ... other config
+
+  signal:
+    image: openzro/signal:latest
+    ports:
+      - '127.0.0.1:8083:80'
+      - '127.0.0.1:10000:10000'
+    # ... other config
+
+  relay:
+    image: openzro/relay:latest
+    ports:
+      - '127.0.0.1:8084:80'
+    # ... other config
+
+  management:
+    image: openzro/management:latest
+    ports:
+      - '127.0.0.1:8081:80'
+    # ... other config
+```
+
+> **Note:** Binding to `127.0.0.1` is recommended when your reverse proxy runs on the same host. This prevents direct access to the containers and ensures all traffic goes through the proxy.
+
+#### Container Port Reference (Multi-Container)
+
+| Service | Host Port | Container Port | Protocol |
+|---------|-----------|----------------|----------|
+| Dashboard | 8080 | 80 | HTTP |
+| Signal (HTTP) | 8083 | 80 | HTTP/WebSocket |
+| Signal (gRPC) | 10000 | 10000 | gRPC (h2c) |
+| Management | 8081 | 80 | HTTP/gRPC |
+| Relay | 8084 | 80 | WebSocket |
+
+---
+
+### Configuration Templates (Multi-Container)
+
+#### Traefik (Multi-Container)
+
+For Traefik, openZro containers are configured with Docker labels for automatic service discovery. The `getting-started.sh` script will prompt for your Traefik configuration:
+
+- **External network**: The Docker network your Traefik container uses
+- **HTTPS entrypoint**: Your Traefik entrypoint for HTTPS traffic (commonly `websecure`)
+- **Certificate resolver**: Your Traefik certresolver for automatic TLS (e.g., `letsencrypt`)
+
+##### Complete Docker Compose with Traefik Labels
+
+Add the following labels to your openZro services in `docker-compose.yml`. Replace:
+- `openzro.example.com` with your domain
+- `websecure` with your HTTPS entrypoint name
+- `letsencrypt` with your certificate resolver name (or remove the certresolver lines if handling TLS externally)
+
+```yaml
+services:
+  dashboard:
+    image: openzro/dashboard:latest
+    networks: [traefik-network]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.openzro-dashboard.rule=Host(`openzro.example.com`)
+      - traefik.http.routers.openzro-dashboard.entrypoints=websecure
+      - traefik.http.routers.openzro-dashboard.tls=true
+      - traefik.http.routers.openzro-dashboard.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-dashboard.priority=1
+      - traefik.http.services.openzro-dashboard.loadbalancer.server.port=80
+
+  signal:
+    image: openzro/signal:latest
+    networks: [traefik-network]
+    labels:
+      - traefik.enable=true
+      # WebSocket router
+      - traefik.http.routers.openzro-signal-ws.rule=Host(`openzro.example.com`) && PathPrefix(`/ws-proxy/signal`)
+      - traefik.http.routers.openzro-signal-ws.entrypoints=websecure
+      - traefik.http.routers.openzro-signal-ws.tls=true
+      - traefik.http.routers.openzro-signal-ws.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-signal-ws.service=openzro-signal-ws
+      - traefik.http.services.openzro-signal-ws.loadbalancer.server.port=80
+      # gRPC router
+      - traefik.http.routers.openzro-signal-grpc.rule=Host(`openzro.example.com`) && PathPrefix(`/signalexchange.SignalExchange/`)
+      - traefik.http.routers.openzro-signal-grpc.entrypoints=websecure
+      - traefik.http.routers.openzro-signal-grpc.tls=true
+      - traefik.http.routers.openzro-signal-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-signal-grpc.service=openzro-signal-grpc
+      - traefik.http.services.openzro-signal-grpc.loadbalancer.server.port=10000
+      - traefik.http.services.openzro-signal-grpc.loadbalancer.server.scheme=h2c
+
+  relay:
+    image: openzro/relay:latest
+    networks: [traefik-network]
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.openzro-relay.rule=Host(`openzro.example.com`) && PathPrefix(`/relay`)
+      - traefik.http.routers.openzro-relay.entrypoints=websecure
+      - traefik.http.routers.openzro-relay.tls=true
+      - traefik.http.routers.openzro-relay.tls.certresolver=letsencrypt
+      - traefik.http.services.openzro-relay.loadbalancer.server.port=80
+
+  management:
+    image: openzro/management:latest
+    networks: [traefik-network]
+    labels:
+      - traefik.enable=true
+      # API router
+      - traefik.http.routers.openzro-api.rule=Host(`openzro.example.com`) && PathPrefix(`/api`)
+      - traefik.http.routers.openzro-api.entrypoints=websecure
+      - traefik.http.routers.openzro-api.tls=true
+      - traefik.http.routers.openzro-api.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-api.service=openzro-api
+      - traefik.http.services.openzro-api.loadbalancer.server.port=80
+      # Management WebSocket router
+      - traefik.http.routers.openzro-mgmt-ws.rule=Host(`openzro.example.com`) && PathPrefix(`/ws-proxy/management`)
+      - traefik.http.routers.openzro-mgmt-ws.entrypoints=websecure
+      - traefik.http.routers.openzro-mgmt-ws.tls=true
+      - traefik.http.routers.openzro-mgmt-ws.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-mgmt-ws.service=openzro-mgmt-ws
+      - traefik.http.services.openzro-mgmt-ws.loadbalancer.server.port=80
+      # Management gRPC router
+      - traefik.http.routers.openzro-mgmt-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/management.ManagementService/`) || PathPrefix(`/management.ProxyService/`))
+      - traefik.http.routers.openzro-mgmt-grpc.entrypoints=websecure
+      - traefik.http.routers.openzro-mgmt-grpc.tls=true
+      - traefik.http.routers.openzro-mgmt-grpc.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-mgmt-grpc.service=openzro-mgmt-grpc
+      - traefik.http.services.openzro-mgmt-grpc.loadbalancer.server.port=80
+      - traefik.http.services.openzro-mgmt-grpc.loadbalancer.server.scheme=h2c
+      # OAuth2 router (embedded IdP)
+      - traefik.http.routers.openzro-oauth2.rule=Host(`openzro.example.com`) && PathPrefix(`/oauth2`)
+      - traefik.http.routers.openzro-oauth2.entrypoints=websecure
+      - traefik.http.routers.openzro-oauth2.tls=true
+      - traefik.http.routers.openzro-oauth2.tls.certresolver=letsencrypt
+      - traefik.http.routers.openzro-oauth2.service=openzro-oauth2
+      - traefik.http.services.openzro-oauth2.loadbalancer.server.port=80
+
+networks:
+  traefik-network:
+    external: true
+```
+
+##### Traefik Configuration Requirements
+
+Your Traefik instance must have the following configured:
+
+**1. HTTPS Entrypoint** (listening on port 443):
+```yaml
+# In traefik.yml or as command args
+entryPoints:
+  websecure:
+    address: ":443"
+```
+
+**2. Certificate Resolver** (for automatic Let's Encrypt certificates):
+```yaml
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: your-email@example.com
+      storage: /letsencrypt/acme.json
+      httpChallenge:
+        entryPoint: web
+```
+
+**3. Docker Provider** with exposedByDefault disabled:
+```yaml
+providers:
+  docker:
+    exposedByDefault: false
+```
+
+**4. HTTP to HTTPS Redirect** (recommended):
+```yaml
+entryPoints:
+  web:
+    address: ":80"
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+```
+
+##### Example Traefik Docker Compose
+
+If you don't have Traefik set up yet, here's a complete example:
+
+```yaml
+services:
+  traefik:
+    image: traefik:v3.2
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedByDefault=false"
+      - "--entrypoints.web.address=:80"
+      - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
+      - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
+      - "--entrypoints.websecure.address=:443"
+      - "--certificatesresolvers.letsencrypt.acme.email=your-email@example.com"
+      - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
+      - "--certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=web"
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"  # Traefik dashboard (optional)
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./letsencrypt:/letsencrypt
+    networks:
+      - traefik-network
+
+networks:
+  traefik-network:
+    name: traefik-network
+```
+
+> **Note:** When using `getting-started.sh` with Traefik, the script will ask for your network name, entrypoint, and certresolver. It will then generate a docker-compose.yml with all the correct labels pre-configured.
+
+---
+
+#### Nginx (Multi-Container)
+
+##### Nginx running in Docker (Multi-Container)
+
+If Nginx is running in Docker, the easiest approach is to have openZro join the same Docker network. The `getting-started.sh` script will ask for your Nginx network name and configure everything automatically.
+
+```nginx
+# openZro Nginx Configuration (Docker network)
+# Uses container names for upstream servers
+
+upstream openzro_dashboard {
+    server openzro-dashboard:80;
+    keepalive 10;
+}
+upstream openzro_signal {
+    server openzro-signal:10000;
+}
+upstream openzro_signal_ws {
+    server openzro-signal:80;
+}
+upstream openzro_management {
+    server openzro-management:80;
+}
+upstream openzro_relay {
+    server openzro-relay:80;
+}
+
+server {
+    listen 80;
+    server_name openzro.example.com;
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name openzro.example.com;
+
+    ssl_certificate /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
+
+    # Required for long-lived gRPC connections
+    client_header_timeout 1d;
+    client_body_timeout 1d;
+
+    # Common proxy headers
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Scheme $scheme;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-Host $host;
+    grpc_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    # Relay (WebSocket)
+    location /relay {
+        proxy_pass http://openzro_relay;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 1d;
+    }
+
+    # Signal WebSocket
+    location /ws-proxy/signal {
+        proxy_pass http://openzro_signal_ws;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 1d;
+    }
+
+    # Signal gRPC
+    location /signalexchange.SignalExchange/ {
+        grpc_pass grpc://openzro_signal;
+        grpc_read_timeout 1d;
+        grpc_send_timeout 1d;
+        grpc_socket_keepalive on;
+    }
+
+    # Management API
+    location /api/ {
+        proxy_pass http://openzro_management;
+        proxy_set_header Host $host;
+    }
+
+    # Management WebSocket
+    location /ws-proxy/management {
+        proxy_pass http://openzro_management;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 1d;
+    }
+
+    # Management gRPC
+    location /management.ManagementService/ {
+        grpc_pass grpc://openzro_management;
+        grpc_read_timeout 1d;
+        grpc_send_timeout 1d;
+        grpc_socket_keepalive on;
+    }
+
+    # Embedded IdP OAuth2
+    location /oauth2/ {
+        proxy_pass http://openzro_management;
+        proxy_set_header Host $host;
+    }
+
+    # Dashboard (catch-all)
+    location / {
+        proxy_pass http://openzro_dashboard;
+    }
+}
+```
+
+##### Nginx running on host (Multi-Container)
+
+If Nginx is installed directly on the host, use localhost addresses:
+
+```nginx
+# openZro Nginx Configuration
+# Replace openzro.example.com with your domain
+# Update SSL certificate paths
+
+upstream openzro_dashboard {
+    server 127.0.0.1:8080;
+    keepalive 10;
+}
+upstream openzro_signal {
+    server 127.0.0.1:10000;
+}
+upstream openzro_signal_ws {
+    server 127.0.0.1:8083;
+}
+upstream openzro_management {
+    server 127.0.0.1:8081;
+}
+upstream openzro_relay {
+    server 127.0.0.1:8084;
+}
+
+server {
+    listen 80;
+    server_name openzro.example.com;
+    location / {
+        return 301 https://$host$request_uri;
+    }
+}
+
+server {
+    listen 443 ssl http2;
+    server_name openzro.example.com;
+
+    ssl_certificate /path/to/fullchain.pem;
+    ssl_certificate_key /path/to/privkey.pem;
+
+    # Required for long-lived gRPC connections
+    client_header_timeout 1d;
+    client_body_timeout 1d;
+
+    # Common proxy headers
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Scheme $scheme;
+    proxy_set_header X-Forwarded-Proto https;
+    proxy_set_header X-Forwarded-Host $host;
+    grpc_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+    # Relay (WebSocket)
+    location /relay {
+        proxy_pass http://openzro_relay;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 1d;
+    }
+
+    # Signal WebSocket
+    location /ws-proxy/signal {
+        proxy_pass http://openzro_signal_ws;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 1d;
+    }
+
+    # Signal gRPC
+    location /signalexchange.SignalExchange/ {
+        grpc_pass grpc://openzro_signal;
+        grpc_read_timeout 1d;
+        grpc_send_timeout 1d;
+        grpc_socket_keepalive on;
+    }
+
+    # Management API
+    location /api/ {
+        proxy_pass http://openzro_management;
+        proxy_set_header Host $host;
+    }
+
+    # Management WebSocket
+    location /ws-proxy/management {
+        proxy_pass http://openzro_management;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "Upgrade";
+        proxy_set_header Host $host;
+        proxy_read_timeout 1d;
+    }
+
+    # Management gRPC
+    location /management.ManagementService/ {
+        grpc_pass grpc://openzro_management;
+        grpc_read_timeout 1d;
+        grpc_send_timeout 1d;
+        grpc_socket_keepalive on;
+    }
+
+    # Embedded IdP OAuth2
+    location /oauth2/ {
+        proxy_pass http://openzro_management;
+        proxy_set_header Host $host;
+    }
+
+    # Dashboard (catch-all)
+    location / {
+        proxy_pass http://openzro_dashboard;
+    }
+}
+```
+
+**Installation:**
+
+Debian/Ubuntu:
+```bash
+sudo ln -s /path/to/openzro.conf /etc/nginx/sites-available/openzro
+sudo ln -s /etc/nginx/sites-available/openzro /etc/nginx/sites-enabled/
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+RHEL/CentOS:
+```bash
+sudo cp /path/to/openzro.conf /etc/nginx/conf.d/openzro.conf
+sudo nginx -t && sudo systemctl reload nginx
+```
+
+##### TLS Certificate Setup for Nginx
+
+> **Note:** **Important difference:** Unlike Caddy which obtains and renews TLS certificates automatically, Nginx requires manual certificate setup and configuration.
+
+You'll need to obtain SSL/TLS certificates and update the certificate paths in your Nginx configuration. Here are the most common options:
+
+**Option 1: Let's Encrypt with Certbot (Recommended)**
+
+Let's Encrypt provides free, automated TLS certificates with automatic renewal.
+
+1. Install certbot:
+```bash
+# Debian/Ubuntu
+sudo apt install certbot python3-certbot-nginx
+
+# RHEL/CentOS
+sudo yum install certbot python3-certbot-nginx
+```
+
+2. Obtain certificate:
+```bash
+# If Nginx is already running
+sudo certbot certonly --nginx -d openzro.example.com
+
+# If Nginx isn't running yet (standalone mode)
+sudo certbot certonly --standalone -d openzro.example.com
+```
+
+3. Update your Nginx config with the certificate paths:
+```nginx
+ssl_certificate /etc/letsencrypt/live/openzro.example.com/fullchain.pem;
+ssl_certificate_key /etc/letsencrypt/live/openzro.example.com/privkey.pem;
+```
+
+4. Set up automatic renewal:
+```bash
+# Certbot automatically installs a systemd timer for renewal
+# Test the renewal process:
+sudo certbot renew --dry-run
+```
+
+> **Note:** **Requirements for Let's Encrypt:**
+- Your domain must point to your server's public IP
+- Port 80 must be accessible from the internet for certificate validation
+- Certificates are valid for 90 days and renewed automatically by certbot
+
+**Option 2: Let's Encrypt with acme.sh**
+
+[acme.sh](https://github.com/acmesh-official/acme.sh) is a lightweight alternative to certbot:
+
+```bash
+# Install acme.sh
+curl https://get.acme.sh | sh
+
+# Issue certificate
+~/.acme.sh/acme.sh --issue -d openzro.example.com --nginx
+
+# Update Nginx config with paths:
+# ssl_certificate /root/.acme.sh/openzro.example.com/fullchain.cer;
+# ssl_certificate_key /root/.acme.sh/openzro.example.com/openzro.example.com.key;
+```
+
+**Option 3: Custom/Commercial Certificates**
+
+If you have certificates from another provider:
+
+1. Place your certificate files on the server:
+```bash
+sudo cp fullchain.pem /etc/ssl/certs/openzro.crt
+sudo cp privkey.pem /etc/ssl/private/openzro.key
+sudo chmod 600 /etc/ssl/private/openzro.key
+```
+
+2. Update your Nginx config:
+```nginx
+ssl_certificate /etc/ssl/certs/openzro.crt;
+ssl_certificate_key /etc/ssl/private/openzro.key;
+```
+
+**TLS Best Practices**
+
+The generated Nginx configurations include recommended TLS settings:
+
+```nginx
+# Use modern TLS protocols only
+ssl_protocols TLSv1.2 TLSv1.3;
+
+# Let clients choose the best cipher
+ssl_prefer_server_ciphers off;
+
+# Strong cipher suites
+ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384:ECDHE-RSA-AES256-GCM-SHA384;
+```
+
+These settings ensure:
+- Only TLS 1.2 and 1.3 are allowed (older protocols like TLS 1.0/1.1 are disabled)
+- Modern cipher suites that support forward secrecy
+- Compatibility with all modern browsers and openZro clients
+
+---
+
+#### Caddy (Multi-Container)
+
+##### Caddy running in Docker (Multi-Container)
+
+If Caddy is running in Docker, the easiest approach is to have openZro join the same Docker network. The `getting-started.sh` script will ask for your Caddy network name and configure everything automatically.
+
+```
+openzro.example.com {
+    # Relay (WebSocket)
+    reverse_proxy /relay* openzro-relay:80
+
+    # Signal WebSocket
+    reverse_proxy /ws-proxy/signal* openzro-signal:80
+
+    # Signal gRPC (h2c for plaintext HTTP/2)
+    reverse_proxy /signalexchange.SignalExchange/* h2c://openzro-signal:10000
+
+    # Management API
+    reverse_proxy /api/* openzro-management:80
+
+    # Management WebSocket
+    reverse_proxy /ws-proxy/management* openzro-management:80
+
+    # Management gRPC
+    reverse_proxy /management.ManagementService/* h2c://openzro-management:80
+
+    # Embedded IdP OAuth2
+    reverse_proxy /oauth2/* openzro-management:80
+
+    # Dashboard (catch-all)
+    reverse_proxy /* openzro-dashboard:80
+}
+```
+
+##### Caddy running on host (Multi-Container)
+
+If Caddy is installed directly on the host, use localhost addresses:
+
+```
+openzro.example.com {
+    # Relay (WebSocket)
+    reverse_proxy /relay* 127.0.0.1:8084
+
+    # Signal WebSocket
+    reverse_proxy /ws-proxy/signal* 127.0.0.1:8083
+
+    # Signal gRPC (h2c for plaintext HTTP/2)
+    reverse_proxy /signalexchange.SignalExchange/* h2c://127.0.0.1:10000
+
+    # Management API
+    reverse_proxy /api/* 127.0.0.1:8081
+
+    # Management WebSocket
+    reverse_proxy /ws-proxy/management* 127.0.0.1:8081
+
+    # Management gRPC
+    reverse_proxy /management.ManagementService/* h2c://127.0.0.1:8081
+
+    # Embedded IdP OAuth2
+    reverse_proxy /oauth2/* 127.0.0.1:8081
+
+    # Dashboard (catch-all)
+    reverse_proxy /* 127.0.0.1:8080
+}
+```
+
+After adding the configuration, reload Caddy:
+```bash
+sudo systemctl reload caddy
+```
+
+---
+
+#### Nginx Proxy Manager (Multi-Container)
+
+Nginx Proxy Manager requires all openZro routing to be configured via the "Advanced" tab. The Custom Locations feature doesn't properly handle path prefixes.
+
+> **Note:** NPM requires backend services to be running before you can create proxy hosts. The `getting-started.sh` script will start openZro containers first, then display the configuration instructions.
+
+##### NPM running in Docker (Multi-Container)
+
+If NPM is running in Docker, the easiest approach is to have openZro join the same Docker network. The script will ask for your NPM network name and configure everything automatically.
+
+**1. Create a Proxy Host in NPM:**
+- Domain: `openzro.example.com`
+- Forward Hostname/IP: `openzro-dashboard`
+- Forward Port: `80`
+- Block Common Exploits: enabled
+
+**2. SSL tab:**
+- Request or select existing certificate
+- **Enable "HTTP/2 Support"** (required for gRPC)
+
+**3. Advanced tab - paste this configuration:**
+
+```nginx
+# Required for long-lived connections (gRPC and WebSocket)
+client_header_timeout 1d;
+client_body_timeout 1d;
+
+# Relay WebSocket
+location /relay {
+    proxy_pass http://openzro-relay:80;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1d;
+}
+
+# Signal WebSocket
+location /ws-proxy/signal {
+    proxy_pass http://openzro-signal:80;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1d;
+}
+
+# Management WebSocket
+location /ws-proxy/management {
+    proxy_pass http://openzro-management:80;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1d;
+}
+
+# API routes
+location /api/ {
+    proxy_pass http://openzro-management:80;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+# OAuth2/IdP routes
+location /oauth2/ {
+    proxy_pass http://openzro-management:80;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+# gRPC for Signal service
+location /signalexchange.SignalExchange/ {
+    grpc_pass grpc://openzro-signal:10000;
+    grpc_read_timeout 1d;
+    grpc_send_timeout 1d;
+    grpc_socket_keepalive on;
+}
+
+# gRPC for Management service
+location /management.ManagementService/ {
+    grpc_pass grpc://openzro-management:80;
+    grpc_read_timeout 1d;
+    grpc_send_timeout 1d;
+    grpc_socket_keepalive on;
+}
+
+```
+
+##### NPM running on host (Multi-Container)
+
+If NPM is installed directly on the host, use localhost addresses:
+
+**1. Create a Proxy Host in NPM:**
+- Domain: `openzro.example.com`
+- Forward Hostname/IP: `127.0.0.1`
+- Forward Port: `8080`
+- Block Common Exploits: enabled
+
+**2. SSL tab:**
+- Request or select existing certificate
+- **Enable "HTTP/2 Support"** (required for gRPC)
+
+**3. Advanced tab - paste this configuration:**
+
+```nginx
+# Required for long-lived connections (gRPC and WebSocket)
+client_header_timeout 1d;
+client_body_timeout 1d;
+
+# Relay WebSocket
+location /relay {
+    proxy_pass http://127.0.0.1:8084;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1d;
+}
+
+# Signal WebSocket
+location /ws-proxy/signal {
+    proxy_pass http://127.0.0.1:8083;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1d;
+}
+
+# Management WebSocket
+location /ws-proxy/management {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_http_version 1.1;
+    proxy_set_header Upgrade $http_upgrade;
+    proxy_set_header Connection "upgrade";
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+    proxy_read_timeout 1d;
+}
+
+# API routes
+location /api/ {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+# OAuth2/IdP routes
+location /oauth2/ {
+    proxy_pass http://127.0.0.1:8081;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+}
+
+# gRPC for Signal service
+location /signalexchange.SignalExchange/ {
+    grpc_pass grpc://127.0.0.1:10000;
+    grpc_read_timeout 1d;
+    grpc_send_timeout 1d;
+    grpc_socket_keepalive on;
+}
+
+# gRPC for Management service
+location /management.ManagementService/ {
+    grpc_pass grpc://127.0.0.1:8081;
+    grpc_read_timeout 1d;
+    grpc_send_timeout 1d;
+    grpc_socket_keepalive on;
+}
+
+```
+
+---
+
+## Troubleshooting
+
+### gRPC connections failing
+
+- Ensure your reverse proxy supports HTTP/2 and gRPC
+- **Nginx Proxy Manager**: Enable "HTTP/2 Support" in the SSL tab
+- Check that `h2c` (plaintext HTTP/2) is correctly configured for gRPC upstreams
+- Verify timeout settings are long enough (gRPC connections can be long-lived)
+
+### WebSocket connections failing
+
+- Ensure WebSocket upgrade headers are passed through
+- Check that `Connection: Upgrade` and `Upgrade: websocket` headers are preserved
+
+### SSL/TLS certificate issues
+
+- Verify your certificates are valid and not expired
+- Check certificate paths in your configuration
+- For Let's Encrypt, ensure ports 80 and 443 are accessible for validation
+
+### Dashboard loads but API calls fail
+
+- Check that `/api/*` routes are correctly configured
+- Verify the management container is running: `docker compose ps management`
+- Check management logs: `docker compose logs management`
+
+### Signal or Relay connections failing
+
+- Verify gRPC routes are using `h2c://` (plaintext HTTP/2)
+- Check that WebSocket routes have proper upgrade handling
+- Ensure coturn (STUN/TURN) is accessible on UDP port 3478
+
+For more help, see the [Troubleshooting guide](/selfhosted/troubleshooting) or reach out on [Slack](/slack-url).

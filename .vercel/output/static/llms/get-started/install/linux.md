@@ -1,0 +1,270 @@
+# Linux Installation
+
+Source: https://docs.netbird.io/get-started/install/linux
+
+---
+
+# Linux Installation
+
+The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
+
+## Linux Install Script
+
+```bash
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
+```
+
+### Ubuntu/Debian (APT)
+1. Add the repository:
+
+ ```bash
+ sudo apt-get update
+ sudo apt-get install ca-certificates curl gnupg -y
+ curl -sSL https://github.com/openzro/openzro/releases/latest | sudo gpg --dearmor --output /usr/share/keyrings/openzro-archive-keyring.gpg
+ echo 'deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://github.com/openzro/openzro/releases/latest stable main' | sudo tee /etc/apt/sources.list.d/openzro.list
+```
+2. Update APT's cache
+
+```bash
+ sudo apt-get update
+```
+3. Install the package
+
+```bash
+ # for CLI only
+ sudo apt-get install openzro
+ # for GUI package
+ sudo apt-get install openzro-ui
+```
+
+### RHEL/Amazon Linux 2 (RPM)
+
+1. Add the repository:
+```bash
+sudo tee /etc/yum.repos.d/openzro.repo <<EOF
+[openzro]
+name=openzro
+baseurl=https://github.com/openzro/openzro/releases/latest
+enabled=1
+gpgcheck=1
+gpgkey=https://github.com/openzro/openzro/releases/latest
+repo_gpgcheck=1
+EOF
+```
+2. Install the package
+```bash
+ # for CLI only
+ sudo yum install openzro
+ # for GUI package
+ sudo yum install libappindicator-gtk3 libappindicator openzro-ui
+```
+
+### Fedora/Amazon Linux 2023 (DNF)
+
+1. Create the repository file:
+```bash
+sudo tee /etc/yum.repos.d/openzro.repo <<EOF
+[openzro]
+name=openzro
+baseurl=https://github.com/openzro/openzro/releases/latest
+enabled=1
+gpgcheck=1
+gpgkey=https://github.com/openzro/openzro/releases/latest
+repo_gpgcheck=1
+EOF
+```
+2. Import the file
+```bash
+#Fedora 40 or earlier/Amazon Linux 2023** (DNF 4)
+ sudo dnf config-manager --add-repo /etc/yum.repos.d/openzro.repo
+#Fedora 41 or later (DNF 5)
+ sudo dnf config-manager addrepo --from-repofile=/etc/yum.repos.d/openzro.repo
+```
+3. Install the package
+```bash
+ # for CLI only
+ sudo dnf install openzro
+ # for GUI package
+ sudo dnf install libappindicator-gtk3 libappindicator openzro-ui
+```
+On some recent releases, the default behaviour for `libappindicator` was changed, so we need to install `gnome-shell-extension-appindicator` and enable it:
+```
+sudo dnf install gnome-shell-extension-appindicator
+sudo gnome-extensions enable appindicatorsupport@rgcjonas.gmail.com
+```
+Under X11, you may need to restart GNOME Shell (Alt+F2, r, ⏎) after that. Under Wayland you need to logout and login again.
+
+### Universal Blue (Native package)
+
+1. Create the repository file:
+```bash
+sudo tee /etc/yum.repos.d/openzro.repo <<EOF
+[openzro]
+name=openzro
+baseurl=https://github.com/openzro/openzro/releases/latest
+enabled=1
+gpgcheck=1
+gpgkey=https://github.com/openzro/openzro/releases/latest
+repo_gpgcheck=1
+EOF
+```
+
+3. Install the package
+```bash
+ # for CLI only
+ rpm-ostree install openzro
+ # for GUI package
+ rpm-ostree install openzro-ui
+ # Don't forget to reboot to apply
+```
+4. Start the service
+```bash
+systemctl enable --now openzro
+```
+
+### Fedora Universal Blue / SteamOS (DistroBox)
+1. Create a distrobox container
+```bash
+distrobox create openzro --init --image debian:12 -a "--cap-add=NET_ADMIN" --additional-packages systemd --root
+```
+2. Install inside the container
+```bash
+distrobox enter --root openzro
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
+```
+3. Export the distrobird binary to the host
+```bash
+#from inside the container
+distrobox-export -b /usr/bin/openzro
+```
+
+### openSUSE (zypper)
+
+1. Add the repository:
+```
+sudo zypper addrepo https://github.com/openzro/openzro/releases/latest openzro
+```
+2. Install the package / GPG key
+
+* Key Fingerprint: `AA9C 09AA 9DEA 2F58 112B 40DF DFFE AB2F D267 A61F`
+* Key ID: `DFFEAB2FD267A61F`
+* Email: `dev@openzro.io`
+```
+# MicroOS (immutable OS with selinux)
+transactional-update pkg in openzro
+reboot
+
+# Tumbleweed / Leap
+zypper in openzro
+```
+
+### NixOS 22.11+/unstable
+
+1. Edit your [`configuration.nix`](https://nixos.org/manual/nixos/stable/index.html#sec-changing-config)
+
+```nix
+ { config, pkgs, ... }:
+ {
+   services.openzro.enable = true; # for openzro service & CLI
+   environment.systemPackages = [ pkgs.openzro-ui ]; # for GUI
+ }
+```
+2. Build and apply new configuration
+
+```bash
+ sudo nixos-rebuild switch
+```
+
+### Binary Install
+**Installation from binary (CLI only)**
+
+1. Checkout openZro [releases](https://github.com/openzro/openzro/releases/latest)
+2. Download the latest release:
+```bash
+  curl -L -o ./openzro_<VERSION>.tar.gz https://github.com/openzro/openzro/releases/download/v<VERSION>/openzro_<VERSION>_<OS>_<Arch>.tar.gz
+```
+
+> **Note:** You need to replace some variables from the URL above:
+
+    - Replace **VERSION** with the latest released version.
+    - Replace **OS** with "linux", "darwin" for MacOS or "windows"
+    - Replace **Arch** with your target system CPU architecture
+
+3. Decompress
+```bash
+  tar xzf ./openzro_<VERSION>.tar.gz
+  sudo mv openzro /usr/bin/openzro
+  sudo chown root:root /usr/bin/openzro
+  sudo chmod +x /usr/bin/openzro
+```
+After that you may need to add /usr/bin in your PATH environment variable:
+````bash
+  export PATH=$PATH:/usr/bin
+````
+4. Install and run the service
+```bash
+  sudo openzro service install
+  sudo openzro service start
+```
+
+## Updating
+
+If your openZro client was installed through a package manager, use that to update.
+If you used the one-command script to install, you can follow this to update:
+
+```bash
+openzro down
+curl -fsSLO https://github.com/openzro/openzro/releases/latest
+chmod +x install.sh
+./install.sh --update
+openzro up
+```
+
+## Running openZro with SSO Login
+### Desktop UI Application
+If you installed the Desktop UI client, you can launch it and click on Connect.
+> It will open your browser, and you will be prompt for email and password. Follow the instructions.
+
+    
+
+### CLI
+Alternatively, you could use command line. Simply run
+   ```bash
+  openzro up
+   ```
+> It will open your browser, and you will be prompt for email and password. Follow the instructions.
+
+    
+
+Check connection status:
+```bash
+  openzro status
+```
+
+## Running openZro with a Setup Key
+In case you are activating a server peer, you can use a [setup key](/manage/peers/register-machines-using-setup-keys) as described in the steps below.
+> This is especially helpful when you are running multiple server instances with infrastructure-as-code tools like ansible and terraform.
+
+1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
+
+```bash
+  openzro up --setup-key <SETUP KEY>
+```
+
+Alternatively, if you are hosting your own Management Service provide `--management-url` property pointing to your Management Service:
+```bash
+  openzro up --setup-key <SETUP KEY> --management-url http://localhost:33073
+```
+
+> You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
+
+2. Check connection status:
+```bash
+  openzro status
+```
+
+3. Check your IP:
+
+```bash
+  ip addr show wt0
+```

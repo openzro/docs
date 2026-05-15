@@ -1,0 +1,73 @@
+# Stream Network Activity to SentinelOne Singularity Data Lake
+
+Source: https://docs.netbird.io/manage/activity/event-streaming/sentinelone-data-lake
+
+---
+
+# Stream Network Activity to SentinelOne Singularity Data Lake
+
+[SentinelOne Singularity Data Lake](https://www.sentinelone.com/platform/data-lake/)  provides a centralized repository for storing and analyzing security data across your organization. By streaming openZro network activity events to SentinelOne Data Lake, you can correlate network connectivity events with endpoint security data for comprehensive threat detection and investigation.
+
+This integration leverages openZro's Generic HTTP streaming capability with SentinelOne Singularity Data Lake-specific configurations to ensure seamless data ingestion into your Data Lake environment.
+
+> **Note:** This feature is only available in the cloud version of openZro.
+
+## Prerequisites
+
+Before you start creating and configuring a SentinelOne Singularity Data Lake event streaming integration, ensure that you have the following:
+- A SentinelOne account with Singularity Data Lake access and appropriate permissions
+- Administrative access to create API keys in your SentinelOne console
+
+## Create a SentinelOne API Token
+
+- Log in to your SentinelOne Management Console and navigate to **Visibility** from the left menu
+- Click on your user email dropdown in the top right toolbar and select **API Keys**
+- Under the **Log Access Keys** section, click **Add Key** dropdown menu and select **Add Write Key**
+- A new API key will be created with access to write logs to Data Lake
+- Click **Copy to Clipboard** and store this token securely. You will need this token when configuring the integration in openZro.
+
+    
+
+## Get the HEC Ingestion URL
+
+Navigate to `https://<your-tenant>.sentinelone.net/docs/en/http-event-collector--hec-.html#http-event-collector--hec-` (replace `<your-tenant>` with your actual SentinelOne tenant)
+to find and copy the HTTP Event Collector base URL from the documentation page. The URL format will be `https://ingest.<region>.sentinelone.net` where `<region>` is your deployment region.
+
+## Create an Integration in openZro
+
+- Navigate to the **Integrations** tab in the openZro dashboard and select **Event Streaming**
+- Find the **Generic HTTP** option and click **Connect Generic HTTP**
+- Configure the endpoint URL by entering the full HEC endpoint URL: `https://ingest.<region>.sentinelone.net/services/collector/event`
+- Select **Bearer Token** for authentication and provide the API token you created earlier
+
+    
+
+- Enable the custom body template and use the following template optimized for SentinelOne Singularity Data Lake:
+
+```json
+{
+  "id": "{{.ID}}",
+  "time": "{{.Timestamp.UnixNano}}",
+  "event": "{{.Message}}",
+  "initiator_id": "{{.InitiatorID}}",
+  "target_id": "{{.TargetID}}",
+  "host": "openzro",
+  "source": "openzro",
+  "sourcetype": "json",
+  "fields": "{{.Meta}}"
+}
+```
+
+    
+
+## Verify the Integration
+
+After configuring the SentinelOne Singularity Data Lake integration in openZro, you can verify that the integration is working correctly by checking the SentinelOne Singularity Data Lake for incoming events. If the integration is successful, you should see test events from openZro in your Data Lake.
+
+- Navigate to **Data Lake** > **Search** > **New Search** in your SentinelOne console
+- Select to search **All Data** and filter for recent events with source **openzro**
+- Verify the test events appear with the expected structure
+
+    
+
+The integration is now set up and ready to stream network activity events to SentinelOne Singularity Data Lake.

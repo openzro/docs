@@ -1,0 +1,252 @@
+# Kubernetes Gateway API Integration
+
+Source: https://docs.netbird.io/manage/integrations/kubernetes/gateway-api-beta
+
+---
+
+# Kubernetes Gateway API Integration 
+
+The openZro Kubernetes operator supports the [Gateway API](https://gateway-api.sigs.k8s.io/) as an alternative to annotation-based service exposure. Using standard Gateway API resources, you can:
+
+- **Expose services publicly** via reverse proxy using `HTTPRoute` resources with the public gateway class
+- **Expose services privately** to your openZro network using `TCPRoute` resources with the private gateway class
+
+The operator watches for these Gateway API resources and automatically creates the corresponding [Networks and Resources](/manage/networks) in your openZro account.
+
+## Prerequisites
+
+Before you begin, ensure you have the following:
+
+- **Helm** version 3+ (recommended)
+- **kubectl** version v1.11.3+
+- Access to a **Kubernetes** v1.11.3+ cluster
+- **Cert Manager** (recommended) — for secure communication between the k8s API and the operator
+- A **openZro API token** — you can create a PAT by following the steps [here](/manage/public-api#creating-a-service-user)
+
+## Installation
+
+### Step 1: Add the Helm repository
+
+```shell
+helm repo add openzro https://openzro.github.io/helms
+```
+
+### Step 2: Install Cert Manager
+
+This is recommended for the k8s API to communicate securely with the openZro operator.
+
+```shell
+kubectl apply -f https://github.com/cert-manager/cert-manager/releases/download/v1.17.0/cert-manager.yaml
+```
+
+### Step 3: Install the Gateway API CRDs
+
+The operator requires the experimental Gateway API CRDs to be installed in your cluster.
+
+```shell
+kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/releases/download/v1.5.0/experimental-install.yaml
+```
+
+### Step 4: Create the openZro API secret
+
+Create a namespace for the operator and store your API token as a Kubernetes secret.
+
+```shell
+kubectl create namespace openzro
+kubectl -n openzro create secret generic openzro-mgmt-api-key --from-literal=NB_API_KEY=$(cat ~/nb-pat.secret)
+```
+
+> **Note:** Replace `~/nb-pat.secret` with the path to your openZro API key.
+
+### Step 5: Install the operator
+
+> **Note:** The operator version 0.3.0-rc.2 is subject to breaking changes. Values and behavior may change in future releases.
+
+```shell
+helm upgrade --install kubernetes-operator openzro/kubernetes-operator \
+  --namespace openzro \
+  --create-namespace \
+  --version 0.3.0-rc.2 \
+  -f - <<EOF
+
+gatewayAPI:
+  enabled: true
+
+webhook:
+  enableCertManager: false
+
+openzroAPI:
+  keyFromSecret:
+    name: "openzro-mgmt-api-key"
+    key: "NB_API_KEY"
+
+EOF
+```
+
+### Step 6: Verify the installation
+
+```bash
+kubectl -n openzro get pods
+# Expected: openzro-operator-kubernetes-operator-xxxxx  1/1  Running
+```
+
+## Configure Routing Peers and Gateways
+
+Once the operator is running, deploy the routing peers and gateway resources. The operator supports two gateway classes:
+
+- **`openzro-public`** — exposes services through a reverse proxy, making them accessible via a public hostname using `HTTPRoute` resources
+- **`openzro-private`** — exposes services as private network resources, accessible only to peers within your openZro network using `TCPRoute` resources
+
+```bash
+cat <<EOF | kubectl apply -f -
+
+apiVersion: openzro.io/v1
+kind: NBRoutingPeer
+metadata:
+  name: openzro
+  namespace: openzro
+spec: {}
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: private
+  namespace: openzro
+spec:
+  gatewayClassName: openzro-private
+  listeners:
+  - protocol: gateway.openzro.io/NBRoutingPeer
+    name: openzro
+    port: 1
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: public
+  namespace: openzro
+spec:
+  gatewayClassName: openzro-public
+  listeners:
+  - protocol: gateway.openzro.io/NBRoutingPeer
+    name: openzro
+    port: 1
+
+EOF
+```
+
+## Expose Services via Reverse Proxy (Public Gateway)
+
+Use `HTTPRoute` resources with the **public** gateway to expose Kubernetes services through a reverse proxy. You can optionally add the `hostnames` field to make the service accessible via a specific domain.
+
+> **Note:** If using a custom hostname, make sure that the domain name is properly configured in your DNS settings.
+
+The following example deploys a demo application and creates an `HTTPRoute` with a custom hostname pointing to the public gateway:
+
+```bash
+ export DEPLOYMENT_IMAGE=ghcr.io/openzro/kubernetes-demo; cat <<EOF | kubectl apply -f -
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: $DEPLOYMENT_NAME
+  namespace: default
+  labels:
+    app: $DEPLOYMENT_NAME
+spec:
+  hostnames:
+    # Optional: omit this field if you don't want to expose this through the reverse proxy
+    - demo-nb-k8s.eu1.openzro.services
+  parentRefs:
+  - name: public
+    namespace: openzro
+  rules:
+  - backendRefs:
+    - name: $DEPLOYMENT_NAME
+      port: 80
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: $DEPLOYMENT_NAME
+  namespace: default
+  labels:
+    app: $DEPLOYMENT_NAME
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: $DEPLOYMENT_NAME
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      labels:
+        app: $DEPLOYMENT_NAME
+    spec:
+      containers:
+      - image: $DEPLOYMENT_IMAGE
+        imagePullPolicy: Always
+        name: demo
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: $DEPLOYMENT_NAME
+  namespace: default
+  labels:
+    app: $DEPLOYMENT_NAME
+spec:
+  type: ClusterIP
+  selector:
+    app: $DEPLOYMENT_NAME
+  ports:
+  - name: http
+    port: 80
+    protocol: TCP
+    targetPort: 80
+EOF
+```
+
+## Expose Private Resources (Private Gateway)
+
+Use `TCPRoute` resources with the **private** gateway to expose services as private network resources, accessible only to peers within your openZro network.
+
+The following example exposes the Kubernetes API server to your openZro peers:
+
+```bash
+cat <<EOF | kubectl apply -f -
+apiVersion: gateway.networking.k8s.io/v1alpha2
+kind: TCPRoute
+metadata:
+  name: kubernetes
+  namespace: default
+spec:
+  parentRefs:
+  - name: private
+    namespace: openzro
+  rules:
+  - backendRefs:
+    - name: kubernetes
+      port: 443
+EOF
+```
+
+## Work in progress features
+
+We know the operator is not yet feature complete, but we thought you would like to hear that we're working on:
+- ACL policy attachment 
+- Reverse Proxy authentication configuration
+- Multi-cluster support
+- Kubernetes API RBAC support
+
+## Get started
+
+    
+
+- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
+- Follow us [on X](https://x.com/openzro)
+- Join our [Slack Channel](/slack-url)
+- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

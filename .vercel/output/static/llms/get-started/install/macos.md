@@ -1,0 +1,132 @@
+# MacOS Installation
+
+Source: https://docs.netbird.io/get-started/install/macos
+
+---
+
+# MacOS Installation
+
+The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
+
+## Install with one command
+
+```bash
+curl -fsSL https://github.com/openzro/openzro/releases/latest | sh
+```
+
+### Package install
+
+1. Download the latest MacOS release installer for your [processor](https://support.apple.com/en-us/HT211814 ):
+    - Intel: 
+    - M1 & M2: 
+_If you require an older version checkout openZro [releases](https://github.com/openzro/openzro/releases/latest)_
+2. Proceed with the installation steps
+3. This will install the openZro app into /Applications and add the daemon service
+4. After installing, you can follow the steps from [Running openZro with SSO Login](#Running-openZro-with-SSO-Login) steps.
+> To uninstall the client remove the app from /Applications
+
+### Homebrew install
+
+1. Download and install homebrew at https://brew.sh/
+2. If openzro was previously installed with homebrew, you will need to run:
+```bash
+# Stop and uninstall daemon service:
+sudo openzro service stop
+sudo openzro service uninstall
+# unlink the app
+brew unlink openzro
+```
+> openzro will copy any existing configuration from the openzro's default configuration paths to the new openZro's default location
+
+3. Install the client
+```bash
+  # for CLI only
+  brew install openzro/tap/openzro
+  # for GUI package
+  brew install --cask openzro/tap/openzro-ui
+```
+4. If you installed CLI only, you need to install and start the client daemon service:
+ ```bash
+  sudo openzro service install
+  sudo openzro service start
+```
+
+### Binary Install
+**Installation from binary (CLI only)**
+
+1. Checkout openZro [releases](https://github.com/openzro/openzro/releases/latest)
+2. Download the latest release:
+```bash
+  curl -L -o ./openzro_<VERSION>.tar.gz https://github.com/openzro/openzro/releases/download/v<VERSION>/openzro_<VERSION>_<OS>_<Arch>.tar.gz
+```
+
+> **Note:** You need to replace some variables from the URL above:
+
+    - Replace **VERSION** with the latest released version.
+    - Replace **OS** with "linux", "darwin" for MacOS or "windows"
+    - Replace **Arch** with your target system CPU architecture
+
+3. Decompress
+```bash
+  tar xzf ./openzro_<VERSION>.tar.gz
+  sudo mv openzro /usr/bin/openzro
+  sudo chown root:root /usr/bin/openzro
+  sudo chmod +x /usr/bin/openzro
+```
+After that you may need to add /usr/bin in your PATH environment variable:
+````bash
+  export PATH=$PATH:/usr/bin
+````
+4. Install and run the service
+```bash
+  sudo openzro service install
+  sudo openzro service start
+```
+## Running openZro with SSO Login
+### Desktop UI Application
+If you installed the Desktop UI client, you can launch it and click on Connect.
+> It will open your browser, and you will be prompt for email and password. Follow the instructions.
+
+    
+
+### CLI
+Alternatively, you could use command line. Simply run
+   ```bash
+  openzro up
+   ```
+> It will open your browser, and you will be prompt for email and password. Follow the instructions.
+
+    
+
+Check connection status:
+```bash
+  openzro status
+```
+
+### Running openZro with a Setup Key
+In case you are activating a server peer, you can use a [setup key](/manage/peers/register-machines-using-setup-keys) as described in the steps below.
+> This is especially helpful when you are running multiple server instances with infrastructure-as-code tools like ansible and terraform.
+
+1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
+
+```bash
+  openzro up --setup-key <SETUP KEY>
+```
+
+Alternatively, if you are hosting your own Management Service provide `--management-url` property pointing to your Management Service:
+```bash
+  openzro up --setup-key <SETUP KEY> --management-url http://localhost:33073
+```
+
+> You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
+
+2. Check connection status:
+```bash
+  openzro status
+```
+
+3. Check your IP:
+
+````bash
+  sudo ifconfig utun100
+````

@@ -1,0 +1,49 @@
+# Provision Users and Groups From Your Identity Provider
+
+Source: https://docs.netbird.io/manage/team/idp-sync
+
+---
+
+# Provision Users and Groups From Your Identity Provider
+
+    
+
+Managing private network access in a business environment is a critical yet often cumbersome task.
+As companies grow and evolve, the manual process of granting access for new employees and revoking it for
+departing ones becomes increasingly time-consuming and error-prone. This challenge strains IT resources, poses significant
+security risks, and impacts productivity.
+
+openZro's IdP-Sync automates user access management to private networks by integrating with your identity provider (IdP)
+and automatically provisioning users and groups. This integration ensures that changes to groups and users are
+synchronized from your identity provider to openZro, granting appropriate network access to new users and immediately
+revoking access for departing employees.
+
+openZro allows you to use synchronized groups to create [access control policies](/manage/access-control/manage-network-access#creating-policies),
+or update network configurations like [DNS](/manage/dns#distribution-groups),
+eliminating the need for manual grouping.
+
+> **Note:** This feature is only available in the cloud version of openZro in the [Team plan](https://openzro.io/pricing) and above.
+
+This video guide walks you through an example integration with Microsoft Entra ID, covering both user onboarding and
+offboarding scenarios:
+
+{/* TODO(docs): record openZro walkthrough — upstream had:  */}
+
+## Supported Identity Providers
+
+openZro provides native support for syncing with the most popular identify providers.
+For detailed setup and configuration steps, select an IdP from the section below:
+
+* [Entra ID (API)](/manage/team/idp-sync/microsoft-entra-id-sync)
+* [Entra ID (SCIM)](/manage/team/idp-sync/microsoft-entra-id-scim-sync)
+* [Okta](/manage/team/idp-sync/okta-sync)
+* [Google Workspace](/manage/team/idp-sync/google-workspace-sync)
+* [JumpCloud](/manage/team/idp-sync/jumpcloud-sync)
+* [Keycloak](/manage/team/idp-sync/keycloak-sync)
+
+### Generic SCIM
+
+openZro provides a way to sync users and groups from any identity provider that supports the SCIM (System for Cross-domain Identity Management) protocol.
+SCIM is a standardized protocol that works with most modern identity providers, although configuration varies between providers.
+
+If your provider is not listed above, contact us at support@openzro.io for assistance with your specific IdP setup.

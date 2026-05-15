@@ -1,0 +1,149 @@
+# Set Up External Signal Server
+
+Source: https://docs.netbird.io/selfhosted/maintenance/scaling/set-up-external-signal
+
+---
+
+# Set Up External Signal Server
+
+This guide is part of the [Splitting Your Self-Hosted Deployment](/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment) guide. It covers extracting the Signal server to a dedicated machine.
+
+In most deployments, the embedded Signal server works well and does not need to be extracted. Consider running an external Signal server if you want to separate it from the Management server for organizational or infrastructure reasons.
+
+Unlike relay servers, the Signal server cannot be replicated as it maintains in-memory connection state. If you need high-availability active-active mode for both Management and Signal, this is available through an [enterprise commercial license](https://openzro.io/pricing#on-prem).
+
+> **Note:** Changing the Signal server URL requires all clients to restart. After updating the configuration, each client must run `openzro down` followed by `openzro up` to reconnect to the new Signal server. This limitation will be addressed in a future client release.
+
+## Server Requirements
+
+- A Linux VM with at least **1 CPU** and **1GB RAM**
+- Public IP address
+- A domain name pointing to the server (e.g., `signal.example.com`)
+- Docker installed
+- Firewall ports open: **80/tcp** (Let's Encrypt HTTP challenge) and **443/tcp** (gRPC/WebSocket client communication)
+
+## Create Signal Configuration
+
+On your signal server, create a directory and configuration:
+
+```bash
+mkdir -p ~/openzro-signal
+cd ~/openzro-signal
+```
+
+Like the relay, the signal server can automatically obtain TLS certificates via Let's Encrypt.
+
+> **Note:** Replace `signal.example.com` with your signal server's domain.
+
+Create `signal.env` with your signal settings:
+
+```bash
+NB_PORT=443
+NB_LOG_LEVEL=info
+
+# TLS via Let's Encrypt (automatic certificate provisioning)
+NB_LETSENCRYPT_DOMAIN=signal.example.com
+```
+
+Create `docker-compose.yml`:
+
+```yaml
+services:
+  signal:
+    image: openzro/signal:latest
+    container_name: openzro-signal
+    restart: unless-stopped
+    ports:
+      - '443:443'
+      - '80:80'
+    env_file:
+      - signal.env
+    volumes:
+      - signal_data:/var/lib/openzro
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "500m"
+        max-file: "2"
+
+volumes:
+  signal_data:
+```
+
+## Alternative: TLS with Existing Certificates
+
+If you have existing TLS certificates, replace the Let's Encrypt variable in `signal.env` with:
+
+```bash
+# Replace the NB_LETSENCRYPT_DOMAIN line with:
+NB_CERT_FILE=/certs/fullchain.pem
+NB_CERT_KEY=/certs/privkey.pem
+```
+
+And add a certificate volume to `docker-compose.yml`:
+
+```yaml
+    volumes:
+      - /path/to/certs:/certs:ro
+      - signal_data:/var/lib/openzro
+```
+
+## Start the Signal Server
+
+```bash
+docker compose up -d
+```
+
+Verify it's running:
+
+```bash
+docker compose logs -f
+```
+
+If you configured Let's Encrypt, trigger certificate provisioning with an HTTPS request:
+
+```bash
+curl -v https://signal.example.com/
+```
+
+Confirm the certificate was issued:
+
+```
+* Server certificate:
+*  subject: CN=signal.example.com
+*  issuer: C=US; O=Let's Encrypt; CN=E8
+*  SSL certificate verify ok.
+```
+
+## Update Main Server Configuration
+
+On your main server, add `signalUri` to `config.yaml`. This disables the embedded Signal server:
+
+```yaml
+server:
+  # ... existing settings ...
+
+  # External signal server
+  signalUri: "https://signal.example.com:443"
+```
+
+Restart the main server:
+
+```bash
+docker compose down
+docker compose up -d
+```
+
+## Verify Signal Extraction
+
+Check the main server logs to confirm the embedded Signal is disabled:
+
+```bash
+docker compose logs openzro-server
+```
+
+```
+INFO combined/cmd/root.go:   Management: true (log level: info)
+INFO combined/cmd/root.go:   Signal: false (log level: )
+INFO combined/cmd/root.go:   Relay: false (log level: )
+```
