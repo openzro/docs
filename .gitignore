@@ -39,7 +39,7 @@ yarn-error.log*
 /src/lib/edit-on-github-routes.js
 
 out/
-.vercel/a
+.vercel/
 
 # claude
 .claude
