@@ -1,0 +1,98 @@
+import {
+    Note
+} from "@/components/mdx";
+
+# Manage Google Workspace-Synced Groups
+
+You followed a `Manage in Google Workspace` link from the openZro
+dashboard's Groups page. The group you came from has `Issued:
+integration` in openZro — its lifecycle is owned by your **Google
+Workspace** tenant, not by openZro. Rename it, change its members,
+or decommission it from the Google admin console; the openZro
+periodic poll replicates the change on the next sync cycle.
+
+Google Workspace integration uses the Directory API (not SCIM).
+openZro pulls the group list and membership at a configurable
+interval — the default is hourly, and the cadence is set per
+integration in `Integrations` → `Google Workspace` → `Refresh
+interval`.
+
+## Where the group lives
+
+In the Google admin console:
+
+* Open `admin.google.com` and sign in with an account that holds
+  the `Groups Admin` or `Super Admin` role.
+* In the left navigation, expand `Directory` → `Groups`.
+* Find the group whose name matches the one shown in openZro.
+
+openZro displays the Google group's name verbatim; the underlying
+identifier is the Google group's primary email address.
+
+## Rename a group
+
+1. Open the group in the admin console.
+2. Click the group name and edit `Name`, save.
+3. Wait for the next openZro sync (≤ the configured refresh
+   interval — typically one hour by default).
+
+openZro updates the existing group record in place by matching on
+the immutable Google group identifier. Policies, routes, and DNS
+configurations that reference the group keep working through the
+rename.
+
+## Change a group's membership
+
+1. Open the group in the admin console.
+2. Use `Add members` or the remove icon to adjust the list.
+3. Save.
+
+The next openZro sync compares the Google membership list with the
+local cache and applies the diff. Peers belonging to removed users
+drop out of the group's reach in the subsequent NetworkMap
+fan-out.
+
+Adding a new user to the group does NOT immediately add their
+peers — peers are linked to the user through the openZro Setup Key
+flow. New peers enrolled by the user after the membership change
+will inherit the group; existing peers stay where they are unless
+the user re-enrols.
+
+<Note>
+Service accounts and group aliases are intentionally NOT synced.
+Only user members of the Google group surface in openZro. If your
+group includes nested groups, expand them in Google admin and add
+the members directly — openZro does not recursively flatten nested
+groups.
+</Note>
+
+## Decommission a Google-synced group
+
+* **Remove the group from openZro's sync scope** (the soft path):
+  in openZro `Integrations` → `Google Workspace`, edit the integration
+  and adjust the group filter to exclude the group, or revoke the
+  group's membership of the synced organisation unit. The next
+  poll removes the group from openZro if it carries no policy /
+  route / resource references.
+* **Delete the group in Google admin** (the destructive path):
+  open the group → `Delete group`. The next openZro sync detects
+  the absence and removes the group locally — same conflict rule
+  as the soft path: if openZro policies / routes / resources still
+  reference the group, the cleanup is deferred until those
+  references are cleared, and a warning is logged on the
+  management daemon.
+
+<Note>
+A regular openZro admin cannot delete a Google-synced group from
+the dashboard — only the integration's own service account has
+permission to delete a group with `Issued: integration`. This is
+intentional: Google is the source of truth, and a dashboard-side
+deletion would be silently undone on the next sync.
+</Note>
+
+## Backlinks
+
+* [Provision Users and Groups from Google Workspace](/manage/team/idp-sync/google-workspace-sync) — the setup
+  page for the Directory API integration.
+* [Manage Access with Groups and Policies](/manage/access-control/manage-network-access) — how to use
+  the synced groups as source / destination selectors.

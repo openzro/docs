@@ -1,0 +1,103 @@
+import {
+    Note
+} from "@/components/mdx";
+
+# Manage Azure AD / Microsoft Entra-Synced Groups
+
+You followed a `Manage in Microsoft Entra` link from the openZro
+dashboard's Groups page. The group you came from has `Issued:
+integration` in openZro — its lifecycle is owned by your **Microsoft
+Entra ID** (formerly Azure AD) tenant, not by openZro. Rename it,
+change its members, or decommission it from the Entra admin centre;
+the openZro sync replicates the change on the next interval.
+
+openZro supports two Microsoft Entra integration paths and they
+behave slightly differently:
+
+* **Graph API integration** — openZro polls Microsoft Graph at a
+  configurable refresh interval (default hourly). Pull-based: you
+  do not configure anything on the Entra side besides the app
+  registration consent.
+* **SCIM provisioning** — Entra pushes user / group updates to
+  openZro's SCIM endpoint. Push-based: typically near-real-time on
+  explicit edits, periodic reconciliation every ~40 minutes.
+
+Both paths leave the openZro group with `Issued: integration` and
+the same lifecycle rules. The only practical difference is the
+propagation latency.
+
+## Where the group lives
+
+In the Entra admin centre (`entra.microsoft.com`):
+
+* Sign in with an account holding the `Groups Administrator` or
+  higher role.
+* In the left navigation, open `Groups` → `All groups`.
+* Find the group whose `Display name` matches the one shown in
+  openZro.
+
+openZro displays the Entra group's `displayName` verbatim and
+matches on the immutable `objectId` (or `id` in Graph) so renames
+do not lose policy / route / resource links.
+
+## Rename a group
+
+1. Open the group in Entra admin → `Properties`.
+2. Edit `Display name`, save.
+3. Wait for the next openZro sync:
+   * Graph API: at most one refresh interval (default 60 minutes;
+     configurable per integration).
+   * SCIM: typically seconds on explicit push.
+
+## Change a group's membership
+
+1. Open the group in Entra admin → `Members`.
+2. Add / remove members.
+3. Save.
+
+Same propagation latency as a rename. Peers belonging to removed
+users drop out of the group's reach in the subsequent NetworkMap
+fan-out (~seconds latency on the openZro side once the sync
+applies).
+
+<Note>
+Dynamic membership groups (rules-based) are supported on both
+integration paths — openZro receives the resolved member list at
+sync time, not the rule definition itself. Adjusting the rule on
+the Entra side updates openZro on the next sync.
+</Note>
+
+## Decommission an Entra-synced group
+
+* **Remove the openZro app assignment** from the group: open the
+  group in Entra admin → `Assigned applications` and revoke the
+  openZro application. On Graph API integrations, you instead
+  adjust the group filter in openZro `Integrations` → `Microsoft
+  Entra ID` to exclude the group. Either way the next sync stops
+  populating the group's members and openZro freezes the cached
+  list.
+* **Delete the group in Entra admin** (the destructive path): open
+  the group → `Delete`. The next openZro sync detects the absence
+  and removes the group locally. If openZro policies / routes /
+  resources still reference the group, the cleanup is deferred and
+  the management daemon logs a warning until the references are
+  cleared.
+
+<Note>
+A regular openZro admin cannot delete an Entra-synced group from
+the dashboard — only the SCIM / Graph integration's service
+account has permission to delete a group with `Issued: integration`.
+This is intentional: Entra is the source of truth, and a dashboard-
+side deletion would be silently undone on the next sync.
+</Note>
+
+## Backlinks
+
+* [Provision Users and Groups from Microsoft Entra (API)](/manage/team/idp-sync/microsoft-entra-id-sync) — setup
+  page for the Graph API integration.
+* [Provision Users and Groups from Microsoft Entra (SCIM)](/manage/team/idp-sync/microsoft-entra-id-scim-sync) — setup
+  page for the SCIM integration.
+* [Enable openZro for Entra ID](/manage/team/entra-id-app-enablement) — Entra-side
+  app registration and admin consent.
+* [Manage Access with Groups and Policies](/manage/access-control/manage-network-access) — how to use
+  the synced groups as source / destination selectors.
