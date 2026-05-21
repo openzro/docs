@@ -1,3 +1,17 @@
+{/*
+  ──────────────────────────────────────────────────────────────────────
+  openZro · Site-to-Site Connectivity — MDX with inline SVG diagrams
+  ──────────────────────────────────────────────────────────────────────
+
+  Drop-in replacement for the original page. The four ASCII diagrams
+  ("Your Laptop ──► openZro Tunnel ──► …") are replaced with self-
+  contained SVG figures. No imports, no global CSS — every diagram is
+  themed for a dark card and works on any page background.
+
+  Tested against MDX 2 (Next.js, Docusaurus 3, Nextra).
+  ──────────────────────────────────────────────────────────────────────
+*/}
+
 import { Tiles } from '@/components/Tiles'
 
 # Site-to-Site Connectivity
@@ -12,10 +26,75 @@ openZro supports three distinct remote access scenarios. Understanding which one
 
 A openZro peer (device running the openZro client) accesses devices on a remote network that don't have openZro installed.
 
-```
-Your Laptop ──────► openZro Tunnel ──────► Routing Peer ──────► Office Printer
-  (peer)                                    (peer)              (clientless)
-```
+{/* ════════════════════════════════════════════════════════════════════
+    01 · VPN-to-Site — peer reaches a clientless device
+    ════════════════════════════════════════════════════════════════════ */}
+
+<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+  <svg viewBox="0 0 760 320" style={{ display: "block", width: "100%", height: "auto" }}>
+    <defs>
+      <marker id="s2s-arr-teal-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#5fe3c8" />
+      </marker>
+      <marker id="s2s-arr-violet-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#a78bfa" />
+      </marker>
+      <style>{`
+        @keyframes s2s-dash-1 { to { stroke-dashoffset: -120; } }
+        .s2s-flow-1 { animation: s2s-dash-1 4.5s linear infinite; }
+      `}</style>
+    </defs>
+
+    {/* tunnel envelope */}
+    <rect x="190" y="92" width="380" height="138" rx="14" fill="rgba(124,58,237,0.06)" stroke="rgba(167,139,250,0.35)" strokeDasharray="4 4" />
+    <text x="200" y="110" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">OPENZRO ENCRYPTED TUNNEL</text>
+
+    {/* peer (laptop) */}
+    <rect x="20" y="110" width="160" height="100" rx="10" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
+    <text x="34" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">PEER</text>
+    <text x="34" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Your laptop</text>
+    <text x="34" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">100.75.232.118</text>
+    <text x="34" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">openZro client</text>
+    <text x="34" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8">initiates</text>
+
+    {/* routing peer */}
+    <rect x="320" y="110" width="170" height="100" rx="10" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
+    <text x="334" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">ROUTING PEER</text>
+    <text x="334" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Office gateway</text>
+    <text x="334" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">100.75.226.48</text>
+    <text x="334" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">advertises 10.0.0.0/24</text>
+    <text x="334" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">openZro client</text>
+
+    {/* remote LAN bracket */}
+    <rect x="510" y="78" width="230" height="222" rx="10" fill="rgba(196,181,253,0.03)" stroke="rgba(196,181,253,0.15)" strokeDasharray="3 4" />
+    <text x="522" y="98" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">REMOTE LAN · 10.0.0.0/24</text>
+
+    {/* clientless target */}
+    <rect x="540" y="110" width="170" height="100" rx="10" fill="rgba(196,181,253,0.04)" stroke="rgba(196,181,253,0.55)" strokeDasharray="3 3" />
+    <text x="554" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">CLIENTLESS</text>
+    <text x="554" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Office printer</text>
+    <text x="554" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">10.0.0.42</text>
+    <text x="554" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">no openZro client</text>
+    <text x="554" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">native protocol</text>
+
+    {/* arrows */}
+    <path d="M180 160 L 320 160" stroke="#c4b5fd" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-violet-1)" />
+    <path d="M490 160 L 540 160" stroke="#5fe3c8" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-teal-1)" />
+
+    {/* animated flow */}
+    <path d="M180 160 L 320 160" stroke="#5fe3c8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-1" />
+    <path d="M490 160 L 540 160" stroke="#5fe3c8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-1" />
+
+    {/* labels */}
+    <rect x="200" y="220" width="120" height="22" rx="6" fill="rgba(124,58,237,0.10)" stroke="rgba(167,139,250,0.30)" />
+    <text x="260" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">WireGuard ◇ E2E</text>
+
+    <rect x="490" y="220" width="50" height="22" rx="6" fill="rgba(95,227,200,0.08)" stroke="rgba(95,227,200,0.35)" />
+    <text x="515" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">LAN</text>
+
+    <text x="380" y="280" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" textAnchor="middle" opacity="0.7">peer initiates → routing peer forwards into local subnet → target replies through the same path</text>
+  </svg>
+</div>
 
 **Common use cases:**
 - Access your home NAS from anywhere
@@ -28,10 +107,76 @@ Your Laptop ──────► openZro Tunnel ──────► Routing P
 
 A device without openZro initiates connections to openZro peers. This is the reverse of VPN-to-Site—the clientless device starts the connection.
 
-```
-Office Server ──────► Routing Peer ──────► openZro Tunnel ──────► Your Laptop
- (clientless)           (peer)                                      (peer)
-```
+{/* ════════════════════════════════════════════════════════════════════
+    02 · Site-to-VPN — clientless initiates outward to a peer
+    ════════════════════════════════════════════════════════════════════ */}
+
+<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+  <svg viewBox="0 0 760 320" style={{ display: "block", width: "100%", height: "auto" }}>
+    <defs>
+      <marker id="s2s-arr-amber-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#f5b942" />
+      </marker>
+      <marker id="s2s-arr-violet-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#a78bfa" />
+      </marker>
+      <style>{`
+        @keyframes s2s-dash-2 { to { stroke-dashoffset: -120; } }
+        .s2s-flow-2 { animation: s2s-dash-2 4.5s linear infinite; }
+      `}</style>
+    </defs>
+
+    {/* LAN bracket */}
+    <rect x="20" y="78" width="240" height="222" rx="10" fill="rgba(196,181,253,0.03)" stroke="rgba(196,181,253,0.15)" strokeDasharray="3 4" />
+    <text x="32" y="98" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">OFFICE LAN · 10.0.0.0/24</text>
+
+    {/* tunnel envelope */}
+    <rect x="270" y="92" width="380" height="138" rx="14" fill="rgba(124,58,237,0.06)" stroke="rgba(167,139,250,0.35)" strokeDasharray="4 4" />
+    <text x="280" y="110" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">OPENZRO ENCRYPTED TUNNEL</text>
+
+    {/* clientless source */}
+    <rect x="40" y="110" width="200" height="100" rx="10" fill="rgba(196,181,253,0.04)" stroke="rgba(196,181,253,0.55)" strokeDasharray="3 3" />
+    <text x="54" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">CLIENTLESS</text>
+    <text x="54" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Office server</text>
+    <text x="54" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">10.0.0.20</text>
+    <text x="54" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">no openZro client</text>
+    <text x="54" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942">initiates</text>
+
+    {/* routing peer */}
+    <rect x="280" y="110" width="170" height="100" rx="10" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
+    <text x="294" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">ROUTING PEER</text>
+    <text x="294" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Office gateway</text>
+    <text x="294" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">10.0.0.1</text>
+    <text x="294" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">default route for LAN</text>
+    <text x="294" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">openZro client</text>
+
+    {/* peer destination */}
+    <rect x="540" y="110" width="180" height="100" rx="10" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
+    <text x="554" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">PEER</text>
+    <text x="554" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Analyst laptop</text>
+    <text x="554" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">100.75.232.118</text>
+    <text x="554" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">openZro client</text>
+    <text x="554" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">accepts inbound</text>
+
+    {/* arrows */}
+    <path d="M240 160 L 280 160" stroke="#f5b942" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-amber-2)" />
+    <path d="M450 160 L 540 160" stroke="#c4b5fd" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-violet-2)" />
+
+    {/* animated flow */}
+    <path d="M240 160 L 280 160" stroke="#f5b942" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-2" />
+    <path d="M450 160 L 540 160" stroke="#f5b942" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-2" />
+
+    <rect x="260" y="220" width="50" height="22" rx="6" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.35)" />
+    <text x="285" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942" textAnchor="middle">LAN</text>
+
+    <rect x="430" y="220" width="120" height="22" rx="6" fill="rgba(124,58,237,0.10)" stroke="rgba(167,139,250,0.30)" />
+    <text x="490" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">WireGuard ◇ E2E</text>
+
+    <rect x="20" y="260" width="720" height="36" rx="8" fill="rgba(245,185,66,0.06)" stroke="rgba(245,185,66,0.30)" />
+    <text x="34" y="276" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942">prerequisite — clientless device must use the routing peer as its gateway (or have a static route)</text>
+    <text x="34" y="290" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942" opacity="0.8">implementation requires Network Routes (Networks does not currently support this direction)</text>
+  </svg>
+</div>
 
 **Common use cases:**
 - Office monitoring systems pushing data to remote analysts
@@ -44,10 +189,95 @@ Office Server ──────► Routing Peer ──────► openZro T
 
 Devices on separate networks communicate with each other, with neither running openZro directly. Each network has a routing peer that handles traffic.
 
-```
-Home NAS ──► Routing Peer ──► openZro Tunnel ──► Routing Peer ──► Office Server
-(clientless)    (peer)                              (peer)         (clientless)
-```
+{/* ════════════════════════════════════════════════════════════════════
+    03 · Site-to-Site — two clientless LANs through two routing peers
+    ════════════════════════════════════════════════════════════════════ */}
+
+<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+  <svg viewBox="0 0 880 360" style={{ display: "block", width: "100%", height: "auto" }}>
+    <defs>
+      <marker id="s2s-arr-teal-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#5fe3c8" />
+      </marker>
+      <marker id="s2s-arr-violet-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#a78bfa" />
+      </marker>
+      <style>{`
+        @keyframes s2s-dash-3 { to { stroke-dashoffset: -120; } }
+        .s2s-flow-3 { animation: s2s-dash-3 4.5s linear infinite; }
+      `}</style>
+    </defs>
+
+    {/* LAN A */}
+    <rect x="20" y="78" width="240" height="222" rx="10" fill="rgba(196,181,253,0.03)" stroke="rgba(196,181,253,0.15)" strokeDasharray="3 4" />
+    <text x="32" y="98" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">HOME LAN · 192.168.1.0/24</text>
+
+    {/* LAN B */}
+    <rect x="620" y="78" width="240" height="222" rx="10" fill="rgba(196,181,253,0.03)" stroke="rgba(196,181,253,0.15)" strokeDasharray="3 4" />
+    <text x="632" y="98" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">OFFICE LAN · 10.0.0.0/24</text>
+
+    {/* tunnel */}
+    <rect x="270" y="92" width="340" height="138" rx="14" fill="rgba(124,58,237,0.06)" stroke="rgba(167,139,250,0.35)" strokeDasharray="4 4" />
+    <text x="280" y="110" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">OPENZRO ENCRYPTED TUNNEL</text>
+
+    {/* Home NAS */}
+    <rect x="40" y="110" width="200" height="100" rx="10" fill="rgba(196,181,253,0.04)" stroke="rgba(196,181,253,0.55)" strokeDasharray="3 3" />
+    <text x="54" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">CLIENTLESS</text>
+    <text x="54" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Home NAS</text>
+    <text x="54" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">192.168.1.20</text>
+    <text x="54" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">no openZro client</text>
+    <text x="54" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">native SMB / NFS</text>
+
+    {/* Routing peer A */}
+    <rect x="278" y="110" width="150" height="100" rx="10" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
+    <text x="292" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">ROUTING PEER</text>
+    <text x="292" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Home gateway</text>
+    <text x="292" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">192.168.1.1</text>
+    <text x="292" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">advertises</text>
+    <text x="292" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">192.168.1.0/24</text>
+
+    {/* Routing peer B */}
+    <rect x="450" y="110" width="150" height="100" rx="10" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
+    <text x="464" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">ROUTING PEER</text>
+    <text x="464" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Office gateway</text>
+    <text x="464" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">10.0.0.1</text>
+    <text x="464" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">advertises</text>
+    <text x="464" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">10.0.0.0/24</text>
+
+    {/* Office server */}
+    <rect x="640" y="110" width="200" height="100" rx="10" fill="rgba(196,181,253,0.04)" stroke="rgba(196,181,253,0.55)" strokeDasharray="3 3" />
+    <text x="654" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">CLIENTLESS</text>
+    <text x="654" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Office server</text>
+    <text x="654" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">10.0.0.20</text>
+    <text x="654" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">no openZro client</text>
+    <text x="654" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">native protocol</text>
+
+    {/* arrows */}
+    <path d="M240 160 L 278 160" stroke="#5fe3c8" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-teal-3)" />
+    <path d="M428 160 L 450 160" stroke="#c4b5fd" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-violet-3)" />
+    <path d="M600 160 L 640 160" stroke="#5fe3c8" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-teal-3)" />
+
+    {/* animated flow */}
+    <path d="M240 160 L 278 160" stroke="#5fe3c8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-3" />
+    <path d="M428 160 L 450 160" stroke="#5fe3c8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-3" />
+    <path d="M600 160 L 640 160" stroke="#5fe3c8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-3" />
+
+    {/* labels */}
+    <rect x="248" y="220" width="50" height="22" rx="6" fill="rgba(95,227,200,0.08)" stroke="rgba(95,227,200,0.35)" />
+    <text x="273" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">LAN</text>
+
+    <rect x="370" y="220" width="138" height="22" rx="6" fill="rgba(124,58,237,0.10)" stroke="rgba(167,139,250,0.30)" />
+    <text x="439" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">WireGuard ◇ E2E</text>
+
+    <rect x="580" y="220" width="50" height="22" rx="6" fill="rgba(95,227,200,0.08)" stroke="rgba(95,227,200,0.35)" />
+    <text x="605" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">LAN</text>
+
+    {/* insight */}
+    <rect x="20" y="278" width="840" height="44" rx="8" fill="rgba(124,58,237,0.06)" stroke="rgba(167,139,250,0.30)" />
+    <text x="34" y="296" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe">both ends are clientless · each LAN has its own routing peer · neither end host knows openZro exists — they just see a route to the other subnet</text>
+    <text x="34" y="312" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" opacity="0.7">implementation requires Network Routes on both peers (Networks does not currently support this)</text>
+  </svg>
+</div>
 
 **Common use cases:**
 - Connect branch office networks to headquarters
@@ -60,10 +290,87 @@ Home NAS ──► Routing Peer ──► openZro Tunnel ──► Routing Peer 
 
 Exit nodes route all internet-bound traffic (`0.0.0.0/0`) through a designated peer, changing your apparent public IP address. Unlike the scenarios above, exit nodes handle internet egress rather than private network access.
 
-```
-Your Laptop ──────► openZro Tunnel ──────► Exit Node ──────► Internet
-  (peer)                                     (peer)
-```
+{/* ════════════════════════════════════════════════════════════════════
+    04 · Exit Nodes — 0.0.0.0/0 through a designated peer
+    ════════════════════════════════════════════════════════════════════ */}
+
+<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+  <svg viewBox="0 0 880 300" style={{ display: "block", width: "100%", height: "auto" }}>
+    <defs>
+      <marker id="s2s-arr-teal-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#5fe3c8" />
+      </marker>
+      <marker id="s2s-arr-violet-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#a78bfa" />
+      </marker>
+      <marker id="s2s-arr-amber-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#f5b942" />
+      </marker>
+      <style>{`
+        @keyframes s2s-dash-4 { to { stroke-dashoffset: -120; } }
+        .s2s-flow-4 { animation: s2s-dash-4 4.5s linear infinite; }
+      `}</style>
+    </defs>
+
+    {/* tunnel */}
+    <rect x="200" y="80" width="370" height="140" rx="14" fill="rgba(124,58,237,0.06)" stroke="rgba(167,139,250,0.35)" strokeDasharray="4 4" />
+    <text x="210" y="98" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">OPENZRO ENCRYPTED TUNNEL</text>
+
+    {/* laptop */}
+    <rect x="20" y="110" width="180" height="100" rx="10" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
+    <text x="34" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">PEER</text>
+    <text x="34" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Your laptop</text>
+    <text x="34" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">100.75.232.118</text>
+    <text x="34" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">default route via</text>
+    <text x="34" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">openZro · 0.0.0.0/0</text>
+
+    {/* exit node */}
+    <rect x="290" y="110" width="190" height="100" rx="10" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
+    <text x="304" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">PEER · EXIT NODE</text>
+    <text x="304" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Home server (BR)</text>
+    <text x="304" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">100.75.226.48</text>
+    <text x="304" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">public IP: 200.x.x.x</text>
+    <text x="304" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">NATs traffic outbound</text>
+
+    {/* public gateway */}
+    <rect x="510" y="110" width="160" height="100" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <text x="524" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">ISP</text>
+    <text x="524" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Public gateway</text>
+    <text x="524" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">ISP NAT</text>
+    <text x="524" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">apparent IP</text>
+    <text x="524" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">→ exit node's IP</text>
+
+    {/* internet */}
+    <rect x="700" y="110" width="160" height="100" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <text x="714" y="130" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">INTERNET</text>
+    <text x="714" y="152" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">example.com</text>
+    <text x="714" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">93.184.216.34</text>
+    <text x="714" y="186" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">sees connection</text>
+    <text x="714" y="200" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">from 200.x.x.x</text>
+
+    {/* arrows */}
+    <path d="M200 160 L 290 160" stroke="#c4b5fd" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-violet-4)" />
+    <path d="M480 160 L 510 160" stroke="#5fe3c8" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-teal-4)" />
+    <path d="M670 160 L 700 160" stroke="#f5b942" strokeWidth="1.4" fill="none" markerEnd="url(#s2s-arr-amber-4)" />
+
+    {/* animated flow */}
+    <path d="M200 160 L 290 160" stroke="#5fe3c8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-4" />
+    <path d="M480 160 L 510 160" stroke="#5fe3c8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-4" />
+    <path d="M670 160 L 700 160" stroke="#5fe3c8" strokeWidth="1.6" strokeLinecap="round" strokeDasharray="2 10" fill="none" className="s2s-flow-4" />
+
+    {/* labels */}
+    <rect x="208" y="220" width="74" height="22" rx="6" fill="rgba(124,58,237,0.10)" stroke="rgba(167,139,250,0.30)" />
+    <text x="245" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">tunnel</text>
+
+    <rect x="488" y="220" width="74" height="22" rx="6" fill="rgba(95,227,200,0.08)" stroke="rgba(95,227,200,0.35)" />
+    <text x="525" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">egress</text>
+
+    <rect x="678" y="220" width="74" height="22" rx="6" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.35)" />
+    <text x="715" y="235" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942" textAnchor="middle">clear-net</text>
+
+    <text x="440" y="278" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" textAnchor="middle" opacity="0.7">unlike VPN-to-Site, this routes internet egress rather than private subnet access</text>
+  </svg>
+</div>
 
 **Common use cases:**
 - Access region-restricted content while traveling
