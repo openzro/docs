@@ -54,10 +54,16 @@ rejects the push.
 3. Save.
 
 The push side carries the membership delta; openZro adds or removes
-the affected users from the group. Peers belonging to the removed
-users immediately drop out of the group's reach (their policies and
-routes update in the next NetworkMap fan-out, which is the same
-~seconds-latency channel that every other policy update rides).
+the affected users from the group record. Note that the active
+NetworkMap on a peer **is not refreshed immediately on the SCIM
+push** — the user's `AutoGroups` list is rewritten and persisted,
+but the peer-side reach only recomputes the next time the account's
+NetworkMap fans out for another reason (policy save, peer enrol,
+directive update). If you need an offboarding to take effect
+immediately, follow the SCIM remove with any account-level mutation
+that bumps the network serial — saving a no-op policy edit is the
+quickest path. Closing the gap so the SCIM path fans out on its
+own is tracked in [openzro/openzro#104](https://github.com/openzro/openzro/issues/104).
 
 Adding a new user to the group does NOT immediately add their
 peers — peers are linked to the user through the openZro Setup Key

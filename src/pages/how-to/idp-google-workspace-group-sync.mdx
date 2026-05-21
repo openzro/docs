@@ -48,9 +48,15 @@ rename.
 3. Save.
 
 The next openZro sync compares the Google membership list with the
-local cache and applies the diff. Peers belonging to removed users
-drop out of the group's reach in the subsequent NetworkMap
-fan-out.
+local cache and applies the diff to each user's `AutoGroups`. Note
+that the active NetworkMap on a peer **is not refreshed immediately
+on the sync** — the user record is rewritten and persisted, but the
+peer-side reach only recomputes the next time the account's
+NetworkMap fans out for another reason (policy save, peer enrol,
+directive update). If you need an offboarding to take effect
+immediately, follow the membership change with any account-level
+mutation that bumps the network serial. Closing the gap so the
+sync path fans out on its own is tracked in [openzro/openzro#104](https://github.com/openzro/openzro/issues/104).
 
 Adding a new user to the group does NOT immediately add their
 peers — peers are linked to the user through the openZro Setup Key

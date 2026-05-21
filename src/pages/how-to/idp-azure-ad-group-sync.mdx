@@ -55,10 +55,17 @@ do not lose policy / route / resource links.
 2. Add / remove members.
 3. Save.
 
-Same propagation latency as a rename. Peers belonging to removed
-users drop out of the group's reach in the subsequent NetworkMap
-fan-out (~seconds latency on the openZro side once the sync
-applies).
+Same propagation latency as a rename for the user-record update —
+SCIM push lands in seconds, Graph poll lands at the next refresh
+interval. Note that the active NetworkMap on a peer **is not
+refreshed immediately when the sync applies** — the user's
+`AutoGroups` list is rewritten and persisted, but the peer-side
+reach only recomputes the next time the account's NetworkMap fans
+out for another reason (policy save, peer enrol, directive update).
+If you need an offboarding to take effect immediately, follow the
+sync with any account-level mutation that bumps the network serial.
+Closing the gap so the SCIM / Graph path fans out on its own is
+tracked in [openzro/openzro#104](https://github.com/openzro/openzro/issues/104).
 
 <Note>
 Dynamic membership groups (rules-based) are supported on both
