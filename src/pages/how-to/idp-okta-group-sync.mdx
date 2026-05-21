@@ -1,0 +1,104 @@
+import {
+    Note
+} from "@/components/mdx";
+
+# Manage Okta-Synced Groups
+
+You followed a `Manage in Okta` link from the openZro dashboard's
+Groups page. The group you came from has `Issued: integration` in
+openZro — that is, its lifecycle is owned by your **Okta** tenant,
+not by openZro. Rename it, change its members, or decommission it
+from Okta; the openZro SCIM provisioning loop replicates the change
+on the next sync interval.
+
+This page covers what to change where, and how the synchronisation
+behaves on each transition.
+
+## Where the group lives
+
+In your Okta admin dashboard:
+
+* Log in to your Okta **admin** console.
+* In the left menu, expand `Directory` → `Groups`.
+* Find the group whose name matches the one shown in openZro.
+
+openZro shows the Okta group's `displayName` verbatim. If you do
+not recognise the group, check the `Applications` tab on the Okta
+group — it must include the openZro application for SCIM to surface
+it on the openZro side.
+
+## Rename a group
+
+1. Open the group in Okta admin → `General` tab.
+2. Edit `Name`, save.
+3. Wait one Okta SCIM push (typically a few seconds for an explicit
+   change; on the order of one hour if you wait for the periodic
+   reconciliation rather than the push).
+
+openZro receives the new name through the SCIM `Group.displayName`
+attribute and updates the existing record in place — the group's
+`ID` is stable, so any policies, routes, or DNS configurations
+referencing the group keep working.
+
+<Note>
+The `All` group cannot be renamed from any IdP — it is a fixed
+openZro construct that always means "every peer in this account".
+If your SCIM push attempts to rename a group to `All`, openZro
+rejects the push.
+</Note>
+
+## Change a group's membership
+
+1. Open the group in Okta → `People` tab.
+2. Add or remove users with `Assign people` / the remove icon.
+3. Save.
+
+The push side carries the membership delta; openZro adds or removes
+the affected users from the group record. Note that the active
+NetworkMap on a peer **is not refreshed immediately on the SCIM
+push** — the user's `AutoGroups` list is rewritten and persisted,
+but the peer-side reach only recomputes the next time the account's
+NetworkMap fans out for another reason (policy save, peer enrol,
+directive update). If you need an offboarding to take effect
+immediately, follow the SCIM remove with any account-level mutation
+that bumps the network serial — saving a no-op policy edit is the
+quickest path. Closing the gap so the SCIM path fans out on its
+own is tracked in [openzro/openzro#104](https://github.com/openzro/openzro/issues/104).
+
+Adding a new user to the group does NOT immediately add their
+peers — peers are linked to the user through the openZro Setup Key
+flow. New peers enrolled by the user after the membership change
+will inherit the group; existing peers stay where they are unless
+the user re-enrols.
+
+## Decommission an Okta-synced group
+
+There are two paths and they behave differently:
+
+* **Remove the openZro application assignment** in Okta admin →
+  `Applications` → `Manage Assignments`. The next SCIM sync sees
+  the group as no longer assigned to openZro. openZro keeps the
+  group record but its `Peers` list shrinks to whatever peers
+  enrolled before the unassignment; no new peers will be added.
+* **Delete the group in Okta** (the destructive path) → the next
+  SCIM sync issues a delete operation against the openZro SCIM
+  endpoint. openZro removes the group if it is not currently
+  referenced by any policy, route, or network resource. If it
+  *is* referenced, the SCIM delete is rejected with a `409
+  Conflict` — clear the references in openZro first, then re-issue
+  the deletion in Okta.
+
+<Note>
+A regular openZro admin cannot delete an Okta-synced group from
+the openZro dashboard. Only the SCIM service user has permission
+to delete a group with `Issued: integration`. This is intentional:
+the IdP is the source of truth, and a dashboard-side deletion
+would be silently undone on the next sync.
+</Note>
+
+## Backlinks
+
+* [Provision Users and Groups from Okta](/manage/team/idp-sync/okta-sync) — the one-time setup
+  page for the OIDC + SCIM integration between openZro and Okta.
+* [Manage Access with Groups and Policies](/manage/access-control/manage-network-access) — how to use
+  the synced groups as source / destination selectors.

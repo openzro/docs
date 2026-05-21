@@ -1,0 +1,97 @@
+import {
+    Note
+} from "@/components/mdx";
+
+# Manage JWT-Claim Groups
+
+You followed a `Manage in your IdP` link from the openZro
+dashboard's Groups page. The group you came from has `Issued: jwt`
+in openZro — its membership is derived from a **JWT claim** that
+your identity provider emits at login time, not from a SCIM push or
+a Graph poll.
+
+JWT-claim groups are stateless on the openZro side: there is no
+periodic sync interval. The group memberships you see in openZro
+are a projection of the most recent login from each user, computed
+on the fly from the `id_token` your IdP returned. To change
+membership, change the claim at the IdP — the next login reflects
+the new state.
+
+This page covers the two operator tasks that come up: adjusting
+which claim openZro reads, and re-scoping a JWT-claim group's
+lifecycle.
+
+## How JWT-claim groups work
+
+When a user signs in:
+
+1. The IdP issues an `id_token` carrying a configurable group claim
+   (default key: `roles`; the key is set per account in `Settings`
+   → `Authentication` → `JWT group sync claim`).
+2. openZro reads the claim, splits it into individual group names,
+   and binds the user to those groups for the duration of the
+   session.
+3. Groups that the user already belonged to and that no longer
+   appear in the new claim are dropped from the user — but only
+   for groups previously created via `Issued: jwt`. Groups with
+   `Issued: api` or `Issued: integration` are untouched by JWT
+   sync (they have their own lifecycle).
+
+A group named in the JWT claim that doesn't exist on the openZro
+side is created automatically with `Issued: jwt`. A group that no
+longer appears in any active session's JWT claim does NOT get
+auto-deleted — it stays as an empty group until an operator removes
+it from the openZro dashboard or until it gets re-bound on a future
+login.
+
+## Adjust which claim openZro reads
+
+The group-claim key is account-wide:
+
+* Open openZro → `Settings` → `Authentication`.
+* Edit `JWT group sync claim` (default: `roles`). Common
+  alternative values: `groups`, `memberOf`, `cognito:groups`.
+* Save. The next login from any user will read the new claim key.
+
+<Note>
+The claim must be either a JSON array of strings or a single
+string (treated as a one-element list). Nested objects, claim URIs
+with mixed-case path segments, and claims keyed on the user object
+rather than the token are not supported — flatten them at your IdP
+or use a token-mapper to project them into the top-level claim.
+</Note>
+
+## Rename a JWT-claim group
+
+Renaming a JWT-claim group on the openZro side alone is a no-op —
+the next login from a user carrying the old claim will re-create
+the original name as a new group. To rename properly:
+
+1. Update the source-of-truth claim at your IdP (Auth0 Rules, Okta
+   token inline hooks, Keycloak protocol mappers, Cognito pre-token
+   trigger Lambda — the exact path depends on the IdP).
+2. Have any logged-in users sign out and back in (or wait for their
+   session to refresh).
+3. The new group name appears on the next login. The old name
+   stays empty in openZro until you remove it manually.
+
+## Decommission a JWT-claim group
+
+Remove the group name from the claim at your IdP. Existing user
+sessions retain the old group binding until they log out / their
+session expires; new logins drop the binding.
+
+Once no logged-in user carries the group name in their claim, the
+group sits empty on the openZro side. A regular admin CAN delete
+an empty `Issued: jwt` group from the openZro dashboard — unlike
+`Issued: integration` groups, JWT groups are not protected against
+manual deletion. If openZro policies, routes, or resources still
+reference the group, the dashboard rejects the deletion until you
+clear those references.
+
+## Backlinks
+
+* [JWT Authentication](/selfhosted/identity-providers/) — the
+  underlying OIDC / JWT auth setup for self-hosted openZro.
+* [Manage Access with Groups and Policies](/manage/access-control/manage-network-access) — how to
+  use JWT-claim groups as source / destination selectors.
