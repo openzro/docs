@@ -13,8 +13,16 @@
 #      resolve to physical files (Cloudflare Pages doesn't reliably
 #      proxy splat rewrites declared in `_redirects`).
 #
-# Pull requests build but don't deploy — they get a preview URL
-# from Cloudflare via the wrangler action's `branch: <pr branch>`.
+# Pull requests deploy to a Cloudflare preview branch rather than
+# production, via the wrangler action's `branch: <pr branch>`, using
+# the `preview` environment's credentials.
+#
+# When the `preview` environment has no CLOUDFLARE_API_TOKEN the
+# publish step is skipped rather than failed: the build is the part
+# that validates a docs change, and a missing preview credential is a
+# repo-configuration gap, not a defect in the pull request. Add the
+# token to the `preview` environment and previews start working with
+# no change here.
 
 name: Deploy docs
 
@@ -36,6 +44,10 @@ concurrency:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    # Lifted to job level so the publish step can test for its presence:
+    # the `secrets` context is not available in a step-level `if`.
+    env:
+      CF_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     environment:
       name: ${{ github.event_name == 'push' && 'production' || 'preview' }}
       url: ${{ steps.publish.outputs.deployment-url }}
@@ -54,8 +66,16 @@ jobs:
       - name: Build for Cloudflare
         run: npm run build:cf
 
+      - name: Note a missing preview credential
+        if: env.CF_API_TOKEN == ''
+        run: |
+          echo "::notice::CLOUDFLARE_API_TOKEN is not set for the \
+          '${{ github.event_name == 'push' && 'production' || 'preview' }}' \
+          environment -- built successfully, skipping the deploy."
+
       - name: Publish to Cloudflare Pages
         id: publish
+        if: env.CF_API_TOKEN != ''
         uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}

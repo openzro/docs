@@ -105,6 +105,59 @@ openZro runs in single account mode by default since v0.10.1. All users joining 
 |----------|---------|-------------|
 | `OPENZRO_DISABLE_ANONYMOUS_METRICS` | `false` | Disable anonymous usage metrics |
 
+### Flow Archive (cold storage)
+
+Written by the management server's archive sink and read back by the
+dashboard's network-traffic view. Full guides:
+[GCS](/selfhosted/flow-archive-gcs) and
+[Compaction](/selfhosted/flow-archive-compaction).
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OPENZRO_FLOW_ARCHIVE_FORMAT` | `ndjson` | `parquet` or `ndjson`. **Set `parquet`** — the `ndjson` default is write-only and cannot be read from the dashboard or compacted. |
+
+**Google Cloud Storage**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OPENZRO_FLOW_ARCHIVE_GCS_BUCKET` | - | Destination bucket. Enables the sink. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_PREFIX` | - | Key prefix. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_PROJECT_ID` | - | Informational. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_CREDENTIALS_FILE` | - | Service-account JSON path, for writes and deletes. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_CREDENTIALS_JSON` | - | The same credential inline. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_HMAC_KEY_ID` | - | HMAC interoperability key. Required for **reads** — DuckDB rejects service-account JSON. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_HMAC_SECRET` | - | Secret for the HMAC key above. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_ENDPOINT` | - | Override the storage endpoint. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_FLUSH_INTERVAL` | `15m` | Forces a rotation once buffered data is this stale. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_MAX_EVENTS_PER_FILE` | `100000` | Rotates after this many events. |
+| `OPENZRO_FLOW_ARCHIVE_GCS_BUFFER_SIZE` | `50000` | In-memory queue capacity. |
+
+**S3 and S3-compatible**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OPENZRO_FLOW_ARCHIVE_S3_BUCKET` | - | Destination bucket. Enables the sink. |
+| `OPENZRO_FLOW_ARCHIVE_S3_PREFIX` | - | Key prefix. |
+| `OPENZRO_FLOW_ARCHIVE_S3_REGION` | - | Bucket region. |
+| `OPENZRO_FLOW_ARCHIVE_S3_ENDPOINT` | - | Custom endpoint (MinIO, R2, GCS interop). |
+| `OPENZRO_FLOW_ARCHIVE_S3_ACCESS_KEY` | - | Signs reads, writes and deletes alike. |
+| `OPENZRO_FLOW_ARCHIVE_S3_SECRET_KEY` | - | Secret for the key above. |
+| `OPENZRO_FLOW_ARCHIVE_S3_FLUSH_INTERVAL` | `15m` | As per GCS. |
+| `OPENZRO_FLOW_ARCHIVE_S3_MAX_EVENTS_PER_FILE` | `100000` | As per GCS. |
+| `OPENZRO_FLOW_ARCHIVE_S3_BUFFER_SIZE` | `50000` | As per GCS. |
+
+**Read path (DuckDB)**
+
+Tuning for archive queries. Raise the limits before assuming a slow
+cold query needs more compaction.
+
+| Variable | Description |
+|----------|-------------|
+| `OPENZRO_FLOW_ARCHIVE_QUERY_TIMEOUT` | Per-query deadline. |
+| `OPENZRO_FLOW_ARCHIVE_MEMORY_LIMIT` | DuckDB memory ceiling. |
+| `OPENZRO_FLOW_ARCHIVE_THREADS` | DuckDB worker threads. |
+| `OPENZRO_FLOW_ARCHIVE_MAX_CONCURRENT_QUERIES` | Archive queries served at once. |
+
 ## Runtime Environment Variables (OZ_ prefix)
 
 These variables can override CLI flags at runtime. The naming convention is `OZ_<FLAG_NAME>` where the flag name is uppercased and hyphens are replaced with underscores.

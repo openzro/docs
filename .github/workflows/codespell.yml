@@ -20,4 +20,7 @@ jobs:
         uses: codespell-project/actions-codespell@v2
         with:
           skip: package.json,package-lock.json
-          ignore_words_list: erro,wasn
+          # aks: Azure Kubernetes Service, read as a typo for "ask".
+          # fpr: the field name in `gpg --with-colons` output, matched
+          #      literally by an awk pattern in the Linux install guide.
+          ignore_words_list: erro,wasn,aks,fpr
