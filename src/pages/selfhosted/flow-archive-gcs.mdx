@@ -1,4 +1,4 @@
-import { Note } from '@/components/mdx'
+import { Note, Warning } from '@/components/mdx'
 
 # Flow Archive — Google Cloud Storage (native)
 
@@ -44,11 +44,36 @@ has `roles/storage.objectCreator` on the bucket. Outside GCP,
 mount a Service Account JSON and pick **file path** or paste the
 JSON inline.
 
+### Object format — pick this before you write anything
+
+`OPENZRO_FLOW_ARCHIVE_FORMAT` selects the encoding, and the choice
+is not cosmetic:
+
+| Value | Written | Readable from the dashboard | Compactable |
+|---|---|---|---|
+| `ndjson` (default) | gzipped NDJSON | **no** | no |
+| `parquet` | Apache Parquet | yes | yes |
+
+<Warning>
+The default is `ndjson`, kept only so archives written before
+Parquet support keep working. It is **write-only**: archive reads go
+through DuckDB, which globs `*.parquet` exclusively, so an archive
+written as NDJSON can never be queried from the dashboard's
+network-traffic view and cannot be compacted. Set
+`OPENZRO_FLOW_ARCHIVE_FORMAT=parquet` before the first event lands,
+or you will have a bucket full of data the product cannot read.
+</Warning>
+
+Changing the value later affects new objects only. Objects already
+written in the other format stay as they are, and the reader keeps
+ignoring the NDJSON ones.
+
 ### Via env vars (boot-time baseline)
 
 For self-host operators who manage configuration in env files:
 
 ```bash
+export OPENZRO_FLOW_ARCHIVE_FORMAT="parquet"
 export OPENZRO_FLOW_ARCHIVE_GCS_BUCKET="openzro-flow-archive"
 export OPENZRO_FLOW_ARCHIVE_GCS_PREFIX="prod"
 
@@ -84,11 +109,19 @@ move between the two (or run both side-by-side) without changing
 downstream tooling.
 
 ```
-<prefix>/year=2026/month=04/day=26/account=<id>/<unix-nano>-<rand>.ndjson.gz
+<prefix>/year=2026/month=04/day=26/account=<id>/<unix-nano>-<rand>.parquet
 ```
 
-Each object is gzipped NDJSON: one JSON event per line, `gzip`-
-compressed. BigQuery, DuckDB, ClickHouse, and Athena all read
+The extension follows the format: `.parquet` for
+`OPENZRO_FLOW_ARCHIVE_FORMAT=parquet`, `.ndjson.gz` for the legacy
+`ndjson` default. Partitioning, prefix and file naming are identical
+either way.
+
+The examples below use the NDJSON layout because they predate
+Parquet support and read cleanly with `zcat`. For a Parquet archive,
+substitute `*.parquet` in the URIs and drop the `gzip` handling ---
+DuckDB, BigQuery, ClickHouse and Athena all read Parquet natively,
+and Parquet is what openZro's own reader expects. BigQuery, DuckDB, ClickHouse, and Athena all read
 this format natively. For BigQuery specifically:
 
 ```sql
@@ -112,14 +145,25 @@ WHERE year = 2026 AND month = 4 AND account = 'acct-1' AND type = 'drop';
 For the workload identity (GKE) or service account (file/JSON):
 
 ```yaml
-# Bucket-level binding, not project-level. The sink only writes;
-# never reads or deletes.
+# Bucket-level binding, not project-level.
 roles:
   - roles/storage.objectCreator
 ```
 
-Do not grant `roles/storage.admin` — the sink does not need it
-and the principle of least privilege says no.
+That covers the **write path only**, which is all the sink itself
+does. Two later stages need more, on the bucket and nothing wider:
+
+| Stage | Needs | Role that covers it |
+|—|—|—|
+| Sink writing events | `storage.objects.create` | `roles/storage.objectCreator` |
+| Dashboard reading the archive | `storage.objects.get`, `storage.objects.list` | `roles/storage.objectViewer` |
+| [Compaction](/selfhosted/flow-archive-compaction) | the above plus `storage.objects.delete` | `roles/storage.objectAdmin` |
+
+Grant the compaction principal `roles/storage.objectAdmin` on the
+bucket only when you actually run compaction with
+`--delete-originals`; a dry run needs no delete permission. Do not
+grant `roles/storage.admin` anywhere — nothing here manages
+buckets, and the principle of least privilege says no.
 
 ## How the data gets to the bucket
 
