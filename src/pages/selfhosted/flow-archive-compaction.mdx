@@ -1,0 +1,272 @@
+import { Note, Warning } from '@/components/mdx'
+
+export const description =
+  'Compact the flow archive into one Parquet object per account per day, so cold queries stop paying for thousands of small-file round trips.'
+
+# Flow Archive — Compaction
+
+The archive sink rotates to a new object whenever the flush
+interval elapses or the per-file event cap is reached, whichever
+comes first. Across accounts and days that adds up to hundreds or
+thousands of small objects, and a query that reaches into the
+archive pays a round trip for each one. The data volume is not the
+problem — the file count is.
+
+Compaction rewrites a day of archived Parquet into **one object per
+account**, sorted, then deletes the originals once it has verified
+the replacement. Nothing about the data changes: same rows, same
+partition layout, same schema.
+
+Measured on one production bucket:
+
+| | Before | After |
+|---|---|---|
+| Objects in a single day | 579 | 4 |
+| Objects in the bucket (5 months) | 13,185 | 219 |
+| Cold query, one month | 85–93 s | 5 s |
+
+The remaining five seconds are fixed per-query overhead — opening
+the store, planning, the first byte from object storage. That is
+why the dashboard warns you when a query reaches past the hot
+retention window, rather than pretending cold and hot are the same
+thing.
+
+## Prerequisite: the archive must be Parquet
+
+<Warning>
+Compaction only operates on `*.parquet` objects. An archive written
+with the default `OPENZRO_FLOW_ARCHIVE_FORMAT=ndjson` has nothing
+for it to compact, and cannot be read from the dashboard either.
+Set the format to `parquet` first — see
+[Object format](/selfhosted/flow-archive-gcs#object-format-pick-this-before-you-write-anything).
+</Warning>
+
+## The command
+
+```bash
+openzro-mgmt flow-archive compact \
+  --from 2026-06-01 \
+  --to   2026-06-30 \
+  --manifest /var/log/openzro/compact-june.jsonl
+```
+
+| Flag | Notes |
+|---|---|
+| `--from`, `--to` | Required. Inclusive range of **UTC** days, `YYYY-MM-DD`. |
+| `--manifest` | Required. Path for the JSONL run log. Must **not** already exist. |
+| `--delete-originals` | Delete the originals after the replacements verify. Omitting it makes the run a dry run. |
+| `--concurrency` | Days processed at once. Default `1`. |
+| `--provider`, `--bucket`, `--prefix`, `--region`, `--endpoint` | Override individual archive fields. |
+| `--gcs-credentials-file` | GCS service-account file used for writes and deletes. |
+
+Credentials are deliberately **not** flags. They come from the
+environment or from the stored integration, so they never land in
+shell history or in a process list.
+
+### Dry run is the default
+
+Without `--delete-originals` the command does everything except the
+delete: it reads the day, writes the compacted objects, verifies
+them, and records what it would have removed. Every way this can go
+wrong — bad credentials, missing permission, an unreadable object,
+a fingerprint mismatch — surfaces before anything is destroyed.
+
+Run a dry run on one day first. The manifest tells you exactly what
+the real run will do.
+
+## Where the archive is
+
+The command resolves the archive location in four steps, and the
+order matters more than it looks:
+
+1. `OPENZRO_FLOW_ARCHIVE_*` environment variables.
+2. `--provider` / `--bucket` / `--prefix` / `--region` /
+   `--endpoint`, each overriding that one field.
+3. **If provider and bucket are both set by now, nothing else is
+   read** — no management config, no database.
+4. Otherwise, the archive configured in the dashboard under
+   `Settings` → `Integrations`, with the flags layered on top.
+
+Step 3 is an escape hatch, not a preference. This command deletes
+objects, so pointing it at a copy of the bucket — or working around
+a deployment whose management config will not load — must not depend
+on the database being up.
+
+Step 4 is where a normal deployment lands. A cluster that configured
+its bucket in the dashboard has no `OPENZRO_FLOW_ARCHIVE_*_BUCKET`
+anywhere, and its credential exists only as an encrypted row;
+reading that row is what avoids keeping a second copy of the
+service-account key.
+
+<Note>
+The environment is all-or-nothing. Without a bucket it describes no
+archive at all, so exporting only a prefix does **not** override the
+dashboard. Use a flag to change one field.
+</Note>
+
+## Credentials
+
+### GCS needs two
+
+This is the one that catches people. Reads go through DuckDB, whose
+GCS secret accepts **only** HMAC interoperability keys and rejects
+service-account JSON. Writes and deletes use the service account.
+One bucket, two credentials:
+
+```bash
+# Reads (DuckDB). Mint under Cloud Storage → Settings → Interoperability.
+export OPENZRO_FLOW_ARCHIVE_GCS_HMAC_KEY_ID="GOOG1E..."
+export OPENZRO_FLOW_ARCHIVE_GCS_HMAC_SECRET="..."
+
+# Writes and deletes.
+export OPENZRO_FLOW_ARCHIVE_GCS_CREDENTIALS_FILE="/etc/openzro/sa.json"
+```
+
+Without the HMAC pair the run fails on the first read, before it
+writes anything.
+
+### S3 needs one
+
+`OPENZRO_FLOW_ARCHIVE_S3_ACCESS_KEY` and `_SECRET_KEY` sign reads,
+writes and deletes alike. No split.
+
+## The manifest
+
+One JSON object per line, one line per day processed. Fields:
+
+| Field | Meaning |
+|---|---|
+| `day` | The UTC day this line covers. |
+| `dry_run` | Whether `--delete-originals` was omitted. |
+| `skipped`, `skipped_because` | Day was left alone, and why (e.g. already compacted). |
+| `objects_before`, `objects_after` | Object count for the day. |
+| `rows` | Rows carried across. |
+| `bytes_written`, `bytes_planned` | Bytes actually written; on a dry run, what would have been. |
+| `accounts` | Accounts present in the day. |
+| `orphans` | Objects that belonged to no partition the rewrite produced. Should be empty. |
+| `fingerprint` | Row count plus two order-independent checksums. |
+| `error` | Set when the day failed. Other days in the range still run. |
+
+The manifest path must not already exist, so a run can never
+silently append to another run's record. Configuration and bootstrap
+errors are raised **before** the file is created, which means a run
+that failed on bad credentials can be retried with the same path.
+
+## How a day is verified
+
+The compactor does not compare what it *sent*; it re-reads what
+**landed in the store** and fingerprints that. The fingerprint is
+the row count plus two independent order-insensitive checksums, so
+neither reordering rows nor swapping two identical ones can pass as
+equal.
+
+Originals are deleted only after the replacement for their day
+verifies. A failed verification leaves both sides intact and marks
+the day in the manifest.
+
+## Running it daily as a CronJob
+
+The Helm chart ships the CronJob. Minimum to switch it on:
+
+```yaml
+management:
+  archiveCompaction:
+    enabled: true
+    schedule: "17 4 * * *"   # UTC
+    lookbackDays: 2
+    deleteOriginals: true
+    envFromSecret:
+      # value is "<secret-name>/<key>"
+      OPENZRO_FLOW_ARCHIVE_GCS_HMAC_KEY_ID: "openzro-flow-archive-hmac/keyId"
+      OPENZRO_FLOW_ARCHIVE_GCS_HMAC_SECRET: "openzro-flow-archive-hmac/secret"
+```
+
+<Warning>
+The HMAC pair goes in `archiveCompaction.envFromSecret`, **not** in
+`management.envFromSecret`. The CronJob is a separate pod and does
+not inherit the management deployment's environment. Putting it in
+the wrong block produces a job that fails on its first read with no
+other symptom.
+</Warning>
+
+| Value | Default | Notes |
+|---|---|---|
+| `enabled` | `false` | |
+| `schedule` | `"17 4 * * *"` | UTC. |
+| `lookbackDays` | `2` | Which day to compact, counted back from today. |
+| `deleteOriginals` | `false` | |
+| `suspend` | `false` | Pause without removing the CronJob. |
+| `concurrency` | `1` | |
+| `backoffLimit` | `0` | No retries — see below. |
+| `startingDeadlineSeconds` | `3600` | |
+| `tmpSizeLimit` | `2Gi` | Scratch space for the rewrite. |
+| `provider`, `bucket`, `prefix`, `region`, `endpoint` | `""` | Same overrides as the flags. |
+| `resources` | 200m / 512Mi → 2 / 2Gi | Raise for large days. |
+
+### SQLite deployments must name the bucket explicitly
+
+The CronJob refuses to render on a deployment whose management store
+is SQLite, and says so at `helm` time rather than failing at 04:17.
+
+Reading the archive that was configured in the dashboard means
+opening the management store. On SQLite that store is a file on a
+volume the management pod mounts, and most storage classes refuse a
+second attach — so the Job cannot reach it. Either enable Postgres
+or MySQL, or name the archive explicitly so step 3 of the resolution
+order short-circuits before any store is opened:
+
+```yaml
+management:
+  archiveCompaction:
+    enabled: true
+    provider: gcs
+    bucket: openzro-flow-archive
+    envFromSecret:
+      OPENZRO_FLOW_ARCHIVE_GCS_HMAC_KEY_ID: "openzro-flow-archive-hmac/keyId"
+      OPENZRO_FLOW_ARCHIVE_GCS_HMAC_SECRET: "openzro-flow-archive-hmac/secret"
+```
+
+### Why `lookbackDays: 2` and not 1
+
+Compaction works on whole UTC days, and the archive reader keeps a
+safety margin so that a query near the boundary still sees events
+whose flush landed late. Compacting yesterday would race that
+margin. Two days back is settled.
+
+### Why zero retries
+
+A failed compaction leaves the originals intact, so there is nothing
+to clean up and nothing lost. An automatic retry would just repeat a
+failure that is almost always environmental — a rotated credential,
+a revoked binding — and bury the signal. Fix the cause; the next
+night's run covers the day.
+
+## Verifying
+
+```bash
+# Objects for a day, before and after.
+gcloud storage ls --recursive \
+  gs://openzro-flow-archive/prod/year=2026/month=6/day=1/ | wc -l
+
+# What the run actually did.
+jq -c '{day, objects_before, objects_after, rows, orphans}' \
+  /var/log/openzro/compact-june.jsonl
+```
+
+<Note>
+Compacted partitions are written by DuckDB's `PARTITION_BY`, which
+emits `month=6`, not `month=06`. Both spellings coexist in a bucket
+that has been partly compacted, and both are read correctly. Do not
+"fix" one to match the other.
+</Note>
+
+## Trade-offs
+
+- **Compaction is not retention.** It reduces object count, not
+  bytes or age. Age-based deletion stays a bucket lifecycle policy.
+- **It rewrites, so it costs writes.** A day is read once and
+  written once. On object storage that bills per operation this is
+  cheaper than the queries it saves, but it is not free.
+- **A partly compacted bucket is normal.** Days that have run and
+  days that have not read identically; there is no migration state
+  to track.

@@ -564,6 +564,10 @@ export const docsNavigation = [
             href: '/selfhosted/flow-archive-gcs',
           },
           {
+            title: 'Flow Archive — Compaction',
+            href: '/selfhosted/flow-archive-compaction',
+          },
+          {
             title: 'Management Geolocation Database',
             href: '/selfhosted/geo-support',
           },
