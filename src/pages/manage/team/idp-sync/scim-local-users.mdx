@@ -1,0 +1,154 @@
+import {Note, Warning} from "@/components/mdx";
+
+# Provision Local Users via SCIM
+
+openZro can manage **local users** (email and password accounts stored in the embedded
+[Dex](https://dexidp.io/)) directly from an identity governance (IGA) or provisioning
+system over SCIM 2.0, with no external identity provider. Your IGA creates users with an
+initial password, manages their group memberships, resets passwords, and deactivates or
+deletes them; openZro keeps the openZro account and the Dex credential in sync.
+
+<Warning>
+    **Dex must use Postgres storage.** On SQLite or in-memory storage, Dex v2.45 and v2.46
+    deadlock their whole token endpoint the first time a local user's session is refreshed,
+    and every later login hangs until Dex restarts. This is an upstream Dex bug
+    ([dexidp/dex#4209](https://github.com/dexidp/dex/issues/4209)); the fix is pending in
+    [dexidp/dex#4991](https://github.com/dexidp/dex/pull/4991).
+
+    The Helm chart already points Dex at Postgres when openZro's store is Postgres. The
+    docker-compose quickstart configures Dex with SQLite: do **not** enable local users there
+    until a Dex release with the fix is available.
+</Warning>
+
+## Requirements
+
+- The embedded Dex is configured (`OPENZRO_DEX_GRPC_ADDR`) and uses **Postgres** storage.
+- **Every** management replica runs a version that supports SCIM local users before you
+  enable creation. Older replicas do not protect local users from some account-wide writes.
+- A [service user](/manage/public-api) with the **admin** role and a personal
+  access token for it. Your IGA authenticates with that token.
+
+## Enabling local user creation
+
+Set the following on every management replica and restart it:
+
+```bash
+OPENZRO_SCIM_LOCAL_USERS_ENABLED=true
+```
+
+This switch only controls **creating new** local users. If you turn it off later, existing
+local users keep working: they can still log in, and your IGA can still reset, deactivate
+and delete them.
+
+We recommend also enabling **Require 2FA for local accounts** under
+`Settings > Authentication`, because Dex's password login has no second factor of its own.
+To restrict which email domains can be provisioned, set the account's
+`allowed_email_domains` setting through the API (`PUT /api/accounts/{id}`); SCIM creation
+honors that list.
+
+## Authentication
+
+Every request uses the service user's token:
+
+```bash
+SCIM=https://<your-management-domain>/scim/v2
+TOKEN=nbp_...   # personal access token of an admin service user
+```
+
+## Create a user
+
+Send the RFC 7643 `password` attribute with the create:
+
+```bash
+curl -X POST "$SCIM/Users" \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/scim+json' \
+  -d '{
+        "userName": "ana@example.com",
+        "displayName": "Ana",
+        "password": "<initial password>",
+        "active": true
+      }'
+```
+
+- `userName` must be a plain email address. It cannot be changed later.
+- The password must be at least 12 characters and at most 72 bytes of UTF-8.
+- The password is never returned, logged or stored by openZro; only Dex keeps a bcrypt hash.
+- The response `id` is the openZro user ID. On first login the user lands on this account
+  with the groups you assigned; no second account is created.
+
+A request without `password` creates an ordinary SCIM user, as before.
+
+## Manage group memberships
+
+Use the standard `/Groups` endpoints. For example, to add a user to a group:
+
+```bash
+curl -X PATCH "$SCIM/Groups/<group-id>" \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/scim+json' \
+  -d '{"Operations": [{"op": "add", "path": "members", "value": [{"value": "<user-id>"}]}]}'
+```
+
+## Reset a password
+
+A password reset must be an **isolated** operation. Either send a PATCH whose single
+operation replaces the password:
+
+```bash
+curl -X PATCH "$SCIM/Users/<user-id>" \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/scim+json' \
+  -d '{"Operations": [{"op": "replace", "path": "password", "value": "<new password>"}]}'
+```
+
+or a PUT that carries the password with the rest of the user unchanged. A request that
+changes the password together with anything else is rejected with `400`.
+
+A reset revokes the user's refresh tokens. It does **not** end access tokens that were
+already issued, nor disconnect devices that are already connected. To cut access
+immediately, deactivate the user.
+
+## Deactivate or delete a user
+
+Deactivation and deletion are **permanent** for local users:
+
+```bash
+# Deactivate: the user stays visible to SCIM as inactive.
+curl -X PATCH "$SCIM/Users/<user-id>" \
+  -H "Authorization: Bearer $TOKEN" -H 'Content-Type: application/scim+json' \
+  -d '{"Operations": [{"op": "replace", "path": "active", "value": false}]}'
+
+# Delete: the user disappears from SCIM (404 afterwards).
+curl -X DELETE "$SCIM/Users/<user-id>" -H "Authorization: Bearer $TOKEN"
+```
+
+Both block the user immediately and then:
+
+1. disconnect the user's devices from the network;
+2. delete the user's personal access tokens;
+3. revoke the user's refresh tokens;
+4. remove the user's credential from Dex.
+
+A delete also removes the user's group memberships. Deleting a user from the dashboard or
+the REST API follows the same steps.
+
+<Note>
+    A local user cannot be re-activated, and the email of a deactivated or deleted local
+    user cannot be provisioned again. If a user was deactivated by mistake, provision them
+    with a different email.
+</Note>
+
+## Errors and retries
+
+| Status | Meaning | What to do |
+|--------|---------|------------|
+| `400`  | The request is invalid or not allowed: password policy, a mixed change with `password`, a rename, re-activation, a disallowed email domain, or creation not enabled. | Fix the request. Nothing was changed. |
+| `404`  | The user does not exist, is still being created, or was deleted. | — |
+| `409`  | The email already belongs to a user, or Dex already holds a credential for it that openZro does not own. | Investigate; nothing was overwritten. |
+| `500`  | An internal step failed (for example, Dex was unreachable). | **Retry the same request.** A create or a deactivation/delete resumes where it stopped. |
+
+While a create or a deactivation is incomplete, the user has no access. Retrying the same
+request is always safe.
+
+## Limitations
+
+- An account that still has local users cannot be deleted. Delete the local users first.
+- Users created through an external identity provider are not affected by any of the above.

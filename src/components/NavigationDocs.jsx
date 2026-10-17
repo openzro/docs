@@ -337,6 +337,10 @@ export const docsNavigation = [
                 title: 'Keycloak',
                 href: '/manage/team/idp-sync/keycloak-sync',
               },
+              {
+                title: 'Local users (SCIM)',
+                href: '/manage/team/idp-sync/scim-local-users',
+              },
             ],
           },
           {
