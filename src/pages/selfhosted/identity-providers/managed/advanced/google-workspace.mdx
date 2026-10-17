@@ -13,7 +13,7 @@ Use Google accounts for authentication with openZro. This supports both personal
 ## Standalone Setup (Advanced)
 
 <Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
 We highly recommend using the simpler setup that adds Google as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended) section in the main Google Workspace documentation.
 
@@ -22,7 +22,7 @@ The standalone setup below replaces your embedded IdP entirely and is only recom
 
 Use Google Workspace as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Google Workspace administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 <Note>
 Beginning with openZro version v0.23.6 and onwards, the Google Workspace IdP manager no longer requires the custom admin role called `User and Schema Management`. We now use a read-only role for user information.
@@ -223,7 +223,7 @@ You've configured all required resources in Google Workspace. Continue with the 
 ---
 
 <Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
 We highly recommend using the simpler setup that adds Google as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended) section in the main Google Workspace documentation.
 </Note>
@@ -233,4 +233,4 @@ We highly recommend using the simpler setup that adds Google as an external IdP 
 - [Google Cloud Console](https://console.cloud.google.com/)
 - [Google OAuth 2.0 Documentation](https://developers.google.com/identity/protocols/oauth2)
 - [Google Workspace Admin Console](https://admin.google.com/)
-- [Embedded IdP Overview](/selfhosted/identity-providers/local)
+- [Embedded IdP Overview](/selfhosted/identity-providers)

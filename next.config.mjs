@@ -50,6 +50,13 @@ const nextConfig = {
                 permanent: true,
             },
             {
+                // The NetBird-derived embedded-IdP page described features openZro
+                // does not have; local users are provisioned over SCIM instead.
+                source: '/selfhosted/identity-providers/local',
+                destination: '/manage/team/idp-sync/scim-local-users',
+                permanent: true,
+            },
+            {
                 source: '/docs/overview/acls',
                 destination: '/manage/access-control/manage-network-access',
                 permanent: true,

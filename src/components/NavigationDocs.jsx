@@ -590,10 +590,6 @@ export const docsNavigation = [
             href: '/selfhosted/identity-providers',
           },
           {
-            title: 'Local User Management',
-            href: '/selfhosted/identity-providers/local',
-          },
-          {
             title: 'Disable Local Auth',
             href: '/selfhosted/identity-providers/disable-local-authentication',
           },

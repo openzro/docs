@@ -6,6 +6,7 @@
 /how-to/networks-concept  /manage/networks  301
 /docs/getting-started/installation  /get-started/install  301
 /docs/overview/personal-access-tokens  /manage/public-api  301
+/selfhosted/identity-providers/local  /manage/team/idp-sync/scim-local-users  301
 /docs/overview/acls  /manage/access-control/manage-network-access  301
 /docs/how-to-guides/nameservers  /manage/dns/internal-dns-servers  301
 /how-to/manage-dns-in-your-network  /manage/dns  301
