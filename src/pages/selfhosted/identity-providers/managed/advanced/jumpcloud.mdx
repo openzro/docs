@@ -7,7 +7,7 @@ import {Note} from "@/components/mdx";
 ## Standalone Setup (Advanced)
 
 <Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
 We highly recommend using the simpler setup that adds JumpCloud as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended) section in the main JumpCloud documentation.
 
@@ -16,7 +16,7 @@ The standalone setup below replaces your embedded IdP entirely and is only recom
 
 Use JumpCloud as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced JumpCloud administrators as it also requires additional setup and ongoing maintenance.
 
-For most deployments, the [embedded IdP](/selfhosted/identity-providers/local) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+For most deployments, the [embedded IdP](/selfhosted/identity-providers) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 ### Prerequisites
 
@@ -269,7 +269,7 @@ The service should now start successfully, and the error should be resolved.
 ---
 
 <Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers/local) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
 
 We highly recommend using the simpler setup that adds JumpCloud as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended) section in the main JumpCloud documentation.
 </Note>
@@ -278,4 +278,4 @@ We highly recommend using the simpler setup that adds JumpCloud as an external I
 
 - [JumpCloud Documentation](https://jumpcloud.com/support)
 - [JumpCloud Admin Console](https://console.jumpcloud.com/)
-- [Embedded IdP Overview](/selfhosted/identity-providers/local)
+- [Embedded IdP Overview](/selfhosted/identity-providers)

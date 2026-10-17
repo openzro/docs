@@ -21,19 +21,19 @@ authentication is handled by the configured identity provider. Upon successful a
 issues a [JSON Web Token (JWT)](https://en.wikipedia.org/wiki/JSON_Web_Token) containing the user's identity and claims. The Management Service validates this token to
 verify the user's identity and grant access.
 
-By default, openZro does not require an external identity provider. New installations include a built-in authentication
-system that lets you create and manage users directly through the Dashboard using local username and password authentication.
-External identity providers are entirely optional. Add them when you need SSO integration with Google, Microsoft, Okta, or
-self-hosted identity providers like Keycloak or Authentik, and more.
+openZro does not require an external identity provider. It bundles [Dex](https://dexidp.io/), which signs users in,
+and new installations start with a bootstrap administrator account for the first login. External identity providers are
+optional. Add them when you need SSO with Google, Microsoft, Okta, or self-hosted identity providers like Keycloak or
+Authentik.
 
-## Local User Management
+## Local Users
 
-Refer to the [Local User Management](/selfhosted/identity-providers/local) page for detailed instructions on using local users
-authentication.
+Local users are email and password accounts stored in the bundled Dex. They are provisioned by an identity governance or
+provisioning system over SCIM 2.0. See [Provision Local Users via SCIM](/manage/team/idp-sync/scim-local-users).
 
 ## External Identity Providers
 
-openZro supports connecting **multiple external identity providers** [alongside local user management](/selfhosted/identity-providers/local).
+openZro supports connecting **multiple external identity providers** [alongside local users](/manage/team/idp-sync/scim-local-users).
 This allows users to sign in with their existing accounts from services like Google, Microsoft and your corporate or self-hosted identity
 provider, while still maintaining the option for local username/password authentication.
 
