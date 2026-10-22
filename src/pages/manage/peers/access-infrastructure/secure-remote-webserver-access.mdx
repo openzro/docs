@@ -1,3 +1,5 @@
+import {Note} from "@/components/mdx";
+
 # Secure Remote Web Server Access: SSH Without Port Exposure
 
 For DevOps teams, secure remote web server access is a critical challenge. Traditionally, remote SSH access has been the go-to solution since it uses the SSH (Secure Shell) protocol to create encrypted network connections, ensuring data confidentiality and integrity while authenticating users and devices.
@@ -22,7 +24,7 @@ Let's dive into the step-by-step process of setting up this secure remote access
 
 For this use case, you'll need the following prerequisites:
 
-* A [openZro account](https://your-management.example.com/)
+* A self-hosted openZro management server (see the [self-hosting guide](/selfhosted/selfhosted-quickstart))
 * Single Sign-On (SSO) authentication set up with your preferred identity provider (optional but recommended for enhanced security).
 * [openZro installed](/get-started/install) on your local machine.
 * A virtual machine running your target web server, configured to accept incoming SSH connections.
@@ -48,7 +50,7 @@ To add your remote web server to openZro's peer network, first you need to gener
 
 ![openZro Creating Setup Key](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/jQ5rhEb.png)
 
-Next, install the openZro agent on the VM.
+Next, install the openZro client on the VM.
 
 * SSH into the remote server
 * Execute the following command:
@@ -58,19 +60,11 @@ Next, install the openZro agent on the VM.
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
 ```
 
-The script downloads and installs the openZro agent and starts the openZro service. After installation, you'll see:
+The package installs and starts the openZro service. Connect it to your management server with the setup key you
+generated:
 
 ```shell
-openZro service has been started
-Installation has been finished. To connect, you need to run openZro by executing the following command:
-
-openzro up
-```
-
-However, since you'll use a setup key, you'll need to run the following command instead, replacing `<YOUR_SETUP_KEY>` with the key you generated::
-
-```shell
-openzro up --setup-key <YOUR_SETUP_KEY>
+openzro up --setup-key <YOUR_SETUP_KEY> --management-url https://<YOUR_MANAGEMENT_DOMAIN>
 ```
 
 Check openZro status by running:
@@ -83,29 +77,32 @@ The expected output is similar to the following:
 
 ```shell
 OS: linux/amd64
-Daemon version: 0.29.0
-CLI version: 0.29.0
+Daemon version: 0.53.1-alpha.103
+CLI version: 0.53.1-alpha.103
+Profile: default
 Management: Connected
 Signal: Connected
 Relays: 2/2 Available
 Nameservers: 0/0 Available
-FQDN: webserver.openzro.cloud
-openZro IP: 100.85.105.240/16
+FQDN: webserver.openzro.selfhosted
+Openzro IP: 100.85.105.240/16
 Interface type: Kernel
 Quantum resistance: false
-Routes: -
+Lazy connection: false
+Networks: -
+Forwarding rules: 0
 Peers count: 0/0 Connected
 ```
 
-Now, go back to openZro's `Peers` dashboard and ensure your remote web server is connected.
+Now, go back to the **Peers** page of the dashboard and ensure your remote web server is connected.
 
 ![openZro Peers Network](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/8I1WVEx.png)
 
 ## 2. Configuring openZro Access Control Policies
 With both peers now connected to openZro, the next step is to configure access control rules. This step is essential to define and restrict who can access the remote server, enhancing security by limiting connections to authorized users or devices only.
 
-* In openZro's left menu, navigate to `Access Control > Policies`
-* Click `Add Policy` to create a new one.
+* In the dashboard, go to **Access Control**
+* Click **Add Policy** to open the policy editor.
 
 openZro offers a range of options for peer access control. For comprehensive details on configuring groups and access policies, refer to the official documentation: [Managing Access with openZro: Groups and Access Policies](/manage/access-control/manage-network-access).
 
@@ -115,28 +112,33 @@ For this specific use case, we've implemented a simple access policy:
 * **Destination Group**: `Testing Environment`
 * **Protocol**: TCP
 * **Port**: 22 (SSH)
-* **Action**: Allow
 
-This policy restricts SSH access to the `Testing Environment`, permitting only authorized members from the group `Freelancers` to connect.
+Click **Add policy** to save it. The policy allows only peers in `Freelancers` to reach port 22 on peers in
+`Testing Environment`.
+
+<Note>
+    New accounts have a **Default** policy that lets all peers reach each other. Disable it, or this policy will not
+    restrict anything.
+</Note>
 
 ![openZro Access Policy](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/AgB9Asr.png)
 
 After establishing the policy, assign peers to their respective groups. To add the remote web server to the `Testing Environment` group:
 
-* Navigate to `Peers` in the left menu
+* Go to **Peers**
 * Click on the name of the peer you want to edit, in this case, `webserver`
-* Find the `Assigned Groups` field and select `Testing Environment` from the dropdown list.
+* Find **Assigned Groups** and select `Testing Environment` from the dropdown list.
 
 ![openZro Web Server Peer](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/QXb6lLs.png)
 
-While you're there, take note of the IP addresses listed on the left. Use the quick copy buttons to get `openZro IP-Address` and `Domain Name`. Alternatively, you can hover over the peer in the peers' list and copy the IP addresses as shown below:
+While you're there, take note of the IP addresses listed on the left. Use the copy buttons to get the **openZro IP-Address** and **Domain Name**. Alternatively, hover over the peer's address in the **Peers** list:
 
 ![openZro IP Addresses](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/EVZssES.png)
 
 With your remote server configured and the corresponding access policy enabled, the final step is to assign users to the appropriate group:
 
-* Locate your user in the peers' list and click on it
-* Find the `Assigned Groups` field and select `Freelancers` from the dropdown list.
+* Locate your local machine in the **Peers** list and click on it
+* Find **Assigned Groups** and select `Freelancers` from the dropdown list.
 
 ![openZro Local User Peer](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/LoNxwd4.png)
 
@@ -144,21 +146,27 @@ With your remote server configured and the corresponding access policy enabled, 
 
 openZro streamlines secure connections without traditional firewall complexities. Throughout this setup, you've implemented access controls without configuring a single firewall rule on any endpoint. This simplicity doesn't compromise security; instead, it enhances it through intuitive, group-based policies.
 
-To verify your setup, simply ping the web server from a third-party device outside of the openZro network using the web server's openZro-assigned IP:
+To verify the policy, test port 22 from a peer that is **not** in `Freelancers`. The connection should time out:
 
-![Terminal No Access to Web Server](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/iHiFujr.png)
+```shell
+$ nc -vz -w 5 webserver.openzro.selfhosted 22
+nc: connect to webserver.openzro.selfhosted port 22 (tcp) timed out: Operation now in progress
+```
 
-There is no response from the host. Now, ping the web server from your configured local machine:
+Then run the same test from your local machine, which is in `Freelancers`:
 
-![Terminal Access to Web Server](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/HKsAcFE.png)
+```shell
+$ nc -vz -w 5 webserver.openzro.selfhosted 22
+Connection to webserver.openzro.selfhosted (100.85.105.240) 22 port [tcp/ssh] succeeded!
+```
 
-As expected, all packets were transmitted. Now, you can securely SSH into your remote web server from your local peer, either using the openZro-assigned domain name or IP address:
+Now you can SSH into the web server from your local machine, using its openZro domain name or IP address:
 
-![Terminal SSH into Web Server using openZro domain](/docs-static/img/manage/peers/access-infrastructure/ssh-webserver-openzro.png)
+```shell
+ssh user@webserver.openzro.selfhosted
+```
 
-This straightforward test confirms your successful implementation of a secure, firewall-free connection to your remote web server via openZro, demonstrating its power in simplifying robust network security.
-
-![Terminal Fastfetch from Web Server](/docs-static/img/manage/peers/access-infrastructure/secure-remote-webserver-access/YoECY8k.png)
+The web server's SSH port is reachable only through openZro, and only from the peers your policy allows.
 
 ## Get Started
 
