@@ -3,7 +3,7 @@ import { Note } from '@/components/mdx'
 # Device Admission
 
 The standard posture-check pipeline (Country, OS Version, Process,
-openZro Version, Network Range, Endpoint Security) filters peers
+openZro Version, Network Range, Endpoint Security, Schedule) filters peers
 out of policy source groups. A peer that fails a check loses
 visibility into the peers it was supposed to talk to, but it stays
 connected to the management plane and keeps its IP. Useful for
@@ -20,11 +20,11 @@ on a fresh connect, and an existing session is closed within
 compliance flip.
 
 <Note>
-  Device Admission is required for tenants subject to Bacen
-  Resolução 4.893 / Circular 3.909 (Brazilian fintechs and banks),
-  DORA, NYDFS Part 500, and PCI-DSS v4.0 §8 — controls that
-  mandate provable refusal of non-compliant endpoints with an
-  auditable record. See the
+  Device Admission helps tenants subject to Bacen Resolução
+  4.893 / Circular 3.909 (Brazilian fintechs and banks), DORA,
+  NYDFS Part 500, and PCI-DSS v4.0 §8 meet controls that call for
+  provable refusal of non-compliant endpoints with an auditable
+  record. See the
   [Bacen → openZro mapping](/compliance/bacen-4893) for the
   per-control crosswalk.
 </Note>
@@ -71,12 +71,14 @@ first, then build a Posture Check of type **Endpoint Security
 
 ### Step 1 — Add the posture check to the admission list (no enforce yet)
 
-Open `Settings` → `Device Admission`. The page exposes three
+Open `Settings` → `Device Admission`. The page exposes four
 controls:
 
 1. **Enforce admission on Login & Sync** — the global toggle.
 2. **Posture checks that gate admission** — the multi-select.
-3. **Audit CSV** — quarterly evidence export button.
+3. **Exempt groups** — peers in these groups skip the gate (see
+   [routing / gateway peers](#bringing-up-routing-gateway-peers-no-mdm)).
+4. **Audit CSV** — quarterly evidence export button.
 
 Tick the posture checks you want to gate admission on, but **leave
 the toggle off**. Save. The list is recorded; nothing is enforced
@@ -141,13 +143,15 @@ with the user's bearer token.
 
 ### Revocation latency vs vendor API load
 
-Default cadence is 60s revalidate interval + 5min MDM cache TTL.
-Tunable via:
+Default cadence is a 60s revalidate interval plus the MDM/EDR
+provider's cache, which follows its **Refresh interval (minutes)**
+(default 5). The revalidator is tunable via:
 
 ```bash
-# 1 = pure Phase 1 (gate only at fresh Sync); no active revocation
-# 0 = same as 1, except the worker is fully off
-# >=10 = revalidator runs every N seconds. 60 is the default.
+# 0     = revalidator off: the gate only runs at Login, AddPeer and Sync
+# 1-9   = floored to 10 seconds
+# >=10  = revalidator runs every N seconds. 60 is the default.
+# unset, negative or invalid = 60
 export OPENZRO_ADMISSION_REVALIDATE_INTERVAL_SECONDS=60
 ```
 
@@ -181,9 +185,9 @@ infrastructure.
 
 Use **exempt groups** for this. Workflow:
 
-1. Create a group `infrastructure-peers` under `Team → Groups`.
+1. Create a group `infrastructure-peers` under `Users & Groups → Groups`.
 2. Issue or edit setup keys with
-   `AutoGroups: ["infrastructure-peers"]` for every gateway peer.
+   `infrastructure-peers` as an auto-assigned group for every gateway peer.
 3. On `Settings → Device Admission`, tick `infrastructure-peers`
    under **Exempt groups**. Save.
 
@@ -197,7 +201,10 @@ sees who set the exemption.
 
 The bypass path. CEO laptop failed Intune, has a meeting in 10
 minutes, the device is in remediation. Grant a per-peer bypass
-with a mandatory reason and time-bounded expiry:
+with a mandatory reason and time-bounded expiry. In the dashboard,
+open the peer's row menu on **Peers** and choose **Bypass
+admission…** (see [Admission Bypass](/manage/access-control/endpoint-detection-and-response/bypass-compliance)),
+or call the API:
 
 ```bash
 curl -fsS -X POST \
@@ -251,9 +258,9 @@ Two options, in order of preference:
 Worst case ≈ 6 min:
 
 ```
-revalidate_interval (60s) + mdm_cache_ttl (5min) + client_backoff (~30s)
+revalidate_interval (60s) + provider_refresh_interval (5min default) + client_backoff (~30s)
 ```
 
-To compress further, the cache TTL can be reduced in the source
-(currently a 5-minute hard-coded constant) but be aware of the
+To compress further, lower the provider's **Refresh interval
+(minutes)** under **Integrations → MDM / EDR**, but be aware of the
 vendor rate-limit cost.
