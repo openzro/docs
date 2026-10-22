@@ -16,13 +16,13 @@ all outgoing traffic, and that may affect how openZro clients connect to the [co
 and negotiate the peer-to-peer connections. 
 
 <Note>
-    Allowing the outbound **P2P (STUN)** service below is **recommended** in more restricted networks for reliable peer connections. This will also improve the reliability of your [High Availability Routes](https://docs.openzro.io/manage/network-routes#high-availability).
+    Allowing the outbound **P2P (STUN)** service below is **recommended** in more restricted networks for reliable peer connections. This will also improve the reliability of your [High Availability Routes](/manage/network-routes#high-availability).
 </Note>
 <Note>
-    Allowing the outbound **Relay (TURN)** service below is **recommended** in more restricted networks for reliable peer connections. This will also improve the reliability of your [High Availability Routes](https://docs.openzro.io/manage/network-routes#high-availability).
+    Allowing the outbound **Relay (TURN)** service below is **recommended** in more restricted networks for reliable peer connections. This will also improve the reliability of your [High Availability Routes](/manage/network-routes#high-availability).
 </Note>
 <Note>
-    If using `fail2ban` or similar, you should whitelist each openzro.io endpoint below.
+    If using `fail2ban` or similar, you should whitelist each of your openZro server endpoints below.
 </Note>
 
 openZro is **self-hosted only** — there is no managed cloud, so the
@@ -37,17 +37,17 @@ rules.
 | Management API | TCP/443 | Outbound from clients | HTTPS to the [management server](/selfhosted/selfhosted-guide#port-requirements) |
 | Signal | TCP/443 | Outbound from clients | gRPC over HTTPS to the [signal server](/selfhosted/selfhosted-guide#port-requirements) |
 | STUN (P2P) | UDP/3478 | Outbound from clients | Direct peer-to-peer NAT traversal — recommended; without it, peers fall back to TURN/relay |
-| TURN (Relay) | UDP/3478, TCP/443 | Outbound from clients | Used when direct P2P fails — required for connectivity in symmetric-NAT or restrictive networks |
-| Relay (openZro Relay) | TCP/443 | Outbound from clients | The openZro relay protocol used in addition to TURN |
+| TURN (Coturn) | UDP/TCP 3478, TLS 5349, relay range UDP 49152–65535 | Outbound from clients | ICE fallback when direct P2P fails and the openZro relay is not used |
+| Relay (openZro Relay) | TCP (WebSocket) and UDP (QUIC, when TLS is enabled) on the relay port: 33080 in the default compose setup, 443 behind a reverse proxy | Outbound from clients | Relays encrypted WireGuard traffic when P2P fails |
 
 If you front your services behind a reverse proxy on TCP/443, the
-client only needs outbound TCP/443 + UDP/3478 to your endpoints — no
+client only needs outbound TCP/443 + UDP/3478 to your endpoints (plus the relay's UDP port if you use QUIC) — no
 inbound ports on perimeter firewalls.
 
 <Note>
     For the full self-hosted port matrix (including the management
-    HTTP listener, embedded relay's TCP/33080 default, and the JWT
-    signing port for the embedded IdP), see the
+    HTTP listener, the relay's default TCP/33080 and Coturn's ports),
+    see the
     [self-hosted guide port requirements](/selfhosted/selfhosted-guide#port-requirements).
 </Note>
 
@@ -125,7 +125,7 @@ In flat office networks or routed VLANs without NAT, an additional firewall rule
 to work. This is because Windows Firewall sees incoming WireGuard UDP packets as unsolicited traffic 
 when there is no NAT state tracking the connection.
 ```powershell
-New-NetFirewallRule -DisplayName "openZro P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\openZro\openzro.exe"
+New-NetFirewallRule -DisplayName "openZro P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\Openzro\openzro.exe"
 ```
 
 See [Environments without NAT](/help/troubleshooting-client#environments-without-nat-flat-networks-routed-vlans) 
@@ -144,39 +144,27 @@ for detailed troubleshooting steps.
 
 ## Why and what are the anonymous usage metrics?
 
-### Why did we add metrics collection?
-As an open-source project and business, making data-driven decisions is essential. By collecting anonymous metrics, we can understand our adoption rate, feature usage, and the types of client operating systems in use. We kindly ask our community users to keep metrics enabled, as this helps us assess the impact of bugs and measure the quality of our software over time.
+### What are they?
+The management server can send aggregate, anonymous usage counts every 12 hours (adjustable with
+`OPENZRO_METRICS_INTERVAL_IN_SECONDS`). The endpoint for these counts is **not operated by the openZro project
+today, so no data is received**. To turn them off, start the management service with
+`--disable-anonymous-metrics=true`.
 
-<Note>
-The collection is strict to our management system.
-</Note>
-
-If the metric collection infringes any internal regulation or policy, it can be disabled by setting the flag `--disable-anonymous-metrics=true` to the management service startup command. the default interval is 12 hours, but it can be adjusted with the environment variable `OPENZRO_METRICS_INTERVAL_IN_SECONDS`.
-
-### What are the metrics being collected?
-We are collecting the following metrics:
-* Number of accounts, users, and service users
-* Number of personal access tokens
-* Number of peers (total, SSH-enabled, login expiration enabled, user-activated)
-* Number of active peers and active users in the last collection interval
-* Number of peers per operating system (total and active)
-* Number of UI clients and their operating systems
-* Number of setup keys usage (including ephemeral peer setup keys)
-* Number of groups
-* Number of routes (including routes with routing groups)
-* Number of networks, network resources, and network routers
-* Number of access control policy rules (by protocol and direction)
-* Number of posture checks and rules with source posture checks
-* Number of reverse proxy services (total, enabled, by status, by target type, by auth type)
-* Number of service targets (by type: peer, host, domain, subnet)
-* Number of custom domains (total and validated)
+### What would be sent?
+* Number of accounts, users, service users and personal access tokens
+* Number of peers (total, user-added, SSH-enabled, login expiration enabled)
+* Number of active peers and active users in the last day
+* Number of peers per operating system, and of UI clients and their operating systems
+* Setup key usage (including ephemeral peer setup keys)
+* Number of groups, routes (including routes with routing groups), nameservers
+* Number of networks, network resources and network routers
+* Number of access control rules, posture checks and rules with source posture checks
 * Rosenpass usage
-* IdP manager type and embedded IdP provider breakdown
-* Store engine type
-* Service uptime
-* Service version (including min/max active peer versions)
+* IdP manager type and store engine type
+* Service uptime and version, and the min/max active peer versions
 * Metrics generation time
 
+No names, e-mail addresses, IP addresses, keys or traffic are included.
 
 ### Metrics UUID
 We are using an installation ID for each management service which is generated once and stored in your management store database. It doesn't have any trace of any other private information, and it helps distinguish each deployment.
