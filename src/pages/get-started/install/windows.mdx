@@ -1,69 +1,74 @@
 import {Note} from "@/components/mdx";
 
+export const description = 'Install the openZro client on Windows with the MSI installer.'
+
 # Windows Installation
 
-The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
+The openZro client (agent) connects a device to an openZro deployment. openZro is
+self-hosted; if you don't have a deployment yet, see the
+[self-hosting quickstart](/selfhosted/selfhosted-quickstart).
 
-1. Download the latest Windows release:
-    - <Button href="https://github.com/openzro/openzro/releases/latest" variant="text">EXE Installer</Button><br />
-    - <Button href="https://github.com/openzro/openzro/releases/latest" variant="text">MSI Installer</Button><br />
-2. Execute the installer and proceed with the installation steps
-3. This will install the UI client in the `C:\Program Files\openZro` and add the daemon service
-4. After installing, you can follow the steps from [Running openZro with SSO Login](#running-net-bird-with-sso-login).
+1. Download the installer for 64-bit Windows:
+   <Button href="https://pkg.openzro.io/windows/openzro.msi" variant="text">openZro MSI installer</Button>.
+   Each release's MSI is also on the [releases page](https://github.com/openzro/openzro/releases).
+2. Run the installer. It installs the `openzro` CLI, the background service
+   (`Openzro`) and the desktop app in `C:\Program Files\Openzro`, and adds the
+   CLI to your `PATH`.
+3. Continue with [Running openZro with SSO login](#running-open-zro-with-sso-login).
+
 <Note>
-    To uninstall the client and service, you can use Add/Remove programs
+    The MSI is not code-signed yet, so Windows SmartScreen may warn on first run.
+    Click **More info → Run anyway**. Code signing is in progress.
 </Note>
 
-## Running openZro with SSO Login
-### Desktop UI Application
-If you installed the Desktop UI client, you can launch it and click on Connect.
-> It will open your browser, and you will be prompt for email and password. Follow the instructions.
+To uninstall the client and the service, use **Settings → Apps → Installed apps**
+(or **Programs and Features**).
 
-<p>
-    <img src="/docs-static/img/get-started/openzro-sso-login-ui.gif" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
+## Point the client at your deployment
+
+Every client needs your management URL. In the desktop app, open
+**Settings → Advanced Settings** from the openZro icon in the system tray and
+enter it. With the CLI, pass `--management-url https://<your-management>:443`
+to `openzro up`.
+
+## Running openZro with SSO login
+
+### Desktop app
+Launch the openZro desktop app and click **Connect**. Your browser opens your
+identity provider's sign-in page; once you sign in, the device connects.
 
 ### CLI
-Alternatively, you could use command line. Simply run
-   ```bash
-  openzro up
-   ```
-> It will open your browser, and you will be prompt for email and password. Follow the instructions.
-
-<p>
-    <img src="/docs-static/img/get-started/openzro-sso-login-cmd.gif" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
-
-Check connection status:
+In a terminal:
 ```bash
-  openzro status
+openzro up --management-url https://<your-management>:443
 ```
+Your browser opens your identity provider's sign-in page. When the login
+completes, the CLI prints `Connected`.
 
-## Running openZro with a Setup Key
-In case you are activating a server peer, you can use a [setup key](/manage/peers/register-machines-using-setup-keys) as described in the steps below.
-> This is especially helpful when you are running multiple server instances with infrastructure-as-code tools like ansible and terraform.
+<Note>
+    If your administrator requires [2FA to sign in devices](/manage/settings/multi-factor-authentication#2-fa-on-device-sign-in),
+    the client also opens an approval page where you enter a code from your authenticator app.
+</Note>
 
-1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
-
-For all systems:
-```bash
-openzro up --setup-key <SETUP KEY>
-```
-
-Alternatively, if you are hosting your own Management Service provide `--management-url` property pointing to your Management Service:
-```bash
-  openzro up --setup-key <SETUP KEY> --management-url http://localhost:33073
-```
-
-> You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
-
-2. Check connection status:
+Check the connection:
 ```bash
 openzro status
 ```
 
-3. Check your IP:
+## Running openZro with a setup key
+
+To register a server or another unattended peer, use a
+[setup key](/manage/peers/register-machines-using-setup-keys):
 
 ```bash
+openzro up --management-url https://<your-management>:443 --setup-key <SETUP KEY>
+```
+
+If you leave out `--setup-key`, `openzro up` starts the SSO login in your browser
+instead.
+
+Check the connection and the tunnel interface:
+```bash
+openzro status
 netsh interface ip show config name="wt0"
 ```

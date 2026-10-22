@@ -22,7 +22,7 @@ database of its own, every account lives in your IdP (Dex,
 Authentik, Keycloak, Okta, Microsoft Entra, Google Workspace,
 Auth0, JumpCloud, Zitadel, or any OIDC-compliant provider).
 
-![openZro IdP SSO and MFA](/docs-static/img/get-started/onboarding/01_openzro-sso.jpeg)
+![openZro sign-in page](/docs-static/img/get-started/onboarding/01_openzro-sso.jpeg)
 
 After successful authentication you land on the dashboard's
 **Peers** page. The first sign-in seeds a default account record,
@@ -31,27 +31,24 @@ every peer reach every other peer — you'll tighten this in step 4.
 
 ## 2. Add your first peer
 
-The dashboard's primary action is the **Add Peer** button (top
+The dashboard's primary action is the **Add peer** button (top
 right of the Peers page). It opens a modal with one tab per
 platform:
 
-- **Linux** (Debian / Ubuntu / RHEL / Rocky / Fedora / Arch)
-- **macOS** (Homebrew or `.pkg` installer)
-- **Windows** (`.msi` installer)
-- **Docker** (single-container quickstart)
+- **Linux**: the one-line install script, or the APT repository by hand
+- **Windows**: the `.msi` installer
+- **macOS**: the universal `.pkg` installer
+- **Docker**: a single-container command
 
 Pick your platform, copy the install command into a terminal on
-the device you want to enroll, and run it:
+the device you want to enroll, and run it. On Linux:
 
 ```bash
-# Debian / Ubuntu — see the modal for other distros
-curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg \
-  | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null
-echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] \
-https://pkg.openzro.io/apt stable main" \
-  | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null
-sudo apt-get update && sudo apt-get install -y openzro
+curl -fsSL https://pkg.openzro.io/install.sh | sh
 ```
+
+The [Linux page](/get-started/install/linux) covers the other
+distributions and the manual repository setup.
 
 Then bring the client up:
 
@@ -76,17 +73,19 @@ auto-assigns it to one or more groups.
 In the dashboard:
 
 1. Open **Setup Keys** in the sidebar.
-2. Click **Add Setup Key**.
-3. Pick **Reusable** (the key works for many enrollments) or
-   **One-off** (single-use), set an expiration, and select which
-   groups new peers using this key should auto-join.
+2. Click **Create Setup Key**.
+3. Turn on **Make this key reusable** if the key should work for
+   many enrollments (off means single-use), set the usage limit and
+   expiration, and select the groups new peers using this key
+   should auto-join.
 4. Copy the generated key — it's shown once.
 
 On the headless device, install openZro the same way as step 2,
 then enroll using the key:
 
 ```bash
-sudo openzro up --setup-key <YOUR_SETUP_KEY>
+sudo openzro up --management-url https://<your-management>.example.com \
+  --setup-key <YOUR_SETUP_KEY>
 ```
 
 The peer appears in **Peers** within seconds, tagged with whatever
@@ -109,7 +108,7 @@ ping 100.74.76.17
 You should see successful replies — the **Default Policy** that
 the dashboard seeded on first login is what makes this work.
 
-To see the policy, open **Access Control → Policies**. The
+To see the policy, open **Security → Access Control**. The
 default rule allows `All → All` on every protocol/port. Disable
 that policy and the ping immediately starts timing out; re-enable
 it and traffic flows again. This is the simplest demo of how
@@ -137,7 +136,8 @@ Quick sketch:
 2. In the dashboard, open **Networks → Add Network**.
 3. Define a **Network Resource** — either a single host
    (`10.10.5.5`) or an entire subnet (`10.10.0.0/16`).
-4. Assign the resource to your routing peer (the host from step 1).
+4. On the network, click **Add Routing Peer** and pick the host
+   from step 1.
 5. Add a **policy** that lets the source group (e.g. your laptops)
    reach this resource.
 

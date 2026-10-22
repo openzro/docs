@@ -779,7 +779,7 @@ export function NavigationDocs({ className }) {
         <TopLevelNavItem href="https://github.com/openzro/openzro">
           Github
         </TopLevelNavItem>
-        <TopLevelNavItem href="/slack-url">Support</TopLevelNavItem>
+        <TopLevelNavItem href="https://github.com/openzro/openzro/discussions">Support</TopLevelNavItem>
         {docsNavigation.map((group, groupIndex) => (
           <NavigationStateProvider key={group.title} index={groupIndex}>
             <NavigationGroup

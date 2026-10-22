@@ -2,11 +2,16 @@ import {Note} from "@/components/mdx";
 
 # Synology Installation
 
-The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
+The openZro client (agent) connects a device to an openZro deployment. openZro is self-hosted; if you don't have a deployment yet, see the [self-hosting quickstart](/selfhosted/selfhosted-quickstart).
+
+<Note>
+    The install script supports Synology models with x86_64 (amd64) or arm64 CPUs.
+    32-bit ARM models are not supported.
+</Note>
 
 ## Installation
 
-Installing a openZro Peer on Synology will require a few additional steps compared to a typical Linux install despite using the same single line command to get everything going.
+Installing an openZro peer on Synology takes a few more steps than a typical Linux install, although it uses the same one-line install script.
 
 1. Ensure your user has administrative privileges. _Control Panel > User & Group > User > Click User and Edit > User Groups > Ensure “administrators” is checked._
 2. Enable SSH Connectivity. _Control Panel > Terminal & SNMP > Terminal > Check the box next to “Enable SSH Service” > Click Apply_
@@ -19,10 +24,10 @@ ssh user@192.168.0.53
 4. Install with one command.
 
 ```bash
-curl -fsSL https://github.com/openzro/openzro/releases/latest | sudo sh
+curl -fsSL https://pkg.openzro.io/install.sh | sudo sh
 ```
 
-5. Add your Synology NAS as a Peer using the steps from [Add peers to your openZro network](https://docs.openzro.io/manage/peers/add-machines-to-your-network) in the documentation.
+5. Connect the NAS to your deployment, with a setup key as described below, or see [Add peers to your openZro network](/manage/peers/add-machines-to-your-network).
 
 ## Reboot Script
 
@@ -58,15 +63,10 @@ In case you are activating a server peer, you can use a [setup key](/manage/peer
 1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
 
 ```bash
-  openzro up --setup-key <SETUP KEY>
+sudo openzro up --management-url https://<your-management>:443 --setup-key <SETUP KEY>
 ```
 
-Alternatively, if you are hosting your own Management Service provide `--management-url` property pointing to your Management Service:
-```bash
-  openzro up --setup-key <SETUP KEY> --management-url http://localhost:33073
-```
-
-> You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
+If you leave out `--setup-key`, `openzro up` starts the SSO login instead and prints the sign-in URL to open in a browser.
 
 2. Check connection status:
 ```bash
@@ -84,11 +84,11 @@ Alternatively, if you are hosting your own Management Service provide `--managem
 If you used the one-command script to install, you can follow this to update:
 
 ```bash
-openzro down
-curl -fsSLO https://github.com/openzro/openzro/releases/latest
+sudo openzro down
+curl -fsSLO https://pkg.openzro.io/install.sh
 chmod +x install.sh
-./install.sh --update
-openzro up
+sudo ./install.sh --update
+sudo openzro up
 ```
 
 ## Uninstallation
@@ -118,13 +118,8 @@ rm -rf /var/lib/openzro
 
 For a complete cleanup, you should also remove the Synology NAS as a peer from your openZro deployment. Log in to the openZro web UI. Navigate to the Peers section. Find the peer corresponding to your Synology NAS and delete it.
 
-## Video Walkthrough
-
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="9VKOAe_T038" /> */}
-
 ## Support Us
 
 - Star us on [GitHub](https://github.com/openzro/openzro)
-- Follow us [on X](https://x.com/openzro)
-- Join our [Slack Channel](/slack-url)
-- openZro release page on GitHub: [releases](https://github.com/openzro/openzro/releases/latest)
+- Ask questions in [GitHub Discussions](https://github.com/openzro/openzro/discussions)
+- openZro [releases](https://github.com/openzro/openzro/releases)

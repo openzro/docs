@@ -1,97 +1,83 @@
 import {Note} from "@/components/mdx";
 
+export const description = 'Run the openZro client in a Docker container.'
+
 # Docker Installation
 
-The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
+The openZro client (agent) connects a device to an openZro deployment. openZro is
+self-hosted; if you don't have a deployment yet, see the
+[self-hosting quickstart](/selfhosted/selfhosted-quickstart).
 
-## Docker Run Command
+The client image is published to the GitHub Container Registry as
+`ghcr.io/openzro/openzro`, for `amd64` and `arm64`. Use `latest`, or pin a release
+tag such as `0.53.1-alpha.103` (no `v` prefix).
 
-Set the ```NB_SETUP_KEY``` environment variable and run the command.
+## Docker run
+
+Set your [setup key](/manage/peers/register-machines-using-setup-keys) and your
+management URL, then run:
+
+```bash
+docker run --rm -d \
+  --name PEER_NAME --hostname PEER_NAME \
+  --cap-add=NET_ADMIN --cap-add=SYS_ADMIN --cap-add=SYS_RESOURCE \
+  -e OZ_SETUP_KEY=<SETUP KEY> \
+  -e OZ_MANAGEMENT_URL=https://<your-management>:443 \
+  -v openzro-client:/var/lib/openzro \
+  ghcr.io/openzro/openzro:latest
+```
+
+openZro uses eBPF and raw sockets, so `SYS_ADMIN` and `SYS_RESOURCE` are
+recommended alongside `NET_ADMIN`. The exact needs vary with the Docker daemon,
+operating system and kernel version.
 
 <Note>
-    You can pass other settings as environment variables. See [Environment variables](/get-started/cli#environment-variables) for details.
+    The container reads its settings from `OZ_`-prefixed environment variables,
+    for example `OZ_SETUP_KEY`, `OZ_MANAGEMENT_URL` and `OZ_HOSTNAME`. See
+    [Environment variables](/get-started/cli#environment-variables) for how they
+    map to the client's flags.
 </Note>
 
-openZro makes use of eBPF and raw sockets, therefore to guarantee the client software functionality, we recommend adding the flags `--cap-add=SYS_ADMIN` and `--cap-add=SYS_RESOURCE` for docker clients.
-The experience may vary depending on the docker daemon, operating system, or kernel version.
-
-```bash
-docker run --rm --name PEER_NAME --hostname PEER_NAME --cap-add=NET_ADMIN --cap-add=SYS_ADMIN --cap-add=SYS_RESOURCE -d -e NB_SETUP_KEY=<SETUP KEY> -v openzro-client:/var/lib/openzro openzro/openzro:latest
-```
-
-See [Docker example](/use-cases/examples#net-bird-client-in-docker) for details.
-
-### Troubleshooting
-1. If you are using self-hosted version and haven't specified `--management-url`, the client app will use the default URL
-which is ```https://api.openzro.io:443```.
-
-2. If you have specified a wrong `--management-url` (e.g., just by mistake when self-hosting)
-to override it you can do the following:
-
-```bash
-openzro down
-openzro up --management-url https://<CORRECT HOST:PORT>/
-```
-
-To override it see the solution #1 above.
-
 ## Docker Compose
-If you prefer to run openZro as a Docker compose stack below is an example. Configure to your specific needs.
+
 ```yaml
 services:
   openzro-client:
-      container_name: openzro-client
-      hostname: <HOSTNAME>
-      cap_add:
-          - NET_ADMIN
-          - SYS_ADMIN
-          - SYS_RESOURCE
-      devices:
-          # Required when using userspace mode or when kernel module is not available
-          - /dev/net/tun
-      network_mode: host
-      environment:
-          - NB_SETUP_KEY=<SETUP KEY>
-      volumes:
-          - openzro-client:/var/lib/openzro
-      image: openzro/openzro:latest
+    container_name: openzro-client
+    hostname: <HOSTNAME>
+    cap_add:
+      - NET_ADMIN
+      - SYS_ADMIN
+      - SYS_RESOURCE
+    devices:
+      # Required when using userspace mode or when the kernel module is not available
+      - /dev/net/tun
+    network_mode: host
+    environment:
+      - OZ_SETUP_KEY=<SETUP KEY>
+      - OZ_MANAGEMENT_URL=https://<your-management>:443
+    volumes:
+      - openzro-client:/var/lib/openzro
+    image: ghcr.io/openzro/openzro:latest
 volumes:
   openzro-client:
-      name: openzro-client
+    name: openzro-client
 ```
 
-## Running openZro with a Setup Key
-In case you are activating a server peer, you can use a [setup key](/manage/peers/register-machines-using-setup-keys) as described in the steps below.
-> This is especially helpful when you are running multiple server instances with infrastructure-as-code tools like ansible and terraform.
+## Check the connection
 
-1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
+Run the CLI inside the container:
 
 ```bash
-docker run --network host --privileged --rm -d -e NB_SETUP_KEY=<SETUP KEY> -v openzro-client:/var/lib/openzro openzro/openzro:<TAG>
+docker exec <container> openzro status
+docker exec <container> ip addr show wt0
 ```
 
-You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
+## Troubleshooting
 
-2. Check connection status:
-```bash
-  openzro status
-```
-
-3. Check your IP:
-
-````bash
-  sudo ifconfig utun100
-````
-
-## Rootless Image
-
-In some cases you may want to run our [rootless image](https://hub.docker.com/layers/openzro/openzro/rootless-latest). Rootless mode operates within a user namespace, reducing the attack surface compared to standard rootful Docker. The rootless mode leverages netstack from the gVisor Go package, enabling the WireGuard stack to run entirely in userspace, circumventing the need for kernel-level access.
-
-```bash
-docker run --rm --name PEER_NAME --hostname PEER_NAME -d \
-    -e NB_SETUP_KEY=<YOUR_SETUP_KEY> \
-    -v openzro-client:/var/lib/openzro \
-    openzro/openzro:rootless-latest
-```
-
-`rootless` is well supported and works without any privileges. However, it will only be useful for inbound access or as routing peer (no outbound connections except via socks proxy)
+1. **The container never connects.** Check that `OZ_MANAGEMENT_URL` is set.
+   There is no hosted service: without it, the client tries a default address
+   that does not exist.
+2. **The management URL is wrong.** Recreate the container with the correct
+   `OZ_MANAGEMENT_URL`. The client keeps its configuration in the
+   `openzro-client` volume, so remove the volume too if you want a clean start.

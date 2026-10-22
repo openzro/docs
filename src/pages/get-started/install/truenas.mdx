@@ -1,70 +1,44 @@
-import {Note} from "@/components/mdx";
-import {YouTube} from "@/components/YouTube";
+import {Note, Warning} from "@/components/mdx";
 
 # Install openZro on TrueNAS
 
+<Warning>
+    **Not validated yet.** openZro is not in the TrueNAS Apps catalog. The steps
+    below run the openZro client image as a TrueNAS **Custom App**; this setup has
+    not been tested on TrueNAS yet. Support for TrueNAS is being planned; until
+    then, test it before relying on it.
+</Warning>
+
+## Run openZro as a Custom App
+
+In TrueNAS SCALE, go to **Apps → Discover Apps → Custom App** and configure:
+
+- **Image**: `ghcr.io/openzro/openzro`, tag `latest` (or a release tag such as
+  `0.53.1-alpha.103`).
+- **Environment variables**:
+  - `OZ_SETUP_KEY`: a [setup key](/manage/peers/register-machines-using-setup-keys)
+    from your openZro dashboard.
+  - `OZ_MANAGEMENT_URL`: your management server, e.g.
+    `https://your-management.example.com:443`. openZro is self-hosted; this must
+    point at your own server.
+  - `OZ_HOSTNAME` (optional): the name this peer shows in the dashboard, e.g.
+    `truenas`.
+- **Network**: enable **Host Network**, so the container uses the TrueNAS host's
+  network stack. Without it, the container cannot reach your LAN or act as a
+  routing peer.
+- **Capabilities**: add `NET_ADMIN` (and `SYS_ADMIN`, `SYS_RESOURCE`, as in the
+  [Docker guide](/get-started/install/docker)).
+- **Storage**: mount a persistent volume at `/var/lib/openzro`, so the peer keeps
+  its identity and configuration across restarts.
+
+After the app is **Running**, open **Peers** in your openZro dashboard: the
+TrueNAS peer should be listed.
+
 <Note>
-**Status — guide on hold (April 2026).** openZro is **not yet
-published to the TrueNAS Apps catalog**, so the "search for openZro
-in Apps" flow described below currently turns up no results. The
-page is kept here for reference while the project decides whether
-to submit `openzro-client` upstream. In the meantime, TrueNAS
-operators who want openZro on their NAS today can run our
-container image directly via TrueNAS's **Custom App** flow with
-`ghcr.io/openzro/openzro` or use the
-[Linux install guide](/get-started/install/linux) on the
-underlying SCALE host.
+    The client runs in a container, so you cannot reach the TrueNAS host's services
+    through the peer's openZro IP or domain: that traffic reaches the container. Use
+    the routing setup below.
 </Note>
-
-openZro can now be installed on TrueNAS via [TrueNAS Apps](https://apps.truenas.com/catalog/openzro-client/) (the built-in app catalog). If you need help setting up TrueNAS from scratch (install, storage pools, datasets, users, SMB sharing, and more), see our [Knowledge Hub Guide: TrueNAS Made Easy](https://openzro.io/knowledge-hub/truenas-setup-and-remote-access).
-
-<Note>
-The openZro app on TrueNAS runs in a Docker container. You **cannot** use the peer's openZro IP address or [openZro domain (hostname)](/manage/dns) to connect directly to your TrueNAS instance traffic to those addresses reaches the container, not the TrueNAS host. See [Access TrueNAS via openZro Networks](#access-truenas-via-openzro-networks) below for the full steps.
-</Note>
-
-## Install openZro from Catalog
-
-1. In TrueNAS, go to **Apps** and search for **openZro**. If it doesn't appear, refresh the catalog (e.g., **Discover Apps** or the catalog refresh option in your TrueNAS version).
-
-<img src="/docs-static/img/get-started/truenas/truenas-refresh-catalog.png" alt="Refresh TrueNAS catalog and search for openZro" className="imagewrapper-big"/>
-
-2. Click **Install** and configure the app as described below. Most defaults are fine; the main fields you need to set are **Hostname** and **Setup Key**.
-
-<img src="/docs-static/img/get-started/truenas/truenas-install-openzro.png" alt="Install openZro app on TrueNAS" className="imagewrapper-big"/>
-
-3. After installation, confirm the app is **Running** in the Apps list.
-4. Open your [openZro dashboard](https://your-management.example.com/) and go to **Peers**. You should see your TrueNAS peer listed. Rename it (e.g., "TrueNAS" or "NAS") if you like for easier identification.
-
-### App configuration
-
-When you install the openZro app, TrueNAS shows an **Edit openZro Client** form. Use this as a guide:
-
-<img src="/docs-static/img/get-started/truenas/truenas-config-setupkey.png" alt="openZro client configuration form with Setup Key" className="imagewrapper-big"/>
-
-
-**openZro Client Configuration**
-
-- **Application name**: Display name in TrueNAS (e.g., "openZro" or "openZro Client"). Default is fine.
-- **Timezone**: Leave default unless you need a specific timezone for logs.
-- **Hostname**: Name this peer will use in openZro (e.g., "truenas" or "nas"). Pick something you’ll recognize in the dashboard.
-- **Setup Key** *(required)*: Paste the setup key you created in [Generate your Setup Key](#generate-your-setup-key). This registers the TrueNAS peer with your openZro network.
-- **Userspace**: Leave default (userspace networking). Only change if you have a specific need.
-- **Management URL** *(required)*: Set the URL of your [self-hosted](/selfhosted/selfhosted-quickstart) openZro management server (e.g., `https://management.example.com:443`). openZro is self-hosted only — there is no managed cloud, so this field must always point at your own server.
-- **Additional Environment Variables**: Leave empty unless you need extra [environment variables](/get-started/cli#environment-variables).
-
-**Network Configuration**
-
-- **Host Network**: Enable **Host Network** so the openZro container uses the TrueNAS host's network stack. Without it, the container only has its own network and cannot reach your LAN or act as a [routing peer](/manage/networks/homelab/access-home-network#choose-or-add-a-routing-peer-in-your-lan). 
-
-**Storage Configuration**
-
-- **State Storage**: Use the default (e.g., **ixVolume**) so openZro can persist its state. This keeps the peer identity and config across app restarts.
-
-**Resources Configuration**
-
-- **CPUs** and **Memory (MB)**: Defaults are usually sufficient. Increase if you have many peers or heavy routing.
-
-You can leave **Labels** and **Additional Storage** empty unless you use them for access policies or custom storage.
 
 ## Access TrueNAS via openZro Networks
 
@@ -78,13 +52,3 @@ Because openZro on TrueNAS runs inside a Docker container, you cannot connect di
 
 After you define an [access control policy](/manage/networks/homelab/access-home-network#create-an-access-control-policy) that allows the right peers or groups to reach this network, you can access TrueNAS and other resources on that subnet through the TrueNAS routing peer.
 
-## Video Walkthrough
-
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="NkP6J3hJew4" /> */}
-
-Install and configure TrueNAS for home server storage, then securely access it from anywhere using openZro. Covers ZFS pools, SMB sharing, apps, and zero-trust remote access, see our [Knowledge Hub Guide: TrueNAS Made Easy](https://openzro.io/knowledge-hub/truenas-setup-and-remote-access).
-
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Follow us [on X](https://x.com/openzro)
-- Join our [Slack Channel](/slack-url)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub
