@@ -14,26 +14,34 @@ To delete the account, you must be signed in as a user with the
 If you aren't the owner, ask the owner to do it.
 
 <Note>
-    This action is irreversible. Once the account is deleted, all
-    associated data — peers, users, groups, policies, routes, network
-    resources, audit log, flow exports, MDM/EDR integrations,
-    posture-check definitions — is permanently gone. There is no
-    recovery from this side; you'd have to restore the management
-    server's database from a backup.
+    This action is irreversible. Peers, users (including service users), setup keys, groups, policies, routes,
+    nameservers and DNS zones, networks and their resources, and posture checks are permanently deleted. There is no
+    recovery from the dashboard; you'd have to restore the management server's database from a backup.
+</Note>
+
+What is **not** removed:
+
+- the activity log, which keeps its history and records the deletion itself;
+- configuration stored outside the account record, such as activity streamers, flow-event exports and MDM/EDR
+  providers.
+
+<Note>
+    If the account has local users provisioned through SCIM, deletion is refused. Delete those users through SCIM
+    first.
 </Note>
 
 ## Steps
 
-1. Open `Settings` → `Danger Zone`.
-2. Review the warning. Click `Delete Account`.
+1. Open **Settings** → **Danger Zone**. Only the owner sees this tab.
+2. Review the warning and click **Delete Account**.
 
    <p>
-       <img src="/docs-static/img/manage/settings/account-settings-danger-zone.png" alt="settings danger zone" className="imagewrapper-big"/>
+       <img src="/docs-static/img/manage/settings/account-settings-danger-zone.png" alt="Delete openZro account in the Danger Zone" className="imagewrapper-big"/>
    </p>
-3. Confirm by clicking `Delete`.
+3. Confirm by clicking **Delete**.
 
    <p>
-       <img src="/docs-static/img/manage/settings/account-settings-delete-account-confirm.png" alt="confirm delete" className="imagewrapper"/>
+       <img src="/docs-static/img/manage/settings/account-settings-delete-account-confirm.png" alt="Delete account confirmation" className="imagewrapper"/>
    </p>
 
 After deletion, your session ends and you're redirected to the login
