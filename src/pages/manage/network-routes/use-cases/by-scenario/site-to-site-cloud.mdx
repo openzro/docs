@@ -39,7 +39,7 @@ Before deploying routing peers, create setup keys with auto-assigned groups:
 3. For AWS:
    - Name: "AWS Routing Peer"
    - Auto-assigned groups: Create and add `aws-routing-peers`
-   - Click **Create**
+   - Click **Create Setup Key**
 4. For GCP:
    - Name: "GCP Routing Peer"
    - Auto-assigned groups: Create and add `gcp-routing-peers`
@@ -58,7 +58,7 @@ Launch an EC2 instance in your VPC with openZro installed. Use the following use
 #!/bin/bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-openzro up --setup-key YOUR_AWS_SETUP_KEY
+openzro up --setup-key YOUR_AWS_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
 **GCP:**
@@ -69,7 +69,7 @@ Launch a Compute Engine instance in your VPC:
 #!/bin/bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-openzro up --setup-key YOUR_GCP_SETUP_KEY
+openzro up --setup-key YOUR_GCP_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
 ## Step 3: Create Network Routes
@@ -80,50 +80,36 @@ openzro up --setup-key YOUR_GCP_SETUP_KEY
 3. Network range: `10.0.0.0/16`
 4. Routing Peer: Select your AWS instance (or use "aws-routing-peers" Peer Group)
 
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-cloud/add-route-aws-vpc.png" alt="Create route for AWS VPC" className="imagewrapper"/>
-</p>
-
 5. Distribution Groups: "gcp-routing-peers"
-6. Access Control Groups: "aws-routing-peers" (required for route-level policies—this group becomes the destination in access policies; without it, policies targeting this route won't apply)
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-cloud/add-route-aws-groups.png" alt="AWS route distribution and access control groups" className="imagewrapper"/>
-</p>
+6. Access Control Groups: "aws-routing-peers" (optional; set it only if you want policies to restrict access to this route, as the group then becomes the destination of those policies)
 
 7. Network Identifier: `aws-vpc`
-8. Enable **Masquerade** (in Additional Settings)
+8. Leave **Masquerade** on (Additional Settings; on by default)
 9. Click **Add Route**
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-cloud/add-route-masquerade.png" alt="Enable masquerade in additional settings" className="imagewrapper"/>
-</p>
 
 **For GCP VPC:**
 1. Click **Add Route**
 2. Network range: `10.1.0.0/16`
 3. Routing Peer: Select your GCP instance (or use "gcp-routing-peers" Peer Group)
 
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-cloud/add-route-gcp-vpc.png" alt="Create route for GCP VPC" className="imagewrapper"/>
-</p>
-
 4. Distribution Groups: "aws-routing-peers"
-5. Access Control Groups: "gcp-routing-peers" (required for route-level policies—this group becomes the destination in access policies; without it, policies targeting this route won't apply)
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-cloud/add-route-gcp-groups.png" alt="GCP route distribution and access control groups" className="imagewrapper"/>
-</p>
+5. Access Control Groups: "gcp-routing-peers" (optional; set it only if you want policies to restrict access to this route, as the group then becomes the destination of those policies)
 
 6. Network Identifier: `gcp-vpc`
-7. Enable **Masquerade** (in Additional Settings)
+7. Leave **Masquerade** on (Additional Settings; on by default)
 8. Click **Add Route**
+
+Both routes now appear on the **Network Routes** page:
+
+<p>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-cloud/routes-cloud.png" alt="Network Routes page with both site routes" className="imagewrapper-big"/>
+</p>
 
 ## Step 4: Create Access Policies
 
 Create two policies allowing the routing peers to communicate in both directions:
 
-1. Go to **Access Control > Policies**
+1. Go to **Access Control** and click **Add Policy** for each policy
 2. Create policies between the routing peer groups:
 
 ```
@@ -137,14 +123,6 @@ For route-level access control (if Access Control Groups configured), you can re
 Source: aws-routing-peers → Destination: gcp-routing-peers (specific protocols)
 Source: gcp-routing-peers → Destination: aws-routing-peers (specific protocols)
 ```
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-cloud/add-policy-aws-to-gcp-tcp.png" alt="AWS to GCP policy with TCP port 443" className="imagewrapper"/>
-</p>
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-cloud/add-policy-gcp-to-aws-udp.png" alt="GCP to AWS policy with UDP port 53" className="imagewrapper"/>
-</p>
 
 ## Step 5: Configure VPC Routing
 
@@ -183,7 +161,7 @@ ping 10.0.0.100  # AWS instance
 ### AWS
 
 - Security groups must allow traffic from the openZro routing peer
-- Enable source/destination check disabled on the routing peer instance
+- Disable the source/destination check on the routing peer instance
 - Consider using an Auto Scaling group for the routing peer with a static ENI
 
 ### GCP

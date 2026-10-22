@@ -63,7 +63,9 @@ If an ACL Group is assigned but no policies grant access to it, all routed traff
 Deploy multiple routing peers for the same route to provide failover. openZro clients automatically select the best available peer based on:
 - Connection type (direct vs relayed)
 - Defined metric priority (lower = higher priority)
-- Connection quality
+- Connection quality (latency)
+
+Each client uses one routing peer at a time; the others take over if it fails. Traffic is not load-balanced across routing peers.
 
 ## Why Use Network Routes?
 

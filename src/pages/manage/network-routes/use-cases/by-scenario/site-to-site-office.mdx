@@ -40,7 +40,7 @@ Before installing openZro on your routing peers, create setup keys with auto-ass
 3. For headquarters:
    - Name: "HQ Routing Peer"
    - Auto-assigned groups: Create and add `hq-routing-peers`
-   - Click **Create**
+   - Click **Create Setup Key**
 4. For branch office:
    - Name: "Branch Routing Peer"
    - Auto-assigned groups: Create and add `branch-routing-peers`
@@ -58,7 +58,7 @@ Install openZro on a server at each location:
 ```bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-sudo openzro up --setup-key YOUR_HQ_SETUP_KEY
+sudo openzro up --setup-key YOUR_HQ_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
 **At branch office:**
@@ -66,7 +66,7 @@ sudo openzro up --setup-key YOUR_HQ_SETUP_KEY
 ```bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-sudo openzro up --setup-key YOUR_BRANCH_SETUP_KEY
+sudo openzro up --setup-key YOUR_BRANCH_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
 ## Step 3: Create Network Routes
@@ -77,27 +77,25 @@ sudo openzro up --setup-key YOUR_BRANCH_SETUP_KEY
 3. Network range: `10.0.0.0/24`
 4. Routing Peer: Select "hq-router" (or use "hq-routing-peers" Peer Group)
 5. Distribution Groups: "branch-routing-peers"
-6. Access Control Groups: "hq-routing-peers" (required for route-level policies—this group becomes the destination in access policies; without it, policies targeting this route won't apply)
+6. Access Control Groups: "hq-routing-peers" (optional; set it only if you want policies to restrict access to this route, as the group then becomes the destination of those policies)
 7. Network Identifier: `hq-network`
-8. Enable **Masquerade** (in Additional Settings)
+8. Leave **Masquerade** on (Additional Settings; on by default)
 9. Click **Add Route**
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-office/add-route-hq-network.png" alt="Create route for headquarters network" className="imagewrapper"/>
-</p>
 
 **For branch office:**
 1. Click **Add Route**
 2. Network range: `10.1.0.0/24`
 3. Routing Peer: Select "branch-router" (or use "branch-routing-peers" Peer Group)
 4. Distribution Groups: "hq-routing-peers"
-5. Access Control Groups: "branch-routing-peers" (required for route-level policies—this group becomes the destination in access policies; without it, policies targeting this route won't apply)
+5. Access Control Groups: "branch-routing-peers" (optional; set it only if you want policies to restrict access to this route, as the group then becomes the destination of those policies)
 6. Network Identifier: `branch-network`
-7. Enable **Masquerade** (in Additional Settings)
+7. Leave **Masquerade** on (Additional Settings; on by default)
 8. Click **Add Route**
 
+Both routes now appear on the **Network Routes** page:
+
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-office/add-route-branch-network.png" alt="Create route for branch network" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-office/routes-office.png" alt="Network Routes page with both site routes" className="imagewrapper-big"/>
 </p>
 
 ## Step 4: Create Access Policies
@@ -115,14 +113,6 @@ For route-level access control (if ACL Groups configured), you can restrict by p
 Source: hq-routing-peers → Destination: branch-routing-peers (specific protocols)
 Source: branch-routing-peers → Destination: hq-routing-peers (specific protocols)
 ```
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-office/add-policy-hq-to-branch-tcp.png" alt="HQ to branch policy with TCP ports 8080 and 53" className="imagewrapper"/>
-</p>
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-office/add-policy-branch-to-hq-tcp.png" alt="Branch to HQ policy with TCP port 443" className="imagewrapper"/>
-</p>
 
 ## Step 5: Configure Network Equipment
 
@@ -226,8 +216,7 @@ For critical connections:
 
 **Slow performance:**
 1. Check routing peer placement—it should have good network connectivity
-2. Consider enabling [lazy connections](/manage/peers/lazy-connection) for large deployments
-3. Review network route priorities if multiple routes exist
+2. If several routing peers serve a route, check their **Metric** values: the lowest metric is preferred
 
 ## Advanced Configuration
 
