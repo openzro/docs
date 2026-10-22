@@ -21,21 +21,26 @@ Remote Laptop ──────► openZro Tunnel ──────► Routing
 
 ## Step 1: Connect a Remote Worker Device to openZro
 
-If you haven't already, install openZro on a remote worker's laptop and connect:
+If you haven't already, [install openZro](/get-started/install) on a remote worker's laptop and connect:
 
-1. Download openZro from [your-management.example.com/install](https://your-management.example.com/)
-2. Run the application and click **Connect** in the system tray
-3. Complete the sign-up process in your browser
-4. Verify the device appears in the [openZro dashboard](https://your-management.example.com/) under **Peers**
+1. Run the application and click **Connect** in the system tray, or run
+   `openzro up --management-url https://<your-management-domain>`
+2. Sign in with the worker's account in the browser
+3. Verify the device appears under **Peers** in your openZro dashboard
 
 ## Step 2: Add the Remote Worker to a User Group
 
-1. In the **Peers** section of the dashboard, select the remote worker's device
+1. In **Peers**, open the remote worker's device
 2. Under **Assigned Groups**, add a new group: `remote-workers`
 
 <p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/remote-worker-access/peer-remote-worker-assigned-group.png" alt="Add remote worker to group" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/associate-peer-groups.png" alt="Assigned Groups on the peer page" className="imagewrapper-big"/>
 </p>
+
+<Note>
+To put every device a user adds into `remote-workers` automatically, add the group to the user's **Auto-assigned
+groups** under **Users & Groups**.
+</Note>
 
 ## Step 3: Find Your Office Subnet
 
@@ -44,11 +49,7 @@ Before configuring openZro, identify your office network's subnet.
 **On your routing peer device, run:**
 
 ```bash
-# Linux
 ip route | grep -E "^[0-9]"
-
-# Windows (PowerShell)
-Get-NetRoute | Where-Object { $_.DestinationPrefix -like "*.*.*.*/*" }
 ```
 
 Look for your local subnet, typically something like `10.0.0.0/24` or `192.168.1.0/24`.
@@ -57,76 +58,59 @@ Look for your local subnet, typically something like `10.0.0.0/24` or `192.168.1
 
 1. Go to **Networks** in the openZro dashboard
 2. Click **Add Network**
-3. Name it "Office LAN" and click **Save**
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/remote-worker-access/add-network-office-lan.png" alt="Add network" className="imagewrapper"/>
-</p>
+3. Name it `Office LAN` and click **Add Network**
 
 ## Step 5: Add Your Office Subnet as a Resource
 
-1. In your new network, click **Add Resource**
-2. In the **Resource** tab, enter a name like "Office Subnet"
-3. Enter your office subnet (e.g., `10.0.0.0/24`)
-4. Expand **Additional Options** and under **Resource Groups**, create a group called `office-lan`
-5. Click **Continue** to proceed to the **Access Control** tab
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/remote-worker-access/add-resource-office-subnet.png" alt="Add resource" className="imagewrapper"/>
-</p>
+1. In your new network, on the **Resources** tab, click **Add Resource**
+2. Enter a name like `Office Subnet`
+3. Enter your office subnet (e.g., `10.0.0.0/24`) as the **Address**
+4. Under **Destination Groups**, create a group called `office-lan`
+5. Click **Add Resource**
 
 <Note>
-For more granular access, add specific server IPs instead of the entire subnet. For example, add `10.0.0.50/32` to only allow access to a specific file server.
+For more granular access, add specific server IPs instead of the entire subnet. For example, add `10.0.0.50` to only allow access to a specific file server.
 </Note>
 
 ## Step 6: Create an Access Policy
 
-1. In the **Access Control** tab, click **Add Policy**
-2. Set **Source** to "`remote-workers`"
-3. Set **Destination** to `office-lan`
-4. Set **Protocol** based on needs (TCP for most apps, All for full access)
-5. Name it "Remote Worker Office Access" and click **Add Policy**
-6. Click **Add Resource** to save the resource with its policy
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/remote-worker-access/add-policy-remote-worker-office-access.png" alt="Create policy for remote worker office access" className="imagewrapper"/>
-</p>
+1. Click **Add Policy** on the `Office Subnet` row. The destination is already `office-lan`.
+2. Set **Source** to `remote-workers`
+3. Set **Protocol** based on needs (TCP with specific ports for most apps, `ALL` for full access)
+4. Click **Continue** twice, name it `Remote Worker Office Access`, and click **Add Policy**
 
 ## Step 7: Set Up the Routing Peer
 
-The routing peer forwards traffic from openZro to your office network. Choose an always-on server at your office:
-- A dedicated Linux VM
-- A Windows Server
-- A Docker container on an existing server
+The routing peer forwards traffic from openZro to your office network. Use an always-on Linux server or VM at your
+office.
 
 **Install openZro on your routing peer:**
 
 1. In the openZro dashboard, go to **Setup Keys**
-2. Create a new setup key (one-time use recommended). Add `office-lan` to **Auto-assigned groups** and click **Create Setup Key**.
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/remote-worker-access/create-new-setup-key-office-lan.png" alt="Create setup key" className="imagewrapper"/>
-</p>
+2. Create a new setup key (one-off is recommended). Add `office-routers` to **Auto-assigned groups** and click
+   **Create Setup Key**.
 
 <Note>
-You can also add groups to peers manually after setup. Go to **Peers**, select the peer, and add groups under **Assigned Groups**.
+Use a group of its own for routing peers instead of `office-lan`. The `office-lan` group is the policy destination, so
+putting the routing peer in it would also give `remote-workers` access to the routing peer itself.
 </Note>
 
 3. On your routing peer, run:
 
 ```bash
-# Linux
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-sudo openzro up --setup-key YOUR_SETUP_KEY
-
-# Windows (PowerShell as Administrator)
-Invoke-WebRequest -Uri "https://github.com/openzro/openzro/releases/latest" -OutFile "install.ps1"; .\install.ps1
-openzro up --setup-key YOUR_SETUP_KEY
+sudo openzro up --setup-key YOUR_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
-4. In the Networks view, click **Add Routing Peer** on your Office LAN network
-5. Select your new peer and click **Add Routing Peer**
+4. In the `Office LAN` network, open the **Routing Peers** tab and click **Add Routing Peer**
+5. Choose **Peer Group**, select `office-routers`, click **Continue** and then **Add Routing Peer**
+
+The office network is now set up:
+
+<p>
+    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/remote-worker-access/office-lan-network.png" alt="Office LAN network with the office subnet resource" className="imagewrapper-big"/>
+</p>
 
 ## Step 8: Test the Connection
 
@@ -143,7 +127,7 @@ Remote workers can now access office resources from any location.
 
 For additional remote workers:
 
-1. Have employees install openZro from [your-management.example.com/install](https://your-management.example.com/)
+1. Have employees [install openZro](/get-started/install) and connect to your management server
 2. After they connect, go to **Peers** and select their device
 3. Under **Assigned Groups**, add them to the "`remote-workers`" group
 
@@ -161,7 +145,7 @@ Alternatively, create a setup key with "`remote-workers`" as an auto-assigned gr
 
 For critical connections, consider:
 - Multiple routing peers at each location
-- Monitoring routing peer health via [Notifications](/manage/settings/notifications) to get alerted when a routing peer disconnects
+- Monitoring routing peer health with your existing tools (`openzro status` on the routing peer)
 - Automatic failover configuration
 
 ### Security
@@ -180,7 +164,7 @@ For critical connections, consider:
 **Slow performance:**
 1. Check routing peer placement—it should have good network connectivity
 2. Consider enabling [lazy connections](/manage/peers/lazy-connection) for large deployments
-3. Review network route priorities if multiple routes exist
+3. If several routing peers serve the network, check their **Metric** values: the lowest metric is preferred
 
 ## Next Steps
 

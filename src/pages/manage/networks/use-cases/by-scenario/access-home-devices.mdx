@@ -21,20 +21,20 @@ Your Laptop ──────► openZro Tunnel ──────► Routing P
 
 ## Step 1: Connect Your Laptop to openZro
 
-If you haven't already, install openZro on your laptop and connect:
+If you haven't already, [install openZro](/get-started/install) on your laptop and connect:
 
-1. Download openZro from [your-management.example.com/install](https://your-management.example.com/)
-2. Run the application and click **Connect** in the system tray
-3. Complete the sign-up process in your browser
-4. Verify your device appears in the [openZro dashboard](https://your-management.example.com/) under **Peers**
+1. Run the application and click **Connect** in the system tray, or run
+   `openzro up --management-url https://<your-management-domain>`
+2. Sign in with your account in the browser
+3. Verify your device appears under **Peers** in your openZro dashboard
 
 ## Step 2: Add Your Laptop to a User Group
 
-1. In the **Peers** section of the dashboard, select your laptop peer
-2. Under **Assigned Groups**, add a new group: "Home Users"
+1. In **Peers**, open your laptop peer
+2. Under **Assigned Groups**, add a new group: `home-users`
 
 <p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/access-home-devices/add-user-group.png" alt="Add user group" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/associate-peer-groups.png" alt="Assigned Groups on the peer page" className="imagewrapper-big"/>
 </p>
 
 ## Step 3: Find Your Home Subnet
@@ -57,56 +57,40 @@ Look for your local subnet, typically something like `192.168.1.0/24` or `192.16
 
 1. Go to **Networks** in the openZro dashboard
 2. Click **Add Network**
-3. Name it "Home LAN" and click **Save**
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/access-home-devices/add-network-home-lan.png" alt="Add network" className="imagewrapper"/>
-</p>
+3. Name it `Home LAN` and click **Add Network**
 
 ## Step 5: Add Your Home Subnet as a Resource
 
-1. In your new network, click **Add Resource**
-2. In the **Resource** tab, enter a name like "Home Subnet"
-3. Enter your home subnet (e.g., `192.168.1.0/24`)
-4. Expand **Additional Options** and under **Resource Groups**, create a group called `home-lan`
-5. Click **Continue** to proceed to the **Access Control** tab
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/access-home-devices/add-resource-home-network.png" alt="Add resource" className="imagewrapper"/>
-</p>
+1. In your new network, on the **Resources** tab, click **Add Resource**
+2. Enter a name like `Home Subnet`
+3. Enter your home subnet (e.g., `192.168.1.0/24`) as the **Address**
+4. Under **Destination Groups**, create a group called `home-lan`
+5. Click **Add Resource**
 
 <Note>
-For more granular access, add specific device IPs instead of the entire subnet. For example, add `192.168.1.50/32` to only allow access to your NAS.
+For more granular access, add specific device IPs instead of the entire subnet. For example, add `192.168.1.50` to only allow access to your NAS.
 </Note>
 
 ## Step 6: Create an Access Policy
 
-1. In the **Access Control** tab, click **Add Policy**
-2. Set **Source** to "Home Users"
-3. Set **Destination** to `home-lan`
-4. Set **Protocol** to All
-5. Name it "Home LAN Access" and click **Add Policy**
-6. Click **Add Resource** to save the resource with its policy
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/access-home-devices/add-policy-home-lan.png" alt="Add policy" className="imagewrapper"/>
-</p>
+1. Click **Add Policy** on the `Home Subnet` row. The destination is already `home-lan`.
+2. Set **Source** to `home-users` and **Protocol** to `ALL`
+3. Click **Continue** twice, name it `Home LAN Access`, and click **Add Policy**
 
 ## Step 7: Set Up the Routing Peer
 
-The routing peer forwards traffic from openZro to your local network. Use any always-on device:
-- Raspberry Pi
-- Synology NAS
-- Apple TV/Android TV
-- Home server
+The routing peer forwards traffic from openZro to your local network. Use any always-on Linux device, such as a
+Raspberry Pi or a home server.
 
 **Install openZro on your routing peer:**
 
 1. In the openZro dashboard, go to **Setup Keys**
-2. Create a new setup key (one-time use recommended). Add `home-lan` to **Auto-assigned groups** and click **Create Setup Key**.
+2. Create a new setup key (one-off is recommended). Add `home-routers` to **Auto-assigned groups** and click
+   **Create Setup Key**.
 
 <Note>
-You can also add groups to peers manually after setup. Go to **Peers**, select the peer, and add groups under **Assigned Groups**.
+Use a group of its own for the routing peer instead of `home-lan`. The `home-lan` group is the policy destination, so
+putting the routing peer in it would also give `home-users` access to the routing peer itself.
 </Note>
 
 3. On your routing peer, run:
@@ -114,19 +98,16 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 ```bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-sudo openzro up --setup-key YOUR_SETUP_KEY
+sudo openzro up --setup-key YOUR_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
-4. In the Networks view, click **Add Routing Peer** on your Home LAN network
+4. In the `Home LAN` network, open the **Routing Peers** tab and click **Add Routing Peer**
+5. Choose **Peer Group**, select `home-routers`, click **Continue** and then **Add Routing Peer**
+
+Your home network is now set up:
 
 <p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/access-home-devices/add-routing-peer.png" alt="Add routing peer button" className="imagewrapper"/>
-</p>
-
-5. Select your new peer and click **Add Routing Peer**
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/access-home-devices/add-routing-peer-home-network.png" alt="Add routing peer" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/access-home-devices/home-lan-network.png" alt="Home LAN network with the home subnet resource" className="imagewrapper-big"/>
 </p>
 
 ## Step 8: Test the Connection
@@ -160,7 +141,7 @@ You can now access your home devices from anywhere.
 
 **Intermittent connectivity:**
 1. Ensure the routing peer has a stable internet connection
-2. Check if your ISP blocks VPN traffic (try a different port or protocol)
+2. Check whether your network blocks UDP; openZro falls back to relayed connections, which work over TCP/WebSocket but are slower
 
 ## Next Steps
 
