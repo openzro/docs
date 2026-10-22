@@ -2,26 +2,22 @@
 
 openZro [Network Routes](/manage/network-routes) enable peers to access external networks such as VPCs, LANs, or office networks. When multiple networks have overlapping IP ranges, openZro's route selection feature lets you choose which routes to apply on the client side.
 
-<Note>
-    Route selection requires openZro client version 0.27.4 or later.
-</Note>
-
 ## Using Route Selection
 
 You can select routes through the CLI or the system tray GUI.
 
 ### CLI
 
-List available routes:
+List available networks (`openzro routes` still works as an alias of `openzro networks`):
 
 ```bash
-openzro routes list
+openzro networks list
 ```
 
 Example output:
 
 ```
-Available Routes:
+Available Networks:
 
   - ID: aws-vpc-ireland
     Network: 172.17.0.0/16
@@ -35,38 +31,36 @@ Available Routes:
 In this example, both routes have the same network range and are both selected, causing a conflict. To resolve this, select only one route:
 
 ```bash
-openzro routes select aws-vpc-ireland
+openzro networks select aws-vpc-ireland
 ```
 
 <Note>
-    Running `openzro routes select` deselects all other routes by default.
+    Running `openzro networks select` replaces the current selection by default. Use `-a` to append instead.
 </Note>
 
 Additional examples:
 
 ```bash
 # Select all routes
-openzro routes select all
+openzro networks select all
 
 # Select multiple routes
-openzro routes select route1 route2
+openzro networks select route1 route2
 
 # Append a route without deselecting others
-openzro routes select -a route3
+openzro networks select -a route3
 ```
 
 ### GUI
 
-Open the openZro system tray application and navigate to **Network Routes**. Click the checkbox next to each route to select or deselect it.
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/overlapping-routes/select-network-routes.png" alt="Route selection in system tray" className="imagewrapper"/>
-</p>
+Open the openZro tray menu and click **Networks**. The window has three tabs: **All networks**, **Overlapping
+networks** and **Exit-node networks**. Use the checkbox next to each route to select or deselect it, or the
+**Select all** and **Deselect All** buttons.
 
 ### Enabling All Routes
 
-Use `openzro routes select all` in the CLI or the corresponding button in the GUI to select all available routes, including any added in the future. This restores the default behavior.
+Use `openzro networks select all` in the CLI or the corresponding button in the GUI to select all available routes, including any added in the future. This restores the default behavior.
 
 ### Disabling All Routes
 
-Use `openzro routes deselect all` in the CLI or the GUI button to deselect all routes, including any added in the future.
+Use `openzro networks deselect all` in the CLI or the GUI button to deselect all routes, including any added in the future.

@@ -1,14 +1,10 @@
 # Configuring Routes with Access Control
 
-<Note>
-    This feature requires openZro version 0.30.0 or later.
-</Note>
-
 By default, network routes allow unrestricted access when no access control groups are assigned. When you assign access control groups to a route, only traffic that matches the defined policies can access the routed network.
 
 ## How Route Access Policies Work
 
-Route access policies are unidirectional and apply only from routing clients to routing peers. The access control group takes effect only when used as a destination group in a policy.
+Route access policies are unidirectional and apply only from routing clients to routing peers. The access control group takes effect only when used as a destination group in a policy, and the policy's source peers must also be in the route's distribution groups to receive the route.
 
 If you assign an empty group (one containing no peers) as the access control group, only the routed network is affected by the policy, not the routing peer itself.
 
@@ -18,69 +14,50 @@ If you assign an empty group (one containing no peers) as the access control gro
 
 ## Creating a Network Route with Access Control
 
-To create a network route with access control groups, navigate to **Network Routes** and click **Add Route**.
+Go to **Network Routes** and click **Add Route**. In this example (see [Key Concepts](/manage/network-routes#key-concepts) for field descriptions):
 
-In this example, we create a route with the following settings (see [Key Concepts](/manage/network-routes#key-concepts) for field descriptions):
-
-- **Network identifier:** `aws-eu-central-1-vpc`
-- **Description:** `Production VPC in Frankfurt`
-- **Network range:** `10.10.0.0/16`
-- **Routing peer:** `server`
-- **Distribution Groups:** `devs`
-- **Access Control Groups:** `servers`
+1. **Route** tab: network range `10.10.0.0/16`, routing peer `aws-eu-router-az-a`. Click **Continue**.
+2. **Groups** tab: **Distribution Groups** `devs`, **Access Control Groups** `servers`. Click **Continue**.
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-route-acl.png" alt="Network route configuration with access control" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-route-acl-group-settings.png" alt="Groups tab with distribution and access control groups" className="imagewrapper"/>
 </p>
 
-Click **Continue** to proceed.
+3. **Name & Description** tab: **Network Identifier** `office-servers`. Click **Continue**.
+4. **Additional Settings** tab: keep the defaults and click **Add Route**.
+
+Because the route has an access control group, the dashboard asks whether to create a policy for it:
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-route-acl-group-settings.png" alt="Network route group settings" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-route-acl-prompt.png" alt="Prompt to create a policy for the route" className="imagewrapper"/>
 </p>
 
-Complete the configuration and click **Add Route** to save.
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-route-acl-saved.png" alt="Saved network route" className="imagewrapper-big"/>
-</p>
-
-Because you assigned an access control group, you will be prompted to create a policy:
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-route-acl-prompt.png" alt="Policy creation prompt" className="imagewrapper"/>
-</p>
-
-Click **Create Policy** to continue.
+Click **Create Policy**. The policy editor opens with the route's distribution groups as source, its access control
+groups as destination, and protocol `ALL`.
 
 ## Creating an Access Control Policy
 
-If you skipped the prompt, navigate to **Access Control** > **Policies** and click **Add policy**.
+If you chose **Later**, go to **Access Control** and click **Add Policy**, then set the source and destination groups
+yourself.
 
-Specify source and destination groups, configure protocol settings, and add Posture Checks if needed. Traffic direction applies only when TCP or UDP is selected.
+Direction is honoured for every protocol, including `ALL` and `ICMP`. In this example the policy uses:
 
-In this example, we create a policy with:
-
-- **Name:** `Devs to Servers`
-- **Description:** `Devs are allowed to access servers`
-- **Protocol:** `TCP`
-- **Ports:** `80`
-- **Source Groups:** `devs`
-- **Destination Groups:** `servers`
+- **Policy name:** `office-servers Policy` (pre-filled from the route)
+- **Source:** `devs`
+- **Destination:** `servers`
+- **Protocol:** `TCP`, **Ports:** `80` (on the **Ports & Protocol** tab)
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-acl-create-policy.png" alt="Create access control policy" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-acl-create-policy.png" alt="Policy editor pre-filled from the route" className="imagewrapper-big"/>
 </p>
 
-You can create new groups by typing a name in the source or destination input fields.
-
-Click **Add Policy** to save. The policy appears in the table.
+Click **Add policy** to save. The route now lists its distribution and access control groups:
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-acl-new-policy.png" alt="New policy in table" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-configuration/access-control/network-route-acl-saved.png" alt="Route with access control group" className="imagewrapper-big"/>
 </p>
 
-With this configuration, peers connected to your routing peer can only access port 80 on the routed network.
+With this configuration, peers in `devs` can only reach port 80 on the routed network.
 
 ## Site-to-Site Traffic Configuration
 
@@ -96,9 +73,10 @@ When masquerading is disabled, access control groups are not required. Traffic f
 
 Choose the configuration that matches your security requirements.
 
-## Behavior Changes in Version 0.30.0
+## Traffic Initiated from the Routed Network
 
-Before version 0.30.0, routing clients accepted any traffic initiated from routed networks. From version 0.30.0 onwards, routing clients only accept return traffic for connections they initiated.
+Routing clients only accept return traffic for connections they initiated through the route. Devices in the routed
+network cannot open new connections to a routing client.
 
 **Example:**
 
@@ -108,10 +86,7 @@ graph LR
     B --- C[Routed Network]
 ```
 
-- **Pre-0.30.0:** Peer A accepted connections initiated from the routed network through Peer B.
-- **Post-0.30.0:** Peer A only accepts return traffic for connections it initiates.
-
-To allow traffic initiated from the routed network in version 0.30.0 and later:
+To allow traffic initiated from the routed network to reach Peer A:
 
 1. Enable masquerade for the route.
 2. Add a peer access policy allowing traffic from the routing peer to the routing client (Peer B to Peer A). This is required whether or not route access policies exist.
