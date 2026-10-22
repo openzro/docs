@@ -69,7 +69,7 @@ export function NavigationAPI({tableOfContents, className}) {
           <TopLevelNavItem href="/api">API</TopLevelNavItem>
           <TopLevelNavItem href="https://openzro.io/knowledge-hub/">Learn</TopLevelNavItem>
           <TopLevelNavItem href="https://github.com/openzro/openzro">Github</TopLevelNavItem>
-          <TopLevelNavItem href="/slack-url">Support</TopLevelNavItem>
+          <TopLevelNavItem href="https://github.com/openzro/openzro/discussions">Support</TopLevelNavItem>
           {apiNavigation.map((group, groupIndex) => (
               <NavigationStateProvider key={group.title} index={groupIndex}>
                 <NavigationGroup
