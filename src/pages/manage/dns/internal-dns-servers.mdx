@@ -106,7 +106,7 @@ Result:
 
 ### DNS Failover and Overlapping Domains
 
-Configure multiple nameserver IPs within a single nameserver entry for automatic failover. The client tries servers in order.
+Configure up to 3 nameserver IPs within a single nameserver entry for automatic failover. The client tries them in order.
 
 If multiple nameservers match a query, the **most specific match wins**:
 
@@ -120,18 +120,25 @@ Nameservers:
 Result: Uses DNS2 (more specific)
 ```
 
+When the **same** match domain is configured in several nameserver entries that reach a peer, only the
+highest-priority one answers by default. For split-horizon setups where different resolvers return different but
+valid answers for the same zone, the client can instead compare the answers: set `"DNSSelectionPolicy":
+"prefer_private"` in the client's profile configuration (for example `/var/lib/openzro/default.json`) and restart the
+client. It then prefers the answer that points into the openZro network or a private range. There is no CLI flag for
+this setting yet.
+
 ---
 
 ## Managing Nameservers
 
 ### Editing
 
-1. Navigate to **DNS** → **Nameservers**
-2. Click the nameserver to edit
-3. Modify settings and click **Save**
+1. Go to **DNS** and open the **Nameservers** tab
+2. Open the nameserver's row menu (**⋮**) and choose **Edit**
+3. Modify settings and click **Save Changes**
 
 <Note>
-Changes propagate to peers within 10-30 seconds. No peer restart required.
+Changes are pushed to peers right away. No peer restart required.
 </Note>
 
 ### Temporarily Disabling
@@ -144,8 +151,8 @@ Edit the nameserver and toggle **Enable Nameserver** to OFF. Peers stop using it
 Before deleting a primary nameserver, create a new primary first, or peers will revert to their original DNS settings.
 </Note>
 
-1. Click the nameserver
-2. Click **Delete** and confirm
+1. Open the nameserver's row menu (**⋮**)
+2. Choose **Delete** and confirm
 
 ---
 
@@ -197,10 +204,10 @@ tasklist /FI "PID eq <PID>"
 
 If the process is `dns.exe` or `svchost.exe` (hosting the DNS Server service), this confirms the port conflict.
 
-3. Optionally, capture a openZro debug bundle for further investigation:
+3. Optionally, capture an openZro debug bundle for further investigation:
 
 ```cmd
-openzro debug for 1m -U
+openzro debug for 1m
 ```
 
 **Fix:**
