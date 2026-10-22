@@ -3,40 +3,42 @@ Posture Checks is a security feature that enhances network protection by impleme
 
 In this regard, openZro posture checks verify various aspects of a connecting device, offering granular control over network access. These checks include **verifying the openZro client version**, allowing you to restrict access to peers with specific versions of the client software. Additionally, you can implement **geographical restrictions** based on country or region, giving you control over where connections can originate from.
 
-The feature also allows for network-level restrictions by enabling you to **allow or block specific peer network ranges**. Furthermore, you can set constraints based on the operating system of the connecting device, **ensuring that only approved OS versions can gain access**. For an even more detailed level of control, Posture Checks can examine the running processes on a peer device, **allowing or denying access based on the presence of specific applications or services**.
+The feature also allows for network-level restrictions by enabling you to **allow or block specific peer network ranges**. Furthermore, you can set constraints based on the operating system of the connecting device, **ensuring that only approved OS versions can gain access**. For an even more detailed level of control, Posture Checks can examine the running processes on a peer device, **allowing or denying access based on the presence of specific applications or services**. They can also **require that an MDM or EDR platform reports the device as compliant**, and **limit access to a time-of-day window**.
 
 By using these diverse checking capabilities, openZro empowers you to create a robust and finely-tuned security posture for your network, significantly reducing the risk of unauthorized access and potential security breaches.
 
 ## Setting Up Posture Checks
 
-Setting up posture checks in openZro is straightforward, you can follow the example in the video below:
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="-KlJUBuZrpo" /> */}
-
-Or follow the guide with other examples below:
-
-Log in to your openZro dashboard and navigate to `Access Control` > `Posture Checks` in the left menu. Click `Create Posture Check` or edit an existing one.
+In the openZro dashboard, go to **Posture Checks** and click **Add Posture Check**, or open an existing check to edit it.
 
 ![openZro Posture Checks](/docs-static/img/manage/access-control/posture-checks/posture-checks-01.png)
 
-A pop-up window will open with two tabs: `Checks` and `Name & Description`.
+A dialog opens with two tabs: **Checks** and **Name & Description**.
 
 ![Create Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-02.png)
 
 From here, you can manage access with posture checks based on several aspects:
 
 ### openZro Client Version
-Restrict access to peers with specific openZro client versions, thus ensuring that all devices connecting to the network use up-to-date, secure client software.
+Restrict access to peers running at least a minimum openZro client version, so that all devices connecting to the network use up-to-date client software.
+
+<Note>
+    The comparison ignores pre-release suffixes: `0.53.1-alpha.103` counts as `0.53.1`. You cannot require a minimum
+    alpha build with this check.
+</Note>
 
 ![openZro Client Version Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-03.png)
 
 ### Country and Region
-Limit network access based on geographical location, helping comply with data regulations or restrict access from high-risk areas. Note that you have two tabs available for this: `Allow` (green) and `Block` (red), making it easy to set up your preferred access rules..
+Limit network access based on geographical location, helping comply with data regulations or restrict access from high-risk areas. Note that you have two tabs available for this: `Allow` (green) and `Block` (red), making it easy to set up your preferred access rules.
 
-![Country and Region Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-04.png)
+The check needs the GeoLite2 database on the management server (see [geolocation support](/selfhosted/geo-support)).
+A peer whose location cannot be determined fails the check.
+
 <Note>
     When allowing access from specific locations in the network settings, all other locations are automatically blocked. Conversely, blocking certain locations means only those are blocked, while access remains open for all other locations.
 </Note>
-#### Peer Network Range
+### Peer Network Range
 This posture check lets you precisely control network access by specifying which IP ranges can connect to your network. You can create policies allowing only connections from approved locations, such as office networks or trusted remote work setups. Additionally, you can enhance security by blocking high-risk IP ranges working in tandem with geo-based posture checks. This granular control helps create a more secure network environment by limiting access to known, trusted sources while preventing connections from potentially risky or unauthorized IP addresses.
 
 ![Peer Network Range Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-05.png)
@@ -45,10 +47,6 @@ This posture check lets you precisely control network access by specifying which
 Restrict access based on the connecting device's OS, ensuring only approved and potentially more secure operating systems can connect.
 
 ![Operating System Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-06.png)
-<Note>
-    The Operating System Check requires openZro version [0.26.0](https://github.com/openzro/openzro/releases) or newer.
-</Note>
-
 The check evaluates the actual `OS version` for Android, macOS, and iOS, while for Linux and Windows, it assesses the `kernel version`.
 
 Below are some examples of OS versions for each operating system:
@@ -63,18 +61,35 @@ Below are some examples of OS versions for each operating system:
 * Windows Server 2022, Version 21H2: `10.0.20348`
 
 ### Process
-[Limit network access based on specific applications or services running on the connecting device](https://openzro.io/knowledge-hub/limit-network-access-based-on-running-processes). By verifying specific applications or processes, you ensure that only devices running essential security software, such as antivirus, firewalls, or endpoint protection agents, can connect to your network, reducing the risk of malware entering your network through unprotected devices. It also aids in maintaining compliance with regulatory requirements by enforcing consistent security measures across all devices.
+Limit network access based on specific applications or services running on the connecting device. By verifying specific applications or processes, you ensure that only devices running essential security software, such as antivirus, firewalls, or endpoint protection agents, can connect to your network, reducing the risk of malware entering your network through unprotected devices. It also aids in maintaining compliance with regulatory requirements by enforcing consistent security measures across all devices.
 
 Furthermore, this process-based posture check allows you to create specific policies for different user groups or network segments based on their unique security needs. Working in conjunction with other posture checks in openZro, this setting offers a comprehensive and user-friendly approach to network security.
 
 ![Process Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-07.png)
 
+### Endpoint Security (MDM/EDR)
+Require that an MDM or EDR platform (Microsoft Intune, SentinelOne, Huntress or CrowdStrike Falcon) reports the
+device as compliant. Select one of the providers configured under **Integrations → MDM / EDR**. If the vendor API
+cannot be reached, the check fails unless you turn on **Fail open on lookup error**. See
+[MDM & EDR integrations](/manage/access-control/endpoint-detection-and-response) for provider setup.
+
+![Endpoint Security Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-endpoint-security.png)
+
+### Schedule
+Allow or deny connections inside a time-of-day window, for example business hours only, an after-hours lockout or a
+maintenance window. Choose the days of the week, a start and end time (a window ending before it starts wraps past
+midnight), a time zone (UTC if empty; the dashboard lists common zones, and the API accepts any IANA name such as
+`America/Sao_Paulo`), and whether the window allows or denies access. Management re-evaluates affected peers at the window boundaries, so connected peers lose or gain access on
+time.
+
+![Schedule Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-schedule.png)
+
 ## Name & Description
-After enabling the desired posture check, go to the `Name & Description` tab. Here, enter a descriptive name for your newly created posture check and save it.
+After enabling the desired checks, go to the **Name & Description** tab, enter a descriptive name and click **Create Posture Check**.
 
 ![Name your Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-08.png)
 
-You'll notice a gray dot to the left of the posture check name, indicating it's inactive. To activate the posture check, you need to link it to an access control policy. 
+The status dot next to the posture check name is off, indicating it's not in use yet. To activate the posture check, link it to an access control policy.
 
 ![New Posture Check](/docs-static/img/manage/access-control/posture-checks/posture-checks-09.png)
 
@@ -82,19 +97,19 @@ You'll notice a gray dot to the left of the posture check name, indicating it's 
 
 To apply a posture check:
 
-* [Create or edit an access control policy](https://docs.openzro.io/access-control).
-* Find the `Posture Checks` tab within the policy settings.
-* Choose `Browse Checks` to select an existing check or `New Posture Check` to create one.
+* [Create or edit an access control policy](/manage/access-control/manage-network-access#creating-policies).
+* Open the **Posture Checks** tab of the policy editor.
+* Choose **Browse Checks** to select an existing check or **New Posture Check** to create one.
 
 Note that you can add multiple posture checks to a single policy as needed for comprehensive security.
 
 ![Add Posture Check to Access Control Policy](/docs-static/img/manage/access-control/posture-checks/posture-checks-10.png)
 
-After adding the posture check, it will appear in the `POSTURE CHECKS` column. For easy management, you can click on it to edit the access control policy, allowing you to add or remove posture checks as needed.
+After saving the policy, the check appears in the **Posture Checks** column of the **Access Control** list.
 
 ![Access Control Policies Dashboard](/docs-static/img/manage/access-control/posture-checks/posture-checks-11.png)
 
-If you revisit the `Posture Checks` dashboard, you'll notice a green dot next to your recently configured posture check. This color shift indicates that the posture check is now active and integrated into your network security framework, actively contributing to your system's protection.
+Back on the **Posture Checks** page, the status dot next to the check is now on, showing that a policy uses it.
 
 ![Posture Checks Dashboard](/docs-static/img/manage/access-control/posture-checks/posture-checks-12.png)
 
