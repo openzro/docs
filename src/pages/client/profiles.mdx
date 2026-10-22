@@ -1,16 +1,16 @@
+import {Note} from "@/components/mdx";
+
 # Switching Between openZro Accounts with Profiles
 
 openZro supports multiple profiles on a single device, making it easy to switch between work, home, or other networks.
 Only one profile is active at a time, and switching takes just a click.
 
-This feature also allows you to switch between self-hosted and cloud-hosted openZro accounts seamlessly without needing
-to juggle multiple config files.
+Each profile can point at a different management server, so you can switch between openZro deployments without
+juggling config files.
 
 <p>
     <img src="/docs-static/img/client/profiles/profiles.png" alt="profiles" className="imagewrapper"/>
 </p>
-
-Watch a short demo GIF demonstrating how profile switching works [here](/docs-static/img/client/profiles/profiles.gif).
 
 ## openZro Profiles GUI Quickstart
 
@@ -21,20 +21,21 @@ To get started with openZro profiles:
 
 You will see a `default` profile created automatically.
 
-Add more profiles by hovering over the default profile and clicking "Manage Profiles".
-After adding a new profile, select it to make it active.
+Add more profiles from the tray menu: open the item that shows the active profile's name, choose **Manage Profiles**,
+and click **New Profile**.
+After adding a profile, click **Select** next to it to make it active.
 
 You can now change the openZro settings, e.g., providing a self-hosted
 instance URL or allowing SSH. The new settings will be saved in the new profile. Click "Connect" to bring up the new profile.
 
-The consequent selection of your profiles from the menu will automatically trigger the openZro client to connect to the network and authentication
-if needed.
+Selecting a profile from the menu afterwards connects the client to that network, asking you to log in if needed.
 
 ## Manage Profiles in the GUI
 
-* **Add** a new profile with a friendly name input.
-* **Delete** any inactive profile (trash icon).
-* **Active and default** profiles cannot be removed.
+* **New Profile** adds a profile with the name you enter.
+* **Select** makes a profile active.
+* **Remove** deletes an inactive profile.
+* The active profile and the `default` profile cannot be removed.
 
 <p>
     <img src="/docs-static/img/client/profiles/manage-profiles.png" alt="profiles" className="imagewrapper"/>
@@ -50,13 +51,17 @@ Think of it as a separate "openZro account" on your machine:
 - **Custom profiles**  
   Any number of additional profiles you add yourself (e.g. `work`, `home`, `test`).
 
-Profiles live in your system or user config folders:
+Profiles live in the client's state directory. The `default` profile is `default.json` at its root, and the profiles
+you add are stored in a subdirectory named after your user, for example `/var/lib/openzro/alice/work.json`.
 
-| OS     | Config path                  | 
-| ------ | --------------------------------- |
-| Linux  | `/var/lib/openzro/...`   | 
-| macOS  | `/var/lib/openzro...`| 
-| Windows| `%ProgramData%\openZro\profiles\` |
+| OS      | State directory           |
+| ------- | ------------------------- |
+| Linux   | `/var/lib/openzro`        |
+| macOS   | `/var/lib/openzro`        |
+| FreeBSD | `/var/db/openzro`         |
+| Windows | `%ProgramData%\Openzro`   |
+
+The `OZ_STATE_DIR` environment variable on the daemon overrides this location.
 
 ---
 
@@ -71,10 +76,10 @@ Profiles live in your system or user config folders:
 
 ## Upgrading From an Older Version
 
-If you're upgrading from openZro below version `0.52.0` that did not support profiles, here's what happens:
+If you're upgrading from a client version without profiles, here's what happens:
 
-* During the first launch after the upgrade, your existing config `/etc/openzro/config.json` (or Windows equivalent) is automatically
-copied to a new profile named  `default`.
+* During the first launch after the upgrade, your existing `config.json` (`/etc/openzro/config.json` on Linux and macOS,
+or `config.json` in the state directory on Windows and FreeBSD) is copied to a new profile named `default`.
 * The `default` profile is set as active, and you can start using it immediately.
 
 ## Disabling Profiles Feature
@@ -85,18 +90,17 @@ In some environments, you may want to disable the profiles feature entirely. Thi
 * **Security policies** that require a single, fixed configuration
 * **Automated deployments** where profile switching could interfere with operations
 
-To disable the profiles feature, you can use the `--disable-profiles` flag when installing the service:
+To disable the profiles feature, start the daemon with the `--disable-profiles` flag:
 
 ```shell
-sudo openzro service install --disable-profiles
+sudo openzro service run --disable-profiles
 ```
 
-Alternatively, you can set the `NB_DISABLE_PROFILES` environment variable:
-
-```shell
-export NB_DISABLE_PROFILES=true
-sudo openzro service install
-```
+<Note>
+    `openzro service install --disable-profiles` does not yet carry the flag into the installed service
+    ([openzro#245](https://github.com/openzro/openzro/issues/245)). Until that is fixed, add `--disable-profiles` to
+    the `service run` command in your service definition (for example a systemd drop-in).
+</Note>
 
 When profiles are disabled:
 * Users cannot create, switch, or remove profiles
@@ -104,10 +108,6 @@ When profiles are disabled:
 * All profile-related CLI commands are disabled
 * The client operates with a single, fixed configuration
 * Profile switching is completely prevented
-
-<Note>
-    You can also disable update settings functionality using the `--disable-update-settings` flag or `NB_DISABLE_UPDATE_SETTINGS` environment variable. This prevents users from modifying any configuration settings, providing an additional layer of control in managed environments.
-</Note>
 
 ---
 
@@ -117,7 +117,7 @@ With the CLI, you can manage profiles easily. The main command is:
 
 ```bash
 openzro profile <add|list|select|remove> [name]
-````
+```
 
 ### Add a New Profile
 
@@ -135,7 +135,7 @@ openzro profile add work
 
 This command does the following in the background:
 
-* Creates a `work.json` file in your config folder.
+* Creates a `work.json` file in your user's profile directory.
 * Keeps the client disconnected until you run `openzro up` or `openzro login`.
 * Will throw an error if the profile with the same name already exists.
 
@@ -206,28 +206,17 @@ If successful, you'll see:
 Profile removed successfully: home
 ```
 
-You can't remove an active profile. If the profile your are trying to remove is active, you'll see an error:
+You can't remove the active profile or the `default` profile; the command fails with an error. It also fails if the
+profile does not exist.
 
-```text
-Cannot remove active profile: home
-```
-
-If the profile does not exist, you'll see an error message:
-
-```text
-Error: profile home does not exist
-```
-
-The command does the following in the background:
-
-* Removes `home.json` and `home.state.json` files from your config folder.
+The command removes `home.json` from your profile directory. The profile's state file (`home.state.json`) is left in
+place.
 
 ---
 
-### Using `--profile` Flags
+### Using the `--profile` Flag
 
-You can use the `--profile` flag with any openZro CLI command to specify which profile to use for that command.
-This is useful for running commands in a specific context without switching profiles manually.
+The `openzro up` and `openzro login` commands accept a `--profile` flag to select a profile and use it in one step.
 
 ```bash
 openzro up --profile work
