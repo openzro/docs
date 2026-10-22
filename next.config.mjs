@@ -551,6 +551,16 @@ const nextConfig = {
                 destination: '/manage/dns/custom-zones',
                 permanent: true,
             },
+            {
+                source: '/manage/dns/nameserver-groups',
+                destination: '/manage/dns/internal-dns-servers#configuring-nameservers-for-internal-domains',
+                permanent: true,
+            },
+            {
+                source: '/manage/dns/private-dns-behind-routing-peers',
+                destination: '/manage/dns/internal-dns-servers#configuring-nameservers-for-internal-domains',
+                permanent: true,
+            },
             // Site-to-site documentation restructure redirects
             {
                 source: '/use-cases/setup-site-to-site-access',
