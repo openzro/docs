@@ -6,10 +6,6 @@ The Block Inbound Connections setting prevents all inbound connections to the lo
 
 This is a client-side override that takes precedence over any policies received from the management service.
 
-<Note>
-    Available since openZro <strong>v0.46.0</strong>.
-</Note>
-
 ## When to use it
 
 - **Outbound-only peers**: A machine that only needs to access remote resources but should never be reachable by other peers.
@@ -18,11 +14,16 @@ This is a client-side override that takes precedence over any policies received 
 
 ## What it blocks
 
-When Block Inbound Connections is enabled, the client will not add any inbound firewall rules. This means:
+When Block Inbound Connections is enabled, the client does not install the inbound rules from your access policies.
+This means:
 
 - **Peer connections**: Other peers cannot initiate connections to this machine.
-- **Routed network traffic**: If this peer acts as a routing peer, inbound traffic to its routed networks is also blocked.
-- **SSH access**: openZro SSH connections to this peer are blocked.
+- **Routing**: The peer stops acting as a routing peer or exit node, so traffic to the networks it would route is not
+  forwarded.
+- **SSH access**: The openZro SSH server does not start on this peer.
+
+Connections that this machine opens itself, and their replies, keep working. The peer still reaches other peers and
+uses the routes and DNS settings it receives.
 
 <Note>
     This setting overrides all policies from the management service. Even if an access control policy explicitly allows traffic to this peer, inbound connections will still be blocked.

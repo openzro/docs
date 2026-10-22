@@ -17,10 +17,13 @@ predict whether the project's posture might change.
 openZro the project is committed to BSD-3-Clause **forever**.
 That commitment is operational, not aspirational:
 
-- The fork-point (`v0.52.2`) is the last upstream commit before
-  NetBird relicensed the main repo to AGPLv3.
-- Code from `netbirdio/netbird` post-`v0.53.0` is **never**
-  copied, paraphrased, or translated into openZro. Security
+- The fork-point (`v0.52.2`) is the last upstream release before
+  NetBird relicensed `management/`, `signal/` and `relay/` to
+  AGPLv3 (from `v0.53.0`).
+- Code from upstream's AGPL directories after `v0.52.2` is
+  **never** copied, paraphrased, or translated into openZro.
+  Upstream directories that stay BSD-3 (such as `client/`) may
+  be adapted, with attribution. Security
   backports for advisories that affect the fork are
   re-implemented clean-room from the public CVE / GHSA prose,
   with the commit message documenting the public sources used
@@ -59,16 +62,18 @@ their own boundary of trust.
 
 ## What "self-host only" means in practice
 
-- **Binaries** live on [GitHub Releases](https://github.com/openzro/openzro/releases).
-  No `pkgs.openzro.io`, no `download.openzro.io` — those hostnames
-  do not exist for the project. The
-  [installation pages](/get-started/install) point operators at
-  Releases.
-- **Dashboard** runs at the operator's own URL — it is part of
-  the management binary, not a hosted property. Documentation
+- **Binaries** are published on [GitHub Releases](https://github.com/openzro/openzro/releases)
+  and as signed apt, yum, zypper and pacman repositories at
+  `pkg.openzro.io`, operated by the project. See the
+  [installation pages](/get-started/install).
+- **Dashboard** runs at the operator's own URL — it is a separate
+  static web app (container image or package) served by the
+  operator, not a hosted property. Documentation
   uses `https://your-management.example.com` as a placeholder
   whenever a dashboard URL appears.
-- **Identity Providers** are operator-supplied — Okta, Microsoft
+- **Identity Providers** are operator-supplied. openZro ships an
+  embedded Dex identity provider by default (with optional local
+  users), and Okta, Microsoft
   Entra, Auth0, Zitadel, Keycloak, Authentik, JumpCloud, Google
   Workspace are all integrated as
   [self-host identity providers](/selfhosted/identity-providers).
@@ -83,6 +88,10 @@ their own boundary of trust.
   `NEXT_PUBLIC_GTM_ID` at build time with your own IDs. The
   upstream's hardcoded NetBird container IDs were removed in
   the visual rebrand.
+- **Management usage counts** are on by default but go nowhere:
+  the endpoint is not operated by the project, so no data is
+  received. Start the management server with
+  `--disable-anonymous-metrics` to turn them off.
 
 ## What this means for compliance
 

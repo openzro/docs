@@ -1,10 +1,10 @@
 
-# Why Wireguard with openZro?
+# Why WireGuard with openZro?
 
 WireGuard is a modern and extremely fast VPN tunnel utilizing state-of-the-art [cryptography](https://www.wireguard.com/protocol/)
-and openZro uses Wireguard to establish a secure tunnel between machines.
+and openZro uses WireGuard to establish a secure tunnel between machines.
 
-Built with simplicity in mind, Wireguard ensures that traffic between two machines is encrypted and flowing, however, it requires a few things to be done beforehand.
+Built with simplicity in mind, WireGuard ensures that traffic between two machines is encrypted and flowing, however, it requires a few things to be done beforehand.
 
 First, in order to connect, the machines have to be configured.
 On each machine, you need to generate private and public keys and prepare a WireGuard configuration file.
@@ -31,6 +31,6 @@ and removing the necessity of port forwarding, opening holes in the firewall, an
 In cases when a direct peer-to-peer connection isn't possible, all traffic is relayed securely between peers.
 openZro also monitors the connection health and restarts broken connections.
 
-There are a few more things that we are working on to make secure private networks simple. A few examples are ACLs, MFA and activity monitoring.
+On top of this, openZro adds access control policies, posture checks, two-factor authentication and an activity log.
 
 Check out the WireGuard [Quick Start](https://www.wireguard.com/quickstart/) guide to learn more about configuring "plain" WireGuard without openZro.

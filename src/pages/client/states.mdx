@@ -6,8 +6,9 @@ icon family is consistent across Linux (GNOME / KDE / others), macOS
 (menu bar) and Windows (notification area) — same shield silhouette,
 same badge anchor at the bottom-right corner.
 
-This page documents every state you can see, what triggered it, and what
-to do about it.
+This page documents every icon you can see, what triggers it, and what
+to do about it. Hovering over the icon shows a tooltip such as
+`Openzro (Connected)`, and the first menu item repeats the state.
 
 ## State reference
 
@@ -26,10 +27,11 @@ to do about it.
       </td>
       <td><strong>Disconnected</strong></td>
       <td>
-        The client is installed and the daemon is running, but no connection
-        to the management server is active. You see this right after install,
-        after <code>openzro down</code>, or whenever the daemon has been
-        explicitly stopped.
+        The daemon is running but the client is not connected. You see this
+        right after install, after <code>openzro down</code> or
+        <strong>Disconnect</strong>, and while the client waits for you to
+        log in (the daemon reports <code>Idle</code>, <code>NeedsLogin</code>,
+        <code>LoginFailed</code> or <code>SessionExpired</code>).
       </td>
     </tr>
     <tr>
@@ -38,10 +40,9 @@ to do about it.
       </td>
       <td><strong>Connecting</strong></td>
       <td>
-        Transient state while the client is establishing the management
-        gRPC stream, exchanging keys with the relay, and bringing the
-        WireGuard interface up. Normally lasts 2–8 seconds. If the icon
-        stays in this state for more than ~30 seconds, see
+        Transient state while the client logs in to the management server,
+        opens its control channel and brings the WireGuard interface up. It
+        normally lasts a few seconds. If the icon stays in this state, see
         <a href="/help/troubleshooting-client">Troubleshooting</a>.
       </td>
     </tr>
@@ -51,10 +52,9 @@ to do about it.
       </td>
       <td><strong>Connected</strong></td>
       <td>
-        The mesh is up. The client has an active management Sync stream,
-        has registered with the signal service, and the WireGuard tunnel
-        to peers is established. Traffic is flowing per the policies that
-        apply to this peer's groups.
+        The client is connected to the management server and has applied its
+        network map. Tunnels to individual peers come up as they connect; run
+        <code>openzro status --detail</code> to see each one.
       </td>
     </tr>
     <tr>
@@ -63,11 +63,9 @@ to do about it.
       </td>
       <td><strong>Update available</strong> (disconnected)</td>
       <td>
-        A newer client release is available on the configured update channel,
-        and the client is not connected. Install the update from the system
-        package manager (
-        <code>apt</code>, <code>dnf</code>, <code>brew</code>,
-        Windows installer, etc.) to get the latest fixes.
+        The management server has told this client that a newer version is
+        available, and the client is not connected. How you install it depends
+        on the platform; see <a href="#updates">Updates</a>.
       </td>
     </tr>
     <tr>
@@ -76,9 +74,8 @@ to do about it.
       </td>
       <td><strong>Update available</strong> (connected)</td>
       <td>
-        Same as above, but the client is currently part of the mesh. Plan
-        your upgrade — restarting the client to pick up a new version
-        re-keys the WireGuard interface and triggers a brief reconnect.
+        Same as above, but the client is connected. Installing the update
+        restarts the daemon, which briefly disconnects the client.
       </td>
     </tr>
     <tr>
@@ -87,10 +84,12 @@ to do about it.
       </td>
       <td><strong>Error</strong></td>
       <td>
-        The client tried to connect but ran into an unrecoverable failure
-        (invalid token, management unreachable, posture check rejected,
-        etc.). Hover the systray icon for the specific message, or run
-        <code>openzro status</code> in a terminal for the full diagnostic.
+        You clicked <strong>Connect</strong> but the tray app could not reach
+        the openZro daemon, usually because the service is not running. Start
+        it with <code>sudo openzro service start</code> (or the Windows
+        service manager) and try again. Login and connection failures do not
+        show this icon; the client returns to <strong>Disconnected</strong>
+        instead, and <code>openzro status</code> shows the reason.
       </td>
     </tr>
   </tbody>
@@ -103,20 +102,34 @@ Typical happy-path lifecycle when a user runs `openzro up`:
 ```
 Disconnected  ──▶  Connecting  ──▶  Connected
                        │
-                       └──▶  Error  (auth or posture failure)
+                       └──▶  Disconnected  (login or connection failure)
 ```
 
 Background events that can shift state without user action:
 
-- **Token expiry** → `Connected` → `Connecting` (refresh) → `Connected`
-  (or `Error` if SSO denies).
+- **Session expiry** (when the administrator enabled login expiration) →
+  `Disconnected`, and the client opens the login page so you can log in again.
 - **Network change** (WiFi roaming, sleep/wake) → `Connected` →
   `Connecting` → `Connected`.
-- **Management restart** (operator-side, e.g. helm upgrade) →
-  `Connected` → `Connecting` → `Connected` (gRPC reconnect; usually under 10 s).
-- **Update detected by background poller** → flips badge to "update
-  available" without changing the underlying connected/disconnected
-  state.
+- **Management restart** (operator-side, e.g. a Helm upgrade) →
+  `Connected` → `Connecting` → `Connected` once the control channel
+  reconnects.
+- **Update announced by management** → adds the update badge without
+  changing the connected/disconnected state.
+
+## Updates
+
+The client does not check for updates on its own: the management server tells
+it when a newer version is available. What happens next depends on the
+platform:
+
+- **macOS**: the **About** menu shows **Install openZro X**, which downloads,
+  verifies and installs the update. When the administrator forces the
+  update, the client installs it without asking.
+- **Windows**: the **About** menu shows **Download openZro X (.msi)**, which
+  opens the installer for the new version in your browser.
+- **Linux**: the icon shows the update badge; upgrade with your package
+  manager.
 
 ## Login success page
 
@@ -146,11 +159,11 @@ causes. Quick reference:
 - **Stuck on Connecting (over 30 s)**: management URL unreachable, or DNS
   is broken inside the daemon's network namespace. `openzro status`
   prints the management URL it's trying.
-- **Disconnected → Error → Disconnected loop**: token expired and the
-  configured SSO connector is unavailable. Run `openzro login` again.
-- **Connected but no peer traffic**: a policy or admission posture
-  check is denying the peer. Check `openzro status --detail` for the
-  rejection reason.
-- **Update available stays after package upgrade**: the client polls
-  GitHub releases roughly every hour. Restart the daemon to force an
-  immediate refresh.
+- **Error icon after clicking Connect**: the daemon is not running.
+  Start the service and try again.
+- **Connected but no peer traffic**: check that a policy allows the
+  traffic and that the peer passes the policy's posture checks. In
+  `openzro status --detail`, look at whether the remote peer is listed
+  and connected.
+- **Update badge stays after a package upgrade**: restart the daemon so
+  it reports its new version to the management server.
