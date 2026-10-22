@@ -1,6 +1,6 @@
 # Connecting from the office
-A typical scenario administrators have is accessing their office networks remotely. With [Network routes](https://docs.openzro.io/manage/network-routes), openZro makes this easy. Still, administrators often want to avoid routing their users’ traffic via openZro when they are in the office.
-To solve this, administrators can leverage the power of [Posture Checks](https://docs.openzro.io/manage/access-control/posture-checks) and create policies that allow connection to the routing peers only if they are outside the office by using
+A typical scenario administrators have is accessing their office networks remotely. With [Network routes](/manage/network-routes), openZro makes this easy. Still, administrators often want to avoid routing their users’ traffic via openZro when they are in the office.
+To solve this, administrators can use [Posture Checks](/manage/access-control/posture-checks) and create policies that allow connection to the routing peers only if they are outside the office by using
 a [Peer Network Range](/manage/access-control/posture-checks#peer-network-range) posture check with a block action.
 
 ## Example
@@ -8,92 +8,96 @@ In the following scenario, our office network is on the subnet `192.168.1.0/24`.
 With this in mind, the goal is to create a Posture Check, create a Policy and assign a Posture Check to it, and finally create a Network Route that will expose the office subnet.
 
 ### Create a Posture Check
-To create a Posture Check, navigate to the `Access Control -> Posture Checks` section in the openZro dashboard and click on **Add Posture Check**.
+To create a Posture Check, go to **Posture Checks** in the openZro dashboard and click **Add Posture Check**.
 
-Select `Peer Network Range`.
+Select **Peer Network Range**.
 
 <p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/posture-check-new-block-network-range.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/posture-checks/posture-checks-02.png" alt="Create Posture Check dialog" className="imagewrapper"/>
 </p>
-Select the `Block` action and click on `Add Network Range` to input your office subbnet `192.168.1.0/24`.
+Select **Block** and click **Add Network Range** to enter your office subnet `192.168.1.0/24`.
 <Note>
 Note that if you have multiple locations that you want to see excluded, you can add multiple network ranges.
 </Note>
 <p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/posture-check-block-network-range.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/posture-checks/posture-checks-05.png" alt="Peer Network Range check blocking 192.168.1.0/24" className="imagewrapper"/>
 </p>
-Click `Save`, then click `Continue` and fill out `Name of the Posture Check` with "Exclude Office subnet”.
+Click **Save**, then **Continue**, name the posture check "Exclude Office subnet" and click **Create Posture Check**.
 
 After we conclude this step, we are ready to create a policy and assign this posture check. 
 ### Create a Policy
 We start by creating a simple policy that will allow access from group `route-users` to group `route-nodes`.
 This is needed to establish the connection between the users and the routing peer.
 
-Navigate to the `Access Control -> Policies` section in the openZro dashboard and click on `Add Policy`.
+Go to **Access Control** in the openZro dashboard and click **Add Policy**.
 
-On the `Source` field, select the group `route-user`, and on the `Destination` field, select the group `route-nodes`.
-Choose `UDP` for the protocol and type `1`on Ports. Click `Continue`.
+On the **Policy** tab, select the group `route-users` as **Source · From** and `route-nodes` as **Destination · To**.
+On the **Ports & Protocol** tab, choose `UDP` and enter port `1`.
 <Note>
-    Note that the protocol and port are arbitrary and can be changed according to your needs. An usual choice is to allow ICMP traffic for troubleshooting purposes.
+    The protocol and port are arbitrary: the policy only needs to connect the users to the routing peer. A common
+    choice is ICMP, which also helps with troubleshooting.
 </Note>
+Open the **Posture Checks** tab, click **Browse Checks**, select `Exclude Office subnet` and add it.
 <p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/policy-office-subnet-with-posturecheck.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/posture-checks/posture-checks-10.png" alt="Posture Checks tab of the policy editor" className="imagewrapper-big"/>
 </p>
-In this step, we'll click `Browse Checks` and select the posture check we created earlier, `Exclude Office subnet`.
-
-Click `Add Posture Checks` and then click `Continue`.
-<p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/policy-with-network-posturecheck-added.png" alt="high-level-dia" className="imagewrapper"/>
-</p>
-Give your policy the name "Allow users to route-nodes" and click on `Add Policy`.
+Name the policy "Allow users to route-nodes" in **Policy name** and click **Add policy**.
 
 We are now ready for the final step of creating the office route.
 
 ### Create a Network Route
 
-Now, let's create a [Network Route](https://docs.openzro.io/manage/network-routes) that will expose the local office subnet `192.168.1.0/24`,
+Now, let's create a [Network Route](/manage/network-routes) that will expose the local office subnet `192.168.1.0/24`,
 which will be distributed to all peers members of the group `route-users`. In this example, we will be using a routing peer named `router-01`,
 which is a member of the group `route-nodes`, this way, the policy we just created goes into effect, and all peers from the group `route-users` will be able to reach
 `router-01` only if they are not in the office network, due to our posture check.
 
-To get started navigate to `Network Routes` menu on the openZro dashboard and click on **Add Route**. Fill out the fields as shown in the image below, and click `Continue`:
+Go to **Network Routes** in the openZro dashboard and click **Add Route**. Enter the network range, select the `route-nodes` group on the **Peer Group** tab, and click **Continue**:
 <p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/create-route-with-posturecheck.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/create-route-with-posturecheck.png" alt="Create New Route with the office network range" className="imagewrapper"/>
 </p>
-Next assign `route-users` do `Distribution Groups`.
+Next, add `route-users` to **Distribution Groups**.
 <p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/distribute-to-groups-posturechecks.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/distribute-to-groups-posturechecks.png" alt="Distribution Groups for the route" className="imagewrapper"/>
 </p>
-Click `Continue` and assign the name "Office network access" to `Network Identifier`, click `Continue` again and in the final step, finish this process by clicking `Add Route`.
+Click **Continue**, enter "Office network access" as the **Network Identifier**, click **Continue** again, and finish with **Add Route**.
 ### Testing Posture Check
 Now that we have created the Posture Check, the Policy, and the Network Route, we can test this configuration. In the following example, we will be testing this Posture Check from a macOS client named `client-01`, and as stated earlier, it belongs to the group `route-users`.
 
-#### While connect from inside our office:
-Our local connection shows that we are connected to local office WiFi and and we are part of that subnet.
-<p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/wifi-inside-office-subnet.png" alt="high-level-dia" className="imagewrapper"/>
-</p>
+#### Connected from inside the office
 
-When we are connected from inside the office, we can observe that the openZro route is not available and that the subnet `192.168.1` is using local network interface `en0` to route traffic.
+The client is on the office Wi-Fi, in the `192.168.1.0/24` subnet. The posture check fails, so the route is not
+offered to this peer:
 
-<p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/openzro-routes-list-local.png" alt="high-level-dia" className="imagewrapper"/>
-</p>
+```bash
+$ openzro routes list
+No networks available.
+```
 
-<p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/netstat-routes-grep-local.png" alt="high-level-dia" className="imagewrapper"/>
-</p>
-#### When connected outside the office, we can observe: 
+Traffic to `192.168.1.0/24` uses the local interface (`en0` on macOS):
 
 <p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/openzro-routes-list-external.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/netstat-routes-grep-local.png" alt="netstat showing 192.168.1.0/24 via en0" className="imagewrapper"/>
 </p>
+
+#### Connected from outside the office
+
+The posture check passes and the route is available:
+
+```bash
+$ openzro routes list
+Available Networks:
+
+  - ID: Office network access
+    Network: 192.168.1.0/24
+    Status: Selected
+```
 
 <p>
-    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/netstat-routes-grep-external.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/access-control/posture-checks/connecting-from-the-office/netstat-routes-grep-external.png" alt="netstat showing 192.168.1.0/24 via utun100" className="imagewrapper"/>
 </p>
 
-Notice that subnet `192.168.1.0/24` is routed through our Wireguard interface (`utun100`).
+Notice that subnet `192.168.1.0/24` is now routed through the WireGuard interface (`utun100`).
 
-As you can see, the Posture Check is working as expected, and the traffic is being routed through openZro only when the client is outside the office network.
-This concludes this Posture Check example.
+As you can see, the posture check works as expected: traffic goes through openZro only when the client is outside the
+office network.

@@ -164,7 +164,7 @@ export const docsNavigation = [
                 href: '/manage/access-control/endpoint-detection-and-response/sentinelone-edr',
               },
               {
-                title: 'Bypass Compliance',
+                title: 'Admission Bypass',
                 href: '/manage/access-control/endpoint-detection-and-response/bypass-compliance',
               },
             ],

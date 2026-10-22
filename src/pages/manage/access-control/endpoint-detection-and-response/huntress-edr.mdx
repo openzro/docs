@@ -1,95 +1,64 @@
+import {Note} from "@/components/mdx";
+
 # Restrict Network Access with Huntress EDR
 
-[Huntress](https://www.huntress.com/) is a managed detection and response (MDR) platform designed for IT service providers and enterprises to protect endpoints from cyber threats. The Huntress agent continuously monitors endpoints, collecting security telemetry including Windows Defender status, firewall configuration, and policy compliance, which can be used to enforce network access controls based on device security posture.
+[Huntress](https://www.huntress.com/) is a managed detection and response (MDR) platform for IT service providers
+and enterprises. The Huntress agent monitors endpoints and reports to the Huntress console, which openZro can use to
+limit network access to devices with a healthy agent and no open incidents.
 
-The integration of openZro with Huntress provides network security by ensuring only devices that meet your defined security standards can access the protected network. This approach allows administrators to enforce access restrictions based on critical Windows security settings such as Defender health status, antivirus definitions, firewall state, and policy compliance, ensuring only properly secured endpoints have access to network resources via openZro.
+## What openZro checks
 
-In this guide, you'll learn how to integrate openZro with Huntress and configure access controls to allow only compliant devices onto your network.
+openZro looks up the peer's hostname in the Huntress API and treats the device as compliant only when:
 
-<Note>
-    TLDR: Devices that fail to meet Huntress security requirements (Defender Policy Status, Managed Microsoft Defender, or Firewall) will automatically lose network access. Once a device meets all compliance criteria, access is restored.
-</Note>
+- a Huntress agent is registered for that hostname;
+- the device has no open incident reports;
+- the agent is not flagged as outdated.
 
+There are no tunable criteria for Huntress.
 
 ## Prerequisites
 
-Before you start creating and configuring a Huntress integration, ensure that you have the following:
-- A Huntress account with the permissions to create and manage API keys.
-  If you don't have the required permissions, ask your Huntress administrator to grant them to you.
+- A Huntress account with permission to create API credentials. If you don't have it, ask your Huntress
+  administrator.
 
-## Create a Huntress API Key
+## Create Huntress API credentials
 
-- Navigate to your Huntress Management Console
-- Go to **Settings** &raquo; **API Credentials**
-- Click **Create API Credential**
-- Fill in the form:
-  - **Name**: `openZro Integration`
-  - **Description**: `API key for openZro EDR integration` (optional)
-- Click **Create**
-- Copy the generated API key and secret immediately (they will only be displayed once)
-- Note your Huntress organization key from the console
+1. In the Huntress dashboard, go to **Account Settings → API Credentials** and click **Create API Credential**.
+2. Name it, for example `openZro Integration`, and click **Create**.
+3. Copy the **API key** and **API secret**. They are shown only once.
 
-<Note>
-Treat the API credentials securely and store them safely. You will need both the API key and secret for the openZro integration configuration.
-</Note>
+## Add Huntress to openZro
 
-## Configure a Huntress Integration in openZro
-
-- Navigate to the [Integrations &raquo; EDR](https://your-management.example.com/) tab in the openZro dashboard
-- Click **Connect Huntress** to start the configuration wizard
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/huntress-edr/getting-started.png" alt="Huntress integration getting started" className="imagewrapper-big"/>
-</p>
-- Click the **Get Started** button to initiate the integration process
-- Enter the API key and secret you created in the previous step and click **Continue** to verify the connection
+1. In the openZro dashboard, go to **Integrations → MDM / EDR** and click **Add provider**.
+2. Fill in the **Add MDM/EDR provider** dialog:
+   - **Name**: a label for this provider, for example `huntress-prod`.
+   - **Type**: Huntress.
+   - **Refresh interval (minutes)**: how long a device's status is cached (1–60, default 5).
+   - **API Key** and **API Secret**: the credentials from the previous step.
+3. Click **Create**.
 
 <p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/huntress-edr/api-config.png" alt="Huntress API configuration" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/huntress-edr/add-provider.png" alt="Add MDM/EDR provider dialog with type Huntress" className="imagewrapper"/>
 </p>
 
-- Select the **groups** you want to apply the integration to and click **Connect**
+## Enforce the check
 
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/huntress-edr/group-config.png" alt="Huntress group configuration" className="imagewrapper-big"/>
-</p>
+1. Go to **Posture Checks**, create a check and add **Endpoint Security (MDM/EDR)** with the Huntress provider.
+2. Use the check in one or both ways:
+   - attach it to [access control policies](/manage/access-control/manage-network-access): failing peers are removed
+     from those policies' sources;
+   - add it to [Device Admission](/manage/access-control/posture-checks/device-admission) and enforce it: failing
+     devices are refused at login and sync, and connected ones are disconnected.
 
+See the [MDM / EDR overview](/manage/access-control/endpoint-detection-and-response) for how the two compare.
 
-<Note>
-    The EDR check will apply only to peers in the selected groups and will require a running Huntress agent.
-    You can also use groups [synchronized from your Identity Provider (IdP)](/manage/team/idp-sync).
-</Note>
+## Notes
 
-- Configure the compliance criteria that devices must meet to access your network. These security requirements ensure only healthy, properly configured devices can connect. Select the criteria that align with your organization's security policies:
-  - **Defender Policy Status**: Requires Windows Defender configuration to match your organization's security policy requirements.
-  - **Managed Microsoft Defender**: Requires Defender to be enabled, up-to-date, scanned recently, and no conflicting antivirus detected.
-  - **Firewall**: Requires an active firewall with all required profiles enabled.
-
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/huntress-edr/compliance-config.png" alt="edr-integrations" className="imagewrapper-big"/>
-</p>
-
-
-- Configure the **Huntress Sync Window** (default is 24 hours). This setting determines which devices openZro will consider for network access based on their recent activity in Huntress. Only devices that have been active and reporting to Huntress within this time window will be synchronized. These devices must then also meet the configured compliance criteria to gain network access.
-
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/huntress-edr/sync-config.png" alt="edr-integrations" className="imagewrapper-big"/>
-</p>
-
-- Click **Connect** to complete the integration setup
-
-- Only peers that have the Huntress agent installed and meet all the configured compliance criteria will be granted access to the network.
-  Peers without the Huntress agent or those that don't meet the compliance requirements will appear with an `Approval required` mark in the peers list and won't be able to access
-  the network until they have the agent installed and satisfy all the specified security requirements.
-
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/huntress-edr/edr-approval-required.png" alt="edr-approval-required" className="imagewrapper-big"/>
-</p>
-
-
-<Note>
-    openZro matches the Huntress agent to the peer using the Serial Number of the device. You must ensure that each of your devices has a unique serial number.
-</Note>
-
-## Managing Exceptions
-
-If you need to grant network access to a peer that fails Huntress compliance checks, you can bypass compliance for that peer. See [Bypass Compliance for Non-Compliant Peers](/manage/access-control/endpoint-detection-and-response/bypass-compliance) for details.
+- Devices are matched by hostname. Make sure each peer's hostname matches the hostname the Huntress agent reports,
+  and that hostnames are unique.
+- A device's status is refreshed after the provider's refresh interval, so changes in Huntress take a few minutes to
+  reach openZro.
+- If the Huntress API cannot be reached, the check fails closed unless **Fail open on lookup error** is enabled on the
+  posture check.
+- To let a single non-compliant device in temporarily, use an
+  [admission bypass](/manage/access-control/endpoint-detection-and-response/bypass-compliance).

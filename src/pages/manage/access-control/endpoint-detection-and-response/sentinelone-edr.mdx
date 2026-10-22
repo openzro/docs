@@ -1,116 +1,81 @@
+import {Note} from "@/components/mdx";
+
 # Restrict Network Access with SentinelOne Singularity™
 
-[SentinelOne Singularity](https://www.sentinelone.com/platform/) is an autonomous cybersecurity platform that provides
-comprehensive endpoint protection, detection, and response capabilities. The SentinelOne agent runs on your devices (endpoints),
-collecting and analyzing endpoint data to detect and respond to threats in real-time. The agent's presence on endpoints and the
-security data it collects can be utilized to enforce access policies and limit network access according to the "health" status
-of the endpoints.
+[SentinelOne Singularity](https://www.sentinelone.com/platform/) is an endpoint protection platform. The SentinelOne
+agent runs on your devices and reports their state to the SentinelOne console, which openZro can use to limit network
+access to devices with active, healthy protection.
 
-The integration of openZro with SentinelOne provides organizations with robust security controls that allow
-only IT-managed devices running SentinelOne to access the network. Additionally, the integration uses SentinelOne's threat
-detection capabilities, enabling administrators to further limit network access based on the security posture of each device.
+## What openZro checks
 
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="QVs0RhprVYM" /> */}
+openZro looks up the peer's hostname (the agent's computer name) in SentinelOne. These conditions always apply; a
+device fails if:
 
-SentinelOne's endpoint protection provides real-time threat detection and automated response capabilities. By integrating with
-SentinelOne Singularity, openZro can ensure that only devices with active security monitoring and protection can access the network.
+- no agent is registered for that hostname;
+- the agent is decommissioned;
+- the agent reports the device as infected;
+- the agent is not active.
 
-In this guide, we will walk you through the configuration steps to integrate SentinelOne Singularity with openZro and use
-endpoint security status to control network access for devices that meet your security requirements.
+You can add these optional conditions when you add the provider:
+
+| Option | Fails the device when |
+|---|---|
+| **Max active threats (optional)** | the number of active threats is above this value. Blank means no threshold. |
+| **Require disk encryption** | disk encryption is not reported as enabled. |
+| **Require host firewall** | the host firewall is not enabled. |
+| **Require console connectivity** | the agent's network status is not `connected`. |
+| **Minimum agent version (optional)** | the agent version is older than this, or cannot be parsed. Blank means no floor. |
+| **Sync window in minutes (optional)** | the agent last checked in longer ago than this, or its last check-in is unknown. Blank means no recency requirement. |
 
 ## Prerequisites
 
-Before you start creating and configuring a SentinelOne integration, ensure that you have the following:
-- A SentinelOne account with the permissions to create and manage API tokens.
-  If you don't have the required permissions, ask your SentinelOne administrator to grant them to you.
+- A SentinelOne account with permission to create service users. If you don't have it, ask your SentinelOne
+  administrator.
 
-## Create a SentinelOne API Token
+## Create a SentinelOne API token
 
-- Navigate to your SentinelOne Management Console
-- Go to **Settings** &raquo; **Users** &raquo; **Service Users**
-- Click **Create Service User**
-- Fill in the form:
-  - **Name**: `openZro Integration`
-  - **Description**: `API token for openZro EDR integration` (optional)
-  - **Expiration Date**: Set your preferred expiration date
-- Click **Next**
-- Select Site and set **Scope** to **Viewer**
-- Click **Create User**
-- Copy the generated API token immediately (it will only be displayed once)
-- Note your SentinelOne console URL from your browser's address bar (e.g., `https://your-tenant.sentinelone.net`)
+1. In the SentinelOne Management Console, go to **Settings → Users → Service Users**.
+2. Click **Create Service User** and fill in the form:
+   - **Name**: `openZro Integration`;
+   - **Expiration Date**: your preferred expiration date.
+3. Click **Next**, select the site and set the scope to **Viewer**.
+4. Click **Create User** and copy the API token. It is shown only once.
+5. Note your console URL from the browser's address bar, for example `https://your-tenant.sentinelone.net`.
 
-<Note>
-Treat the API token securely and store it safely. You will need both the console URL and API token for the openZro integration configuration.
-</Note>
+## Add SentinelOne to openZro
 
-## Configure a SentinelOne Integration in openZro
-
-- Navigate to the [Integrations &raquo; EDR](https://your-management.example.com/) tab in the openZro dashboard
-- Click **Connect SentinelOne** to start the configuration wizard
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/sentinelone/getting-started.png" alt="SentinelOne integration getting started" className="imagewrapper-big"/>
-</p>
-- Click the **Get Started** button to initiate the integration process
-- Enter your SentinelOne console URL (e.g., `https://your-tenant.sentinelone.net`) and click **Continue**
+1. In the openZro dashboard, go to **Integrations → MDM / EDR** and click **Add provider**.
+2. Fill in the **Add MDM/EDR provider** dialog:
+   - **Name**: a label for this provider, for example `sentinelone-prod`.
+   - **Type**: SentinelOne.
+   - **Refresh interval (minutes)**: how long a device's status is cached (1–60, default 5).
+   - **Management URL**: your console URL.
+   - **API Token**: the token from the previous step.
+   - The optional conditions from [What openZro checks](#what-open-zro-checks).
+3. Click **Create**.
 
 <p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/sentinelone/console-config.png" alt="SentinelOne console configuration" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/sentinelone/add-provider.png" alt="Add MDM/EDR provider dialog with type SentinelOne" className="imagewrapper"/>
 </p>
 
-- Enter the API token you created in the previous step and click **Continue** to verify the connection
+## Enforce the check
 
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/sentinelone/service-user.png" alt="SentinelOne service user configuration" className="imagewrapper-big"/>
-</p>
+1. Go to **Posture Checks**, create a check and add **Endpoint Security (MDM/EDR)** with the SentinelOne provider.
+2. Use the check in one or both ways:
+   - attach it to [access control policies](/manage/access-control/manage-network-access): failing peers are removed
+     from those policies' sources;
+   - add it to [Device Admission](/manage/access-control/posture-checks/device-admission) and enforce it: failing
+     devices are refused at login and sync, and connected ones are disconnected.
 
-- Select the **groups** you want to apply the integration to and click **Connect**
+See the [MDM / EDR overview](/manage/access-control/endpoint-detection-and-response) for how the two compare.
 
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/sentinelone/group-config.png" alt="SentinelOne group configuration" className="imagewrapper-big"/>
-</p>
+## Notes
 
-
-<Note>
-    The EDR check will apply only to peers in the selected groups and will require a running SentinelOne agent.
-    You can also use groups [synchronized from your Identity Provider (IdP)](/manage/team/idp-sync).
-</Note>
-
-- Configure the compliance criteria that devices must meet to access your network. These security requirements ensure only healthy, properly configured devices can connect. Select the criteria that align with your organization's security policies:
-  - **Allowed Active Threats**: Maximum number of active threats allowed on a device. Default is set to `0` to block devices with any active threats.
-  - **Disk Encryption**: Requires disk encryption to be enabled on the device.
-  - **Firewall**: Requires the device firewall to be enabled and active.
-  - **Block Infected Devices**: Prevents network access for devices with confirmed active infections.
-  - **Network Connectivity**: Requires active network connection between the device and SentinelOne services.
-  - **Active Status**: Requires the SentinelOne agent to be active and reporting. The agent must be in operational state (not disabled, corrupted, or experiencing errors).
-  - **Latest Agent Version**: Requires the SentinelOne agent to be running the most current version.
-
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/sentinelone/compliance-config.png" alt="edr-integrations" className="imagewrapper-big"/>
-</p>
-
-
-- Configure the **SentinelOne Sync Window** (default is 24 hours). This setting determines which devices openZro will consider for network access based on their recent activity in SentinelOne. Only devices that have been active and reporting to SentinelOne within this time window will be synchronized. These devices must then also meet the configured compliance criteria to gain network access.
-
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/sentinelone/sync-config.png" alt="edr-integrations" className="imagewrapper-big"/>
-</p>
-
-- Click **Connect** to complete the integration setup
-
-- Only peers that have the SentinelOne agent installed and meet all the configured compliance criteria will be granted access to the network. 
-  Peers without the SentinelOne agent or those that don't meet the compliance requirements will appear with an `Approval required` mark in the peers list and won't be able to access 
-  the network until they have the agent installed and satisfy all the specified security requirements.
-
-<p>
-    <img src="/docs-static/img/manage/access-control/endpoint-detection-and-response/sentinelone/edr-approval-required.png" alt="edr-approval-required" className="imagewrapper-big"/>
-</p>
-
-
-<Note>
-    openZro matches the SentinelOne agent to the peer using the Serial Number of the device. You must ensure that each of your devices has a unique serial number.
-</Note>
-
-## Managing Exceptions
-
-If you need to grant network access to a peer that fails SentinelOne compliance checks, you can bypass compliance for that peer. See [Bypass Compliance for Non-Compliant Peers](/manage/access-control/endpoint-detection-and-response/bypass-compliance) for details.
-
+- Devices are matched by hostname. Make sure each peer's hostname matches the computer name SentinelOne reports, and
+  that hostnames are unique.
+- A device's status is refreshed after the provider's refresh interval, so changes in SentinelOne take a few minutes
+  to reach openZro.
+- If the SentinelOne API cannot be reached, the check fails closed unless **Fail open on lookup error** is enabled on
+  the posture check.
+- To let a single non-compliant device in temporarily, use an
+  [admission bypass](/manage/access-control/endpoint-detection-and-response/bypass-compliance).
