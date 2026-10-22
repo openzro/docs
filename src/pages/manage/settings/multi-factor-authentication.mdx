@@ -1,60 +1,202 @@
-# Multi-Factor Authentication (MFA)
+import {Note, Warning} from "@/components/mdx";
 
-openZro supports Multi-Factor Authentication (MFA) to enhance the security of your account by requiring a second form of verification during login.
-This works automatically if you have enabled MFA in your SSO Provider (Google, Microsoft etc.) and use the **interactive SSO login** feature in openZro.
+export const description = 'Require a TOTP second factor for dashboard sessions and, optionally, for signing in devices.'
 
-openZro MFA is primarily for users with **email / password login**. It is available for all users and can be enabled from the Dashboard on the Settings page [https://your-management.example.com/).
+# Two-factor authentication (2FA)
+
+openZro has its own two-factor authentication, built into the management
+server. It works the same in every self-hosted deployment and needs no
+external service. Users add openZro to an authenticator app (Google
+Authenticator, Authy, 1Password, Bitwarden, …) and enter the 6-digit code it
+shows.
+
+The second factor protects two things:
+
+- **Dashboard and API sessions.** A user the rule applies to enters a code
+  after signing in, and again when that session's 2FA expires.
+- **Device sign-in**, when you switch it on. Adding a device, or signing one in
+  again after its login expired, needs an approval made with the user's code.
+  See [2FA on device sign-in](#2-fa-on-device-sign-in).
+
+Personal access tokens and service users are not asked for a code.
+
+## How the second factor works
+
+- **Codes** are standard TOTP (RFC 6238): 6 digits, a new one every 30
+  seconds. Each code works only once, so a code seen over someone's shoulder
+  cannot be replayed.
+- **Backup codes.** Setting up 2FA gives the user 10 single-use backup codes.
+  Any of them works in place of a code, for example after losing the phone.
+- **Lockout.** After 5 wrong codes in a row, the user is locked out of 2FA
+  for 15 minutes.
+- **Sessions.** A successful code covers the dashboard session it was entered
+  in for up to 8 hours. A new sign-in, or a session on another device, asks
+  again.
+
+## Require 2FA
+
+In the dashboard, go to **Settings → Authentication** and find the
+**Two-factor authentication (TOTP)** card. There are two rules, chosen by how
+the user signs in:
+
+| Setting | Applies to |
+| --- | --- |
+| **Require 2FA for local accounts** | Users of the bundled Dex local login (email and password). These have no other second factor, so this is the main protection for them. |
+| **Require 2FA for federated accounts (redundancy)** | Users who sign in through an external identity provider (Google, Microsoft, Okta, …). They then enter two codes: the provider's and openZro's. Turn this on only if you treat the identity provider as a separate trust domain. |
+
+Under each rule, the card shows how many active users it applies to have no
+2FA yet. These are the users who will be asked to set it up at their next
+sign-in.
+
+Both rules are off by default. Users can still set up 2FA on their own while
+the rules are off.
+
+## Set up 2FA
+
+A user the rules apply to is taken to the setup page at their next sign-in.
+Any user can also set it up, or manage it later, from **Profile Settings →
+Two-factor authentication** in the account menu.
+
+1. Scan the QR code with the authenticator app, or choose **Can't scan?** to
+   type the key in.
+2. Enter the 6-digit code the app shows.
+3. Save the 10 backup codes somewhere safe, such as a password manager. They
+   are shown only once.
+
+From the same page a user can regenerate their backup codes, which invalidates
+the old ones, or turn 2FA off. Both ask for a current code first. Turning it
+off under an enforced rule only means setting it up again at the next sign-in.
+
+## Manage users' 2FA
+
+The **Users** list has a **2FA** column for each user:
+
+- **On**: the user has set up 2FA.
+- **Off**: the user has not set up 2FA.
+- **Locked until HH:MM**: the user hit the lockout and can try again at that
+  time.
+
+To remove a user's second factor, for example after they lost both the
+authenticator and the backup codes, open the user's menu and choose **Reset
+2FA**. The user sets it up again at their next sign-in. You must have 2FA set
+up on your own account, and enter a current code, to reset someone else's.
+
+Turning 2FA off and resetting it are recorded in the activity log. For a
+reset, the log records the admin who did it and the user it was done to.
 
 <Note>
-    You may not need openZro MFA. Your SSO Provider (Google, Microsoft etc.) may already have MFA enabled. Enabling this setting could result in duplicated MFA checks.
-</Note>
-<Note>
-    This feature is only available in the cloud version of openZro. <br />Self-Hosted users can use their own Identity Provider for MFA.
+    Keep at least two administrators with 2FA set up, so one can reset the
+    other's second factor.
 </Note>
 
-## Enabling and Disabling MFA
-Navigate to the Dashboard's `Settings` page and the `Authentication` tab and enable or disable MFA. <br />
-After enabling, you can `Logout` and log back in to see the MFA prompt.
+## 2FA on device sign-in
 
-- When disabling MFA, the current active MFA devices of all users will not be removed and will be reused when MFA is enabled again. To remove MFA devices from users, check the [Reset MFA](#reset-mfa) section below.
-- If a user is not part of the account and MFA is enabled, the first-time `Sign Up` will not require MFA. <br /> Only subsequent logins will require MFA.
+With **Require 2FA to sign in devices** on, a user the rules above apply to
+must approve a device sign-in with their second factor when they:
 
-<p>
-    <img src="/docs-static/img/manage/settings/mfa/mfa-settings.png" alt="MFA Settings" className="imagewrapper-big"/>
-</p>
+- add a new device;
+- sign a device in again after its login expired (see
+  [peer session expiration](/manage/settings/enforce-periodic-user-authentication)).
 
+A device whose login is still valid reconnects in the background without a
+code. With login expiration on, the code is therefore asked once per expiration
+period.
 
-### Remember Browser for MFA
-When you enable MFA, you can choose to remember your browser for 30 days. This means you will only need to enter the MFA code once every 30 days.
-When disabled, you will need to enter the MFA code every time you log in.<br />
-Once enabled you will see a checkbox to remember your browser for 30 days while entering the MFA code during login.
+This stops a leaked password from being enough to bring up a tunnel: the
+attacker also needs the user's authenticator.
 
+### What the user sees
 
-## Checking User MFA Status
-You can check individual user MFA status by going to the `Users` page of the Dashboard.<br />
-Click on a specific user to see their MFA status.
-- `Active` - MFA is enabled and user **has completed** the MFA setup.
-- `Not enrolled` - MFA is enabled but user **has not completed** the MFA setup yet.
+1. The user signs in as usual (`openzro up`, or **Connect** in the desktop
+   app) and completes the identity provider's login.
+2. The client shows a link to approve the sign-in:
+   - the CLI prints it and opens it in the browser, unless `--no-browser` is
+     set;
+   - the desktop app shows it in a window.
+3. The approval page, which needs no dashboard session, shows the request:
+   - the device name and operating system, as the device reported them;
+   - the address and location the server saw;
+   - a short fingerprint of the device key;
+   - the time of the attempt;
+   - the account, and the user's email partly masked.
+4. The user enters a code from the authenticator app, or a backup code, and
+   chooses **Approve**. The device connects on its own within a few seconds.
 
-<p>
-    <img src="/docs-static/img/manage/settings/mfa/mfa-not-enrolled.png" alt="MFA Status" className="imagewrapper-big"/>
-</p>
+A request can be approved for 5 minutes. If it was not the user's attempt,
+**Not me** denies it, and that device cannot ask again until the request
+expires.
 
-## Reset MFA
-To reset MFA for a specific user, click on the user in the `Users` tab and click on the `Reset MFA` button.<br />
-This will reset MFA for the user, and they will need to set it up again during the next login.
+The client explains the other outcomes:
 
-<Note>
-    Currently openZro does not provide recovery codes for MFA. Make sure to have multiple administrators configured to prevent lockout situations.
-    If all `Owners` or `Admins` lose access to the Dashboard, you should contact [support@openzro.io](mailto:support@openzro.io) for assistance.
-</Note>
+- **Denied**: when the device can try again.
+- **No 2FA set up**: the user must set it up in the dashboard first. The client
+  links to it.
+- **Too many requests**: a user can have at most 5 requests at a time, so a
+  stolen password cannot flood them with approval links. The client says when
+  to try again.
 
-<p>
-    <img src="/docs-static/img/manage/settings/mfa/mfa-reset-mfa.png" alt="MFA Reset" className="imagewrapper-big"/>
-</p>
+### Before you switch it on
 
-## Get started
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Follow us [on X](https://x.com/openzro)
-- Join our [Slack Channel](/slack-url)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub
+The server enforces this setting, and older clients cannot complete the
+approval. Switch it on in this order:
+
+1. **Turn on [peer approval](/manage/peers/approve-peers) for third parties.**
+   Put your internal groups in **Groups that skip approval**, so only external
+   users' new devices wait for an admin. Keep it on afterwards: 2FA setup is
+   self-service, so someone holding only a password could set up their own
+   authenticator, but their new device would still wait for an admin.
+2. **Make sure everyone the rules apply to has set up 2FA.** Saving the setting
+   is refused while an active user it would apply to has no 2FA. The counts
+   under the 2FA rules show who is left. Users created or reset later are not
+   blocked by this check: they are asked to set up 2FA when they first sign
+   in a device.
+3. **Upgrade every management server.** A server without this feature would
+   let a device sign in without the code.
+4. **Upgrade the desktop and CLI clients of the users it applies to.** Older
+   clients get a message asking them to update and cannot sign in devices.
+   Mobile clients do not support device sign-in approval yet. Do not switch
+   this on for accounts whose users rely on them.
+5. **Switch on Require 2FA to sign in devices.**
+
+To roll back, switch the setting **off before** bringing back an older
+management server.
+
+<Warning>
+    The approval link carries a short-lived token that lets whoever holds it
+    approve or deny that one sign-in. Users should open it only for a sign-in
+    they started, and choose **Not me** otherwise.
+</Warning>
+
+### Configure the dashboard URL
+
+Approval and setup links point to the dashboard. If the dashboard is not served
+at the management server's address, set its public URL on the management
+server, in either of these places:
+
+- `HttpConfig.DashboardURL` in `management.json`;
+- the `OPENZRO_DASHBOARD_URL` environment variable, which takes precedence.
+
+The URL must use `https://`. Plain `http://` is accepted only for `localhost`
+or a loopback address, for testing, because the page carries a token and the
+user's code. The management server refuses to start with any other value.
+When it is not set, clients build the link from their management server's
+host.
+
+### Monitoring
+
+The activity log records:
+
+- each device sign-in that waits for approval, and each approval, wrong code,
+  denial and expiry;
+- switching the setting on and off.
+
+Through the management metrics endpoint:
+
+| Metric | Meaning |
+| --- | --- |
+| `management.peer.login.mfa.refusal.counter` | Sign-ins refused by the check, by `reason`: `required` (each poll while waiting), `denied`, `rate_limited`, `enrollment_required`, `error`. |
+| `management.peer.login.mfa.outcome.counter` | Approval requests by `outcome`: `approved`, `failed`, `denied`, `expired`. |
+| `management.peer.login.mfa.time.to.approval.ms` | Time from a sign-in's first refusal to its approval. |
+
+The design is recorded in
+[ADR-0028](https://github.com/openzro/openzro/blob/main/docs/adr/0028-mfa-on-peer-login.md).

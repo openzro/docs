@@ -41,13 +41,27 @@ openZro integrates with EDR providers (Microsoft Intune, SentinelOne, Huntress, 
 approval — devices that the EDR vendor reports as compliant can be auto-approved, and non-compliant ones stay pending.
 See [EDR integrations](/manage/access-control/endpoint-detection-and-response) for the full setup.
 
-## Selectively exempt groups
+## Skip approval for internal groups
 
-You can mark certain groups (e.g. **routing-peers**, **service-accounts**) as exempt from
-approval gating via `ExtraSettings.IntegratedValidatorGroups`. Peers that are members of
-any exempt group skip the approval check and join the network immediately. This matches
-the **Device Admission Exempt Groups** behaviour documented under
-[Device Admission](/manage/access-control/posture-checks/device-admission#exempt-groups).
+Peers in a group listed under **Groups that skip approval** (in **Settings →
+Authentication**, below **Require peer approval**) are approved automatically.
+Use it to keep approval for third parties only: list your internal staff
+groups, routing peers or service accounts, and every other new device waits
+for an admin. A peer in any listed group skips the check.
+
+- Only existing groups can be listed, and a group on the list cannot be
+  deleted.
+- Removing a group sends back to pending only the peers that group had let
+  through. Peers that were approved when they registered stay approved.
+- Changes are recorded in the activity log.
+
+Through the API, the list is `settings.extra.peer_approval_exempt_groups` on
+`PUT /api/accounts/{accountId}`. Omitting the field keeps the current list,
+and an empty list clears it.
+
+Peer approval for third parties is also step 1 of switching on
+[2FA on device sign-in](/manage/settings/multi-factor-authentication#2-fa-on-device-sign-in),
+where it stays on as a backstop.
 
 ## Get started
 

@@ -399,7 +399,7 @@ export const docsNavigation = [
             href: '/manage/settings/enforce-periodic-user-authentication',
           },
           {
-            title: 'Multi-Factor Authentication',
+            title: 'Two-Factor Authentication',
             href: '/manage/settings/multi-factor-authentication',
           },
           { title: 'Auto Update', href: '/manage/peers/auto-update' },

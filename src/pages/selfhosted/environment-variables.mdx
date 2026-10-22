@@ -99,6 +99,12 @@ openZro runs in single account mode by default since v0.10.1. All users joining 
 | `OPENZRO_MGMT_API_CERT_FILE` | Path to TLS certificate file |
 | `OPENZRO_MGMT_API_CERT_KEY_FILE` | Path to TLS certificate key file |
 
+### Dashboard URL
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `OPENZRO_DASHBOARD_URL` | - | Public URL of the dashboard, used in the links clients open for [2FA on device sign-in](/manage/settings/multi-factor-authentication#configure-the-dashboard-url). Overrides `HttpConfig.DashboardURL`. Must be `https://`; `http://` only for `localhost` or a loopback address. When unset, clients use the management server's host. |
+
 ### Metrics and Analytics
 
 | Variable | Default | Description |
