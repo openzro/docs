@@ -51,7 +51,7 @@ Device A (192.168.1.50) → Routing Peer → [Source stays 192.168.1.50] → Rem
 - More complex setup
 
 <Warning>
-Without masquerade, traffic from unknown source IPs is rejected by openZro's policy engine. You cannot use ACL Groups or Network Resources without masquerade enabled.
+Route ACL Groups match openZro peer IPs only. With masquerade off, traffic from LAN devices that are not openZro peers does not match any access control policy, so ACL Groups cannot restrict it.
 </Warning>
 
 ## Choosing the Right Approach
@@ -181,16 +181,16 @@ Configure your router to advertise routes via DHCP or add static routes for all 
 |--------|----------|----------------|
 | Supported scenarios | VPN-to-Site only | All (VPN-to-Site, Site-to-VPN, Site-to-Site) |
 | Access control | Per-resource policies | Per-route with ACL Groups |
-| Masquerade | Always enabled | Configurable |
+| Masquerade | Configurable per routing peer (Linux), on by default | Configurable per route, on by default |
 | Setup complexity | Simpler | More manual configuration |
-| Routing peer redundancy | Built-in | Manual configuration |
+| Routing peer redundancy | Peer groups or multiple routing peers | Peer groups or multiple routing peers per route |
 | Policy requirement | Resource policies only | Routing peer + ACL Group policies |
 
 ## Troubleshooting
 
 ### Route Not Active
 
-**Symptoms:** Peers do not see the route; `openzro routes list` shows nothing
+**Symptoms:** Peers do not see the route; `openzro networks list` prints `No networks available.`
 
 **Causes:**
 1. No access policy grants access to the routing peer
@@ -253,7 +253,7 @@ Configure your router to advertise routes via DHCP or add static routes for all 
 openzro status
 
 # List active routes
-openzro routes list
+openzro networks list
 
 # Check system routes
 ip route show
@@ -285,9 +285,9 @@ traceroute 192.168.200.50
 
 ### Multiple Routing Peers
 
-For high availability or load distribution:
+For high availability:
 - Deploy multiple routing peers for the same route
-- openZro distributes traffic across available peers
+- Each client uses one routing peer at a time, chosen by metric, connection type and latency; the others take over if it fails
 - Monitor peer health and remove failed peers promptly
 
 ### Monitoring

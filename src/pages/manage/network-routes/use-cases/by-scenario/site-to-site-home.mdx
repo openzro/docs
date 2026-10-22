@@ -38,11 +38,11 @@ Before installing openZro on your routing peers, create setup keys with auto-ass
 1. Go to **Setup Keys** in the openZro dashboard
 2. Click **Create Setup Key**
 3. For your home routing peer:
-   - Network Identifier: "Home Routing Peer"
+   - Name: "Home Routing Peer"
    - Auto-assigned groups: Create and add `home-routing-peers`
-   - Click **Create**
+   - Click **Create Setup Key**
 4. Repeat for parents' home:
-   - Network Identifier: "Parents Routing Peer"
+   - Name: "Parents Routing Peer"
    - Auto-assigned groups: Create and add `parents-routing-peers`
 
 <Note>
@@ -56,7 +56,7 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 ```bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-sudo openzro up --setup-key YOUR_HOME_SETUP_KEY
+sudo openzro up --setup-key YOUR_HOME_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
 **At parents' home:**
@@ -64,7 +64,7 @@ sudo openzro up --setup-key YOUR_HOME_SETUP_KEY
 ```bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-sudo openzro up --setup-key YOUR_PARENTS_SETUP_KEY
+sudo openzro up --setup-key YOUR_PARENTS_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
 ## Step 3: Create Network Routes
@@ -78,12 +78,8 @@ sudo openzro up --setup-key YOUR_PARENTS_SETUP_KEY
 - Distribution Groups: "parents-routing-peers"
 - Access Control Groups: "home-routing-peers" (optional—for route-level policies, this group becomes the destination in access policies; without it, policies targeting this route won't apply)
 - Network Identifier: `home-lan`
-- Enable **Masquerade** in Additional Settings (recommended for simplicity)
+- Leave **Masquerade** on in Additional Settings (the default, recommended for simplicity)
 - Click **Add Route**
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-home/add-new-route-home-rpi.png" alt="Create route for home network" className="imagewrapper"/>
-</p>
 
 **For parents' home network:**
 - Network range: `192.168.2.0/24`
@@ -91,37 +87,31 @@ sudo openzro up --setup-key YOUR_PARENTS_SETUP_KEY
 - Distribution Groups: "home-routing-peers"
 - Access Control Groups: "parents-routing-peers" (optional—for route-level policies, this group becomes the destination in access policies; without it, policies targeting this route won't apply)
 - Network Identifier: `parents-lan`
-- Enable **Masquerade** in Additional Settings (recommended)
+- Leave **Masquerade** on in Additional Settings (the default, recommended)
 - Click **Add Route**
 
+Both routes now appear on the **Network Routes** page:
+
 <p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-home/add-new-route-parents-rpi.png" alt="Create route for parents network" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-home/routes-home.png" alt="Network Routes page with both site routes" className="imagewrapper-big"/>
 </p>
 
 ## Step 4: Create Access Policies
 
 Create two policies that allow the routing peers to communicate in both directions:
 
-1. Go to **Access Control > Policies**
+1. Go to **Access Control** and click **Add Policy** for each policy
 2. Add first policy:
-   - Network Identifier: "Home to Parents"
+   - Policy name: "Home to Parents"
    - Source: "home-routing-peers"
    - Destination: "parents-routing-peers"
    - Protocol: All (or restrict as needed)
 
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-home/add-policy-home-to-parents.png" alt="Create policy for home to parents" className="imagewrapper"/>
-</p>
-
 3. Add second policy:
-   - Network Identifier: "Parents to Home"
+   - Policy name: "Parents to Home"
    - Source: "parents-routing-peers"
    - Destination: "home-routing-peers"
    - Protocol: All (or restrict as needed)
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/use-cases/by-scenario/site-to-site-home/add-policy-parents-to-home.png" alt="Create policy for parents to home" className="imagewrapper"/>
-</p>
 
 ## Step 5: Configure Clientless Devices
 

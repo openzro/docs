@@ -9,17 +9,13 @@ Network Routes let you route traffic from openZro peers to private networks with
     <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes.png" alt="Network Routes diagram" className="imagewrapper-big"/>
 </p>
 
-<Note>
-Network Routes require openZro [v0.9.0](https://github.com/openzro/openzro/releases) or later.
-</Note>
-
 <Warning>
 By default, Network Routes bypass Access Control rules. Traffic flows freely to routed networks unless you [configure access control explicitly](/manage/network-routes/use-cases/by-configuration/access-control). See [Network Routes caveats](#network-routes-caveats) for details.
 </Warning>
 
 ## Network Routes vs Networks
 
-[Networks](/manage/networks) is the newer, simpler replacement for Network Routes. We recommend using Networks where possible; however, Networks do not yet support all remote access scenarios. Network Routes will continue to be maintained, so choose whichever fits your use case.
+[Networks](/manage/networks) is the newer, simpler way to reach internal resources and the recommended choice for new setups. Network Routes still cover scenarios Networks does not, such as site-to-site routing; choose whichever fits your use case.
 
 For a detailed comparison, see our [site-to-site documentation](/use-cases/site-to-site).
 
@@ -31,7 +27,7 @@ A **network identifier** is a name for the network you want to route. A **range*
 
 ### Routing Peer
 
-A routing peer is a openZro device that forwards traffic between the openZro network and a private network. It must have network access to the resources you want to reach.
+A routing peer is an openZro device that forwards traffic between the openZro network and a private network. It must have network access to the resources you want to reach.
 
 <Note>
 A network route grants access to the network behind the routing peer, not to the routing peer machine itself. If you need to reach services running on the routing peer, create a separate peer-to-peer [access control policy](/manage/access-control) that targets the routing peer's group as the destination.
@@ -69,7 +65,7 @@ Metric determines routing peer priority in high availability configurations. Low
 
 A highly available route combines multiple routes with the same network identifier and ranges but different routing peers or peer groups. This provides redundant paths between your peers and external networks.
 
-Connected peers select a routing peer based on connection type and metric priority.
+Each connected peer uses one routing peer at a time, chosen by metric priority, connection type (direct or relayed) and latency; the others are standby.
 
 ### DNS Routes
 
@@ -81,7 +77,10 @@ For example, route traffic to `website.com` or `api.website.com` through a speci
     <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-dns-routes.png" alt="DNS Routes diagram" className="imagewrapper"/>
 </p>
 
-By default, DNS routes resolve every 60 seconds. Adjust this interval with the `--dns-router-interval` flag:
+How domains are resolved depends on **Settings** > **Networks** > **Enable DNS wildcard routing**, which is on by
+default. With it on, the routing peer resolves the domains on demand and clients route the returned addresses. With it
+off, clients resolve the domains themselves every 60 seconds; adjust that interval with the `--dns-router-interval`
+flag:
 
 ```bash
 openzro up --dns-router-interval 30s
@@ -92,16 +91,13 @@ The **Keep routes** option is enabled by default. When enabled, if a domain stop
 This preserves connections during IP changes, such as DNS-based load balancing where long-running connections to a previous IP remain valid.
 
 <Note>
-DNS Routes require openZro [v0.28.0](https://github.com/openzro/openzro/releases) or later. Wildcard domains are not supported.
-</Note>
-
-<Note>
-Starting with openZro v0.59.0, the local DNS forwarder port changed from `5353` to `22054` to avoid collisions. The Management Service applies the new port only when all peers in the account run v0.59.0 or newer.
+The dashboard and API accept wildcard domains such as `*.example.com` in DNS routes. For wildcard access, the
+[Networks](/manage/networks#domain-resources) domain resources are the better-tested path.
 </Note>
 
 ## Managing Network Routes
 
-A network route describes a network you want to connect with your openZro peers. It includes an identifier, network range, routing peer or peer groups, and parameters for priority and masquerading.
+A network route describes a network you want to connect with your openZro peers. It includes an identifier, a network range or domains, a routing peer or peer group, distribution and access control groups, and settings for priority (metric), masquerading and whether the route is enabled.
 
 ### Creating a Network Route
 
@@ -111,16 +107,18 @@ Open **Network Routes** from the sidebar and click **Add Route**.
     <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-add-button.png" alt="Add route button" className="imagewrapper-big"/>
 </p>
 
-Enter your route details. In this example:
+The **Create New Route** dialog has four tabs. In this example:
 
-- **Network identifier:** `aws-eu-central-1-vpc`
-- **Description:** `Production VPC in Frankfurt`
-- **Network range:** `172.31.0.0/16`
-- **Routing peer:** `ec2-demo-node`
-- **Distribution Groups:** `All`
+1. **Route**: keep **Network Range**, enter `172.31.0.0/16`, and select the routing peer `aws-eu-router-az-a`. Choose
+   **Domains** instead to route by domain name. Click **Continue**.
+2. **Groups**: set **Distribution Groups** to `All`. **Access Control Groups** are optional (see
+   [ACL Groups](#acl-groups)). Click **Continue**.
+3. **Name & Description**: set **Network Identifier** to `aws-eu-central-1-vpc` and **Description** to
+   `Production VPC in Frankfurt`. Click **Continue**.
+4. **Additional Settings**: keep **Enable Route** and **Masquerade** on and the default **Metric** (9999).
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-create.png" alt="Create network route form" className="imagewrapper" width="70%"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-create.png" alt="Route tab of the Create New Route dialog" className="imagewrapper"/>
 </p>
 
 Click **Add Route** to save.
@@ -133,19 +131,15 @@ Peers connected to your routing peer can now send traffic to your external netwo
 
 ### Creating a Network Route with Routing Group
 
-Select the **Peer group** tab when creating a route to use a peer group as your routing peers. Ensure the groups contain Linux, Windows, macOS, or Docker peers, as traffic routing is supported on these platforms.
+Select **Peer Group** instead of **Routing Peer** when creating a route to use a group of peers as routing peers (one group per route). Masquerade is always on for routing peers that are not Linux.
 
 Groups with multiple peers automatically provide [high availability](#high-availability).
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-groups-create.png" alt="Create route with peer group" className="imagewrapper" width="70%"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-groups-create.png" alt="Route with a peer group" className="imagewrapper"/>
 </p>
 
 Click **Add Route** to save.
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-groups-saved-new.png" alt="Saved route with peer group" className="imagewrapper-big"/>
-</p>
 
 ### Creating Highly Available Routes
 
@@ -158,15 +152,15 @@ Enable high availability in two ways:
 
 The first option is covered [above](#creating-a-network-route-with-routing-group).
 
-To add individual peers, click **Add Peer** in the High Availability column. Select a peer in the **Routing Peer** field, choose the **Distribution Groups**, and click **Add Route**.
+To add individual peers, click **Add Peer** in the **High Availability** column of the route. The **Add New Routing Peer** dialog opens: select a peer in the **Routing Peer** field, choose the **Distribution Groups**, and click **Add Route**.
 
-This example adds `aws-nb-europe-router-az-b` to the `aws-eu-central-1-vpc` route:
+This example adds `aws-eu-router-az-b` to the `aws-eu-central-1-vpc` route:
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-create-ha.png" alt="Add HA peer to route" className="imagewrapper" width="70%"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-create-ha.png" alt="Add New Routing Peer dialog" className="imagewrapper"/>
 </p>
 
-Peers connected to either `aws-nb-europe-router-az-a` or `aws-nb-europe-router-az-b` now have highly available access to `172.31.0.0/16`.
+Peers connected to either `aws-eu-router-az-a` or `aws-eu-router-az-b` now have highly available access to `172.31.0.0/16`.
 
 <p>
     <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-saved-new-ha.png" alt="Saved HA route" className="imagewrapper-big"/>
@@ -182,11 +176,7 @@ Select multiple distribution groups to control which peers use each routing peer
 
 Ensure access control rules allow connectivity between these peers and the routing peers.
 
-In this example, peers in `berlin-office` use `aws-nb-europe-router-az-a` to access `aws-eu-central-1-vpc`, while peers in `london-office` use `aws-nb-europe-router-az-b`:
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes-groups-attribution.png" alt="Group attribution for routes" className="imagewrapper-big"/>
-</p>
+For example, add the route twice with the same network identifier: once with routing peer `aws-eu-router-az-a` and distribution group `berlin-office`, and once with `aws-eu-router-az-b` and `london-office`. Peers in `berlin-office` then use `aws-eu-router-az-a` to reach `aws-eu-central-1-vpc`, and peers in `london-office` use `aws-eu-router-az-b`.
 
 ### Routes Without Masquerading
 
@@ -208,33 +198,25 @@ This limitation led to the creation of [Networks](/manage/networks), which uses 
 
 Consider a Network Route distributed through `Group R` (Routing Peer) to `Group A` (intended client):
 
-<p>
-    <img src="/docs-static/img/manage/network-routes/concepts/route-ip-address.png" alt="Route IP address configuration" className="imagewrapper-big"/>
-</p>
-
 After creating an Access Policy granting only `ICMP` access from `Group A` to `Group R`:
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/concepts/policy-icmp-group-r.png" alt="ICMP policy from group A to R" className="imagewrapper-big"/>
-</p>
 
 You might expect only ICMP traffic to work. However, all traffic to the routed network succeeds because Network Routes only require connectivity to the Routing Peer to activate:
 
 ```shell
-root@brys-vm-nbt-ubuntu-01:~# openzro networks ls
+root@client-01:~# openzro networks ls
 Available Networks:
 
   - ID: network-route-srvs-site
     Network: 192.168.100.0/24
     Status: Selected
-root@brys-vm-nbt-ubuntu-01:~# ping -c1 192.168.100.10
+root@client-01:~# ping -c1 192.168.100.10
 PING 192.168.100.10 (192.168.100.10) 56(84) bytes of data.
 64 bytes from 192.168.100.10: icmp_seq=1 ttl=63 time=0.521 ms
 
 --- 192.168.100.10 ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 0.521/0.521/0.521/0.000 ms
-root@brys-vm-nbt-ubuntu-01:~# curl 192.168.100.10/health && echo
+root@client-01:~# curl 192.168.100.10/health && echo
 OK
 ```
 
@@ -242,52 +224,44 @@ OK
 
 When using both Network Routes and Networks with the same Routing Peer, permissions can overflow unexpectedly.
 
-In this example, a Network Resource for `*.nb.test` uses ACL group `manual:srvs`:
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/concepts/resource-domain.png" alt="Wildcard domain resource" className="imagewrapper-big"/>
-</p>
+In this example, a Network Resource for `*.corp.test` uses ACL group `manual:srvs`:
 
 An HTTP-only policy grants access from `manual:client`:
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/concepts/policy-http.png" alt="HTTP-only policy" className="imagewrapper-big"/>
-</p>
 
 HTTP access works as expected:
 
 ```shell
-root@brys-vm-nbt-ubuntu-02:~# openzro networks ls
+root@client-02:~# openzro networks ls
 Available Networks:
 
-  - ID: *.nb.test
-    Domains: *.nb.test
+  - ID: *.corp.test
+    Domains: *.corp.test
     Status: Selected
     Resolved IPs: -
-root@brys-vm-nbt-ubuntu-02:~# curl srv.nb.test/health; echo
+root@client-02:~# curl srv.corp.test/health; echo
 OK
-root@brys-vm-nbt-ubuntu-02:~# openzro networks ls
+root@client-02:~# openzro networks ls
 Available Networks:
 
-  - ID: *.nb.test
-    Domains: *.nb.test
+  - ID: *.corp.test
+    Domains: *.corp.test
     Status: Selected
     Resolved IPs:
-      [srv.nb.test.]: 192.168.100.10
+      [srv.corp.test.]: 192.168.100.10
 ```
 
 However, ICMP and SSH also work, which violates the HTTP-only policy:
 
 ```shell
-root@brys-vm-nbt-ubuntu-02:~# ping -c1 srv.nb.test
-PING srv.nb.test (192.168.100.10) 56(84) bytes of data.
+root@client-02:~# ping -c1 srv.corp.test
+PING srv.corp.test (192.168.100.10) 56(84) bytes of data.
 64 bytes from 192.168.100.10: icmp_seq=1 ttl=63 time=0.242 ms
 
---- srv.nb.test ping statistics ---
+--- srv.corp.test ping statistics ---
 1 packets transmitted, 1 received, 0% packet loss, time 0ms
 rtt min/avg/max/mdev = 0.242/0.242/0.242/0.000 ms
-root@brys-vm-nbt-ubuntu-02:~# ssh srv.nb.test
-root@srv.nb.test: Permission denied (publickey).
+root@client-02:~# ssh srv.corp.test
+root@srv.corp.test: Permission denied (publickey).
 ```
 
 ### Why Does This Happen?
@@ -296,14 +270,6 @@ The Routing Peer belongs to both routing groups:
 
 1. `m:group-r` for the Network Route
 2. `manual:router:srvs` for the Network and its domain Resource
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/concepts/network-routers.png" alt="Network routers configuration" className="imagewrapper-big"/>
-</p>
-
-<p>
-    <img src="/docs-static/img/manage/network-routes/concepts/routing-peer-groups.png" alt="Routing peer groups" className="imagewrapper-big"/>
-</p>
 
 The Network Route grants unrestricted access to the network range, bypassing the HTTP-only restriction on the Network Resource.
 
