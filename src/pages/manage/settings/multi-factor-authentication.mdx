@@ -51,6 +51,10 @@ sign-in.
 Both rules are off by default. Users can still set up 2FA on their own while
 the rules are off.
 
+<p>
+    <img src="/docs-static/img/manage/settings/mfa/2fa-settings.png" alt="Two-factor authentication settings" className="imagewrapper-big"/>
+</p>
+
 ## Set up 2FA
 
 A user the rules apply to is taken to the setup page at their next sign-in.
@@ -63,9 +67,14 @@ Two-factor authentication** in the account menu.
 3. Save the 10 backup codes somewhere safe, such as a password manager. They
    are shown only once.
 
-From the same page a user can regenerate their backup codes, which invalidates
-the old ones, or turn 2FA off. Both ask for a current code first. Turning it
-off under an enforced rule only means setting it up again at the next sign-in.
+From the same section a user can choose **Regenerate backup codes**, which
+invalidates the old ones, or **Disable 2FA**. Both ask for a current code
+first. Disabling it under an enforced rule only means setting it up again at
+the next sign-in.
+
+<p>
+    <img src="/docs-static/img/manage/settings/mfa/2fa-profile.png" alt="Two-factor authentication in Profile Settings" className="imagewrapper-big"/>
+</p>
 
 ## Manage users' 2FA
 
@@ -77,9 +86,13 @@ The **Users** list has a **2FA** column for each user:
   time.
 
 To remove a user's second factor, for example after they lost both the
-authenticator and the backup codes, open the user's menu and choose **Reset
-2FA**. The user sets it up again at their next sign-in. You must have 2FA set
+authenticator and the backup codes, open the user's row menu (**⋮**) and
+choose **Reset 2FA**. The user sets it up again at their next sign-in. You must have 2FA set
 up on your own account, and enter a current code, to reset someone else's.
+
+<p>
+    <img src="/docs-static/img/manage/settings/mfa/2fa-users-reset.png" alt="Users list with the 2FA column and the Reset 2FA action" className="imagewrapper"/>
+</p>
 
 Turning 2FA off and resetting it are recorded in the activity log. For a
 reset, the log records the admin who did it and the user it was done to.
@@ -113,6 +126,12 @@ attacker also needs the user's authenticator.
    - the CLI prints it and opens it in the browser, unless `--no-browser` is
      set;
    - the desktop app shows it in a window.
+
+   ```text
+   This sign-in needs your 2FA approval. Open this link to approve it:
+   https://dashboard.example.com/mfa/peer-login#t=…
+   The request expires in 5 minutes. Waiting for the approval...
+   ```
 3. The approval page, which needs no dashboard session, shows the request:
    - the device name and operating system, as the device reported them;
    - the address and location the server saw;
@@ -121,6 +140,10 @@ attacker also needs the user's authenticator.
    - the account, and the user's email partly masked.
 4. The user enters a code from the authenticator app, or a backup code, and
    chooses **Approve**. The device connects on its own within a few seconds.
+
+<p>
+    <img src="/docs-static/img/manage/settings/mfa/device-signin-approval.png" alt="Device sign-in approval page" className="imagewrapper"/>
+</p>
 
 A request can be approved for 5 minutes. If it was not the user's attempt,
 **Not me** denies it, and that device cannot ask again until the request
@@ -181,6 +204,21 @@ or a loopback address, for testing, because the page carries a token and the
 user's code. The management server refuses to start with any other value.
 When it is not set, clients build the link from their management server's
 host.
+
+### Troubleshooting
+
+- **The user lost their authenticator.** They can sign in with a backup code
+  and set 2FA up again from Profile Settings. Without backup codes, an admin
+  uses **Reset 2FA**, and the user sets it up at their next sign-in.
+- **"Locked until …"** in the Users list: the user entered 5 wrong codes. Wait
+  until the time shown, or reset their 2FA.
+- **The client asks to set up 2FA first.** The user has no second factor yet,
+  for example a user created or reset after you switched the setting on. They
+  set it up in the dashboard, then sign in again.
+- **The link opens the wrong host.** Set the
+  [dashboard URL](#configure-the-dashboard-url).
+- **An older client keeps saying "update openZro".** It cannot complete the
+  approval; upgrade it.
 
 ### Monitoring
 
