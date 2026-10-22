@@ -93,7 +93,6 @@ export const docsNavigation = [
           },
           { title: 'SSH', href: '/manage/peers/ssh' },
           { title: 'Lazy Connections', href: '/manage/peers/lazy-connection' },
-          { title: 'Remote Jobs', href: '/manage/peers/remote-jobs' },
           {
             title: 'Access Infrastructure',
             isOpen: true,
