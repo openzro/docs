@@ -68,8 +68,8 @@ Two-factor authentication** in the account menu.
    are shown only once.
 
 From the same section a user can choose **Regenerate backup codes**, which
-invalidates the old ones, or **Disable 2FA**. Both ask for a current code
-first. Disabling it under an enforced rule only means setting it up again at
+invalidates the old ones, or **Disable 2FA**. Both require a session verified
+with 2FA; if yours isn't, you're asked for a code first. Disabling it under an enforced rule only means setting it up again at
 the next sign-in.
 
 <p>
@@ -87,8 +87,8 @@ The **Users** list has a **2FA** column for each user:
 
 To remove a user's second factor, for example after they lost both the
 authenticator and the backup codes, open the user's row menu (**⋮**) and
-choose **Reset 2FA**. The user sets it up again at their next sign-in. You must have 2FA set
-up on your own account, and enter a current code, to reset someone else's.
+choose **Reset 2FA** (shown only for users who have 2FA set up). The user sets it up again at their next
+sign-in. You must have 2FA set up on your own account, and a session verified with it, to reset someone else's.
 
 <p>
     <img src="/docs-static/img/manage/settings/mfa/2fa-users-reset.png" alt="Users list with the 2FA column and the Reset 2FA action" className="imagewrapper"/>

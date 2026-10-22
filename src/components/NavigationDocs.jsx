@@ -403,10 +403,6 @@ export const docsNavigation = [
           },
           { title: 'Client Updates', href: '/manage/peers/auto-update' },
           { title: 'Lazy Connections', href: '/manage/peers/lazy-connection' },
-          {
-            title: 'Notifications',
-            href: '/manage/settings/notifications',
-          },
           { title: 'Delete Account', href: '/manage/settings/delete-account' },
         ],
       },

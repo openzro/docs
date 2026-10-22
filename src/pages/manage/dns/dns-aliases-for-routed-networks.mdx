@@ -1,3 +1,6 @@
+export const description = 'Give resources behind routing peers friendly DNS names with custom zones'
+import {Note} from "@/components/mdx"
+
 # DNS Aliases for Routed Networks
 
 This guide explains how to use Custom DNS Zones with openZro's Networks to provide easy-to-remember DNS names for resources in private
@@ -10,7 +13,7 @@ Custom DNS Zones work seamlessly with openZro's [Networks](/manage/networks) fea
 
 ### The Challenge
 
-Imagine you're a developer who needs to connect to a PostgreSQL database in your company's data center. The database is at IP address `192.168.0.68`, accessible through a openZro routing peer. You might write connection strings like this:
+Imagine you're a developer who needs to connect to a PostgreSQL database in your company's data center. The database is at IP address `192.168.0.68`, accessible through an openZro routing peer. You might write connection strings like this:
 
 ```bash
 psql -h 192.168.0.68 -U admin
@@ -58,97 +61,63 @@ This guide will walk you through a common use case: providing DNS names for a Po
 
 ### Step 1: Create a Custom DNS Zone
 
-First, create a Custom DNS Zone to manage the DNS records for your private services.
+First, create a Custom DNS Zone to manage the DNS records for your private services. See
+[Custom Zones](/manage/dns/custom-zones) for the dialog in detail.
 
-1.  Navigate to **DNS** > **Zones** in the openZro dashboard.
-2.  Click **Add Zone**.
-3.  Configure the zone:
-    - **Domain**: `openzro.internal`.
-    - **Distribution Groups**: Select the groups that should have access to this DNS zone (e.g., `dev`, `internal-services`).
-    - **Enable Search Domain**: Keep this enabled to allow using short names (e.g., `postgres` instead of `postgres.openzro.internal`).
-4.  Click **Add Zone**.
-
-<img src="/docs-static/img/manage/dns/dns-aliases/zone-config.png" alt="Delete DNS Zone" className="imagewrapper-big"/>
+1. Go to **DNS**, open the **DNS Zones** tab and click **Add Zone**.
+2. On the **Zone** tab:
+   - **Name**: `Internal services`
+   - **Domain**: `openzro.internal`
+   - **Append to search domain**: turn it on to allow short names (e.g., `postgres` instead of
+     `postgres.openzro.internal`).
+3. Click **Continue** and select the **Distribution Groups** that should resolve these names (e.g., `dev`).
+4. Click **Add Zone**.
 
 ### Step 2: Add DNS Records
 
-Next, add DNS records for each of your services.
+Open the zone and click **Add Record** for each service:
 
-1.  Click on the newly created zone to view its details.
-2.  Click **Add Record** and create the following records:
-
-    **PostgreSQL Database (A Record):**
-    - **Name**: `postgres`
-    - **Type**: `A`
-    - **Value**: `192.168.0.68`
-
-    **Internal Wiki (A Record):**
-    - **Name**: `wiki`
-    - **Type**: `A`
-    - **Value**: `192.168.0.78`
-
-<img src="/docs-static/img/manage/dns/dns-aliases/records-created.png" alt="DNS Records Created" className="imagewrapper-big"/>
+| Type | Name | Content |
+|---|---|---|
+| A | `postgres` | `192.168.0.68` |
+| A | `wiki` | `192.168.0.78` |
 
 ### Step 3: Configure Network Routing
 
-To enable access to your private resources, you need to set up a network with routing peers that can reach the private network where your PostgreSQL database and Wiki are hosted.
+The DNS records return private IPs, so peers also need a route to those IPs through a routing peer.
 
 #### Create a Network
 
-1. Navigate to **Networks** > **Networks** in the openZro dashboard.
-2. Click **Add Network** to start the network creation wizard.
-3. Fill out the network details:
-   - **Name**: `Internal Network`
-   - **Description**: `Provides access to internal service resources`
-4. Click **Add Network**.
-
-<img src="/docs-static/img/manage/dns/dns-aliases/create-network.png" alt="Create Network" className="imagewrapper-big"/>
+1. Go to **Networks** and click **Add Network**.
+2. Name it `Internal Network`, add a description, and click **Add Network**.
 
 #### Add Network Resources
 
-Add a wildcard resource that will match all services in your DNS zone.
+Add the services as **IP resources** (or the whole `192.168.0.0/24` subnet as one resource). On the network's
+**Resources** tab, click **Add Resource**:
 
-1. Click **Add Resource** and configure:
-   - **Name**: `Internal Wiki`
-   - **Address**: `wiki.openzro.internal`
-   - **Groups**: Assign to a resource group (e.g., `internal-services`)
-2. Click **Add Resource**.
-
-<img src="/docs-static/img/manage/dns/dns-aliases/add-resource.png" alt="Add Network Resource" className="imagewrapper-big"/>
+- **Name**: `Internal Postgres`, **Address**: `192.168.0.68`, **Destination Groups**: `internal-services`
+- **Name**: `Internal Wiki`, **Address**: `192.168.0.78`, **Destination Groups**: `internal-services`
 
 <Note>
-    Repeat the same steps to add the **Internal Postgres** resource with the address `postgres.openzro.internal`.
+    Use the IP addresses, not the zone names. A domain resource for a name that the custom zone already answers would
+    never be routed, because the zone answers the query before the domain route is installed.
 </Note>
 
-#### Create Access Control Policy
+#### Create an Access Control Policy
 
-Create a policy to allow your developers to access these resources.
-
-1. Click **Add Policy** and configure:
-   - **Name**: `Internal Services Policy`
-   - **Source**: Select the `dev` group
-   - **Destination**: Select the `internal-services` group
-   - **Protocol**: `TCP`
-   - **Ports**: `All`
-2. Click **Continue** twice, then click **Add Policy**.
-
-<img src="/docs-static/img/manage/dns/dns-aliases/create-policy.png" alt="Create Access Control Policy" className="imagewrapper-big"/>
-
+Click **Add Policy** on one of the resources and allow the `dev` group to reach `internal-services` over TCP (all
+ports, or only the ones your services use). Click **Continue** twice, name it `Internal Services Policy`, and click
+**Add Policy**.
 
 #### Add a Routing Peer
 
-Next, add a routing peer that has access to your private network.
+On the **Routing Peers** tab, click **Add Routing Peer**, select the peer (or peer group) that runs in your data
+center, click **Continue** and then **Add Routing Peer**.
 
-1. Click **Add Routing Peer** and select the peer that is running in your data center or VPC.
-2. Click **Continue** and then **Add Routing Peer** to confirm.
+The network is now configured:
 
-<img src="/docs-static/img/manage/dns/dns-aliases/add-routing-peer.png" alt="Add Routing Peer" className="imagewrapper-big"/>
-
-After completing the wizard, your network routing is configured, and the DNS names you created will now work seamlessly with the network routes.
-
-You can view your fully configured network in the Networks dashboard:
-
-<img src="/docs-static/img/manage/dns/dns-aliases/network-overview.png" alt="Fully Configured Network" className="imagewrapper-big"/>
+<img src="/docs-static/img/manage/dns/dns-aliases/network-overview.png" alt="Internal Network with the two IP resources" className="imagewrapper-big"/>
 
 ### Step 4: Verify the Setup
 
@@ -156,7 +125,7 @@ With the DNS zone and records configured, your developers can now access the ser
 
 #### Verify Network Routes
 
-First, confirm that peers in the `dev` group have received the network routes for `wiki.openzro.internal` and `postgres.openzro.internal`.
+First, confirm that peers in the `dev` group have received the routes to the two services.
 
 On a peer device in the `dev` group, run:
 
@@ -169,16 +138,13 @@ You should see output similar to:
 ```bash
 Available Networks:
 
-  - ID: Internal Wiki
-    Domains: wiki.openzro.internal
-    Status: Selected
-    Resolved IPs: -
-    Routes:
-
   - ID: Internal Postgres
-    Domains: postgres.openzro.internal
+    Network: 192.168.0.68/32
     Status: Selected
-    Resolved IPs: -
+
+  - ID: Internal Wiki
+    Network: 192.168.0.78/32
+    Status: Selected
 ```
 
 #### Access Your Services

@@ -103,6 +103,8 @@
 /how-to/troubleshooting-client  /help/troubleshooting-client  301
 /how-to/report-bug-issues  /help/report-bug-issues  301
 /manage/dns/zones  /manage/dns/custom-zones  301
+/manage/dns/nameserver-groups  /manage/dns/internal-dns-servers#configuring-nameservers-for-internal-domains  301
+/manage/dns/private-dns-behind-routing-peers  /manage/dns/internal-dns-servers#configuring-nameservers-for-internal-domains  301
 /use-cases/setup-site-to-site-access  /use-cases/site-to-site  301
 /manage/peers/site-to-site/db-workload-migration  /manage/network-routes/use-cases/by-scenario/site-to-site-cloud  301
 /manage/network-routes/use-cases/site-to-site-cloud  /manage/network-routes/use-cases/by-scenario/site-to-site-cloud  301

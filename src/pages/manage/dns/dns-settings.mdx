@@ -43,19 +43,19 @@ The `--disable-dns` flag takes precedence over server-side DNS settings. Even if
 
 ### Disable DNS Management for a Group
 
-1. Go to **DNS** → **DNS Settings**
+1. Go to **DNS** and open the **DNS Settings** tab
 2. Click the groups selection box and select existing groups, or type a new group name and press enter to create one inline
 3. Click **Save Changes**
 
 <img src="/docs-static/img/manage/dns/openzro-dns-settings.png" alt="DNS settings" className="imagewrapper-big"/>
 
 <Note>
-Changes take effect within 10-30 seconds. Peers in disabled groups will revert to their original DNS settings.
+Changes are pushed to peers right away. Peers in disabled groups revert to their original DNS settings.
 </Note>
 
 ### Re-enable DNS Management
 
-1. Go to **DNS** → **DNS Settings**
+1. Go to **DNS** and open the **DNS Settings** tab
 2. Remove the group from the disabled list
 3. Click **Save Changes**
 
@@ -71,11 +71,11 @@ You can manage DNS settings programmatically:
 
 ```bash
 # Get current settings
-curl -X GET https://api.openzro.io/api/dns/settings \
+curl -X GET https://<your-management-domain>/api/dns/settings \
   -H "Authorization: Token <TOKEN>"
 
 # Update settings
-curl -X PUT https://api.openzro.io/api/dns/settings \
+curl -X PUT https://<your-management-domain>/api/dns/settings \
   -H "Authorization: Token <TOKEN>" \
   -H "Content-Type: application/json" \
   -d '{
@@ -86,12 +86,10 @@ curl -X PUT https://api.openzro.io/api/dns/settings \
   }'
 ```
 
-See the full [API Reference](/ipa/resources/dns) for more details.
 
 ---
 
 ## Next Steps
 
-- **[Internal DNS Servers](/manage/dns/internal-dns-servers)** — Configure nameservers and internal DNS
-- **[Internal DNS Servers](/manage/dns/internal-dns-servers)** — Work with AD, BIND, and other internal DNS
+- **[Internal DNS Servers](/manage/dns/internal-dns-servers)** — Configure nameservers and work with AD, BIND, and other internal DNS
 - **[Troubleshooting](/manage/dns/troubleshooting)** — Diagnose DNS issues
