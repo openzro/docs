@@ -1,84 +1,78 @@
 import {Note} from "@/components/mdx";
 
 # Lazy Connections
-openZro now includes an experimental lazy connection feature designed to improve performance and reduce resource usage by connecting to peers only when needed. Instead of maintaining always-on connections, openZro activates them on-demand based on activity or signaling.
-
-This guide walks you through enabling and configuring this feature in your openZro client.
-
-<Note>
-    Minimum supported agent version: <strong>v0.50.1</strong>.
-    This or higher version must also be installed on the peers you are trying to access for lazy connections to function.
-</Note>
+Lazy connections are an experimental feature that connects to peers only when they are needed. Instead of keeping a
+connection open to every peer in the network map, the openZro client opens a connection when there is traffic or
+signaling for that peer, and closes it again after a period of inactivity.
 
 <Note>
-    This feature also requires an upgraded openZro Management and Signal server.
-    If you're self-hosting openZro, ensure your server is updated to version <strong>v0.50.1</strong>, which adds support for lazy connections.
+    This feature is experimental. Functionality and behavior may change in future releases.
 </Note>
+
+## What are lazy connections?
+
+When enabled, the openZro client:
+
+- Establishes peer-to-peer connections **only when needed**, for example when you ping a remote peer.
+- Monitors peer activity and **closes connections** that stay idle longer than the inactivity threshold.
+- Keeps excluded peers **always connected**.
+
+This is useful in **large deployments** or **resource-constrained devices**, where a permanent full mesh to every
+peer is unnecessary.
 
 <Note>
-    This feature is currently under active development and will continue to evolve. Future releases will enhance disconnection logic and add support for accessing resources through routing peers, which is not yet available.
+    The first packet to a peer that is not connected yet may see a **short delay** while the connection is
+    established.
 </Note>
 
-## What Are Lazy Connections?
+### How automatic disconnection works
 
-When enabled, lazy connections allow the openZro agent to:
+Once a connection is open, it stays open while there is WireGuard activity with the remote peer. If no activity is
+seen for longer than the inactivity threshold, the connection goes idle, even if the remote peer is still reachable.
+The next packet to that peer opens it again.
 
-- Establish peer-to-peer connections **only when needed** (e.g., when pinging a remote peer).
-- Monitor peer activity and **automatically disconnect peers** that remain inactive **and unreachable** for a specified time.
-- Keep critical peers (such as excluded peers) **always connected** to ensure uninterrupted communication.
-
-This feature is especially useful in **large-scale deployments** or **resource-constrained environments**, where maintaining full-mesh, permanent connections to all peers is unnecessary and inefficient.
-
-<Note>
-    When using lazy connections, there may be a **slight delay** when initiating a connection to a peer that is not yet connected. This is expected behavior, as the connection is established on-demand.
-</Note>
-
-
-### How Automatic Disconnection Works
-
-Once a connection between two peers is established, it will remain open only if there is ongoing traffic from the remote peer. If no traffic is received for 15 minutes, the connection will be closed — even if the remote peer is still reachable.
-
-<Note>
-The default inactivity threshold is <strong>60 minutes</strong>, and can be configured via the <code>NB_LAZY_CONN_INACTIVITY_THRESHOLD</code> environment variable (`60`).
-</Note>
-
-## Enabling via the system tray
-
-You can toggle Lazy Connections directly from the openZro system tray:
-
-1. Click the openZro icon in the system tray.
-2. Go to **Settings**.
-3. Click **Enable Lazy Connections** to toggle the setting.
-
-## Enabling Lazy Connections on agent
-
-Lazy connections are disabled by default. You can enable Lazy Connections using the following environment variable:
+The default threshold is **15 minutes**. Change it with the `OZ_LAZY_CONN_INACTIVITY_THRESHOLD` environment
+variable, set to a whole number of minutes (minimum 1):
 
 ```bash
-export NB_ENABLE_EXPERIMENTAL_LAZY_CONN=true
+export OZ_LAZY_CONN_INACTIVITY_THRESHOLD=30
 ```
 
-Or pass the flag directly via the CLI when running the agent:
+## Enabling in the dashboard
+
+Go to **Settings → Clients** and turn on **Enable lazy connections** in the **Experimental** card. The change is
+saved immediately and reaches every client in the account on its next network map update.
+
+- **Enabled:** the client starts its lazy connection manager. Existing connections stay open until they are idle
+  for longer than the inactivity threshold.
+- **Disabled:** the client stops the lazy connection manager and connects to all remote peers.
+
+## Enabling on a single client
+
+Lazy connections are disabled by default. To enable them on one client regardless of the account setting, use the
+CLI flag. It is saved in the active profile and survives restarts:
 
 ```bash
 openzro up --enable-lazy-connection
 ```
+
+Or set the environment variable on the client service. It applies only to that process, so add it to your service
+definition (systemd, Docker, etc.):
+
+```bash
+export OZ_ENABLE_EXPERIMENTAL_LAZY_CONN=true
+```
+
+You can also toggle it from the desktop app: open the openZro tray menu, go to **Settings** and click
+**Enable Lazy Connections**.
+
 <Note>
-    This configuration is <strong>not persistent</strong>. You must reapply the flag or environment variable after each restart unless it is built into your service definition (e.g., systemd or Docker).
+    When lazy connections are enabled locally, the account setting in the dashboard cannot turn them off on that
+    client.
 </Note>
 
-## Enabling Lazy Connections in the openZro Dashboard
+## Limitations
 
-The lazy connection feature can also be configured through the openZro Dashboard. Here’s how it works once the setting is updated:
-
-Setting enabled:
-* The client’s lazy connection manager is now active. Existing peer connections and ongoing connection attempts will remain unchanged for one hour.
-After that, any connection that couldn't be established due to unavailable remote peers will transition to an idle state.
-
-Setting disabled:
-* The lazy connection manager is now disabled. The client will immediately attempt to establish connections with all remote peers.
-
-## Get started
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Ask questions in [GitHub Discussions](https://github.com/openzro/openzro/discussions)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub
+- Lazy connections are not started when [quantum resistance (Rosenpass)](/client/post-quantum-cryptography)
+  is enabled on the client.
+- Remote peers must run openZro (or a NetBird-compatible client) v0.45.0 or later. Every openZro release meets this.

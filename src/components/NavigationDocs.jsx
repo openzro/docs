@@ -93,7 +93,6 @@ export const docsNavigation = [
           },
           { title: 'SSH', href: '/manage/peers/ssh' },
           { title: 'Lazy Connections', href: '/manage/peers/lazy-connection' },
-          { title: 'Remote Jobs', href: '/manage/peers/remote-jobs' },
           {
             title: 'Access Infrastructure',
             isOpen: true,
@@ -116,7 +115,7 @@ export const docsNavigation = [
               },
             ],
           },
-          { title: 'Auto Update', href: '/manage/peers/auto-update' },
+          { title: 'Client Updates', href: '/manage/peers/auto-update' },
         ],
       },
       {
@@ -402,7 +401,7 @@ export const docsNavigation = [
             title: 'Two-Factor Authentication',
             href: '/manage/settings/multi-factor-authentication',
           },
-          { title: 'Auto Update', href: '/manage/peers/auto-update' },
+          { title: 'Client Updates', href: '/manage/peers/auto-update' },
           { title: 'Lazy Connections', href: '/manage/peers/lazy-connection' },
           {
             title: 'Notifications',

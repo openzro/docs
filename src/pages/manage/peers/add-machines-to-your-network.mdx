@@ -8,28 +8,29 @@ An openZro peer is any machine that runs the [openZro agent](/about-openzro/how-
 and is connected to the network — a virtual machine running in
 AWS, GCP, or Azure; a personal laptop on Linux, macOS, or Windows;
 a single-board computer like a Raspberry Pi; a Docker container;
-a pfSense or OPNsense gateway; or any other host that can run the
-openZro client.
+or any other host that can run the openZro client. pfSense and OPNsense gateways are
+[not validated yet](/get-started/install/pfsense).
 
 {/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="JRCZy4rLi-c" start={34} /> */}
 
 ## Use openZro web UI to add new peers
 
 To add a new peer to your network follow these steps:
-1. Sign-in to your openZro deployment at https://your-management.example.com/ and go to the Peers tab.
-2. Hit `Add Peer` button
+1. Sign in to your openZro dashboard and go to **Peers**.
+2. Click **Add peer**.
 
 <p>
     <img src="/docs-static/img/manage/peers/add-machines-to-your-network/add-new-peer-empty.png" alt="high-level-dia" className="imagewrapper-big"/>
 </p>
 
-3. Follow the instructions
+3. Pick the operating system (Linux, Windows, macOS or Docker) and follow the instructions in the
+   **Install openZro** dialog.
 
 <p>
     <img src="/docs-static/img/manage/peers/add-machines-to-your-network/add-new-peer-popup.png" alt="high-level-dia" width="700" className="imagewrapper"/>
 </p>
 
-4. Refresh the Peers tab, and it will display new machines
+4. Once the client is connected, click the refresh button next to the filters. The new machine shows up in the list.
 
 <p>
     <img src="/docs-static/img/manage/peers/add-machines-to-your-network/peer-list.png" alt="high-level-dia" className="imagewrapper-big"/>

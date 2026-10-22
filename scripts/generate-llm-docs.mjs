@@ -19,7 +19,7 @@ const OUTPUT_DIR = path.join(ROOT_DIR, 'public/llms');
 const LLMS_TXT_PATH = path.join(ROOT_DIR, 'public/llms.txt');
 
 // Base URL for the docs site
-const BASE_URL = 'https://docs.netbird.io';
+const BASE_URL = 'https://docs.openzro.io';
 
 /**
  * Strip JSX/React components from MDX content, keeping clean markdown
@@ -181,16 +181,16 @@ function generateLlmsTxt(pages) {
     sections[section].push(page);
   }
 
-  let content = `# NetBird Documentation
+  let content = `# openZro Documentation
 
-> NetBird is an open-source WireGuard-based mesh VPN platform that creates secure private networks.
+> openZro is an open-source, self-hosted zero-trust mesh network built on WireGuard.
 > This file provides an index of all documentation pages in markdown format for LLM consumption.
 
 ## About
 
-- Website: https://netbird.io
+- Website: https://openzro.io
 - Documentation: ${BASE_URL}
-- GitHub: https://github.com/netbirdio/netbird
+- GitHub: https://github.com/openzro/openzro
 
 ## Documentation Index
 
@@ -201,9 +201,9 @@ Each link below points to a clean markdown version of the documentation page.
   // Section display names
   const sectionNames = {
     'introduction': 'Introduction',
-    'about-netbird': 'About NetBird',
+    'about-openzro': 'About openZro',
     'get-started': 'Getting Started',
-    'manage': 'Managing NetBird',
+    'manage': 'Managing openZro',
     'selfhosted': 'Self-Hosting',
     'ipa': 'API Reference',
     'use-cases': 'Use Cases',
