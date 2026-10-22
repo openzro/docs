@@ -1,25 +1,27 @@
+import {Note, Warning} from "@/components/mdx";
+
 # pfSense Installation
 
-pfSense ships a NetBird package maintained by Netgate (the pfSense
-vendor) that includes both the agent and the firewall UI integration.
-**openZro is wire-compatible with that client** because we forked
-NetBird at `v0.52.2`, the last permissively-licensed release before
-the upstream's AGPL relicense — and the agent ↔ management protocol
-hasn't broken across versions.
+<Warning>
+    **Not validated yet.** openZro does not publish a FreeBSD build, so on pfSense
+    this page uses the NetBird community package (agent and UI plugin) pointed at
+    your openZro management server. That combination has not been tested against
+    openZro. Native pfSense support for openZro is being planned; until then, test
+    it in a lab before relying on it.
+</Warning>
 
-So the workflow is: install the upstream `pfSense-pkg-NetBird` from
-[netbirdio/pfsense-netbird](https://github.com/netbirdio/pfsense-netbird/releases),
-then point the **Management URL** field at your openZro management
-server. No openZro-specific build needed.
+The NetBird project publishes a pfSense package
+([netbirdio/pfsense-netbird](https://github.com/netbirdio/pfsense-netbird/releases))
+with the agent and a firewall UI integration. openZro forked NetBird at
+`v0.52.2`, and the agent talks to management over the same protocol, so the
+package can be pointed at an openZro management server instead of NetBird's.
+Newer NetBird agents may use features openZro does not have.
 
 <Note>
-    The packages on the upstream release page are signed by Netgate.
-    The agent binary is licensed AGPLv3 (NetBird's current license);
-    the pfSense plugin itself is Apache 2.0. You're an end-user
-    consuming both — neither license affects your use of openZro.
+    The NetBird client (agent) is BSD-3-Clause licensed, like openZro's client.
+    The package is published by the NetBird project, not by openZro or Netgate.
 </Note>
 
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="Kgrcquyeohc" /> */}
 
 ## Prerequisites
 
@@ -66,10 +68,9 @@ server. No openZro-specific build needed.
 
 5. **Verify the installation**
 
-   The NetBird configuration UI should now appear under
-   `VPN` > `NetBird` in the pfSense menu. The label says NetBird
-   because that's the upstream package name — point it at openZro
-   in the next step.
+   The configuration UI should now appear under `VPN` > `NetBird` in the
+   pfSense menu. The label says NetBird because that is the package's name;
+   you point it at openZro in the next step.
 
 ## Configuration
 
@@ -79,26 +80,17 @@ In `VPN` > `NetBird`, fill out the authentication form:
 
 - **Management URL**: enter your openZro management server, e.g.
   `https://your-management.example.com:443`. Do **not** leave the
-  default — that points at the upstream NetBird managed cloud.
+  default, which points at NetBird's hosted service.
 - **Setup Key**: paste a setup key issued from your openZro
   dashboard.
 
 Click `Save`.
 
-<p>
-    {/* TODO(docs): replace with openZro screenshot */}
-    <img src="/docs-static/img/get-started/pfSense/authentication.png" alt="authentication" className="imagewrapper-big"/>
-</p>
-
 ### Verify connection status
 
-The Status page shows connected peers and control-service health.
-Open it via `Status` > `NetBird` in the pfSense menu.
-
-<p>
-    {/* TODO(docs): replace with openZro screenshot */}
-    <img src="/docs-static/img/get-started/pfSense/status.png" alt="connection status" className="imagewrapper-big"/>
-</p>
+Open `Status` > `NetBird` in the pfSense menu. It shows the connected peers and
+the health of the management, signal and relay connections, which should point
+at your openZro deployment.
 
 ### Assign the WireGuard interface
 
@@ -168,7 +160,7 @@ work reliably:
    - `Diagnostics` > `States`
    - Filter by the openZro host IP, click `Kill`
 
-4. **Restart the agent**:
+4. **Restart the agent** (the package's binary is `netbird`):
    - `netbird service restart` on the device
    - `netbird status -d` to verify
 
