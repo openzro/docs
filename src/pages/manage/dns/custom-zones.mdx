@@ -11,87 +11,52 @@ This provides complete control over internal DNS without running separate infras
 
 ### Creating a Custom Zone
 
-To create a new Custom DNS Zone, navigate to **DNS** > **Zones** in the openZro Dashboard and click **Add Zone**. Configure the zone settings as described below:
+Go to **DNS**, open the **DNS Zones** tab and click **Add Zone**. The **Add DNS Zone** dialog has two tabs.
 
-<img src="/docs-static/img/manage/dns/zones/add-zone.png" alt="Add Custom Zone" className="imagewrapper-big"/>
+<img src="/docs-static/img/manage/dns/zones/add-zone.png" alt="Add DNS Zone dialog" className="imagewrapper"/>
 
-**Domain**
+On the **Zone** tab:
 
-The fully qualified domain name for this zone (e.g., `services.company.internal`). All DNS records in this zone will use this domain as their suffix.
+- **Name**: a human-readable label for the zone, for example `Internal services`.
+- **Domain**: the zone apex, for example `corp.internal`. All records in the zone use it as their suffix. It must be a
+  valid FQDN, cannot be changed after creation, and must not overlap the openZro peer DNS domain or another zone.
+- **Enable Zone**: on by default. When off, the zone and its records are kept but not distributed to peers, which is
+  useful for pausing a zone without deleting it.
+- **Append to search domain**: off by default. When on, peers can resolve bare names against the zone (`wiki` →
+  `wiki.corp.internal`). When off, use full names.
 
-- Must be a valid FQDN format
-- Cannot be changed after creation
-- Must not conflict with the openZro peer DNS domain
+Click **Continue**. On the **Distribution** tab, select one or more **Distribution Groups**: only peers in these groups
+receive the zone. At least one group is required. Click **Add Zone**.
 
-**Distribution Groups**
-
-Select one or more peer groups that should receive this zone. Only peers in the selected groups will be able to resolve the zone's DNS records.
-
-- At least one group is required
-- Peers must belong to at least one selected group to receive the zone
-- Changes to group membership automatically update zone distribution
-
-**Enable Search Domain**
-
-When enabled, the zone's domain is added to the peer's DNS search list, allowing short name queries.
-
-- Disabled by default
-- When enabled: queries like `api` expand to `api.services.company.internal`
-- When disabled: full FQDNs must be used (e.g., `api.services.company.internal`)
-
-**Enable DNS Zone**
-
-Controls whether the zone is active and distributed to peers.
-
-- Enabled by default
-- When disabled: zone is not distributed, but records are preserved
-- Useful for testing configurations before deployment
-
-Click **Add Zone** to create the zone
-
-<img src="/docs-static/img/manage/dns/zones/zone-created.png" alt="Zone Created Successfully" className="imagewrapper-big"/>
+<img src="/docs-static/img/manage/dns/zones/zone-created.png" alt="DNS Zones list" className="imagewrapper-big"/>
 
 ### Adding Records to a Zone
 
-After creating the zone, click on it to view its details, then click **Add Record** to add DNS records.
+Click the zone to open its page, then click **Add Record**. Records are edited inline in the **DNS Records** table:
 
-**Hostname**
+- **Type**: A (IPv4 address), AAAA (IPv6 address) or CNAME (alias to another domain).
+- **Name**: the host name inside the zone, for example `wiki` for `wiki.corp.internal`. Use `@` for the zone apex.
+- **Content**: the IP address, or the target domain for a CNAME.
+- **TTL**: how long, in seconds, resolvers may cache the record. Defaults to 300 (5 minutes) if left empty.
 
-The hostname for this DNS record within the zone. For example, `server` in zone `dev.local` creates `server.dev.local`.
+Click the check mark to save the record.
 
-**Record Type**
-
-The DNS record type. Supported types are A (IPv4 address), AAAA (IPv6 address), and CNAME (alias to another domain).
-
-**Value**
-
-The target for this DNS record. For A records, this is an IPv4 address. For CNAME records, this is another domain name.
-
-**Time to Live (TTL)**
-
-How long (in seconds) DNS resolvers should cache this record before checking for updates. Lower values mean faster propagation of changes but more DNS queries. Default is 300 seconds (5 minutes).
-
-<img src="/docs-static/img/manage/dns/zones/add-record.png" alt="Add DNS Record" className="imagewrapper-big"/>
-
-Click **Add Record** to create the DNS record.
-
-<img src="/docs-static/img/manage/dns/zones/record-created.png" alt="DNS Record Created Successfully" className="imagewrapper-big"/>
+<img src="/docs-static/img/manage/dns/zones/add-record.png" alt="Zone page with records and the inline Add Record row" className="imagewrapper-big"/>
 
 ### Updating a Zone
 
-To update zone settings such as distribution groups or search domain configuration, click the three dots next to the zone, select **Edit**, make the necessary changes, and click **Save Changes** to apply them.
-
-<img src="/docs-static/img/manage/dns/zones/update-zone.png" alt="Update DNS Zone" className="imagewrapper-big"/>
+To change a zone's name, distribution groups or toggles, open the row menu (**⋮**) of the zone and choose **Edit**, or
+click **Edit zone** on the zone's page. Make the changes and click **Save Changes**. The domain cannot be changed.
 
 ### Deleting a Zone
 
-To delete a zone, click the three dots next to the zone, select **Delete**, and confirm the deletion when prompted.
+Open the row menu (**⋮**) of the zone, choose **Delete**, and confirm.
 
 <Note>
-Deleting a zone will also remove all existing records within that zone. If only a single record needs to be removed, delete the individual record instead of the entire zone.
+Deleting a zone also removes all of its records. To remove a single record, delete it from the zone's page instead.
 </Note>
 
-<img src="/docs-static/img/manage/dns/zones/delete-zone.png" alt="Delete DNS Zone" className="imagewrapper-big"/>
+<img src="/docs-static/img/manage/dns/zones/delete-zone.png" alt="Delete zone confirmation" className="imagewrapper"/>
 
 
 ## Behavior
@@ -100,14 +65,19 @@ Deleting a zone will also remove all existing records within that zone. If only 
 
 Custom DNS Zones take precedence over nameservers when there is a conflict. If a nameserver is configured with a match domain that is the same as a Custom DNS Zone domain, the zone's records will be resolved first, and the nameserver will not be queried for that domain.
 
+A name inside a distributed zone that has no record gets an authoritative `NXDOMAIN` answer; it is not forwarded to
+nameservers.
+
 ## Limitations
 
 Custom DNS Zones have the following limitations:
 
 - **Domain cannot be changed**: Once a zone is created, its domain cannot be modified. The zone must be deleted and recreated with a new domain
-- **Cannot use peer DNS domain**: Zone domain must not conflict with your openZro peer DNS domain (e.g., `openzro.cloud`, `openzro.selfhosted`, or a custom domain configured via the `--dns-domain` flag or in **Settings** > **Network** > **DNS Domain**)
+- **Cannot use peer DNS domain**: Zone domain must not conflict with your openZro peer DNS domain (`openzro.selfhosted` by default, or the domain set with the management server's `--dns-domain` flag or in **Settings** > **Networks** > **Custom DNS domain**)
+- **No overlapping zones**: A zone cannot be inside or contain another zone's domain
 - **CNAME exclusivity**: CNAME records cannot coexist with A or AAAA records for the same hostname
 - **Empty zones not distributed**: Zones without any DNS records are not distributed to peers
+- **Record types**: Only A, AAAA and CNAME records are supported; wildcard records are not
 
 ## Use Cases
 
