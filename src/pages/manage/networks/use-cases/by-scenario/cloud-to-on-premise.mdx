@@ -36,55 +36,39 @@ Look for your local subnet, typically something like `10.100.0.0/24`.
 
 1. Go to **Networks** in the openZro dashboard
 2. Click **Add Network**
-3. Name it "On-Premise Data Center" and click **Save**
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/cloud-to-on-prem/add-network-on-prem-datacenter.png" alt="Add network" className="imagewrapper"/>
-</p>
+3. Name it `On-Prem Datacenter` and click **Add Network**
 
 ## Step 3: Add Your Database as a Resource
 
-1. In your new network, click **Add Resource**
-2. In the **Resource** tab, enter a name like "Database Servers"
-3. Enter your database subnet or specific IP (e.g., `10.100.0.0/24` or `10.100.0.50/32`)
-4. Expand **Additional Options** and under **Resource Groups**, create a group called `on-prem-databases`
-5. Click **Continue** to proceed to the **Access Control** tab
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/cloud-to-on-prem/add-resource-database-servers.png" alt="Add resource" className="imagewrapper"/>
-</p>
+1. In your new network, on the **Resources** tab, click **Add Resource**
+2. Enter a name like `Database Servers`
+3. Enter your database subnet or a specific IP (e.g., `10.100.0.0/24` or `10.100.0.50`) as the **Address**
+4. Under **Destination Groups**, create a group called `on-prem-databases`
+5. Click **Add Resource**
 
 <Note>
-For more granular access, add specific database IPs instead of the entire subnet. For example, add `10.100.0.50/32` to only allow access to your production database.
+For more granular access, add specific database IPs instead of the entire subnet. For example, add `10.100.0.50` to only allow access to your production database.
 </Note>
 
 ## Step 4: Create an Access Policy
 
-1. In the **Access Control** tab, click **Add Policy**
-2. Set **Source** to "`cloud-workloads`" (you'll create this group in the next step)
-3. Set **Destination** to `on-prem-databases`
-4. Set **Protocol** to TCP
-5. Set **Ports** to the database ports (e.g., `5432` for PostgreSQL, `3306` for MySQL)
-6. Name it "Cloud to Database Access" and click **Add Policy**
-7. Click **Add Resource** to save the resource with its policy
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/cloud-to-on-prem/add-policy-on-prem-databases.png" alt="Add policy" className="imagewrapper"/>
-</p>
+1. Click **Add Policy** on the `Database Servers` row. The destination is already `on-prem-databases`.
+2. Set **Source** to `cloud-workloads` (type the name to create the group; you will add peers to it in Step 6)
+3. Set **Protocol** to TCP and **Ports** to the database ports (e.g., `5432` for PostgreSQL, `3306` for MySQL)
+4. Click **Continue** twice, name it `Cloud to On-Prem Databases`, and click **Add Policy**
 
 ## Step 5: Set Up the Routing Peer On-Premise
 
-The routing peer forwards traffic from openZro to your data center network. Install openZro on a server that can reach the database:
+The routing peer forwards traffic from openZro to your data center network. Install openZro on a Linux server that can
+reach the database:
 
 1. In the openZro dashboard, go to **Setup Keys**
-2. Create a new setup key (one-time use recommended). Add `on-prem-databases` to **Auto-assigned groups** and click **Create Setup Key**.
-
-<p>
-    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/cloud-to-on-prem/create-new-setup-key-on-prem-db.png" alt="Create setup key" className="imagewrapper"/>
-</p>
+2. Create a new setup key (one-off is recommended). Add `on-prem-routers` to **Auto-assigned groups** and click
+   **Create Setup Key**.
 
 <Note>
-You can also add groups to peers manually after setup. Go to **Peers**, select the peer, and add groups under **Assigned Groups**.
+Use a group of its own for routing peers instead of `on-prem-databases`. The `on-prem-databases` group is the policy
+destination, so putting the routing peer in it would also open the database ports on the routing peer itself.
 </Note>
 
 3. On your on-premise server, run:
@@ -92,11 +76,17 @@ You can also add groups to peers manually after setup. Go to **Peers**, select t
 ```bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-sudo openzro up --setup-key YOUR_SETUP_KEY
+sudo openzro up --setup-key YOUR_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
-4. In the Networks view, click **Add Routing Peer** on your On-Premise Data Center network
-5. Select your new peer and click **Add Routing Peer**
+4. In the `On-Prem Datacenter` network, open the **Routing Peers** tab and click **Add Routing Peer**
+5. Choose **Peer Group**, select `on-prem-routers`, click **Continue** and then **Add Routing Peer**
+
+The network now looks like this:
+
+<p>
+    <img src="/docs-static/img/manage/networks/use-cases/by-scenario/cloud-to-on-prem/on-prem-network.png" alt="On-Prem Datacenter network with the database resource" className="imagewrapper-big"/>
+</p>
 
 ## Step 6: Deploy openZro on `cloud-workloads`
 
@@ -110,7 +100,7 @@ Create a setup key for your cloud workloads:
 ```bash
 # See /get-started/install for distro-specific instructions; quick one-liner for Debian/Ubuntu:
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null && echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] https://pkg.openzro.io/apt stable main" | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null && sudo apt-get update && sudo apt-get install -y openzro
-sudo openzro up --setup-key YOUR_CLOUD_SETUP_KEY
+sudo openzro up --setup-key YOUR_CLOUD_SETUP_KEY --management-url https://<your-management-domain>
 ```
 
 **For containers (Docker Compose):**
@@ -118,14 +108,15 @@ sudo openzro up --setup-key YOUR_CLOUD_SETUP_KEY
 ```yaml
 services:
   openzro:
-    image: openzro/openzro:latest
+    image: ghcr.io/openzro/openzro:latest
     network_mode: host
     cap_add:
       - NET_ADMIN
     environment:
-      - NB_SETUP_KEY=YOUR_SETUP_KEY
+      - OZ_SETUP_KEY=YOUR_SETUP_KEY
+      - OZ_MANAGEMENT_URL=https://<your-management-domain>
     volumes:
-      - openzro-config:/etc/openzro
+      - openzro-config:/var/lib/openzro
     restart: unless-stopped
 
 volumes:
@@ -191,7 +182,7 @@ Your cloud application can now securely access the on-premise database.
 ### High Availability
 
 - Deploy multiple routing peers and configure failover
-- Monitor routing peer health with your existing tools or set up [Notifications](/manage/settings/notifications) to get alerted when a routing peer disconnects
+- Monitor routing peer health with your existing tools (`openzro status` on the routing peer, or the peer's status on the **Peers** page)
 - Use cloud-native load balancing where appropriate
 
 ### Performance

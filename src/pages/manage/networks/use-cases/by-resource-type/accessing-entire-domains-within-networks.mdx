@@ -15,113 +15,67 @@ Using wildcard domains, developers can access any subdomain under `*.dev.example
 
 Before starting, ensure you have:
 - [openZro clients](/get-started) installed on developer and data scientist devices
-- [Routing peers](/manage/networks#routing-peers) configured in your network using [setup keys](/manage/peers/access-infrastructure/setup-keys-add-servers-to-network)
-- [Nameservers](/manage/dns) configured in openZro to resolve domain queries
+- [Routing peers](/manage/networks#routing-peers) in your network, added with [setup keys](/manage/peers/access-infrastructure/setup-keys-add-servers-to-network)
+- A routing peer that can resolve the internal domains. If it cannot, add a [nameserver](/manage/dns) distributed to
+  the routing peer's group.
 
 ## Enable DNS wildcard routing
 
-DNS wildcard routing allows openZro to resolve subdomain requests through routing peers. This must be enabled before using wildcard domain resources.
+DNS wildcard routing lets routing peers resolve domains on behalf of clients, which wildcard domain resources need.
+It is **enabled by default** for new accounts. To check it, go to **Settings** > **Networks** and confirm that
+**Enable DNS wildcard routing** is on:
+
+![DNS wildcard routing setting](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/01-domains-within-networks.png)
 
 <Note>
-DNS wildcard routing shifts DNS resolution from the local client to the routing peer, enabling access control rules and optimized traffic routing.
-</Note>
-
-To enable DNS wildcard routing:
-
-1. Navigate to `Settings` > `Networks` in openZro
-2. Toggle `Enable DNS wildcard routing`
-
-![Enabling DNS wildcard routing](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/01-domains-within-networks.png)
-
-<Note>
-DNS wildcard routing requires routing peers and clients running version `0.35.0` or later. Restart your routing peers and clients after enabling this feature.
-</Note>
-
-<Note>
-DNS Forwarder port change: Starting with openZro v0.59.0, the local DNS forwarder switches from port <code>5353</code> to <code>22054</code> to avoid collisions. For backward compatibility, the Management Service applies the new port only when <strong>all peers in the account</strong> run v0.59.0 or newer.
+Restart your routing peers and clients after changing this setting.
 </Note>
 
 ## Set up the development network
 
 ### Create the network
 
-1. Navigate to `Networks` > `Networks` in the openZro dashboard
-2. Click `Add Network`
-3. Enter a name (e.g., `Development Network`) and optional description
-4. Click `Add Network`
-
-![Creating Developers Domain Network](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/02-domains-within-networks.png)
+1. Go to **Networks** and click **Add Network**.
+2. Enter a name (e.g., `Development Network`) and an optional description.
+3. Click **Add Network**.
 
 ### Add routing peers
 
-Click `Add Routing Peer` to enable access to resources in this network.
-
-![Add Routing Peers Window](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/03-domains-within-networks.png)
-
-Choose your routing configuration:
-- Select `Routing Peers` to add a single peer
-- Select `Peer Group` to add multiple peers for high availability
-- Click `Continue`
-
-![Local Routing Peers](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/04-domains-within-networks.png)
-
-In `Advanced Settings`:
-- Enable `Masquerade` to access private networks without configuring local routers
-- Set `Metric` to prioritize routers (lower values = higher priority)
-- Click `Add Routing Peer`
-
-![Masquerade and Metric](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/05-domains-within-networks.png)
+Open the network, go to the **Routing Peers** tab and click **Add Routing Peer**. Select a single peer under
+**Routing Peers**, or a **Peer Group** for high availability, click **Continue**, keep **Masquerade** on, and click
+**Add Routing Peer**.
 
 ### Add a wildcard domain resource
 
-Click `Add Resource` to open the resource modal.
+On the **Resources** tab, click **Add Resource** and configure:
 
-![Add Domain Resource](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/06-domains-within-networks.png)
-
-In the **Resource** tab, configure the resource:
 - **Name**: `Development Wildcard Domain`
 - **Address**: `*.dev.example.com`
-- Expand **Additional Options** and under **Resource Groups**, select or create a group (e.g., `Development Domain`)
-- Click **Continue** to proceed to the **Access Control** tab
+- **Destination Groups**: create or select `development-domain`
 
-![Add Development Wildcard Resource](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/07-domains-within-networks.png)
+Click **Add Resource**.
 
 ### Create an access policy
 
-In the **Access Control** tab, click **Add Policy** to grant developers access to `*.dev.example.com`.
+Click **Add Policy** on the resource's row. The destination is already `development-domain`. Set:
 
-Configure the policy:
 - **Protocol**: `ALL`
-- **Source**: `Developers`
-- **Destination**: `Development Domain` (auto-populated)
+- **Source**: `developers`
 
-![Developers Policy](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/09-domains-within-networks.png)
-
-Click `Continue` to optionally add posture checks, then `Continue` again. Enter a policy name (e.g., `Development Wildcard Domain Policy`) and click `Add Policy`.
-
-![Developers Policy Name](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/10-domains-within-networks.png)
-
-Click **Add Resource** to save the resource with its policy.
+Click **Continue** to optionally add posture checks, then **Continue** again. Name the policy (e.g.,
+`Development wildcard domain policy`) and click **Add Policy**.
 
 ### Add the base domain resource
 
-Wildcard domains (`*.dev.example.com`) only match subdomains, not the base domain itself. To also allow access to `dev.example.com`, add it as a separate resource.
+To be sure `dev.example.com` itself is reachable, add it as a separate resource. Click **Add Resource** again:
 
-1. Navigate to `Networks` > `Development Network` and click `Add Resource`
+- **Name**: `Development Regular Domain`
+- **Address**: `dev.example.com`
+- **Destination Groups**: `development-domain`, the same group as the wildcard
 
-![Development Network](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/11-domains-within-networks.png)
+Because it shares the group, the existing routing peers and policy apply to it automatically:
 
-2. In the **Resource** tab, configure the resource:
-   - **Name**: `Development Regular Domain`
-   - **Address**: `dev.example.com`
-   - Expand **Additional Options** and under **Resource Groups**, select `Development Domain` (same group as the wildcard)
-   - Click **Continue** to proceed to the **Access Control** tab, then click **Add Resource**
-
-![Regular Domain Resource](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/12-domains-within-networks.png)
-
-Since you used the same group, openZro automatically applies the existing routing peers and access policies.
-
-![Development Network Resources](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/13-domains-within-networks.png)
+![Development Network resources](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/13-domains-within-networks.png)
 
 Verify the configuration from a developer workstation:
 
@@ -133,7 +87,7 @@ Available Networks:
     Domains: dev.example.com
     Status: Selected
     Resolved IPs:
-      [example.com]: 93.184.215.14, 2606:2800:21f:cb07:6820:80da:af6b:8b2c
+      [dev.example.com]: 93.184.215.14
 
   - ID: Development Wildcard Domain
     Domains: *.dev.example.com
@@ -143,39 +97,20 @@ Available Networks:
 
 ## Set up the AI model training network
 
-Follow the same steps to create a network for data scientists.
+Follow the same steps to create a network for data scientists:
 
-Create a new network named `AI Model Training Network`:
-
-![AI Network](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/14-domains-within-networks.png)
-
-Add routing peers (single or group for high availability):
-
-![AI Routing Peers](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/15-domains-within-networks.png)
-
-Add the wildcard domain resource for `*.ai.example.com`. In the **Resource** tab, enter the name and address, then expand **Additional Options** to assign a resource group (e.g., `AI Domain`). Click **Continue** to go to the **Access Control** tab:
-
-![AI Wildcard Domain Resource](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/16-domains-within-networks.png)
-
-In the **Access Control** tab, click **Add Policy** and create an access policy for the `Data Scientists` group:
-
-![AI Team Access Policy](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/17-domains-within-networks.png)
-
-Click **Add Resource** to save. Then add the base domain `ai.example.com` as a separate resource using the same resource group. The completed network:
-
-![AI Network](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/18-domains-within-networks.png)
+1. Create a network named `AI Model Training Network` and add its routing peers.
+2. Add the wildcard resource `*.ai.example.com` in a new `ai-domain` group.
+3. Click **Add Policy** on it and grant the `data-scientists` group access with protocol `ALL`.
+4. Add the base domain `ai.example.com` as another resource in `ai-domain`.
 
 ### Add specific subdomain resources
 
-You can add individual subdomain resources for more granular access control. For example, to add a specific AI model subdomain:
+You can also add individual subdomains as resources, for example to give them their own policies later. Click
+**Add Resource**, enter the subdomain (e.g., `quantumnet.ai.example.com`) and assign it to a group. Here all of them
+use `ai-domain`:
 
-Click `Add Resource`, enter the subdomain name and address in the **Resource** tab, expand **Additional Options** to assign it to the appropriate resource group, then click **Continue** and **Add Resource**:
-
-![New AI Model Resource](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/19-domains-within-networks.png)
-
-The network now shows all resources:
-
-![AI Training Model Network](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/20-domains-within-networks.png)
+![AI Model Training Network resources](/docs-static/img/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks/20-domains-within-networks.png)
 
 Verify from a data scientist workstation:
 
