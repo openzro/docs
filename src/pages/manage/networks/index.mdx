@@ -5,12 +5,12 @@ openZro creates a secure peer-to-peer mesh network where devices running the ope
 However, installing the agent on every machine is not always feasible. Networks solve this by letting you route traffic to entire LANs, office networks, or cloud VPCs without requiring the openZro agent on each device.
 
 <p>
-    <img src="/docs-static/img/manage/networks/openzro-network-routes.png" alt="high-level-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes.png" alt="openZro peers reaching a private network through a routing peer" className="imagewrapper-big"/>
 </p>
 
 ## Networks vs. Network Routes
 
-Networks is the newer, simpler replacement for Network Routes. We encourage you to use Networks where possible; however, Networks do not yet support all remote access scenarios. Network Routes will continue to be actively maintained, so use whichever fits your use case.
+Networks is the newer, simpler way to reach internal resources, and the recommended choice for new setups. Network Routes still cover a few scenarios Networks does not, such as site-to-site routing; use whichever fits your use case.
 
 For a detailed comparison, see our [site-to-site documentation](/use-cases/site-to-site).
 
@@ -20,23 +20,37 @@ For a detailed comparison, see our [site-to-site documentation](/use-cases/site-
 
 A Network is a configuration container that maps your on-premise or cloud infrastructure into a logical set of resources and routing peers. You can create multiple networks to represent different environments such as office networks, cloud VPCs, or data center LANs.
 
+Go to **Networks** and click **Add Network**, then give it a name and an optional description. The dashboard then offers to add a resource, a policy and a routing peer to it.
+
 <p>
-    <img src="/docs-static/img/manage/networks/index/new-network-2.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/networks/index/new-network-2.png" alt="Add Network dialog" className="imagewrapper"/>
+</p>
+
+Each network shows its resources, policies and routing peers in the **Networks** list. Click a network to manage it: its page has a **Resources** tab and a **Routing Peers** tab.
+
+<p>
+    <img src="/docs-static/img/manage/networks/index/networks-list.png" alt="Networks list" className="imagewrapper-big"/>
 </p>
 
 ### Routing Peers
 
 Routing peers are machines that bridge your openZro peers to your internal networks. They forward traffic from openZro clients to resources that do not have the openZro agent installed.
 
-You can add multiple routing peers using individual peers or groups to ensure high availability and load balancing. Each routing peer can be configured with masquerading and priority settings.
+To add one, open the network's **Routing Peers** tab and click **Add Routing Peer**. Choose individual peers or a **Peer Group**; add several routing peers for high availability. Each client uses one routing peer at a time and fails over to another if it goes away.
 
 <p>
-    <img src="/docs-static/img/manage/networks/index/add-routing-peer-1.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/networks/index/add-routing-peer-1.png" alt="Add Routing Peer dialog with a peer group" className="imagewrapper"/>
 </p>
 
-<Note>
-To get alerted when a routing peer goes offline, enable the **Routing Peer Disconnected** event in [Notifications](/manage/settings/notifications). You can receive alerts via email, webhook, or Slack.
-</Note>
+On the **Advanced Settings** tab you can disable the routing peer, turn **Masquerade** off (Linux routing peers only; other platforms always masquerade), and set its **Metric**: a lower metric means higher priority.
+
+<p>
+    <img src="/docs-static/img/manage/networks/index/add-routing-peer-2.png" alt="Routing peer advanced settings" className="imagewrapper"/>
+</p>
+
+<p>
+    <img src="/docs-static/img/manage/networks/index/routing-peers-1.png" alt="Routing Peers tab of a network" className="imagewrapper-big"/>
+</p>
 
 <Note>
 A network resource policy grants access to the network **behind** the routing peer, not to the routing peer machine itself. If you need to access services running on the routing peer (for example, Pi-hole, Home Assistant, or a monitoring dashboard), add the routing peer to a group and create a peer-to-peer [access control policy](/manage/access-control) with that group as the destination.
@@ -47,25 +61,18 @@ A network resource policy grants access to the network **behind** the routing pe
 Resources are the machines, services, or subnets you want to access within your internal network. You can define resources as:
 
 - Single IP addresses
-- IP ranges
+- Subnets in CIDR notation (e.g., `10.0.0.0/24`)
 - Domain names (e.g., `example.com`)
-- Wildcard domains (e.g., `*.company.internal`) when [DNS wildcard routing](#enable-dns-wildcard-routing) is enabled
+- Wildcard domains (e.g., `*.company.internal`), which need [DNS wildcard routing](#enable-dns-wildcard-routing) (on by default)
 
 <p>
-    <img src="/docs-static/img/manage/networks/index/resources-1.png" alt="resources" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/networks/index/resources-1.png" alt="Resources tab of a network" className="imagewrapper-big"/>
 </p>
 
 ### Domain Resources
 
 In addition to IP-based resources, openZro supports routing domain names. In the Dashboard, you can enter a domain name (e.g., `example.com`) or wildcard domain (e.g., `*.example.com`) instead of an IP range. openZro clients will then resolve and route traffic to that domain.
 
-For troubleshooting, see [Debugging access to Domain Resources](/help/troubleshooting-client#debugging-access-to-domain-resources).
-
-<Note>
-  Clients running versions `0.59.0` and `0.59.1` may fail to resolve domain resources served by routing peers running versions `0.59.0` to `0.59.9` when all peers in the organization are on version `0.59.0` or newer.
-
-  To fix this, either use client versions `<= 0.58.2` or `>= 0.59.2`, or upgrade the routing peer to version `0.59.10` or later.
-</Note>
 
 #### How Domain Resolution Works
 
@@ -74,19 +81,17 @@ For troubleshooting, see [Debugging access to Domain Resources](/help/troublesho
    - The OS sends the DNS query to openZro's Local DNS Forwarder, which runs on:
      - **macOS and Windows**: The highest available IP in your openZro range (typically `100.xxx.255.254:53`)
      - **Other systems**: Your local openZro client IP (e.g., `100.xxx.123.45:53`)
-   - The Local DNS Forwarder sends the query to the Remote DNS Resolver on the routing peer using:
-     - Port `22054` for openZro client versions `0.59.0` and newer
-     - Port `5353` for openZro client versions `0.58.x` and older
+   - The Local DNS Forwarder sends the query to the Remote DNS Resolver on the routing peer, on port `5353`.
    - The routing peer resolves the domain using its local DNS configuration and returns the result.
-   - The Local DNS Forwarder creates routing rules for the returned IP addresses before sending them to the applicatioxn. See [Trigger the Domain Resource](/help/troubleshooting-client#trigger-the-domain-resource) to observe this behavior.
+   - The Local DNS Forwarder creates routing rules for the returned IP addresses before sending them to the application.
 3. The application receives the response normally, with a slight delay on the first request.
 4. Subsequent requests are served instantly from the Local DNS Forwarder's cache.
 
 <Note>
-  openZro attempts to automatically open DNS forwarder ports on routing peer firewalls, but this may fail on some systems. If you experience issues, manually open the required ports.
+  openZro attempts to automatically open the DNS forwarder port on routing peer firewalls, but this may fail on some systems. If you experience issues, manually open UDP and TCP port `5353` on the routing peer.
 
   To verify firewall access, run this command from the client device:
-  `nslookup -port=22054 <routed-domain> <routing-peer-ip>` (e.g., `nslookup -port=22054 example.com 100.123.45.67`).
+  `nslookup -port=5353 <routed-domain> <routing-peer-ip>` (e.g., `nslookup -port=5353 example.com 100.123.45.67`).
 
   Firewall blocking DNS requests is the most common cause of domain resource issues.
 </Note>
@@ -97,29 +102,34 @@ For troubleshooting, see [Debugging access to Domain Resources](/help/troublesho
 
 ## Manage Access to Resources
 
-To control access to resources, you can assign them to resource groups and create [access control policies](/manage/access-control/manage-network-access#creating-policies) directly from the Add Resource modal. A peer can only see a resource when a policy grants access from one of the peer's groups (source) to one of the resource's groups (destination).
+Every resource belongs to one or more groups, and access is granted with [access control policies](/manage/access-control/manage-network-access#creating-policies) that use those groups as destination. A peer can only see a resource when a policy grants access from one of the peer's groups (source) to one of the resource's groups (destination).
 
-When adding or editing a resource, the modal has two tabs:
+To add a resource, open the network, go to the **Resources** tab and click **Add Resource**. The dialog asks for:
 
-- **Resource**: Configure the resource name and address. Expand **Additional Options** to set a description and assign the resource to **Resource Groups** (e.g., `Databases`, `Web Servers`) for use in access policies.
-- **Access Control**: View, create, or manage access control policies for this resource before saving.
+- **Name** and an optional **Description**;
+- **Address**: an IP address, a CIDR subnet, a domain or a wildcard domain;
+- **Destination Groups** (required): the groups policies will target, for example `Databases` or `Web Servers`;
+- **Enable Resource**: turn the resource on or off without deleting it.
+
+Then click **Add Policy** on the resource's row to create a policy for it.
 
 <p>
-    <img src="/docs-static/img/manage/networks/index/resources-2.png" alt="resource-modal" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/networks/index/resources-2.png" alt="Add Resource dialog" className="imagewrapper"/>
 </p>
 
-Access control policies define which peers can access which resources based on source groups, destination groups, and allowed traffic types (TCP, UDP, ICMP). When creating a policy:
+Access control policies define which peers can access which resources based on source groups, destination groups, and allowed traffic types (ALL, TCP, UDP, ICMP). When creating a policy:
 
 - Place the resource's group in the **destination** field
 - Place the peer's group in the **source** field
 - Peers in the source groups will receive the resource routes and corresponding firewall rules
+- Policies to resources are always one-way: resources behind a routing peer cannot open connections back to peers
 
 <Note>
   Unlike peers, resources are not automatically members of the built-in `All` group. To use `All` group rules with resources, you must explicitly add them to this group.
 </Note>
 
 <Note>
-  If you skip adding policies in the Access Control tab, a confirmation dialog will warn you that the resource will not be accessible by any peers without an access control policy.
+  When you add a resource from the **Networks** list, the dashboard offers to create a policy for it right away. A resource without a policy is not reachable by any peer.
 </Note>
 
 <Note>
@@ -131,14 +141,14 @@ Access control policies define which peers can access which resources based on s
   This is intentional — it aligns the new feature with the zero-trust default — but it surprises operators who replicate a working Network Routes setup as a Network and find the resource silently dropped at the firewall. Always attach at least one policy per resource (source = peer group, destination = the resource's group, scope = the protocols/ports the resource serves).
 </Note>
 
-Example policy allowing the `Berlin Office` group to access the internal CRM system:
+For example, clicking **Add Policy** on the `CRM` row opens a policy dialog with the resource's group already set as destination. Here the `berlin-office` group gets HTTPS access to the CRM; click **Continue** to name the policy and save it with **Add Policy**:
 
 <p>
-    <img src="/docs-static/img/manage/networks/index/resource-acl-1.png" alt="resource-acl" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/networks/index/resource-acl-1.png" alt="Policy created from a resource row" className="imagewrapper"/>
 </p>
 
 <Note>
-    Policies for domain or wildcard domain resources may unintentionally affect peers with IP range resources, since IP ranges can match any address. We recommend using dedicated networks and routing peers for domain-based resources to prevent unwanted access. A fix for this behavior is planned for an upcoming release.
+    Policies for domain or wildcard domain resources may unintentionally affect peers with IP range resources, since IP ranges can match any address. We recommend using dedicated networks and routing peers for domain-based resources to prevent unwanted access.
 </Note>
 
 ## Manage Access to Routing Peer
@@ -158,22 +168,21 @@ This additional policy ensures that the routing peer's input chain allows inboun
 
 ## Enable DNS Wildcard Routing
 
-To use wildcard domains as resources, you must enable DNS wildcard routing. This setting changes how domains are resolved: instead of the client resolving domains locally, the routing peer performs DNS resolution.
+Wildcard domain resources need DNS wildcard routing, which is enabled by default for new accounts. With it, the routing peer resolves domains instead of the client.
 
 This is also useful for regular domain resources when you want to:
 
 - Resolve domain names using the routing peer's DNS infrastructure
 - Route traffic through a geographically nearby routing peer
-- Enable more restrictive access control rules (support coming in future releases)
 
-To enable DNS wildcard routing, go to **Settings** > **Networks** > **Enable DNS wildcard routing**:
+The setting is under **Settings** > **Networks** > **Enable DNS wildcard routing**:
 
 <p>
-    <img src="/docs-static/img/manage/networks/index/settings-1.png" alt="settings-acl" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/networks/index/settings-1.png" alt="DNS wildcard routing setting" className="imagewrapper"/>
 </p>
 
 <Note>
-    DNS wildcard routing requires routing peers and clients running version 0.35.0 or later. After enabling this feature, restart your routing peers and clients to apply the changes.
+    After changing this setting, restart your routing peers and clients to apply it.
 </Note>
 
 <Note>
@@ -182,9 +191,6 @@ To enable DNS wildcard routing, go to **Settings** > **Networks** > **Enable DNS
   Two ways to deal with it: (1) keep DNS Wildcard Routing **disabled**, which falls back to a permissive NAT rule on the routing peer and works as a generic egress for whatever the resource captures; or (2) split your infra so the routed app hostnames live on a different LB IP than the openZro control plane. See [ADR-0015](https://github.com/openzro/openzro/blob/main/docs/adr/0015-hostname-network-resources-and-acl.md) for the full diagnostic and trade-offs.
 </Note>
 
-<Note>
-    Starting with openZro v0.59.0, the local DNS forwarder port changed from `5353` to `22054` to avoid port collisions. For backward compatibility, the new port is only used when **all peers in the account** run v0.59.0 or newer. If any peer is on an older version, port `5353` is used for all peers.
-</Note>
 
 ## Use Cases
 
@@ -193,9 +199,6 @@ To enable DNS wildcard routing, go to **Settings** > **Networks** > **Enable DNS
 - [Accessing entire domains within networks](/manage/networks/use-cases/by-resource-type/accessing-entire-domains-within-networks)
 
 ## Get Started
-
-<div className="text-center">
-    </div>
 
 - Make sure to [star us on GitHub](https://github.com/openzro/openzro)
 - Ask questions in [GitHub Discussions](https://github.com/openzro/openzro/discussions)
