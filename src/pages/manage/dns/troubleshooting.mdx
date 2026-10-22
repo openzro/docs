@@ -180,7 +180,7 @@ If public domains resolution fails, check if you can resolve against a public re
     {"ip": "1.1.1.1", "ns_type": "udp", "port": 53},
     {"ip": "8.8.8.8", "ns_type": "udp", "port": 53}
   ],
-  "groups": ["All Peers"]
+  "groups": ["<group-id>"]
 }
 ```
 
@@ -257,7 +257,7 @@ time dig @10.0.0.2 internal.company.internal
 ```
 
 **Fix**:
-1. Add more nameservers for load balancing
+1. Add more nameserver IPs for failover (up to 3; they are tried in order)
 2. Check nameserver health
 3. Consider caching DNS server closer to peers
 
@@ -276,7 +276,7 @@ openzro status
 **Fix**:
 - Check physical network connection
 - Verify firewall rules
-- Review openZro logs: `openzro up --log-level debug`
+- Raise the client log level with `openzro debug log level debug` and review the logs
 
 #### Solution C: DNS Cache Issues
 
@@ -285,7 +285,7 @@ openzro status
 **Linux**:
 ```bash
 # systemd-resolved
-sudo systemd-resolve --flush-caches
+sudo resolvectl flush-caches
 
 # nscd
 sudo systemctl restart nscd
@@ -496,14 +496,14 @@ resolvectl query name.at.example.com.
 To confirm nameservers are properly registered on Windows using PowerShell:
 
 ```shell
-PS C:\Users\kdn> Get-DnsClientNrptRule
-Name                             : openZro-Match
+PS C:\Users\user> Get-DnsClientNrptRule
+Name                             : Openzro-Match
 Version                          : 2
-Namespace                        : {.openzro.cloud, .83.100.in-addr.arpa}
+Namespace                        : {.openzro.selfhosted, .83.100.in-addr.arpa}
 ...
  NameServers                      : 100.83.255.254
 ...
-PS C:\Users\kdn> Get-DnsClientNrptPolicy
+PS C:\Users\user> Get-DnsClientNrptPolicy
 
 
 Namespace                        : .83.100.in-addr.arpa
@@ -511,20 +511,20 @@ Namespace                        : .83.100.in-addr.arpa
 NameServers                      : 100.83.255.254
 ...
 
-Namespace                        : .openzro.cloud
+Namespace                        : .openzro.selfhosted
 ...
 NameServers                      : 100.83.255.254
 ...
 
-PS C:\Users\kdn> ipconfig /all
+PS C:\Users\user> ipconfig /all
 ...
 Unknown adapter wt0:
 
-   Connection-specific DNS Suffix  . : openzro.cloud
+   Connection-specific DNS Suffix  . : openzro.selfhosted
    Description . . . . . . . . . . . : WireGuard Tunnel
 ...
    Connection-specific DNS Suffix Search List :
-                                      openzro.cloud
+                                      openzro.selfhosted
                                       83.100.in-addr.arpa
 ...
 ```
@@ -532,7 +532,7 @@ Unknown adapter wt0:
 In the output above, look for:
 
 - `100.XXX.255.254` under _NameServers_ (the local proxy address of the openZro client)
-- `.openzro.cloud` and `.XXX.100.in-addr.arpa` under _Namespace_ for built-in entries
+- `.openzro.selfhosted` and `.XXX.100.in-addr.arpa` under _Namespace_ for built-in entries
 - `.your.custom.domain.example.com` under _Namespace_ for your custom domains
 
 #### Verifying nameserver registration on macOS
@@ -543,7 +543,7 @@ To confirm nameservers are properly registered on macOS using the terminal:
 > scutil --dns
 ...
 resolver #2
-  domain   : openzro.cloud
+  domain   : openzro.selfhosted
   nameserver[0] : 100.83.255.254
   port     : 53
   flags    : Supplemental, Request A records, Request AAAA records
@@ -563,7 +563,7 @@ resolver #8
 In the output above, look for:
 
 - `100.XXX.255.254` under _nameserver[N]_ (the local proxy address of the openZro client)
-- `openzro.cloud` and `.XXX.100.in-addr.arpa` under _domain_ for built-in entries
+- `openzro.selfhosted` and `.XXX.100.in-addr.arpa` under _domain_ for built-in entries
 - `.your.custom.domain.example.com` under _domain_ for your custom domains
 - `Reachable` in the _reach_ field
 
@@ -592,9 +592,9 @@ For `systemd-resolved`, check the configuration with `resolvectl status`.
 
 For other configuration backends, look for these entries in `/etc/resolv.conf`:
 
-- `127.0.0.1` - default address for openZro DNS proxy listener
-- `127.0.0.153` - fallback address for openZro DNS proxy listener
-- Value of `$NB_DNS_RESOLVER_ADDRESS` - custom override for the openZro DNS proxy listener
+- the peer's openZro IP - default address for the openZro DNS proxy listener in kernel mode
+- `127.0.0.1` or `127.0.0.153` - fallback addresses when port 53 on the openZro IP is taken
+- the value of `--dns-resolver-address` (or `OZ_DNS_RESOLVER_ADDRESS`) - custom override for the listener
 
 To find the address the openZro client is listening on:
 
@@ -639,71 +639,69 @@ We'll troubleshoot in reverse order, starting with the most common issues. First
 
 For the examples in this section, we'll assume:
 
-- A `*.nb.test` Network Resource is configured
-- We're trying to access `srv.nb.test`
-- `zxc.nb.test` doesn't exist (used to demonstrate errors)
+- A `*.corp.test` Network Resource is configured
+- We're trying to access `srv.corp.test`
+- `zxc.corp.test` doesn't exist (used to demonstrate errors)
 - The Routing Peer's openZro address is `100.83.136.209`
-    - It's named `brys-vm-nbt-ubuntu-isolated-02` in the outputs
-- The client is named `brys-vm-nbt-ubuntu-01` in the outputs
+    - It's named `routing-peer-01` in the outputs
+- The client is named `client-01` in the outputs
     - The client runs Ubuntu, but most commands work across all platforms
     - Its IP address is `100.83.73.97`
     - On macOS and Windows, use `100.83.255.254` to access the local DNS forwarder instead
-- The Resource runs on `brys-vm-nbt-ubuntu-isolated-01` in the outputs
-- We'll only check port `22054`, but you may need to repeat steps for port `5353` on legacy clients
+- The Resource runs on `routed-server-01` in the outputs
+- The Routing Peer's DNS forwarder listens on port `5353`
 
 <Note>
-  Port `5353` is the well-known Multicast DNS port (used by Avahi, Bonjour, printer sharing, Chromecast, etc.) and may already be in use by other software. This can prevent older Routing Peers from routing Domain Resources.
+  Port `5353` is the well-known Multicast DNS port (used by Avahi, Bonjour, printer sharing, Chromecast, etc.) and may already be in use by other software. If something else holds it on the Routing Peer, Domain Resources cannot be resolved there.
 
   Notably, Chrome and Chromium-based browsers can occupy port `5353`, even on Windows Server machines.
-
-  To address this, we switched to port `22054`. We strongly recommend updating your fleet to version `0.59.10` or later.
 </Note>
 
 ### Is the Routing Peer correctly resolving queries?
 
 While this is rarely the issue in practice, it's worth verifying that the Routing Peer can resolve the requested domain and access the target resource.
 
-Refer to [Verifying DNS resolution in practice](#verifying-dns-resolution-in-practice) for OS-specific commands, adjusting the domain to `srv.nb.test`.
+Refer to [Verifying DNS resolution in practice](#verifying-dns-resolution-in-practice) for OS-specific commands, adjusting the domain to `srv.corp.test`.
 
 Also verify that the Routing Peer has network access to the routed resource:
 
 For TCP services, you should see something like this:
 
 ```shell
-kdn@brys-vm-nbt-ubuntu-01:~$ nc -vz -w 1 srv.nb.test 80
-Connection to srv.nb.test (192.168.100.10) 80 port [tcp/http] succeeded!
-kdn@brys-vm-nbt-ubuntu-01:~$ nc -vz -w 1 srv.nb.test 12345
-nc: connect to srv.nb.test (192.168.100.10) port 12345 (tcp) failed: Connection refused
+user@client-01:~$ nc -vz -w 1 srv.corp.test 80
+Connection to srv.corp.test (192.168.100.10) 80 port [tcp/http] succeeded!
+user@client-01:~$ nc -vz -w 1 srv.corp.test 12345
+nc: connect to srv.corp.test (192.168.100.10) port 12345 (tcp) failed: Connection refused
 ```
 
 For UDP:
 
 ```shell
-kdn@brys-vm-nbt-ubuntu-01:~$ nc -vz -w 1 -u srv.nb.test 12345 ; echo $?
-Connection to srv.nb.test (192.168.100.10) 12345 port [udp/*] succeeded!
+user@client-01:~$ nc -vz -w 1 -u srv.corp.test 12345 ; echo $?
+Connection to srv.corp.test (192.168.100.10) 12345 port [udp/*] succeeded!
 0
-kdn@brys-vm-nbt-ubuntu-01:~$ nc -vz -w 1 -u srv.nb.test 12347 ; echo $?
+user@client-01:~$ nc -vz -w 1 -u srv.corp.test 12347 ; echo $?
 1
 ```
 
 ### Is the remote DNS resolver accessible to the client?
 
-Verify that the client Peer can reach and use the Routing Peer's DNS resolver. This step rules out firewall-related issues with the Routing Peer. If the following command fails, you'll need to open port `22054` in the Routing Peer's firewall.
+Verify that the client Peer can reach and use the Routing Peer's DNS resolver. This step rules out firewall-related issues with the Routing Peer. If the following command fails, you'll need to open port `5353` in the Routing Peer's firewall.
 
 ```shell
-kdn@brys-vm-nbt-ubuntu-01:~$ nslookup -timeout=1 -port=22054 srv.nb.test 100.83.136.209
+user@client-01:~$ nslookup -timeout=1 -port=5353 srv.corp.test 100.83.136.209
 Server:         100.83.136.209
-Address:        100.83.136.209#22054
+Address:        100.83.136.209#5353
 
 Non-authoritative answer:
-Name:   srv.nb.test
+Name:   srv.corp.test
 Address: 192.168.100.10
 
-kdn@brys-vm-nbt-ubuntu-01:~$ nslookup -timeout=1 -port=22054 zxc.nb.test 100.83.136.209
+user@client-01:~$ nslookup -timeout=1 -port=5353 zxc.corp.test 100.83.136.209
 Server:         100.83.136.209
-Address:        100.83.136.209#22054
+Address:        100.83.136.209#5353
 
-** server can't find zxc.nb.test: NXDOMAIN
+** server can't find zxc.corp.test: NXDOMAIN
 
 ```
 
@@ -718,31 +716,31 @@ While local DNS forwarder failures are rare, using it is a good way to force the
 Notice that the IP addresses are initially missing from the routing table (`ip route show` on Linux), but are added after resolving the domain for the first time using the local DNS Forwarder:
 
 ```shell
-kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
+user@client-01:~$ openzro networks ls
 Available Networks:
 
-  - ID: *.nb.test
-    Domains: *.nb.test
+  - ID: *.corp.test
+    Domains: *.corp.test
     Status: Selected
     Resolved IPs: -
-kdn@brys-vm-nbt-ubuntu-01:~$ ip route show table all | grep 192.168.100
-kdn@brys-vm-nbt-ubuntu-01:~$ nslookup -timeout=1 srv.nb.test 100.83.73.97
+user@client-01:~$ ip route show table all | grep 192.168.100
+user@client-01:~$ nslookup -timeout=1 srv.corp.test 100.83.73.97
 Server:         100.83.73.97
 Address:        100.83.73.97#53
 
 Non-authoritative answer:
-Name:   srv.nb.test
+Name:   srv.corp.test
 Address: 192.168.100.10
-kdn@brys-vm-nbt-ubuntu-01:~$ ip route show table all | grep 192.168.100
+user@client-01:~$ ip route show table all | grep 192.168.100
 192.168.100.10 dev wt0 table 7120
-kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
+user@client-01:~$ openzro networks ls
 Available Networks:
 
-  - ID: *.nb.test
-    Domains: *.nb.test
+  - ID: *.corp.test
+    Domains: *.corp.test
     Status: Selected
     Resolved IPs:
-      [srv.nb.test.]: 192.168.100.10
+      [srv.corp.test.]: 192.168.100.10
 ```
 
 ### Verifying Domain Resource registration with the operating system
@@ -757,57 +755,57 @@ After confirming everything works within openZro's scope, restart openZro and ch
   You might notice that `openzro down` followed by `openzro up` doesn't clear the `Resolved IPs`:
 
   ```shell
-  kdn@brys-vm-nbt-ubuntu-01:~$ sudo openzro down
+  user@client-01:~$ sudo openzro down
   Disconnected
-  kdn@brys-vm-nbt-ubuntu-01:~$ sudo openzro up
+  user@client-01:~$ sudo openzro up
   Connected
-  kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
+  user@client-01:~$ openzro networks ls
   Available Networks:
 
-    - ID: *.nb.test
-      Domains: *.nb.test
+    - ID: *.corp.test
+      Domains: *.corp.test
       Status: Selected
       Resolved IPs:
-        [srv.nb.test.]: 192.168.100.10
+        [srv.corp.test.]: 192.168.100.10
   ```
 
   This is expected behavior—the results are stored in the client daemon's in-memory cache. However, the routing rules are properly cleared:
 
   ```shell
-  kdn@brys-vm-nbt-ubuntu-01:~$ ip route show table all | grep 192.168.100
-  kdn@brys-vm-nbt-ubuntu-01:~$
+  user@client-01:~$ ip route show table all | grep 192.168.100
+  user@client-01:~$
   ```
 </Note>
 
 We'll start fresh by restarting the entire openZro service to purge all caches, then proceed with testing:
 
 ```shell
-kdn@brys-vm-nbt-ubuntu-01:~$ sudo openzro service restart
-openZro service has been restarted
-kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
+user@client-01:~$ sudo openzro service restart
+Openzro service has been restarted
+user@client-01:~$ openzro networks ls
 Available Networks:
 
-  - ID: *.nb.test
-    Domains: *.nb.test
+  - ID: *.corp.test
+    Domains: *.corp.test
     Status: Selected
     Resolved IPs: -
-kdn@brys-vm-nbt-ubuntu-01:~$ ip route show table all | grep 192.168.100
-kdn@brys-vm-nbt-ubuntu-01:~$ resolvectl query srv.nb.test
-srv.nb.test: 192.168.100.10                    -- link: wt0
+user@client-01:~$ ip route show table all | grep 192.168.100
+user@client-01:~$ resolvectl query srv.corp.test
+srv.corp.test: 192.168.100.10                    -- link: wt0
 
 -- Information acquired via protocol DNS in 8.1ms.
 -- Data is authenticated: no; Data was acquired via local or encrypted transport: no
 -- Data from: network
-kdn@brys-vm-nbt-ubuntu-01:~$ ip route show table all | grep 192.168.100
+user@client-01:~$ ip route show table all | grep 192.168.100
 192.168.100.10 dev wt0 table 7120
-kdn@brys-vm-nbt-ubuntu-01:~$ openzro networks ls
+user@client-01:~$ openzro networks ls
 Available Networks:
 
-  - ID: *.nb.test
-    Domains: *.nb.test
+  - ID: *.corp.test
+    Domains: *.corp.test
     Status: Selected
     Resolved IPs:
-      [srv.nb.test.]: 192.168.100.10
+      [srv.corp.test.]: 192.168.100.10
 ```
 
 <Note>
@@ -838,4 +836,3 @@ Avoid future DNS issues:
 - **[DNS Overview](/manage/dns)** - Understand DNS architecture
 - **[Internal DNS Servers](/manage/dns/internal-dns-servers)** - Nameserver configuration and internal DNS
 - **[DNS Settings](/manage/dns/dns-settings)** - Management modes
-- **[API Reference](/ipa/resources/dns)** - Automate DNS
