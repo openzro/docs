@@ -21,14 +21,14 @@ A **Peer** is a machine or any device that is connected to the network.
 It can be a Linux server running in the cloud or on-premises, a personal laptop, mobile phone, or even a Raspberry Pi.
 
 <p>
-    <img src="/docs-static/img/about-openzro/high-level-dia.png" alt="high-level-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/about-openzro/high-level-dia.png" alt="openZro architecture overview" className="imagewrapper-big"/>
 </p>
 
 With openZro clients installed and authorized on the Management service, machines form a mesh network connecting
 to each other directly via an encrypted point-to-point WireGuard tunnel.
 
 <p>
-    <img src="/docs-static/img/about-openzro/mesh.png" alt="high-level-dia" className="imagewrapper"/>
+    <img src="/docs-static/img/about-openzro/mesh.png" alt="Peers connected in a WireGuard mesh" className="imagewrapper"/>
 </p>
 
 While it is possible to create a full mesh network, it might be not a desirable outcome.
@@ -59,7 +59,7 @@ After that, they are able to establish a connection to the new peer.
 The Management service is always self-hosted by the operator.
 
 <p>
-    <img src="/docs-static/img/about-openzro/management.png" alt="management-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/about-openzro/management.png" alt="Management service" className="imagewrapper-big"/>
 </p>
 
 ## Client Application
@@ -100,7 +100,7 @@ peers need to find each other and exchange the most suitable connection candidat
 This is done through Signal. After a connection has been established, Signal steps out.
 
 <p>
-    <img src="/docs-static/img/about-openzro/signal.png" alt="signal-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/about-openzro/signal.png" alt="Connection setup through Signal and STUN" className="imagewrapper-big"/>
 </p>
 
 <Note>
@@ -120,7 +120,7 @@ Coturn is still part of the default deployment: it provides STUN for NAT discove
 peers that cannot use the openZro Relay.
 
 <p>
-    <img src="/docs-static/img/about-openzro/relay.png" alt="relay-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/about-openzro/relay.png" alt="Relay fallback" className="imagewrapper-big"/>
 </p>
 
 <Note>
