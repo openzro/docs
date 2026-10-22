@@ -1,130 +1,104 @@
 import {Note} from "@/components/mdx";
 
-# MacOS Installation
+export const description = 'Install the openZro client on macOS with the universal .pkg installer.'
 
-The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
+# macOS Installation
+
+The openZro client (agent) connects a device to an openZro deployment. openZro is
+self-hosted; if you don't have a deployment yet, see the
+[self-hosting quickstart](/selfhosted/selfhosted-quickstart).
 
 ## Package install
 
-1. Download the latest MacOS release installer for your [processor](https://support.apple.com/en-us/HT211814 ):
-    - Intel: <Button href="https://github.com/openzro/openzro/releases/latest" variant="text" arrow="right">Download openZro for Intel</Button>
-    - M1 & M2: <Button href="https://github.com/openzro/openzro/releases/latest" variant="text" arrow="right">Download openZro for Apple Silicon</Button><br />
-_If you require an older version checkout openZro [releases](https://github.com/openzro/openzro/releases/latest)_
-2. Proceed with the installation steps
-3. This will install the openZro app into /Applications and add the daemon service
-4. After installing, you can follow the steps from [Running openZro with SSO Login](#Running-openZro-with-SSO-Login) steps.
-> To uninstall the client remove the app from /Applications
+1. Download the installer. It is universal, for both Intel and Apple Silicon:
+   <Button href="https://pkg.openzro.io/macos/openzro.pkg" variant="text" arrow="right">Download openZro for macOS</Button>.
+   Each release's `.pkg` is also on the [releases page](https://github.com/openzro/openzro/releases).
+2. Open the `.pkg` and follow the steps. The installer is signed with an Apple
+   Developer ID and notarized, so macOS opens it without a Gatekeeper warning.
+3. It installs:
+   - the desktop app, `/Applications/openZro UI.app`;
+   - the CLI, `/usr/local/bin/openzro`;
+   - the background service, which it registers and starts.
+4. Continue with [Running openZro with SSO login](#running-open-zro-with-sso-login).
 
-### Homebrew install
+### Uninstall
 
-1. Download and install homebrew at https://brew.sh/
-2. If openzro was previously installed with homebrew, you will need to run:
 ```bash
-# Stop and uninstall daemon service:
 sudo openzro service stop
 sudo openzro service uninstall
-# unlink the app
-brew unlink openzro
-```
-> openzro will copy any existing configuration from the openzro's default configuration paths to the new openZro's default location
-
-3. Install the client
-```bash
-  # for CLI only
-  brew install openzro/tap/openzro
-  # for GUI package
-  brew install --cask openzro/tap/openzro-ui
-```
-4. If you installed CLI only, you need to install and start the client daemon service:
- ```bash
-  sudo openzro service install
-  sudo openzro service start
+sudo rm /usr/local/bin/openzro
+sudo rm -rf "/Applications/openZro UI.app"
 ```
 
-### Binary Install
-**Installation from binary (CLI only)**
+## Binary install (CLI only)
 
-1. Checkout openZro [releases](https://github.com/openzro/openzro/releases/latest)
-2. Download the latest release:
-```bash
-  curl -L -o ./openzro_<VERSION>.tar.gz https://github.com/openzro/openzro/releases/download/v<VERSION>/openzro_<VERSION>_<OS>_<Arch>.tar.gz
-```
+1. Pick a version on the [releases page](https://github.com/openzro/openzro/releases)
+   and download the macOS archive. `<ARCH>` is `arm64` (Apple Silicon), `amd64`
+   (Intel) or `all` (universal):
+   ```bash
+   curl -L -o openzro.tar.gz https://github.com/openzro/openzro/releases/download/v<VERSION>/openzro_<VERSION>_darwin_<ARCH>.tar.gz
+   ```
+2. Install the binary:
+   ```bash
+   tar xzf openzro.tar.gz
+   sudo install -m 0755 openzro /usr/local/bin/openzro
+   ```
+3. Install and start the service:
+   ```bash
+   sudo openzro service install
+   sudo openzro service start
+   ```
 
 <Note>
-
-    You need to replace some variables from the URL above:
-
-    - Replace **VERSION** with the latest released version.
-    - Replace **OS** with "linux", "darwin" for MacOS or "windows"
-    - Replace **Arch** with your target system CPU architecture
-
+    The raw binary in the archive is not notarized. If macOS blocks it, run
+    `xattr -d com.apple.quarantine /usr/local/bin/openzro`. The `.pkg` above does
+    not need this.
 </Note>
 
-3. Decompress
-```bash
-  tar xzf ./openzro_<VERSION>.tar.gz
-  sudo mv openzro /usr/bin/openzro
-  sudo chown root:root /usr/bin/openzro
-  sudo chmod +x /usr/bin/openzro
-```
-After that you may need to add /usr/bin in your PATH environment variable:
-````bash
-  export PATH=$PATH:/usr/bin
-````
-4. Install and run the service
-```bash
-  sudo openzro service install
-  sudo openzro service start
-```
-## Running openZro with SSO Login
-### Desktop UI Application
-If you installed the Desktop UI client, you can launch it and click on Connect.
-> It will open your browser, and you will be prompt for email and password. Follow the instructions.
+## Point the client at your deployment
 
-<p>
-    <img src="/docs-static/img/get-started/openzro-sso-login-ui.gif" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
+Every client needs your management URL. In the desktop app, open
+**Settings → Advanced Settings** from the openZro icon in the menu bar and enter
+it. With the CLI, pass `--management-url https://<your-management>:443` to
+`openzro up`.
+
+## Running openZro with SSO login
+
+### Desktop app
+Launch the openZro desktop app and click **Connect**. Your browser opens your
+identity provider's sign-in page; once you sign in, the device connects.
 
 ### CLI
-Alternatively, you could use command line. Simply run
-   ```bash
-  openzro up
-   ```
-> It will open your browser, and you will be prompt for email and password. Follow the instructions.
-
-<p>
-    <img src="/docs-static/img/get-started/openzro-sso-login-cmd.gif" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
-
-Check connection status:
 ```bash
-  openzro status
+openzro up --management-url https://<your-management>:443
+```
+Your browser opens your identity provider's sign-in page. When the login
+completes, the CLI prints `Connected`.
+
+<Note>
+    If your administrator requires [2FA to sign in devices](/manage/settings/multi-factor-authentication#2-fa-on-device-sign-in),
+    the client also opens an approval page where you enter a code from your authenticator app.
+</Note>
+
+Check the connection:
+```bash
+openzro status
 ```
 
-### Running openZro with a Setup Key
-In case you are activating a server peer, you can use a [setup key](/manage/peers/register-machines-using-setup-keys) as described in the steps below.
-> This is especially helpful when you are running multiple server instances with infrastructure-as-code tools like ansible and terraform.
+## Running openZro with a setup key
 
-1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
+To register a server or another unattended peer, use a
+[setup key](/manage/peers/register-machines-using-setup-keys):
 
 ```bash
-  openzro up --setup-key <SETUP KEY>
+openzro up --management-url https://<your-management>:443 --setup-key <SETUP KEY>
 ```
 
-Alternatively, if you are hosting your own Management Service provide `--management-url` property pointing to your Management Service:
+If you leave out `--setup-key`, `openzro up` starts the SSO login in your browser
+instead.
+
+Check the connection and the tunnel interface:
 ```bash
-  openzro up --setup-key <SETUP KEY> --management-url http://localhost:33073
+openzro status
+ifconfig utun100
 ```
-
-> You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
-
-2. Check connection status:
-```bash
-  openzro status
-```
-
-3. Check your IP:
-
-````bash
-  sudo ifconfig utun100
-````

@@ -1,93 +1,121 @@
 import {Note} from "@/components/mdx";
 
+export const description = 'Install the openZro client on your devices and connect them to your openZro deployment.'
+
 # Install openZro
 
-If you're a new user you should visit the [Quickstart Guide](https://docs.openzro.io/get-started). This will help you setup your management dashboard and connect your first client. For quick install instructions, including desktop applications, visit the [install prompt](https://your-management.example.com/) through the management dashboard. To view all the client installation methods we've set up a variety of platform specific pages.
+The openZro client (agent) connects a device to an openZro deployment. New to
+openZro? Start with the [Quickstart Guide](/get-started), which sets up the
+dashboard and connects your first client.
 
-<Button href="https://your-management.example.com/" arrow="right" children="Download openZro" />
+openZro is self-hosted: there is no hosted service. If you don't have a
+deployment yet, see the [self-hosting quickstart](/selfhosted/selfhosted-quickstart).
 
-The openZro client (agent) allows a peer to join a pre-existing openZro deployment. If a openZro deployment is not yet available, there are both managed and [self-hosted](https://docs.openzro.io/selfhosted/selfhosted-quickstart) options available.
+The quickest way to install a client is the install page of your own dashboard,
+`https://<your-dashboard>/install`, or **Peers → Add peer**. It shows the command
+for each platform with your management URL already filled in.
 
-## Install and Update Instructions
+## Install and update instructions
 * [Install on Linux](/get-started/install/linux)
 * [Install on macOS](/get-started/install/macos)
 * [Install on Windows](/get-started/install/windows)
 * [Install with Docker](/get-started/install/docker)
 
-## Additional Platforms
-* [Install on Synology](/get-started/install/synology)
-{/* TrueNAS hidden from the hub — page is paused pending a decision on
-    whether to submit `openzro-client` to the TrueNAS Apps catalog. */}
-* [Install on pfSense](/get-started/install/pfsense)
-* [Install on OPNSense](/get-started/install/opnsense)
+## Additional platforms
 * [Install on Raspberry Pi](/get-started/install/raspberrypi)
 * [Install on Proxmox VE](/get-started/install/proxmox-ve)
+* [Install on Synology](/get-started/install/synology)
+* [Install on pfSense](/get-started/install/pfsense) (not validated yet)
+* [Install on OPNsense](/get-started/install/opnsense) (not validated yet)
+{/* TrueNAS hidden from the hub — page is paused pending a decision on
+    whether to submit `openzro-client` to the TrueNAS Apps catalog. */}
 
-## Running openZro with SSO Login
-### Desktop UI Application
-If you installed the Desktop UI client, you can launch it and click on Connect.
-> It will open your browser, and you will be prompt for email and password. Follow the instructions.
+## Point the client at your deployment
 
-<p>
-    <img src="/docs-static/img/get-started/openzro-sso-login-ui.gif" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
+Every client needs your management URL. Without it, the client tries a default
+address that does not exist and cannot connect.
+
+- **CLI:** pass `--management-url https://<your-management>:443` to `openzro up`,
+  or set `OZ_MANAGEMENT_URL`.
+- **Desktop app:** open **Settings → Advanced Settings** from the openZro icon in
+  the system tray and enter the management URL.
+
+## Running openZro with SSO login
+
+### Desktop app
+Launch the openZro desktop app and click **Connect**. Your browser opens your
+identity provider's sign-in page; once you sign in, the device connects.
 
 ### CLI
-Alternatively, you could use command line. Simply run
-   ```bash
-  openzro up
-   ```
-> It will open your browser, and you will be prompt for email and password. Follow the instructions.
+```bash
+openzro up --management-url https://<your-management>:443
+```
+
+The CLI opens your browser at your identity provider's sign-in page:
+
+```text
+Please do the SSO login in your browser.
+If your browser didn't open automatically, use this URL to log in:
+
+<your identity provider's sign-in URL>
+```
+
+With the bundled identity provider, the sign-in page looks like this:
 
 <p>
-    <img src="/docs-static/img/get-started/openzro-sso-login-cmd.gif" alt="high-level-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/get-started/onboarding/01_openzro-sso.jpeg" alt="openZro sign-in page" className="imagewrapper"/>
 </p>
 
-Check connection status:
+When the login completes, the CLI prints `Connected`.
+
+<Note>
+    If your administrator requires [2FA to sign in devices](/manage/settings/multi-factor-authentication#2-fa-on-device-sign-in),
+    the client also opens an approval page where you enter a code from your authenticator app.
+</Note>
+
+Check the connection:
 ```bash
-  openzro status
+openzro status
 ```
 
-## Running openZro with a Setup Key
-In case you are activating a server peer, you can use a [setup key](/manage/peers/register-machines-using-setup-keys) as described in the steps below.
-> This is especially helpful when you are running multiple server instances with infrastructure-as-code tools like ansible and terraform.
+## Running openZro with a setup key
 
-1. Login to the Management Service. You need to have a `setup key` in hand (see [setup keys](/manage/peers/register-machines-using-setup-keys)).
+To register a server or another unattended peer, use a
+[setup key](/manage/peers/register-machines-using-setup-keys). This is useful
+when you provision many machines with tools like Ansible or Terraform.
 
-For all systems:
 ```bash
-  openzro up --setup-key <SETUP KEY>
+openzro up --management-url https://<your-management>:443 --setup-key <SETUP KEY>
 ```
 
-For **Docker**, you can run with the following command:
+With **Docker**:
 ```bash
-docker run --network host --privileged --rm -d -e NB_SETUP_KEY=<SETUP KEY> -v openzro-client:/var/lib/openzro openzro/openzro:<TAG>
-```
-> TAG > 0.6.0 version
-
-Alternatively, if you are hosting your own Management Service provide `--management-url` property pointing to your Management Service:
-```bash
-  openzro up --setup-key <SETUP KEY> --management-url http://localhost:33073
-```
-
-> You could also omit the `--setup-key` property. In this case, the tool will prompt for the key.
-
-2. Check connection status:
-```bash
-  openzro status
+docker run --rm -d \
+  --cap-add=NET_ADMIN \
+  -e OZ_SETUP_KEY=<SETUP KEY> \
+  -e OZ_MANAGEMENT_URL=https://<your-management>:443 \
+  -v openzro-client:/var/lib/openzro \
+  ghcr.io/openzro/openzro:latest
 ```
 
-3. Check your IP:
+If you leave out `--setup-key`, `openzro up` starts the SSO login in your browser
+instead.
 
-On **macOS** :
-````bash
-  sudo ifconfig utun100
-````
+Check the connection, then the tunnel interface and its openZro IP:
+
+```bash
+openzro status
+```
+
 On **Linux**:
 ```bash
-  ip addr show wt0
-     ```
+ip addr show wt0
+```
+On **macOS**:
+```bash
+ifconfig utun100
+```
 On **Windows**:
 ```bash
-  netsh interface ip show config name="wt0"
+netsh interface ip show config name="wt0"
 ```

@@ -77,7 +77,7 @@ ls /dev/net
 
 ### Installing openZro
 
-Before we install openZro, we are going to want to generate a one-off setup key to use with our LXC installation. While [openZro's documentation offers comprehensive guidance on this process](https://docs.openzro.io/manage/peers/register-machines-using-setup-keys), let's quickly review the essential steps:
+Before we install openZro, we are going to want to generate a one-off setup key to use with our LXC installation. While [openZro's documentation offers comprehensive guidance on this process](/manage/peers/register-machines-using-setup-keys), let's quickly review the essential steps:
 
 - Access your [openZro dashboard](https://your-management.example.com/)
 - Navigate to the `Setup Keys` section
@@ -96,30 +96,26 @@ apt update && apt upgrade -y && apt install curl -y
 
 Now that our system is updated, we can install openZro from the
 signed APT repository (assuming an Ubuntu / Debian template — for
-other distros see the [install guide](/get-started/install)):
+other distros see the [install guide](/get-started/install)). The
+LXC console logs you in as `root`, so the commands run without `sudo`:
 
 ```bash
+apt-get install -y curl ca-certificates
 curl -fsSL https://pkg.openzro.io/openzro-archive-keyring.gpg \
-  | sudo tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null
+  | tee /usr/share/keyrings/openzro-archive-keyring.gpg > /dev/null
 echo "deb [signed-by=/usr/share/keyrings/openzro-archive-keyring.gpg] \
 https://pkg.openzro.io/apt stable main" \
-  | sudo tee /etc/apt/sources.list.d/openzro.list > /dev/null
-sudo apt-get update && sudo apt-get install -y openzro
+  | tee /etc/apt/sources.list.d/openzro.list > /dev/null
+apt-get update && apt-get install -y openzro
 ```
 
 Now that openZro is installed, we can connect our peer to the
 deployment using the setup key we generated earlier. 
 
 ```bash
-  openzro up --setup-key <SETUP KEY>
+openzro up --management-url https://<your-management>:443 --setup-key <SETUP KEY>
 ```
 
-Now you should see a successful connection message and you're good to go! Now if you want to access your entire network using this LXC with openZro, check out the docs to learn more about openZro Networks!
-
-## Proxmox Setup Tutorial
-
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="KMNS_JoHFhg" /> */}
-
-## Additional Resources
-
-If you want to set up your own Proxmox machine, check out our [Knowledge Hub post on Proxmox](https://openzro.io/knowledge-hub/proxmox-getting-started-guide). This comprehensive guide covers the basics of getting Proxmox up and running, setting up a LXC container with openZro for remote connectivity, and diving into some more advanced tips and tricks such as setting up a ZFS pool and enabling IOMMU for GPU passthrough.
+The CLI prints `Connected` and you're good to go. To reach your whole network
+through this LXC, make it a routing peer with
+[openZro Networks](/manage/networks).

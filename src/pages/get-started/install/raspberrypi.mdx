@@ -1,12 +1,8 @@
-import {Note} from "@/components/mdx";
-
 # Install openZro on the Raspberry Pi
-
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="P0aAdYnex80" /> */}
 
 Start by downloading [Raspberry Pi Imager](https://www.raspberrypi.com/software/) for your operating system and inserting a microSD card with at least 8GB of capacity, though 32GB is recommended for breathing room.
 
-Open Raspberry Pi Imager and choose Ubuntu Server 24.04 LTS (64-bit) from the "Other general-purpose" OS section under Ubuntu. Select your microSD card as the storage destination, then click the gear icon to configure the advanced options. Here you'll set your hostname to something memorable like `openzro-pi`, enable SSH with password authentication, and configure your username and password. If you're not using Ethernet, add your WiFi credentials here as well, along with your locale and timezone settings.
+Open Raspberry Pi Imager and choose an OS: Ubuntu Server 24.04 LTS (64-bit), from the "Other general-purpose" section, or Raspberry Pi OS. openZro publishes packages for arm64 and for 32-bit ARM (armhf), so both work. Select your microSD card as the storage destination, then click the gear icon to configure the advanced options. Here you'll set your hostname to something memorable like `openzro-pi`, enable SSH with password authentication, and configure your username and password. If you're not using Ethernet, add your WiFi credentials here as well, along with your locale and timezone settings.
 
 Write the image to the card, insert it into your Pi, and power it on. It may take a couple minutes to complete its first boot sequence.
 
@@ -17,7 +13,7 @@ Write the image to the card, insert it into your Pi, and power it on. It may tak
 Once your Pi boots, which typically takes 2-3 minutes on first run, connect via SSH using either the hostname you configured or the IP address assigned by your router:
 
 ```bash
-ssh username@openzropi.local
+ssh username@openzro-pi.local
 # Or use the IP address if mDNS isn't working
 ssh username@192.168.1.xxx
 
@@ -34,8 +30,8 @@ sudo apt update && sudo apt upgrade -y
 
 ### Install openZro
 
-Raspberry Pi OS is Debian-based, so the standard APT repository
-works. For other distros (Alpine, Arch, etc.) see the
+Both Ubuntu and Raspberry Pi OS use APT, so the standard openZro
+repository works. For other distros (Alpine, Arch, etc.) see the
 [Linux install guide](/get-started/install/linux):
 
 ```bash
@@ -56,11 +52,11 @@ service, and starts it.
 Authenticate and join your network:
 
 ```bash
-sudo openzro up
+sudo openzro up --management-url https://<your-management>:443
 ```
 
-This presents an Authentication URL — open it in a browser, sign in
-through your IdP, and approve the device. Alternatively, use a
+This prints a sign-in URL: open it in a browser, sign in through your
+identity provider, and approve the device. Alternatively, use a
 [setup key](/manage/peers/register-machines-using-setup-keys) for
 headless authentication.
 

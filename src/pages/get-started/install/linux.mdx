@@ -4,11 +4,22 @@ import {Note} from "@/components/mdx";
 
 The openZro client (agent) lets a peer join an existing openZro
 network. If a deployment isn't ready yet, follow the
-[self-host quickstart](https://docs.openzro.io/selfhosted/selfhosted-quickstart)
+[self-host quickstart](/selfhosted/selfhosted-quickstart)
 to stand one up — there is no managed cloud.
 
-The recommended install method is the signed APT or YUM/DNF/zypper
-repository at **`pkg.openzro.io`**. It tracks every release tag and
+## Quick install
+
+The install script detects your distribution, adds the right
+repository (APT, YUM/DNF, pacman) and installs the client. It is the
+command the dashboard shows under **Peers → Add peer**:
+
+```bash
+curl -fsSL https://pkg.openzro.io/install.sh | sh
+```
+
+To set up the repository yourself, use the steps below. The
+recommended method is the signed APT or YUM/DNF/zypper repository at
+**`pkg.openzro.io`**. It tracks every release tag and
 uses the same GPG key for the metadata across distributions, so the
 trust path is consistent.
 
@@ -32,6 +43,9 @@ sudo apt-get install -y openzro       # CLI / daemon
 sudo apt-get install -y openzro-ui    # optional desktop UI (system tray)
 ```
 
+The desktop UI (`openzro-ui`) is published for amd64 (x86_64) only; the
+`openzro` client is published for amd64, arm64, armhf and i386.
+
 ## RHEL / Fedora / Amazon Linux (YUM / DNF)
 
 ```bash
@@ -47,7 +61,7 @@ EOF
 
 # RHEL 9 / Fedora / Amazon Linux 2023 use dnf
 sudo dnf install -y openzro
-sudo dnf install -y openzro-ui   # optional, for desktop UI
+sudo dnf install -y openzro-ui   # optional, for desktop UI (x86_64 only)
 
 # RHEL 7 / Amazon Linux 2 use yum
 sudo yum install -y openzro
@@ -102,6 +116,7 @@ EOF
 
 sudo pacman -Sy
 sudo pacman -S openzro
+sudo pacman -S openzro-ui    # optional desktop UI, x86_64 only
 ```
 
 ### AUR alternative
@@ -115,16 +130,14 @@ package downloads the same prebuilt binary from GitHub Releases.
 yay -S openzro-bin
 # or
 paru -S openzro-bin
+
+# optional desktop UI
+yay -S openzro-ui-bin
 ```
 
 The AUR package has no compile step — it just unpacks the binary
 tarball and installs the same `/usr/bin/openzro` as the pacman repo.
 
-<Note>
-    `openzro-ui` is not yet packaged for Arch. If you want the
-    desktop tray application, install it separately from the binary
-    tarball (see [Direct download](#direct-download-if-you-cant-use-a-package-repo) below).
-</Note>
 
 ## Direct download (if you can't use a package repo)
 
@@ -133,8 +146,9 @@ the asset matching your OS / architecture and unpack:
 
 ```bash
 # CLI / daemon — replace VERSION with the tag you want
-VERSION=v0.53.1-alpha.1
-ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/')
+VERSION=v0.53.1-alpha.103
+ARCH=$(uname -m | sed -e 's/x86_64/amd64/' -e 's/aarch64/arm64/' \
+  -e 's/armv[67]l/armv6/' -e 's/i[3-6]86/386/')
 curl -L -o openzro.tar.gz \
   "https://github.com/openzro/openzro/releases/download/${VERSION}/openzro_${VERSION#v}_linux_${ARCH}.tar.gz"
 tar -xzf openzro.tar.gz
@@ -156,14 +170,24 @@ sudo dnf install ./openzro_${VERSION#v}_linux_${ARCH}.rpm
 
 ## After install
 
-The `openzro` daemon is installed but not connected to a network
-yet. Run:
+The packages (APT, YUM/DNF, zypper, pacman, AUR) install and start the
+`openzro` service for you. Connect the client to your deployment:
+
+```bash
+sudo openzro up --management-url https://<your-management>:443
+```
+
+Without `--setup-key`, this opens your browser for the SSO login. To
+register an unattended server instead, add
+`--setup-key <YOUR_SETUP_KEY>` (see
+[setup keys](/manage/peers/register-machines-using-setup-keys)).
+
+If you installed from the direct-download tarball, install and start
+the service first:
 
 ```bash
 sudo openzro service install
 sudo openzro service start
-sudo openzro up --management-url https://your-management.example.com:443 \
-                --setup-key <YOUR_SETUP_KEY>
 ```
 
 Verify:
@@ -173,11 +197,11 @@ sudo openzro status -d
 ```
 
 For the desktop UI, launch `openzro-ui` from your application menu
-(it integrates with the system tray) or start the daemon then run
-`openzro-ui` from the shell.
+(it integrates with the system tray), or run `openzro-ui` from the
+shell once the service is running.
 
 ## Get started
 
 - [Star openZro on GitHub](https://github.com/openzro/openzro)
 - Latest [release notes](https://github.com/openzro/openzro/releases)
-- Self-host the management server: [Quickstart](https://docs.openzro.io/selfhosted/selfhosted-quickstart)
+- Self-host the management server: [Quickstart](/selfhosted/selfhosted-quickstart)
