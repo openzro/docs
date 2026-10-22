@@ -1,79 +1,66 @@
 import {Note, Warning} from "@/components/mdx";
 
-# Client Automatic Updates
+# Client Updates
 
-The Automatic Updates feature allows the openZro client to notify users when a new version is available and prompt them to install it. This ensures that users always have the latest features and security patches without needing to manually download and install updates.
-
-<Note>
-    Minimum supported agent version: <strong>v0.61.0</strong>.
-    This or higher version must also be installed on the peers you need to Automatically Update.
-</Note>
+Client updates let an administrator choose which openZro version the clients in an account should run. Management
+sends the target version to each client in scope, and the client tells the user an update is available or, on macOS,
+installs it.
 
 <Note>
-    This feature also requires an upgraded openZro Management server.
-    If you're self-hosting openZro, ensure your server is updated to version <strong>v0.61.0</strong>, which adds support for Automatic Updates.
+    Client updates were added in openZro v0.53.1-alpha.75. Older clients and management servers ignore the setting.
 </Note>
 
-<Note>
-    This feature is currently under active development and will continue to evolve. Future releases will add Linux support, and handling for long-running peers.
-</Note>
+## Set a target version
 
-## Enable Automatic Updates
+![Client updates](/docs-static/img/how-to-guides/auto-update/dashboard.png)
 
-![Automatic Updates](/docs-static/img/how-to-guides/auto-update/dashboard.png)
+Go to **Settings → Clients** and fill in the **Client updates** card, then click **Save**:
 
-To enable client auto updates, navigate to [Settings &raquo; Clients](https://your-management.example.com/) and enable 'Automatic Updates'.
+| Field | Description |
+|---|---|
+| **Target version** | The version clients should run, for example `0.53.1-alpha.103`. A leading `v` is removed. Leave it empty to send no update. |
+| **Force silent install** | Install the update without asking the user. macOS only. |
+| **Target groups** | Only peers in these groups get the update. |
+| **Target peers** | Individual peers that get the update. They are not subject to the rollout ring. |
+| **Exclude groups** | Peers in these groups never get the update, even if listed in Target peers. |
+| **Rollout ring (%)** | Send the update to only this percentage of the peers in scope (0–100). Empty means all of them. |
 
-You can either:
-
-* Update to latest stable version.
-* Update to a specific version.
-
-<Note>
-    Once enabled, openZro clients will prompt the user to install the specified version when connecting via the UI, if the current version is older than the specified version.
-</Note>
-
-### Force Automatic Updates
-
-When you need updates to be installed without user interaction, enable the **Force Automatic Updates** toggle. With this option, updates are installed automatically in the background without prompting the user.
+With no target groups and no target peers, the whole account is in scope, still subject to the exclude groups and the
+rollout ring. A peer's place in the ring is derived from its WireGuard public key, so it stays the same between syncs
+and across management replicas. Raise the percentage to widen the rollout.
 
 <Warning>
-    Enabling Force Automatic Updates will restart the openZro client during updates, which can temporarily disrupt active connections. Use with caution in production environments.
+    A forced install restarts the openZro client, which briefly interrupts its connections. Exclude routing peers and
+    servers with **Exclude groups** before forcing an update.
 </Warning>
-
 
 ## How it works
 
-1. **User-Initiated Connection**: When a Peer connects to Management, it will receive the current Automatic Updates settings.
-2. **Version Check**: The Peer will compare its current version with the version specified in the Automatic Updates settings.
-3. **Update Process**:
-    1. If the Peer is running an older version than specified, it will prompt the user to install the update.
-    2. Client will then download the update package from the official openZro repository.
-    3. The Peer will then install the update and restart itself to apply the changes.
+1. When a client logs in or syncs, management decides whether it is in scope and, if so, sends it the target version.
+2. If the client runs an older version, it fetches the update manifest of the target release from GitHub
+   (`https://github.com/openzro/openzro/releases/download/v<version>/update-manifest.json`). The manifest lists each
+   platform's package and its SHA-256 checksum.
+3. What happens next depends on the platform:
 
-When **Force Automatic Updates** is enabled, step 3.1 is skipped, the update is installed automatically in the background without user interaction.
+| Platform | Behavior |
+|---|---|
+| **macOS** | The tray's **About** menu shows **Install update now**. The client downloads the package, checks its checksum and Apple notarization, and installs it. With **Force silent install**, it installs without asking. |
+| **Windows** | The tray's **About** menu shows **Download update**, which opens the MSI download. The user runs the installer. |
+| **Linux** | The tray icon shows an update badge. Update with your package manager. |
 
-## Supported Platforms
+If the manifest cannot be fetched, the client retries with backoff (30 seconds up to 8 minutes). It also checks the
+directive again every 30 minutes, so a raised rollout ring reaches long-running clients without a restart. A forced
+install is attempted once per directive change.
 
-Automatic Updates are supported on the following platforms only:
-- Windows
-- macOS (with PKG installer)
+<Note>
+    Deployments that mirror releases can point clients at their own manifests with the
+    `OPENZRO_UPDATE_MANIFEST_TEMPLATE` environment variable on the client, for example
+    `https://mirror.example.com/v{version}/update-manifest.json`. `{version}` is replaced with the target version.
+    Setting it to an empty value turns client updates off on that client.
+</Note>
 
-Linux support is not available at this time due to the variety of distributions and package managers. A future release may include support for popular distributions.
+## API
 
-## Backward and Forward Compatibility
-
-* If Management server version &lt; v0.61.0, clients will **not** automatically update.
-* If Management server version &gt;= v0.61.0, openZro clients with version &gt;= v0.61.0 will automatically update according to the Automatic Updates settings.
-
-## Notes
-
-1. Automatic Updates will be set to "disabled" by default.
-2. If the Peer is unable to download or install the update (e.g., due to network issues), it will show an error notification but will not retry until the next restart.
-3. For long-running Peers, a future release may include support for periodic update checks during runtime.
-4. All notifications related to Automatic Updates will be shown only if openZro UI is running and Notifications are enabled.
-
-## Get started
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Ask questions in [GitHub Discussions](https://github.com/openzro/openzro/discussions)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub
+The same settings are available on `PUT /api/accounts/{accountId}` under `settings`:
+`client_update_target_version`, `client_update_force`, `client_update_target_groups`, `client_update_target_peers`,
+`client_update_exclude_groups` and `client_update_rollout_percent`.
