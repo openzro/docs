@@ -24,14 +24,14 @@ Most home routers use what's called **Endpoint-Independent Mapping (EIM)** or "E
 
 **Why P2P usually works:** Because the mapping is consistent, a STUN server can discover your public IP:port, share it with a peer, and that peer can send packets directly to you. The router sees return traffic and allows it through because it matches an existing mapping.
 
-<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+<div style={{ background: "#1a1330", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
   <svg viewBox="0 0 720 320" style={{ display: "block", width: "100%", height: "auto" }}>
     <defs>
       <marker id="oz-arr-violet-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 L10 5 L0 10 z" fill="#a78bfa" />
       </marker>
-      <marker id="oz-arr-teal-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 L10 5 L0 10 z" fill="#5fe3c8" />
+      <marker id="oz-arr-light-1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#ddd6fe" />
       </marker>
     </defs>
 
@@ -43,40 +43,40 @@ Most home routers use what's called **Endpoint-Independent Mapping (EIM)** or "E
     <text x="32" y="192" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">:12345</text>
 
     {/* router */}
-    <rect x="265" y="100" width="190" height="120" rx="10" fill="rgba(95,227,200,0.06)" stroke="rgba(95,227,200,0.55)" />
-    <text x="277" y="120" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#5fe3c8" letterSpacing="0.08em">HOME ROUTER · EIM</text>
+    <rect x="265" y="100" width="190" height="120" rx="10" fill="rgba(221,214,254,0.06)" stroke="rgba(221,214,254,0.55)" />
+    <text x="277" y="120" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#ddd6fe" letterSpacing="0.08em">HOME ROUTER · EIM</text>
     <text x="277" y="140" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Easy NAT</text>
     <text x="277" y="158" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">public: 203.0.113.10</text>
     <text x="277" y="173" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">port: 54321</text>
-    <line x1="277" y1="184" x2="443" y2="184" stroke="rgba(95,227,200,0.35)" strokeWidth="1" strokeDasharray="2 3" />
-    <text x="277" y="202" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8">same port → all destinations</text>
+    <line x1="277" y1="184" x2="443" y2="184" stroke="rgba(221,214,254,0.35)" strokeWidth="1" strokeDasharray="2 3" />
+    <text x="277" y="202" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe">same port → all destinations</text>
 
     {/* servers */}
-    <rect x="540" y="40" width="160" height="60" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <rect x="540" y="40" width="160" height="60" rx="10" fill="#0f0a1f" stroke="rgba(167,139,250,0.30)" />
     <text x="552" y="60" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">INTERNET</text>
     <text x="552" y="80" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Server A</text>
 
-    <rect x="540" y="140" width="160" height="60" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <rect x="540" y="140" width="160" height="60" rx="10" fill="#0f0a1f" stroke="rgba(167,139,250,0.30)" />
     <text x="552" y="160" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">INTERNET</text>
     <text x="552" y="180" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Server B</text>
 
-    <rect x="540" y="240" width="160" height="60" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <rect x="540" y="240" width="160" height="60" rx="10" fill="#0f0a1f" stroke="rgba(167,139,250,0.30)" />
     <text x="552" y="260" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">INTERNET</text>
     <text x="552" y="280" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Server C</text>
 
     {/* arrows */}
     <path d="M180 160 L260 160" stroke="#c4b5fd" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-violet-1)" />
-    <path d="M455 150 C 500 90, 510 75, 540 70" stroke="#5fe3c8" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-teal-1)" />
-    <path d="M455 170 L 540 170" stroke="#5fe3c8" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-teal-1)" />
-    <path d="M455 190 C 500 230, 510 250, 540 270" stroke="#5fe3c8" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-teal-1)" />
+    <path d="M455 150 C 500 90, 510 75, 540 70" stroke="#ddd6fe" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-light-1)" />
+    <path d="M455 170 L 540 170" stroke="#ddd6fe" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-light-1)" />
+    <path d="M455 190 C 500 230, 510 250, 540 270" stroke="#ddd6fe" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-light-1)" />
 
     {/* port badges */}
-    <rect x="475" y="115" width="50" height="18" rx="4" fill="rgba(95,227,200,0.08)" stroke="rgba(95,227,200,0.35)" />
-    <text x="500" y="128" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">:54321</text>
-    <rect x="475" y="161" width="50" height="18" rx="4" fill="rgba(95,227,200,0.08)" stroke="rgba(95,227,200,0.35)" />
-    <text x="500" y="174" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">:54321</text>
-    <rect x="475" y="207" width="50" height="18" rx="4" fill="rgba(95,227,200,0.08)" stroke="rgba(95,227,200,0.35)" />
-    <text x="500" y="220" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">:54321</text>
+    <rect x="475" y="115" width="50" height="18" rx="4" fill="rgba(221,214,254,0.08)" stroke="rgba(221,214,254,0.35)" />
+    <text x="500" y="128" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">:54321</text>
+    <rect x="475" y="161" width="50" height="18" rx="4" fill="rgba(221,214,254,0.08)" stroke="rgba(221,214,254,0.35)" />
+    <text x="500" y="174" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">:54321</text>
+    <rect x="475" y="207" width="50" height="18" rx="4" fill="rgba(221,214,254,0.08)" stroke="rgba(221,214,254,0.35)" />
+    <text x="500" y="220" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">:54321</text>
   </svg>
 </div>
 
@@ -92,14 +92,14 @@ Many enterprise firewalls and some ISP-grade routers use **Endpoint-Dependent Ma
 
 **Why P2P is harder:** When a STUN server discovers your public IP:port, that mapping is only valid for traffic to/from the STUN server itself. When your peer tries to send packets to that address, the firewall may reject them or map them differently.
 
-<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+<div style={{ background: "#1a1330", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
   <svg viewBox="0 0 720 340" style={{ display: "block", width: "100%", height: "auto" }}>
     <defs>
       <marker id="oz-arr-violet-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 L10 5 L0 10 z" fill="#a78bfa" />
       </marker>
-      <marker id="oz-arr-amber-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 L10 5 L0 10 z" fill="#f5b942" />
+      <marker id="oz-arr-mid-2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#8b5cf6" />
       </marker>
     </defs>
 
@@ -111,40 +111,40 @@ Many enterprise firewalls and some ISP-grade routers use **Endpoint-Dependent Ma
     <text x="32" y="202" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">:12345</text>
 
     {/* firewall */}
-    <rect x="245" y="80" width="230" height="180" rx="10" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.55)" />
-    <text x="257" y="100" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#f5b942" letterSpacing="0.08em">CORPORATE FIREWALL · EDM</text>
+    <rect x="245" y="80" width="230" height="180" rx="10" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.55)" />
+    <text x="257" y="100" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#8b5cf6" letterSpacing="0.08em">CORPORATE FIREWALL · EDM</text>
     <text x="257" y="120" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Symmetric NAT</text>
     <text x="257" y="138" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">public: 198.51.100.5</text>
-    <line x1="257" y1="150" x2="463" y2="150" stroke="rgba(245,185,66,0.30)" strokeWidth="1" strokeDasharray="2 3" />
+    <line x1="257" y1="150" x2="463" y2="150" stroke="rgba(139,92,246,0.30)" strokeWidth="1" strokeDasharray="2 3" />
 
     {/* mapping rows */}
-    <rect x="257" y="160" width="206" height="22" rx="4" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.30)" />
-    <text x="266" y="175" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942">:60001 → Server A</text>
-    <rect x="257" y="188" width="206" height="22" rx="4" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.30)" />
-    <text x="266" y="203" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942">:60002 → Server B</text>
-    <rect x="257" y="216" width="206" height="22" rx="4" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.30)" />
-    <text x="266" y="231" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942">:60003 → Server C</text>
+    <rect x="257" y="160" width="206" height="22" rx="4" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.30)" />
+    <text x="266" y="175" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#8b5cf6">:60001 → Server A</text>
+    <rect x="257" y="188" width="206" height="22" rx="4" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.30)" />
+    <text x="266" y="203" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#8b5cf6">:60002 → Server B</text>
+    <rect x="257" y="216" width="206" height="22" rx="4" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.30)" />
+    <text x="266" y="231" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#8b5cf6">:60003 → Server C</text>
 
-    <text x="257" y="252" fontFamily="JetBrains Mono, monospace" fontSize="9.5" fill="#f5b942">different port per destination</text>
+    <text x="257" y="252" fontFamily="JetBrains Mono, monospace" fontSize="9.5" fill="#8b5cf6">different port per destination</text>
 
     {/* servers */}
-    <rect x="555" y="60" width="150" height="56" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <rect x="555" y="60" width="150" height="56" rx="10" fill="#0f0a1f" stroke="rgba(167,139,250,0.30)" />
     <text x="567" y="80" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">INTERNET</text>
     <text x="567" y="100" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Server A</text>
 
-    <rect x="555" y="150" width="150" height="56" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <rect x="555" y="150" width="150" height="56" rx="10" fill="#0f0a1f" stroke="rgba(167,139,250,0.30)" />
     <text x="567" y="170" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">INTERNET</text>
     <text x="567" y="190" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Server B</text>
 
-    <rect x="555" y="240" width="150" height="56" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <rect x="555" y="240" width="150" height="56" rx="10" fill="#0f0a1f" stroke="rgba(167,139,250,0.30)" />
     <text x="567" y="260" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">INTERNET</text>
     <text x="567" y="280" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Server C</text>
 
     {/* arrows */}
     <path d="M180 170 L240 170" stroke="#c4b5fd" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-violet-2)" />
-    <path d="M475 171 C 510 130, 530 100, 555 90" stroke="#f5b942" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-amber-2)" />
-    <path d="M475 199 L 555 179" stroke="#f5b942" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-amber-2)" />
-    <path d="M475 227 C 510 245, 530 260, 555 268" stroke="#f5b942" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-amber-2)" />
+    <path d="M475 171 C 510 130, 530 100, 555 90" stroke="#8b5cf6" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-mid-2)" />
+    <path d="M475 199 L 555 179" stroke="#8b5cf6" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-mid-2)" />
+    <path d="M475 227 C 510 245, 530 260, 555 268" stroke="#8b5cf6" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-mid-2)" />
   </svg>
 </div>
 
@@ -160,17 +160,17 @@ Mobile carriers typically use **Carrier-Grade NAT (CGNAT)**, which adds an extra
 
 **The double-NAT problem:**
 
-<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+<div style={{ background: "#1a1330", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
   <svg viewBox="0 0 760 320" style={{ display: "block", width: "100%", height: "auto" }}>
     <defs>
       <marker id="oz-arr-violet-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
         <path d="M0 0 L10 5 L0 10 z" fill="#a78bfa" />
       </marker>
-      <marker id="oz-arr-amber-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 L10 5 L0 10 z" fill="#f5b942" />
+      <marker id="oz-arr-mid-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#8b5cf6" />
       </marker>
-      <marker id="oz-arr-rose-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 L10 5 L0 10 z" fill="#f06b8b" />
+      <marker id="oz-arr-grey-3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#9a93ad" />
       </marker>
     </defs>
 
@@ -182,21 +182,21 @@ Mobile carriers typically use **Carrier-Grade NAT (CGNAT)**, which adds an extra
     <text x="32" y="194" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">(private)</text>
 
     {/* NAT 1 */}
-    <rect x="185" y="120" width="160" height="90" rx="10" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.55)" />
-    <text x="197" y="140" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#f5b942" letterSpacing="0.08em">NAT LAYER 1</text>
+    <rect x="185" y="120" width="160" height="90" rx="10" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.55)" />
+    <text x="197" y="140" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#8b5cf6" letterSpacing="0.08em">NAT LAYER 1</text>
     <text x="197" y="160" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Cell tower</text>
     <text x="197" y="178" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">carrier-internal</text>
     <text x="197" y="194" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">100.64.x.x · CGNAT</text>
 
     {/* NAT 2 */}
-    <rect x="370" y="120" width="180" height="90" rx="10" fill="rgba(240,107,139,0.06)" stroke="rgba(240,107,139,0.55)" />
-    <text x="382" y="140" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#f06b8b" letterSpacing="0.08em">NAT LAYER 2</text>
+    <rect x="370" y="120" width="180" height="90" rx="10" fill="rgba(154,147,173,0.06)" stroke="rgba(154,147,173,0.55)" />
+    <text x="382" y="140" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#9a93ad" letterSpacing="0.08em">NAT LAYER 2</text>
     <text x="382" y="160" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Carrier NAT</text>
     <text x="382" y="178" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">public IP (shared)</text>
     <text x="382" y="194" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">often symmetric</text>
 
     {/* internet */}
-    <rect x="575" y="120" width="160" height="90" rx="10" fill="#1d1838" stroke="rgba(167,139,250,0.30)" />
+    <rect x="575" y="120" width="160" height="90" rx="10" fill="#0f0a1f" stroke="rgba(167,139,250,0.30)" />
     <text x="587" y="140" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">INTERNET</text>
     <text x="587" y="160" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Internet</text>
     <text x="587" y="178" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">peers, STUN,</text>
@@ -204,8 +204,8 @@ Mobile carriers typically use **Carrier-Grade NAT (CGNAT)**, which adds an extra
 
     {/* arrows */}
     <path d="M160 165 L185 165" stroke="#c4b5fd" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-violet-3)" />
-    <path d="M345 165 L370 165" stroke="#f5b942" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-amber-3)" />
-    <path d="M550 165 L575 165" stroke="#f06b8b" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-rose-3)" />
+    <path d="M345 165 L370 165" stroke="#8b5cf6" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-mid-3)" />
+    <path d="M550 165 L575 165" stroke="#9a93ad" strokeWidth="1.4" fill="none" markerEnd="url(#oz-arr-grey-3)" />
 
     {/* labels */}
     <text x="265" y="234" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" textAnchor="middle">private→private</text>
@@ -214,9 +214,9 @@ Mobile carriers typically use **Carrier-Grade NAT (CGNAT)**, which adds an extra
 
     {/* footer note */}
     <g transform="translate(20,260)">
-      <rect width="715" height="38" rx="8" fill="rgba(240,107,139,0.06)" stroke="rgba(240,107,139,0.30)" />
-      <text x="14" y="18" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f06b8b">two NAT translations · symmetric at layer 2 · public IP shared · short mapping timeouts (30–60s) · tower hops change the path</text>
-      <text x="14" y="32" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f06b8b" opacity="0.7">→ 100.64.0.0/10 is also used by openZro internally — intentional, avoids conflicts with typical private ranges</text>
+      <rect width="715" height="38" rx="8" fill="rgba(154,147,173,0.06)" stroke="rgba(154,147,173,0.30)" />
+      <text x="14" y="18" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#9a93ad">two NAT translations · symmetric at layer 2 · public IP shared · short mapping timeouts (30–60s) · tower hops change the path</text>
+      <text x="14" y="32" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#9a93ad" opacity="0.7">→ 100.64.0.0/10 is also used by openZro internally — intentional, avoids conflicts with typical private ranges</text>
     </g>
   </svg>
 </div>
@@ -249,31 +249,34 @@ Cloud VMs and data center servers present a different scenario:
 
 ## openZro Relay
 
-When direct peer-to-peer connections aren't possible (usually due to NAT difficulties), openZro uses relay servers to ensure connectivity. openZro includes a custom-built relay system optimized specifically for its use case.
+When direct peer-to-peer connections aren't possible (usually due to NAT difficulties), openZro uses relay servers to ensure connectivity. The openZro Relay is a purpose-built service that ships with every deployment.
 
 ### How the Relay Works
 
-The openZro relay is a lightweight server that forwards encrypted WireGuard traffic between peers when they cannot connect directly. Unlike traditional TURN servers, openZro's relay uses a custom protocol designed for efficiency.
+The openZro relay is a lightweight server that forwards encrypted WireGuard traffic between peers when they cannot connect directly. Unlike a TURN server, it uses its own lightweight protocol and authenticates clients with short-lived tokens issued by the Management service.
 
 **Transport protocols:**
-- **QUIC**: A modern UDP-based protocol with built-in encryption. This is the primary transport and offers lower latency.
-- **WebSocket**: An HTTP-based protocol that works over TCP. This serves as a fallback when UDP is blocked, as it appears as standard HTTPS traffic to firewalls.
+- **QUIC**: A UDP-based protocol with built-in encryption. The relay only listens for QUIC when it is configured with TLS.
+- **WebSocket**: Runs over TCP. It works where UDP is blocked and, behind TLS on port 443, looks like ordinary HTTPS traffic to firewalls.
 
-When a client connects to a relay server, it races both protocols simultaneously and uses whichever succeeds first. If QUIC (UDP) fails due to network restrictions, WebSocket (TCP) automatically takes over.
+When a client connects to a relay server, it dials both protocols at the same time and keeps whichever succeeds first. If UDP is blocked, the WebSocket connection wins.
 
 ### Relay Selection
 
 When two peers need to communicate through a relay:
 
-1. Both peers receive relay server information from the openZro Management service
-2. The Signal service helps peers negotiate which relay server to use
-3. Both peers connect to the agreed-upon relay server
-4. Traffic flows through the relay while remaining end-to-end encrypted
+1. The Management service sends each client the list of relay servers configured for the deployment
+2. Each client connects to all of them in parallel and keeps the first that answers as its *home* relay
+3. During connection setup, peers tell each other their home relay through the Signal service
+4. If the other peer's home relay is a different server, the client also connects to that one
+5. Traffic flows through the relay while remaining end-to-end encrypted
 
-openZro supports multiple relay server instances for high availability. If a relay server becomes unavailable, peers can switch to an alternative.
+A deployment can run several relay instances for high availability. If a client's home relay becomes unavailable, it
+picks another one from the list. Kubernetes deployments can also run several relay pods behind a single address; see
+[ADR-0014](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md).
 
 <Note>
-Self-hosted deployments can run their own relay servers. For best performance, deploy relay servers geographically close to your users.
+Relay servers are run by the operator of the deployment. For best performance, run them close to your users.
 </Note>
 
 ## P2P vs. Relayed Connections
@@ -282,43 +285,43 @@ Self-hosted deployments can run their own relay servers. For best performance, d
 
 When openZro establishes a P2P connection, traffic flows directly between peers with no intermediate servers:
 
-<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+<div style={{ background: "#1a1330", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
   <svg viewBox="0 0 720 260" style={{ display: "block", width: "100%", height: "auto" }}>
     <defs>
-      <marker id="oz-arr-teal-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 L10 5 L0 10 z" fill="#5fe3c8" />
+      <marker id="oz-arr-light-4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#ddd6fe" />
       </marker>
-      <marker id="oz-arr-teal-4s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M10 0 L0 5 L10 10 z" fill="#5fe3c8" />
+      <marker id="oz-arr-light-4s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M10 0 L0 5 L10 10 z" fill="#ddd6fe" />
       </marker>
     </defs>
 
     {/* peer A */}
-    <rect x="40" y="80" width="200" height="110" rx="12" fill="rgba(95,227,200,0.06)" stroke="rgba(95,227,200,0.55)" />
-    <text x="56" y="102" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#5fe3c8" letterSpacing="0.08em">PEER A</text>
+    <rect x="40" y="80" width="200" height="110" rx="12" fill="rgba(221,214,254,0.06)" stroke="rgba(221,214,254,0.55)" />
+    <text x="56" y="102" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#ddd6fe" letterSpacing="0.08em">PEER A</text>
     <text x="56" y="124" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Your PC</text>
     <text x="56" y="143" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">100.75.232.118</text>
     <text x="56" y="160" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">ICE candidate: host</text>
     <text x="56" y="177" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">wireguard endpoint</text>
 
     {/* peer B */}
-    <rect x="480" y="80" width="200" height="110" rx="12" fill="rgba(95,227,200,0.06)" stroke="rgba(95,227,200,0.55)" />
-    <text x="496" y="102" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#5fe3c8" letterSpacing="0.08em">PEER B</text>
+    <rect x="480" y="80" width="200" height="110" rx="12" fill="rgba(221,214,254,0.06)" stroke="rgba(221,214,254,0.55)" />
+    <text x="496" y="102" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#ddd6fe" letterSpacing="0.08em">PEER B</text>
     <text x="496" y="124" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Server</text>
     <text x="496" y="143" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">100.75.226.48</text>
     <text x="496" y="160" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">ICE candidate: srflx</text>
     <text x="496" y="177" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">wireguard endpoint</text>
 
     {/* tunnel */}
-    <path d="M240 135 L 480 135" stroke="#5fe3c8" strokeWidth="2" fill="none" markerEnd="url(#oz-arr-teal-4)" markerStart="url(#oz-arr-teal-4s)" />
-    <rect x="306" y="108" width="108" height="24" rx="12" fill="rgba(95,227,200,0.10)" stroke="rgba(95,227,200,0.45)" />
-    <text x="360" y="124" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">WireGuard ◇ E2E</text>
-    <text x="360" y="160" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">encrypted tunnel — no intermediate server</text>
+    <path d="M240 135 L 480 135" stroke="#ddd6fe" strokeWidth="2" fill="none" markerEnd="url(#oz-arr-light-4)" markerStart="url(#oz-arr-light-4s)" />
+    <rect x="306" y="108" width="108" height="24" rx="12" fill="rgba(221,214,254,0.10)" stroke="rgba(221,214,254,0.45)" />
+    <text x="360" y="124" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">WireGuard ◇ E2E</text>
+    <text x="360" y="160" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">encrypted tunnel — no intermediate server</text>
 
     {/* footer */}
     <g transform="translate(40,215)">
       <text x="0" y="0" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#a78bfa" letterSpacing="0.08em">CONNECTION</text>
-      <text x="0" y="16" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#ddd6fe">type: P2P · latency: 15.2ms · direct: true</text>
+      <text x="0" y="16" fontFamily="JetBrains Mono, monospace" fontSize="11" fill="#ddd6fe">type: P2P · latency: 15.2ms</text>
     </g>
   </svg>
 </div>
@@ -327,7 +330,7 @@ When openZro establishes a P2P connection, traffic flows directly between peers 
 - **Lower latency**: Packets take the shortest network path
 - **Higher throughput**: No relay server bottleneck
 - **Better reliability**: Fewer points of failure
-- **Privacy**: Traffic doesn't pass through any third-party infrastructure
+- **Privacy**: Traffic doesn't pass through any server, not even your own
 
 **Requirements:**
 - At least one peer must have "friendly" NAT or a public IP
@@ -338,7 +341,7 @@ When openZro establishes a P2P connection, traffic flows directly between peers 
 
 When P2P fails, openZro falls back to relay servers. Traffic is encrypted before leaving your device and remains encrypted through the relay:
 
-<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+<div style={{ background: "#1a1330", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
   <svg viewBox="0 0 760 280" style={{ display: "block", width: "100%", height: "auto" }}>
     <defs>
       <marker id="oz-arr-violet-5" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
@@ -355,18 +358,18 @@ When P2P fails, openZro falls back to relay servers. Traffic is encrypted before
     <text x="36" y="134" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Your PC</text>
     <text x="36" y="153" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">symmetric NAT</text>
     <text x="36" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">UDP blocked</text>
-    <text x="36" y="187" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">→ relay candidate</text>
+    <text x="36" y="187" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">→ home relay</text>
 
     {/* relay */}
     <rect x="265" y="60" width="230" height="170" rx="12" fill="rgba(124,58,237,0.22)" stroke="rgba(167,139,250,0.65)" />
-    <text x="281" y="82" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">OPENZRO RELAY</text>
-    <text x="281" y="104" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">streamline-es-mad1-0</text>
-    <text x="281" y="123" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">rels://…:443</text>
+    <text x="281" y="82" fontFamily="JetBrains Mono, monospace" fontSize="9" fill="#c4b5fd" letterSpacing="0.08em">openZro relay</text>
+    <text x="281" y="104" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">relay.example.com</text>
+    <text x="281" y="123" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">rels://relay.example.com:443</text>
     <line x1="281" y1="134" x2="481" y2="134" stroke="rgba(167,139,250,0.30)" strokeWidth="1" strokeDasharray="2 3" />
-    <text x="281" y="154" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe">primary · QUIC (UDP)</text>
-    <text x="281" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" opacity="0.7">low-latency transport</text>
-    <text x="281" y="192" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe">fallback · WebSocket (TCP/443)</text>
-    <text x="281" y="208" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" opacity="0.7">looks like normal HTTPS</text>
+    <text x="281" y="154" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe">QUIC (UDP, needs TLS)</text>
+    <text x="281" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" opacity="0.7">dialed in parallel</text>
+    <text x="281" y="192" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe">WebSocket (TCP/443)</text>
+    <text x="281" y="208" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" opacity="0.7">first to connect wins</text>
 
     {/* peer B */}
     <rect x="550" y="90" width="190" height="110" rx="12" fill="rgba(124,58,237,0.18)" stroke="rgba(167,139,250,0.55)" />
@@ -374,7 +377,7 @@ When P2P fails, openZro falls back to relay servers. Traffic is encrypted before
     <text x="566" y="134" fontFamily="JetBrains Mono, monospace" fontSize="11.5" fontWeight="600" fill="#faf9fc">Server</text>
     <text x="566" y="153" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">behind aggressive FW</text>
     <text x="566" y="170" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">DPI on tunnels</text>
-    <text x="566" y="187" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">→ host candidate</text>
+    <text x="566" y="187" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd">→ same relay</text>
 
     {/* tunnel arrows */}
     <path d="M210 145 L 265 145" stroke="#c4b5fd" strokeWidth="2" fill="none" markerEnd="url(#oz-arr-violet-5)" markerStart="url(#oz-arr-violet-5s)" />
@@ -382,8 +385,8 @@ When P2P fails, openZro falls back to relay servers. Traffic is encrypted before
 
     {/* E2E ribbon */}
     <g transform="translate(0,245)">
-      <rect x="20" y="0" width="720" height="28" rx="14" fill="rgba(95,227,200,0.06)" stroke="rgba(95,227,200,0.35)" />
-      <text x="380" y="18" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">WireGuard end-to-end encryption — relay forwards opaque encrypted packets, cannot decrypt</text>
+      <rect x="20" y="0" width="720" height="28" rx="14" fill="rgba(221,214,254,0.06)" stroke="rgba(221,214,254,0.35)" />
+      <text x="380" y="18" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">WireGuard end-to-end encryption — relay forwards opaque encrypted packets, cannot decrypt</text>
     </g>
   </svg>
 </div>
@@ -414,15 +417,15 @@ openzro status --detail
 Example output:
 ```
 Peers detail:
- server-a.openzro.cloud:
-  openZro IP: 100.75.232.118/32
+ server-a.openzro.selfhosted:
+  Openzro IP: 100.75.232.118/32
+  Public key: 5tH+hYCFz0Wy8Y0vCnE7TyRuJ0UH9q3E3Fb6hYnRk2E=
   Status: Connected
   -- detail --
   Connection type: P2P
-  Direct: true
   ICE candidate (Local/Remote): host/srflx
   ICE candidate endpoints (Local/Remote): 192.168.1.50:51820/203.0.113.10:51820
-  Relay server address: rels://streamline-es-mad1-0.relay.openzro.io:443
+  Relay server address: rels://relay.example.com:443
   Last connection update: 1 hour, 37 minutes ago
   Last WireGuard handshake: 1 minute, 5 seconds ago
   Transfer status (received/sent) 6.5 KiB/10.3 KiB
@@ -430,15 +433,15 @@ Peers detail:
   Networks: -
   Latency: 15.2ms
 
- server-b.openzro.cloud:
-  openZro IP: 100.75.226.48/32
+ server-b.openzro.selfhosted:
+  Openzro IP: 100.75.226.48/32
+  Public key: kE9yYbM0p6m2JqL0dQe1pH3lS8x4WcV7uN2tR5fZaAg=
   Status: Connected
   -- detail --
   Connection type: Relayed
-  Direct: false
   ICE candidate (Local/Remote): relay/host
   ICE candidate endpoints (Local/Remote): 108.54.10.33:60434/10.128.0.12:51820
-  Relay server address: rels://streamline-es-mad1-0.relay.openzro.io:443
+  Relay server address: rels://relay.example.com:443
   Last connection update: 1 hour, 37 minutes ago
   Last WireGuard handshake: 1 minute, 5 seconds ago
   Transfer status (received/sent) 6.5 KiB/10.3 KiB
@@ -454,8 +457,7 @@ Peers detail:
 | `Connection type: P2P` | Direct connection, traffic doesn't go through relay |
 | `Connection type: Relayed` | Traffic flows through relay server |
 | `ICE candidate (Local/Remote)` | `host` = direct IP, `srflx` = NAT-translated IP, `relay` = relay server |
-| `Relay server address` | Which relay server is being used for the connection |
-| `Direct: true/false` | Whether local traffic is direct (false when using local relay proxy) |
+| `Relay server address` | The client's home relay server |
 
 ### Common Scenarios
 
@@ -481,7 +483,8 @@ Both peers are behind NAT, but hole punching succeeded.
 ```
 ICE candidate (Local/Remote): relay/host
 ```
-P2P failed for at least one direction; traffic flows through relay.
+P2P failed and the connection goes through a TURN server (Coturn). This only happens when one of the peers cannot use
+the openZro Relay.
 
 ## How openZro Establishes Connections
 
@@ -497,7 +500,7 @@ Each peer discovers all possible ways it can be reached:
 
 - **Host candidates**: Local IP addresses on the machine (e.g., `192.168.1.50:51820`). These are gathered by enumerating all network interfaces on the device.
 - **Server reflexive candidates**: Public IP:port as seen from outside the NAT (e.g., `203.0.113.10:54321`). These are discovered by sending a STUN binding request to a STUN server, which responds with the public IP and port it observed.
-- **Relay candidates**: Addresses allocated by TURN/relay servers (fallback option). These are obtained by requesting an allocation from a TURN server, which reserves a port on the relay that can forward traffic to the peer.
+- **Relay candidates**: Addresses allocated by a TURN server (Coturn). A peer requests an allocation, which reserves a port on the TURN server that can forward traffic to it. Relay candidates are only gathered when one of the peers cannot use the openZro Relay; otherwise ICE only tries host and server reflexive candidates, and the openZro Relay is the fallback.
 
 **2. Candidate Exchange**
 
@@ -518,6 +521,10 @@ Priority 4: Relay ↔ Any         (fallback via relay server)
 
 The first candidate pair that successfully exchanges packets becomes the active connection. openZro then configures WireGuard to use this path for encrypted tunnel traffic.
 
+ICE runs alongside the openZro Relay. When both peers support the relay, the connection can come up through it first
+and moves to the direct path as soon as ICE succeeds. If the direct path later fails, the connection falls back to the
+relay.
+
 ### NAT Hole Punching
 
 When both peers are behind NAT, openZro uses a technique called **UDP hole punching**:
@@ -527,17 +534,17 @@ When both peers are behind NAT, openZro uses a technique called **UDP hole punch
 3. Because both NATs now have outbound mappings, return packets are allowed through
 4. The connection is established through both NAT holes
 
-<div style={{ background: "#14102a", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
+<div style={{ background: "#1a1330", border: "1px solid rgba(196,181,253,0.12)", borderRadius: "14px", padding: "24px", margin: "24px 0" }}>
   <svg viewBox="0 0 720 360" style={{ display: "block", width: "100%", height: "auto" }}>
     <defs>
-      <marker id="oz-arr-amber-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 L10 5 L0 10 z" fill="#f5b942" />
+      <marker id="oz-arr-mid-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#8b5cf6" />
       </marker>
-      <marker id="oz-arr-teal-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M0 0 L10 5 L0 10 z" fill="#5fe3c8" />
+      <marker id="oz-arr-light-6" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M0 0 L10 5 L0 10 z" fill="#ddd6fe" />
       </marker>
-      <marker id="oz-arr-teal-6s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-        <path d="M10 0 L0 5 L10 10 z" fill="#5fe3c8" />
+      <marker id="oz-arr-light-6s" viewBox="0 0 10 10" refX="1" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M10 0 L0 5 L10 10 z" fill="#ddd6fe" />
       </marker>
     </defs>
 
@@ -555,40 +562,40 @@ When both peers are behind NAT, openZro uses a technique called **UDP hole punch
     {/* step 1 */}
     <circle cx="60" cy="100" r="10" fill="rgba(124,58,237,0.20)" stroke="#a78bfa" />
     <text x="60" y="105" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle" fontWeight="600">1</text>
-    <path d="M130 100 L 590 100" stroke="#f5b942" strokeWidth="1.4" strokeDasharray="4 4" fill="none" markerEnd="url(#oz-arr-amber-6)" />
-    <rect x="240" y="84" width="240" height="24" rx="6" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.30)" />
-    <text x="360" y="100" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942" textAnchor="middle">A → B&rsquo;s public addr · UDP probe</text>
+    <path d="M130 100 L 590 100" stroke="#8b5cf6" strokeWidth="1.4" strokeDasharray="4 4" fill="none" markerEnd="url(#oz-arr-mid-6)" />
+    <rect x="240" y="84" width="240" height="24" rx="6" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.30)" />
+    <text x="360" y="100" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#8b5cf6" textAnchor="middle">A → B&rsquo;s public addr · UDP probe</text>
     <text x="360" y="124" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" opacity="0.7" textAnchor="middle">may be dropped — but opens a hole in A&rsquo;s NAT</text>
 
     {/* step 2 */}
     <circle cx="660" cy="160" r="10" fill="rgba(124,58,237,0.20)" stroke="#a78bfa" />
     <text x="660" y="165" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle" fontWeight="600">2</text>
-    <path d="M590 160 L 130 160" stroke="#f5b942" strokeWidth="1.4" strokeDasharray="4 4" fill="none" markerEnd="url(#oz-arr-amber-6)" />
-    <rect x="240" y="144" width="240" height="24" rx="6" fill="rgba(245,185,66,0.08)" stroke="rgba(245,185,66,0.30)" />
-    <text x="360" y="160" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f5b942" textAnchor="middle">B → A&rsquo;s public addr · UDP probe</text>
+    <path d="M590 160 L 130 160" stroke="#8b5cf6" strokeWidth="1.4" strokeDasharray="4 4" fill="none" markerEnd="url(#oz-arr-mid-6)" />
+    <rect x="240" y="144" width="240" height="24" rx="6" fill="rgba(139,92,246,0.08)" stroke="rgba(139,92,246,0.30)" />
+    <text x="360" y="160" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#8b5cf6" textAnchor="middle">B → A&rsquo;s public addr · UDP probe</text>
     <text x="360" y="184" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#c4b5fd" opacity="0.7" textAnchor="middle">may be dropped — but opens a hole in B&rsquo;s NAT</text>
 
     {/* step 3 */}
     <circle cx="60" cy="220" r="10" fill="rgba(124,58,237,0.20)" stroke="#a78bfa" />
     <text x="60" y="225" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle" fontWeight="600">3</text>
-    <rect x="180" y="204" width="360" height="32" rx="8" fill="rgba(95,227,200,0.06)" stroke="rgba(95,227,200,0.30)" />
-    <text x="360" y="220" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">both NATs now have outbound mappings →</text>
-    <text x="360" y="232" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">return packets are accepted</text>
+    <rect x="180" y="204" width="360" height="32" rx="8" fill="rgba(221,214,254,0.06)" stroke="rgba(221,214,254,0.30)" />
+    <text x="360" y="220" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">both NATs now have outbound mappings →</text>
+    <text x="360" y="232" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">return packets are accepted</text>
 
     {/* step 4 */}
-    <circle cx="60" cy="280" r="10" fill="rgba(95,227,200,0.20)" stroke="#5fe3c8" />
-    <text x="60" y="285" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle" fontWeight="600">4</text>
-    <circle cx="660" cy="280" r="10" fill="rgba(95,227,200,0.20)" stroke="#5fe3c8" />
-    <text x="660" y="285" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle" fontWeight="600">4</text>
-    <path d="M130 280 L 590 280" stroke="#5fe3c8" strokeWidth="2" fill="none" markerEnd="url(#oz-arr-teal-6)" markerStart="url(#oz-arr-teal-6s)" />
-    <rect x="280" y="262" width="160" height="24" rx="12" fill="rgba(95,227,200,0.10)" stroke="rgba(95,227,200,0.45)" />
-    <text x="360" y="278" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#5fe3c8" textAnchor="middle">P2P connection · WireGuard</text>
+    <circle cx="60" cy="280" r="10" fill="rgba(221,214,254,0.20)" stroke="#ddd6fe" />
+    <text x="60" y="285" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle" fontWeight="600">4</text>
+    <circle cx="660" cy="280" r="10" fill="rgba(221,214,254,0.20)" stroke="#ddd6fe" />
+    <text x="660" y="285" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle" fontWeight="600">4</text>
+    <path d="M130 280 L 590 280" stroke="#ddd6fe" strokeWidth="2" fill="none" markerEnd="url(#oz-arr-light-6)" markerStart="url(#oz-arr-light-6s)" />
+    <rect x="280" y="262" width="160" height="24" rx="12" fill="rgba(221,214,254,0.10)" stroke="rgba(221,214,254,0.45)" />
+    <text x="360" y="278" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#ddd6fe" textAnchor="middle">P2P connection · WireGuard</text>
 
     {/* failure note */}
     <g transform="translate(0,310)">
-      <rect x="40" y="0" width="640" height="36" rx="8" fill="rgba(240,107,139,0.06)" stroke="rgba(240,107,139,0.30)" />
-      <text x="360" y="16" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f06b8b" textAnchor="middle">fails when: symmetric NAT changes port mappings · strict filtering drops unsolicited UDP</text>
-      <text x="360" y="30" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#f06b8b" opacity="0.8" textAnchor="middle">· NAT mapping times out before the rendezvous completes  →  fall back to relay</text>
+      <rect x="40" y="0" width="640" height="36" rx="8" fill="rgba(154,147,173,0.06)" stroke="rgba(154,147,173,0.30)" />
+      <text x="360" y="16" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#9a93ad" textAnchor="middle">fails when: symmetric NAT changes port mappings · strict filtering drops unsolicited UDP</text>
+      <text x="360" y="30" fontFamily="JetBrains Mono, monospace" fontSize="10" fill="#9a93ad" opacity="0.8" textAnchor="middle">· NAT mapping times out before the rendezvous completes  →  fall back to relay</text>
     </g>
   </svg>
 </div>
@@ -606,19 +613,17 @@ Home networks typically achieve P2P connections without any configuration. If yo
 
 1. **Check your router's NAT type**: Some gaming routers have "NAT type" settings (Open, Moderate, Strict). Open is best for P2P.
 
-2. **Enable UPnP or NAT-PMP**: These protocols allow applications to request port mappings automatically.
-
-3. **Avoid double NAT**: If your ISP provides a router and you have your own, you may have two layers of NAT. Consider putting the ISP router in bridge mode.
+2. **Avoid double NAT**: If your ISP provides a router and you have your own, you may have two layers of NAT. Consider putting the ISP router in bridge mode.
 
 ### For Corporate Networks
 
 Corporate environments are often more restrictive. Work with your IT team to:
 
-1. **Allow UDP outbound**: openZro works best when UDP traffic is permitted to the STUN/TURN servers.
+1. **Allow UDP outbound**: openZro works best when UDP is allowed to the STUN server and between peers.
 
 2. **Whitelist openZro endpoints**: See the [FAQ](/about-openzro/faq) for the list of endpoints and ports.
 
-3. **Consider split tunneling**: If full P2P isn't possible, ensure the relay ports are accessible.
+3. **Keep the relay reachable**: If P2P isn't possible, make sure the relay port is reachable so peers can fall back to it.
 
 ### For Mobile Users
 
@@ -632,14 +637,15 @@ Mobile connections are inherently variable. To improve reliability:
 
 ## openZro's Relay Infrastructure
 
-openZro provides globally distributed relay servers to ensure minimal performance impact and connectivity even in the most restrictive networks. The relay system supports two transport protocols:
+openZro does not operate relay servers for you: each deployment runs its own. Where you place them decides the latency
+of relayed connections, so run one near each large group of users and list them all in the Management configuration.
+The relay supports two transports:
 
-- **QUIC**: High-performance UDP-based transport (primary)
-- **WebSocket**: TCP-based transport that works over port 443 (fallback when UDP is blocked)
+- **QUIC**: UDP-based, available when the relay is configured with TLS
+- **WebSocket**: TCP-based, and the one that gets through networks that only allow HTTPS on port 443
 
-The WebSocket transport is particularly important for corporate networks that only allow HTTPS traffic, as it appears as standard web traffic to firewalls.
-
-For legacy compatibility, openZro also supports TURN (Coturn) servers, though the native relay is recommended for new deployments.
+The default deployment also includes Coturn. It provides STUN for every client and TURN as an ICE fallback for peers
+that cannot use the openZro Relay.
 
 ## Summary
 
