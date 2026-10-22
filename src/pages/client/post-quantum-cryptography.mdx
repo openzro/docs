@@ -14,8 +14,8 @@ The software is [open-source](https://github.com/rosenpass/rosenpass) and design
 It ensures future-proof security against quantum threats by continuously generating and rotating WireGuard pre-shared keys every two minutes.
 Rosenpass can also be used as a generic key-exchange mechanism for other protocols.
 
-Starting [v0.25.4](https://github.com/openzro/openzro/releases), the openZro agent runs an embedded Rosenpass server
-that automatically rotates and applies WireGuard pre-shared keys to every point-to-point connection.
+When Rosenpass is enabled, the openZro client runs an embedded Rosenpass server that automatically rotates and applies
+WireGuard pre-shared keys to every point-to-point connection.
 <Note>
     openZro uses a [Golang implementation](https://github.com/cunicu/go-rosenpass) of the Rosenpass protocol by the [cunīcu](https://cunicu.li) project.
 </Note>
@@ -25,11 +25,19 @@ that automatically rotates and applies WireGuard pre-shared keys to every point-
     This is still an experimental feature, may contain bugs, and is not supported on mobile devices.
 </Note>
 
+<Note>
+    Rosenpass cannot be combined with lazy connections. When Rosenpass is enabled, the client connects to all peers at
+    startup even if lazy connections are turned on.
+</Note>
+
 ### Enabling via the system tray
 
 1. Click the openZro icon in the system tray.
 2. Go to **Settings**.
 3. Click **Enable Quantum-Resistance** to toggle the setting.
+
+To use permissive mode (see [below](#enable-permissive-mode)), open **Settings → Advanced Settings** and check
+**Enable Rosenpass permissive mode**.
 
 ### Enabling via the CLI
 
