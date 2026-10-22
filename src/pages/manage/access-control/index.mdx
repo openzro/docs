@@ -2,11 +2,11 @@
 openZro's access control system is built on Zero Trust security principles, ensuring that no device or user has access to network resources by default. Instead, access must be explicitly granted through carefully designed policies. This guide will help you understand how openZro's policy system works, clarify the important distinction between user groups and peer groups, and provide step-by-step instructions for implementing secure access control in your network.
 
 <p>
-    <img src="/docs-static/img/manage/access-control/update-policy.png" alt="openZro Policy Update" />
+    <img src="/docs-static/img/manage/access-control/create-rule.png" alt="openZro policy editor" />
 </p>
 
 <Note>
-    **NEW:** For a visual overview of your access policies and how peers, groups, and their relationships connect, check out the [**Control Center**](https://docs.openzro.io/manage/control-center) feature in openZro. The Control Center provides an interactive graph view that makes it easy to understand your network's access structure at a glance.
+    For a visual overview of how policies, peers and groups connect, see the [**Control Center**](/manage/control-center).
 </Note>
 
 ## Zero-Trust Principles and openZro
@@ -25,7 +25,7 @@ Zero-trust networking operates on the principle of "never trust, always verify."
     **TLDR:**  openZro automatically creates a Default policy that allows all devices to communicate with each other. While this helps with onboarding, the Default policy completely undermines zero-trust principles and should be removed once you create proper access control policies. Make sure to have replacement policies ready before deleting it, or all peer communication will stop.
 </Note>
 
-When you first create a openZro account, a **Default policy** is automatically created that allows all peers to communicate with each other using any protocol. This policy exists because early openZro users were confused and frustrated when their devices couldn't communicate—openZro's deny-by-default security model meant nothing worked without policies defined, and users thought the platform was broken. 
+When the first user logs in to a new openZro deployment, a **Default policy** is automatically created that allows all peers to communicate with each other using any protocol. It exists so that a new network works out of the box: with openZro's deny-by-default model, nothing would connect until policies were defined. Self-hosted deployments that don't want it can set `DisableDefaultPolicy: true` in `management.json`.
 
 <p>
     <img src="/docs-static/img/manage/access-control/all-all-policy.png" alt="openZro ALL to ALL" />
@@ -59,9 +59,11 @@ The distinction is based on **how groups are used and assigned**, not on any tec
 
 When a user signs into openZro on a device (such as a Windows computer using the desktop client or a smartphone using the mobile app), that device automatically receives all group memberships assigned to that user account. This typically happens manually on invite or through your Identity Provider (IdP) integration.
 
-1. **IdP Integration:** User groups are defined in your identity provider (such as Okta, Azure AD, Google Workspace, etc.)
-2. **Automatic Assignment:** When a user signs into openZro with SSO on their device, that device (peer) automatically inherits the user's group memberships
-3. **Dynamic Updates:** If a user's group membership changes in the IdP, their device's access permissions update accordingly
+1. **Groups from your IdP:** User groups can come from your identity provider, either from the groups claim of the
+   login token (JWT group propagation, under **Settings**) or through [IdP sync](/manage/team/idp-sync).
+2. **Automatic Assignment:** When a user signs in to openZro on a device, that device (peer) inherits the user's
+   auto-assigned groups
+3. **Updates:** When a user's groups change, their devices' group memberships and access follow
 
 **Methods for assigning user groups to peers:**
 
@@ -82,13 +84,13 @@ When a user signs into openZro on a device (such as a Windows computer using the
 **Peer groups** are groups that are assigned directly to infrastructure resources—servers, databases, network appliances, backup systems, and other non-user devices. These resources don't have users logging into them, so groups are assigned either through setup keys or manual assignment.
 
 <p>
-    <img src="/docs-static/img/manage/access-control/peer-groups.png" alt="openZro Peer Groups" />
+    <img src="/docs-static/img/manage/access-control/associate-peer-groups.png" alt="Assigned Groups on a peer" />
 </p>
 
 **How peer groups work:**
 
 1. **Manual Creation:** Groups are created explicitly in the openZro interface
-2. **Setup Key Assignment:** The most common method - when creating a setup key, you specify which groups should be [auto-assigned](https://docs.openzro.io/manage/peers/register-machines-using-setup-keys#peer-auto-grouping) to any peer that registers with that key
+2. **Setup Key Assignment:** The most common method - when creating a setup key, you specify which groups should be [auto-assigned](/manage/peers/register-machines-using-setup-keys#peer-auto-grouping) to any peer that registers with that key
 3. **Manual Assignment:** Administrators can also manually assign groups to specific infrastructure peers after they're connected
 
 **What are Setup Keys?**
@@ -149,7 +151,7 @@ This ensures that:
 
 - Users can reach the resources they need
 - Your policies clearly show the direction of access
-- Resources cannot initiate connections back to user devices (when using specific ports)
+- Resources cannot initiate connections back to user devices
 - It's easy to audit who has access to what
 
 **Example:**
@@ -214,17 +216,17 @@ In rare cases, such as callback mechanisms or notification systems, you might ne
 
 ## Policy Directionality
 
-Understanding policy directionality is essential for implementing Zero Trust access control. How policies behave depends on whether you're connecting to **peers** (devices running openZro) or **network resources** (internal systems accessed through routing peers).
+Understanding policy directionality is essential for implementing Zero Trust access control. How policies behave depends on whether you're connecting to **peers** (devices running openZro) or **network resources** (internal systems accessed through routing peers).
 
 <p>
-    <img src="/docs-static/img/manage/access-control/policy-direction.gif" alt="openZro Policy Direction" className="imagewrapper" />
+    <img src="/docs-static/img/manage/access-control/policy-direction.png" alt="Direction toggle in the policy editor" className="imagewrapper" />
 </p>
 
 ### Policies Between Peers
 
 When both source and destination are peers running the openZro agent, you have full control over directionality:
 
-**Unidirectional:** Traffic flows only from source to destination. In the openZro UI, this appears as a single arrow (→).
+**Unidirectional:** Traffic flows only from source to destination. In the policy editor, select the single arrow (→) in the direction toggle between **Source · From** and **Destination · To**.
 
 Example:
 
@@ -239,7 +241,7 @@ Direction: Source → Destination (unidirectional)
 
 App servers can initiate connections to database servers on port 5432, but database servers cannot initiate NEW connections back to app servers on that port. Return traffic for established connections is handled automatically by openZro's stateful firewall.
 
-**Bidirectional:** Both groups can initiate connections to each other. In the openZro UI, you can enable this by clicking the bidirectional arrows (⟷).
+**Bidirectional:** Both groups can initiate connections to each other. In the policy editor, select the two arrows (⟷) in the direction toggle.
 
 Example:
 
@@ -253,11 +255,11 @@ Direction: Bidirectional (both can initiate)
 
 All Kubernetes nodes can initiate connections to each other. This is useful for infrastructure components that need to coordinate.
 
-**Alternative approach for bidirectional (less common):** Instead of using the bidirectional toggle, you could create two separate policies with reversed source and destination. However, using the bidirectional toggle in a single policy is the recommended approach.
+**Alternative approach for bidirectional (less common):** Instead of using the bidirectional toggle, you could create two separate policies with reversed source and destination. However, using the bidirectional toggle in a single policy is the recommended approach.
 
 ### Policies to Network Resources
 
-**IMPORTANT:** When the destination is a **network resource** accessed through a routing peer (not a peer running openZro directly), policies are **ALWAYS unidirectional** and can ONLY flow from source to destination.
+**IMPORTANT:** When the destination is a **network resource** accessed through a routing peer (not a peer running openZro directly), policies are **ALWAYS unidirectional** and can ONLY flow from source to destination.
 
 Example:
 
@@ -278,9 +280,9 @@ Network resources don't have the openZro agent installed. They don't know the op
 Think of it this way:
 
 - ✅ Your laptop (openZro peer) → Routing peer → Office printer (network resource) = **Works**
-- ❌ Office printer (network resource) → Routing peer → Your laptop (openZro peer) = **Impossible** (printer doesn't know about openZro)
+- ❌ Office printer (network resource) → Routing peer → Your laptop (openZro peer) = **Impossible** (printer doesn't know about openZro)
 
-**UI Behavior:** When creating a policy where the destination is a network resource, the bidirectional toggle will either be disabled or attempting to enable it will have no effect, because bidirectional communication is not possible in this scenario.
+**UI Behavior:** When creating a policy where the destination is a network resource, the bidirectional toggle will either be disabled or attempting to enable it will have no effect, because bidirectional communication is not possible in this scenario.
 
 <Note>
 Policies to network resources control access to the network behind the routing peer, not the routing peer itself. To access services running on the routing peer, create a separate peer-to-peer policy with the routing peer's group as the destination. See [Routing Peers](/manage/networks#routing-peers) for more information.
@@ -288,18 +290,16 @@ Policies to network resources control access to the network behind the routing p
 
 ### Protocol-Specific Behavior
 
-Policy directionality also depends on the protocol selected:
+openZro applies the direction you choose to every protocol, including **ALL**, **ICMP**, and **TCP/UDP** without
+ports. A one-way policy only lets the source start connections; replies are always allowed.
 
-**Always Bidirectional (regardless of UI setting):**
+Ports can only be set for TCP and UDP. Leaving them empty allows every port.
 
-- **ALL protocol**: Both directions can always initiate connections
-- **ICMP**: Both directions can always initiate (for ping, etc.)
-- **TCP/UDP without specific ports**: Both directions can initiate connections
-
-**Can Be Unidirectional (when ports are specified):**
-
-- **TCP with specific ports**: Can be unidirectional (only source initiates on those ports)
-- **UDP with specific ports**: Can be unidirectional (only source initiates on those ports)
+<Note>
+    A one-way policy with protocol **ALL** is marked experimental in the editor. Reply traffic relies on connection
+    tracking, and traffic the destination starts on its own (SNMP traps, syslog push, unsolicited ICMP) is dropped.
+    Prefer TCP/UDP with explicit ports when you can.
+</Note>
 
 Example:
 
@@ -316,9 +316,9 @@ Even though this is unidirectional, return traffic (HTTPS responses) is automati
 
 ### Platform-Specific Implementation
 
-**Linux Platforms:** openZro integrates with native Linux firewall capabilities using connection tracking rules (`ct state established,related accept`). The kernel's connection tracking handles reply traffic automatically.
+**Linux Platforms:** In kernel mode, openZro integrates with native Linux firewall capabilities using connection tracking rules (`ct state established,related accept`). The kernel's connection tracking handles reply traffic automatically.
 
-**Non-Linux Platforms:** openZro implements a stateful firewall in userspace with a connection tracker that dynamically creates temporary rules for reply traffic:
+**Other platforms and Linux in userspace (netstack) mode:** openZro implements a stateful firewall in userspace with a connection tracker that dynamically creates temporary rules for reply traffic:
 
 - **TCP**: Full state machine tracking
 - **UDP/ICMP**: Session tracking using timeouts
@@ -355,6 +355,7 @@ Policy: Engineering Mesh (NOT RECOMMENDED)
 Source: engineering-mixed  (contains both user laptops and servers)
 Destination: engineering-mixed
 Protocol: ALL
+Direction: Bi-directional
 
 ```
 
@@ -373,8 +374,10 @@ Destination: kubernetes-clusters
 Protocol: TCP
 Ports: 6443, 8080-8090, 10250-10255
 Direction: One-way
-
 ```
+
+The dashboard accepts ports and ranges together. Through the API, a rule takes either `ports` or `port_ranges`, so
+send single ports as ranges (`6443-6443`) when you mix them.
 
 ### Pattern 2: Contractor Limited Access
 
@@ -387,7 +390,7 @@ Destination: contractor-resources
 Protocol: TCP
 Ports: 443, 22
 Direction: One-way
-Posture Checks: [openZro Latest Version]
+Posture Checks: [Minimum client version]
 
 ```
 
