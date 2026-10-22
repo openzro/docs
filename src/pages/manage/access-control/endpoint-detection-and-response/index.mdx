@@ -19,22 +19,38 @@ With the rise of remote work, endpoints often operate outside the traditional co
 making them more vulnerable to attacks. EDR provides a layer of security that is not dependent on the physical location
 of the endpoint, thus extending protection to remote workers and their devices.
 
-openZro integrates with major EDR and MDM platforms to restrict network access only to devices managed by the company's IT department.
-With the integration enabled, openZro synchronizes the list of devices managed by the MDM or EDR platform via the API and
-checks the presence of the MDM or EDR agent on the device, blocking access to the network if the agent is not installed or
-not compliant with the organization's security policies.
-
-openZro doesn't apply the MDM and EDR checks to all devices in the network. Instead, you can select specific groups of devices for
-the checks to apply.
+openZro integrates with major EDR and MDM platforms to restrict network access to devices managed by the company's IT
+department. For each peer it checks, openZro looks the device up by hostname in the vendor's API and caches the result
+for the provider's refresh interval (5 minutes by default). A peer that is not found, or that the vendor does not
+report as healthy, fails the check. If the vendor API cannot be reached, the check fails closed unless you allow it
+to fail open.
 
 <Note>
-    EDR / MDM posture checks ship in the BSD-3 management binary —
-    no licensing gate. The driver code lives at
-    [`management/server/mdm/`](https://github.com/openzro/openzro/tree/main/management/server/mdm),
-    one file per vendor (~150 lines each). New vendors are
-    welcome — see the [`Provider` interface](https://github.com/openzro/openzro/blob/main/management/server/mdm/provider.go)
-    for the contract.
+    EDR / MDM checks ship in the BSD-3 management binary, with no licensing gate. The driver code lives at
+    [`management/server/mdm/`](https://github.com/openzro/openzro/tree/main/management/server/mdm), one file per
+    vendor. New vendors are welcome — see the
+    [`Provider` interface](https://github.com/openzro/openzro/blob/main/management/server/mdm/provider.go) for the
+    contract.
 </Note>
+
+## How to enable it
+
+1. **Add the provider.** Go to **Integrations → MDM / EDR**, click **Add provider**, choose the type and enter the
+   vendor credentials described on its page below. Each provider has a **Refresh interval** (1–60 minutes, default 5)
+   that sets how long a device's status is cached.
+2. **Create a posture check.** Go to **Posture Checks**, create a check and add **Endpoint Security (MDM/EDR)**,
+   selecting the provider. Turn on **Fail open on lookup error** only if you prefer access over safety while the
+   vendor API is down.
+3. **Choose how to enforce it.** You can use one or both:
+   - **Per policy:** attach the posture check to [access control policies](/manage/access-control/manage-network-access).
+     A peer that fails it is removed from those policies' sources, so it loses access to their destinations but stays
+     connected. Which devices are checked follows the policies' source groups.
+   - **Account-wide:** add the posture check to [Device Admission](/manage/access-control/posture-checks/device-admission)
+     and enforce it. A failing device is refused at login and sync, and a connected one is disconnected within minutes.
+     Use exempt groups for routing peers and servers that are not enrolled in the MDM/EDR.
+
+Devices are matched by hostname: make sure each peer's hostname matches the name the vendor's agent reports. Intune
+also uses the user's email address; see its page for details.
 
 ## Supported EDR / MDM platforms
 
@@ -47,8 +63,8 @@ Tanium, Jamf Pro, and Kandji are on the
 [roadmap](https://github.com/openzro/openzro/blob/main/docs/ROADMAP.md)
 as P2.
 
-## Managing Exceptions
+## Managing exceptions
 
-In some cases, you may need to grant network access to devices that don't meet EDR compliance requirements. openZro provides a compliance bypass mechanism for these scenarios:
-
-* [Bypass Compliance for Non-Compliant Peers](/manage/access-control/endpoint-detection-and-response/bypass-compliance)
+When Device Admission refuses a device that needs access anyway, grant it a time-limited
+[admission bypass](/manage/access-control/posture-checks/device-admission#i-need-to-let-one-user-laptop-in-temporarily-break-glass).
+A bypass only skips the Device Admission gate; posture checks attached to policies still apply.
