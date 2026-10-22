@@ -11,7 +11,7 @@ Administrators then can assess whether the peer is eligible to join the network.
     Peer approval is implemented end-to-end in openZro — it is not a managed-cloud-only
     feature. The validator at
     [`management/integrations/integrations/validator.go`](https://github.com/openzro/openzro/blob/main/management/integrations/integrations/validator.go)
-    persists Pending / Approved / Rejected state on each peer and respects
+    keeps a pending flag on each peer and respects
     `ExtraSettings.IntegratedValidatorGroups` for selective enforcement (so service accounts
     or routing peers can be exempt from approval gating).
 </Note>
@@ -19,14 +19,15 @@ Administrators then can assess whether the peer is eligible to join the network.
 {/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="JRCZy4rLi-c" start={335} /> */}
 
 ## Enable peer approval
-To enable peer approval, navigate to `Settings` → `Authentication` in your openZro dashboard and toggle on **Peer approval**.
+To enable peer approval, navigate to `Settings` → `Authentication` in your openZro dashboard and turn on **Require peer approval** in the **Peer approval** card, then click **Save Changes**.
 
 <p>
     <img src="/docs-static/img/manage/peers/approve-peers/peer-approval-settings.png" alt="peer-approval-settings" className="imagewrapper-big"/>
 </p>
 
 <Note>
-    When disabling the peer approval, all pending approval requests will automatically be approved.
+    While peer approval is off, pending peers are not gated and get network access. Their pending flag is
+    kept, so turning approval back on holds them again until an admin approves them.
 </Note>
 
 ## Approve peer
@@ -49,10 +50,13 @@ update peers.
     API: `PUT /api/peers/{peerId}` with `"approval_required": false`.
 </Note>
 
-## Automate peer approval with EDR integrations
-openZro integrates with EDR providers (Microsoft Intune, SentinelOne, Huntress, CrowdStrike Falcon) to automate peer
-approval — devices that the EDR vendor reports as compliant can be auto-approved, and non-compliant ones stay pending.
-See [EDR integrations](/manage/access-control/endpoint-detection-and-response) for the full setup.
+## Combine with Device Admission
+Peer approval is a manual check. To check devices automatically, openZro integrates with EDR and MDM providers
+(Microsoft Intune, SentinelOne, Huntress, CrowdStrike Falcon) through
+[Device Admission](/manage/access-control/posture-checks/device-admission). Device Admission is a separate gate: a
+device the provider does not report as compliant is refused at enrollment, login and sync, rather than left pending.
+Both gates can be on at the same time; a new device then has to pass the EDR check and wait for an admin. See
+[EDR integrations](/manage/access-control/endpoint-detection-and-response) for the provider setup.
 
 ## Skip approval for internal groups
 
