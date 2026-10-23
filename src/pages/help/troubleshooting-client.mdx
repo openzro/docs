@@ -16,53 +16,56 @@ This will output the following information:
 
 ```shell
 Peers detail:
- server-a.openzro.cloud:
-  openZro IP: 100.75.232.118/32
+ server-a.openzro.selfhosted:
+  Openzro IP: 100.75.232.118/32
   Public key: kndklnsakldvnsld+XeRF4CLr/lcNF+DSdkd/t0nZHDqmE=
   Status: Connected
   -- detail --
   Connection type: P2P
-  Direct: true
   ICE candidate (Local/Remote): host/host
   ICE candidate endpoints (Local/Remote): 10.128.0.35:51820/10.128.0.54:51820
+  Relay server address: -
   Last connection update: 20 seconds ago
-  Last Wireguard handshake: 19 seconds ago
+  Last WireGuard handshake: 19 seconds ago
   Transfer status (received/sent) 6.1 KiB/20.6 KiB
   Quantum resistance: false
-  Routes: 10.0.0.0/24
+  Networks: 10.0.0.0/24
   Latency: 37.503682ms
 
- server-b.openzro.cloud:
-  openZro IP: 100.75.226.48/32
+ server-b.openzro.selfhosted:
+  Openzro IP: 100.75.226.48/32
   Public key: Mi6jtrK5Tokndklnsakldvnsld+XeRF4CLr/lcNF+DSdkd=
   Status: Connected
   -- detail --
   Connection type: Relayed
-  Direct: false
-  ICE candidate (Local/Remote): relay/host
-  ICE candidate endpoints (Local/Remote): 108.54.10.33:60434/10.128.0.12:51820
+  ICE candidate (Local/Remote): -/-
+  ICE candidate endpoints (Local/Remote): -/-
+  Relay server address: rels://openzro.example.com:443
   Last connection update: 20 seconds ago
-  Last Wireguard handshake: 18 seconds ago
+  Last WireGuard handshake: 18 seconds ago
   Transfer status (received/sent) 6.1 KiB/20.6 KiB
   Quantum resistance: false
-  Routes: -
+  Networks: -
   Latency: 37.503682ms
 
-OS: darwin/amd64
-Daemon version: 0.27.4
-CLI version: 0.27.4
-Management: Connected to https://api.openzro.io:443
-Signal: Connected to https://signal.openzro.io:443
+OS: linux/amd64
+Daemon version: 0.53.1
+CLI version: 0.53.1
+Profile: default
+Management: Connected to https://openzro.example.com:443
+Signal: Connected to https://openzro.example.com:443
 Relays:
-  [stun:turn.openzro.io:5555] is Available
-  [turns:turn.openzro.io:443?transport=tcp] is Available
+  [stun:openzro.example.com:3478] is Available
+  [rels://openzro.example.com:443] is Available
 Nameservers:
   [8.8.8.8:53, 8.8.4.4:53] for [.] is Available
-FQDN: maycons-mbp-2.openzro.cloud
-openZro IP: 100.75.143.239/16
+FQDN: laptop.openzro.selfhosted
+Openzro IP: 100.75.143.239/16
 Interface type: Kernel
 Quantum resistance: false
-Routes: -
+Lazy connection: false
+Networks: -
+Forwarding rules: 0
 Peers count: 2/2 Connected
 ```
 
@@ -72,16 +75,15 @@ the management server, or the signal server.
 
 As for Peers, the status will show the following information:
 
-* `Connection type`: P2P, Relayed, where relayed connections indicate a limitation in the network that prevents a direct
+* `Connection type`: P2P or Relayed. Relayed connections indicate a limitation in the network that prevents a direct
   connection between the peers.
-* `Direct`: true/false, where true indicates a direct connection between the peers without a local proxy. This case is
-  common when the local peer is allocating the relay connection.
-* `ICE candidate (Local/Remote)`: relay/host, where relay indicates that the local peer is using a relay connection and
-  host indicates that the remote peer is using a direct connection.
-* `Last Wireguard handshake`: Indicating the last time the Wireguard handshake was performed. Usually, this is performed
+* `ICE candidate (Local/Remote)`: the candidate types used on each side, for example `host`, `srflx` (address seen
+  through NAT) or `relay`.
+* `Relay server address`: the relay carrying the connection when it is relayed.
+* `Last WireGuard handshake`: the last time the WireGuard handshake was performed. Usually, this is performed
   every 2 minutes, and if you don\'t see an update here or if the value is empty, that indicates that the connection
   wasn\'t possible yet.
-* `Transfer status (received/sent)`: Indicating the amount of data received and sent by the peer. This is useful to
+* `Transfer status (received/sent)`: the amount of data received and sent by the peer. This is useful to
   check if the connection is being used.
 
 See more details about the status command [here](/get-started/cli#status).
@@ -89,7 +91,7 @@ See more details about the status command [here](/get-started/cli#status).
 ## Getting client logs
 
 By default, client logs are located in the `/var/log/openzro/client.log` file on macOS and Linux and in the
-`C:\ProgramData\openzro\client.log` file on Windows.
+`C:\ProgramData\Openzro\client.log` file on Windows.
 
 You can analyze the logs to identify the root cause of the problem. If you need help, open
 a [github issue](https://github.com/openzro/openzro/issues/new/choose) and attach the logs.
@@ -100,12 +102,12 @@ A debug archive containing the recent logs and the status at the time of executi
 command.
 
 Adding the `--anonymize (-A)` flag will anonymize the logs, removing sensitive information such as public IP addresses
-and domain
-names. In case you have tunneling issues, omitting the `--anonymize` flag might help our analysis.
-Adding the `--system-info (-S)` flag will add system information like network routes and interfaces
+and domain names. For tunneling issues, a bundle without `--anonymize` is easier to analyze; share it only with people
+you trust. System information like network routes and interfaces is included by default; use `--system-info=false` to
+leave it out.
 
 ```shell
-openzro debug bundle --anonymize --system-info
+openzro debug bundle --anonymize
 ```
 
 This will output the path of the generated file. The output file is owned by and can only be accessed by the user
@@ -118,74 +120,43 @@ To capture logs for a specific time period, you can use the `debug for` command.
 the specified time has elapsed.
 
 ```shell
-openzro debug for 5m --system-info
+openzro debug for 5m
 ```
 
 <Note>
   The flag `--anonymize (-A)` can be used to anonymize IP addresses and non-openzro.io domains in logs and status output when needed.
 </Note>
 
-To capture any issues arising during the `up` and `down` processes, this will set the log level to `TRACE` and bring
-openzro `up` and `down` up to a few times.
-After 5 minutes the openzro status will be restored to the previous state and the debug bundle will be generated.
+To capture issues arising during the `up` and `down` processes, the command sets the log level to `TRACE`, brings
+openzro `down` and `up` once, and waits for the given duration. Then it restores the previous state and log level and
+generates the debug bundle.
 
-### Debug bundle uploads
+### Sharing a debug bundle
 
-Since version `0.43.1`, you can share debug bundle with the openZro development team without local administrative
-privileges
-by using the `--upload-bundle (-U)` flag.
-It will securely generate and upload the debug bundle to our servers for access by the openZro development team. See
-examples below:
+Attach the bundle file to your [GitHub issue](https://github.com/openzro/openzro/issues/new/choose), or send it
+privately to whoever is helping you. openZro does not run a hosted upload service.
 
-Run debug for a specific time and upload the bundle:
+The client can also upload bundles to an upload server you run yourself. The server ships as the
+`ghcr.io/openzro/upload` image. Pass its URL with `--upload-bundle (-U)` and `--upload-bundle-url`:
 
 ```shell
-openzro debug for 1m --system-info --upload-bundle
+openzro debug bundle --upload-bundle --upload-bundle-url https://upload.example.com/upload-url
 ```
 
-To generate a bundle without restarting the client and then uploading:
+The command prints the local file path and an upload file key that identifies the bundle on your server.
 
-```shell
-openzro debug bundle --system-info --upload-bundle
-```
+### Debug bundles with the GUI
 
-This will output an `Upload file key`, which is effectively a random filename in our internal storage system
-and can be safely shared with us through public channels such as GitHub Issues or Slack.
-
-```shell
-openzro debug bundle --system-info --upload-bundle
-Local file:     
-/tmp/openzro.debug.2611377582.zip
-Upload file key:
-1234567890ab27fb37c88b3b4be7011e22aa2e5ca6f38ffa9c4481884941f726/12345678-90ab-cdef-1234-567890abcdef
-```
+To generate a bundle from the desktop client, open the tray menu and go to **Settings → Create Debug Bundle**.
 
 <Note>
-  The flag `--anonymize` can be used to anonymize IP addresses and non-openzro.io domains in logs and status output when needed.
+The wizard has **Upload bundle automatically after creation** checked by default, pointing at an upload service that
+does not exist. Uncheck it to only create the file, or replace the upload URL with your own upload server.
 </Note>
-### Debug bundle uploads with GUI
-Since version `0.43.2` users can upload their debug bundle via the GUI client.
 
-To generate a bundle via GUI, you can access the application then go to `Settings` > `Create Debug Bundle` and follow
-the wizard to upload the bundle:
-
-<p>
-    <img src="/docs-static/img/help/troubleshooting-client/ui-settings.png" alt="service-user-overview" className="imagewrapper-big"/>
-</p>
-<Note>
-  If needed, you can update the upload URL and select to anonymize sensitive information like IP addresses and non-openzro.io domains in logs and status output.
-</Note>
-<p>
-    <img src="/docs-static/img/help/troubleshooting-client/ui-bundle-wizard.png" alt="service-user-overview" className="imagewrapper-big"/>
-</p>
-By default running with trace log enable before generating the bundle is selected. This will restart the client connections and provide a `disconnect to connected` information for our engineers.
-
-If you uncheck this option, a bundle will be generated without running this step. Which is very useful when you have an
-issue that recovers when restarting the client.
-<p>
-    <img src="/docs-static/img/help/troubleshooting-client/ui-bundle-success.png" alt="service-user-overview" className="imagewrapper-big"/>
-</p>
-Once the bundle generation is complete, you can click on `Copy Key` to get the uploaded key and share with openZro\'s team.
+By default, the wizard runs the client with trace logging and restarts its connections before generating the bundle,
+which records the transition from disconnected to connected. Uncheck this option to generate the bundle right away,
+which is useful when the issue recovers when the client restarts.
 
 ### Debug bundles on remote machines
 
@@ -207,7 +178,7 @@ On Linux, the userspace packet filter is only active when the kernel firewall ba
 
 ### Advanced environment variables
 
-The client has environment variables for tuning routing, firewall behavior, ICE connectivity, and WireGuard mode. These can help work around edge cases (e.g. `NB_USE_LEGACY_ROUTING` for routing loop issues, `NB_WG_KERNEL_DISABLED` to force userspace WireGuard, `NB_SKIP_NFTABLES_CHECK` to fall back to iptables). See the full list at [Client Environment Variables](/client/environment-variables).
+The client has environment variables for tuning routing, firewall behavior, ICE connectivity, and WireGuard mode. These can help work around edge cases (e.g. `OZ_USE_LEGACY_ROUTING` for routing loop issues, `OZ_WG_KERNEL_DISABLED` to force userspace WireGuard, `OZ_SKIP_NFTABLES_CHECK` to fall back to iptables). See the full list at [Client Environment Variables](/client/environment-variables).
 
 ## Enabling debug logs on agent
 
@@ -240,7 +211,7 @@ You can add the following line to the file to enable debug logs:
 
 ```shell
 sudo mkdir -p /etc/sysconfig
-echo 'NB_LOG_LEVEL=debug' | sudo tee -a /etc/sysconfig/openzro
+echo 'OZ_LOG_LEVEL=debug' | sudo tee -a /etc/sysconfig/openzro
 sudo systemctl restart openzro
 ```
 
@@ -258,29 +229,18 @@ sudo openzro service start
 You need to run the following commands with an elevated PowerShell or `cmd.exe` window.
 
 ```powershell
-[Environment]::SetEnvironmentVariable("NB_LOG_LEVEL", "debug", "Machine")
+[Environment]::SetEnvironmentVariable("OZ_LOG_LEVEL", "debug", "Machine")
 openzro service restart
 ```
 
 ### On Docker
 
-You can set the environment variable `NB_LOG_LEVEL` to `debug` to enable debug logs.
+You can set the environment variable `OZ_LOG_LEVEL` to `debug` to enable debug logs.
 
 ```shell
 docker run --rm --name PEER_NAME --hostname PEER_NAME --cap-add=NET_ADMIN --cap-add=SYS_ADMIN --cap-add=SYS_RESOURCE -d \
--e NB_SETUP_KEY=<SETUP KEY> -e NB_LOG_LEVEL=debug -v openzro-client:/var/lib/openzro openzro/openzro:latest
-```
-
-### On Android
-
-Enable the ADB in the developer menu on the Android device.
-In the app set the the Trace log level setting - it is a checkbox in the advanced menu.
-With the ADB tool, you can get the logs from your device. The ADB is part of the SDK platform tools pack (zip file).
-You can download it from [here](https://developer.android.com/tools/releases/platform-tools).
-Please extract it and run the next command in the case of Linux:
-
-```shell
-sudo adb logcat -v time | grep GoLog
+-e OZ_SETUP_KEY=<SETUP KEY> -e OZ_MANAGEMENT_URL=https://<YOUR_OPENZRO_DOMAIN> -e OZ_LOG_LEVEL=debug \
+-v openzro-client:/var/lib/openzro ghcr.io/openzro/openzro:latest
 ```
 
 ## Running the agent in foreground mode
@@ -320,11 +280,11 @@ the agent on the next psexec run:
 Sometimes, you want to test openZro running on userspace mode instead of a kernel module. That can be a check to see if
 there is a problem with openZro's firewall management in kernel mode.
 
-You must run the agent in foreground mode and set the environment variable `NB_WG_KERNEL_DISABLED` to `true`.
+You must run the agent in foreground mode and set the environment variable `OZ_WG_KERNEL_DISABLED` to `true`.
 
 ```shell
 sudo openzro service stop
-sudo bash -c 'NB_WG_KERNEL_DISABLED=true openzro up -F'  > /tmp/openzro.log
+sudo bash -c 'OZ_WG_KERNEL_DISABLED=true openzro up -F'  > /tmp/openzro.log
 ```
 
 ## Debugging GRPC
@@ -347,17 +307,18 @@ set verbose logging for the the [Pion/ICE](https://github.com/pion/ice) library 
 
 ```shell {{ title: 'Environment variable' }}
 PIONS_LOG_DEBUG=all
-NB_LOG_LEVEL=debug
+OZ_LOG_LEVEL=debug
 ```
 
 ```shell
 sudo openzro service stop
-sudo bash -c 'PIONS_LOG_DEBUG=all NB_LOG_LEVEL=debug openzro up -F' > /tmp/openzro.log
+sudo bash -c 'PIONS_LOG_DEBUG=all OZ_LOG_LEVEL=debug openzro up -F' > /tmp/openzro.log
 ```
 
 ## Host-based firewall issues
 
-openZro automatically adds firewall rules on all platforms to allow traffic on the openZro interface (`wt0`). 
+openZro automatically adds firewall rules on all platforms to allow traffic on the openZro interface (`wt0` on Linux
+and Windows, `utun100` on macOS, unless changed with `--interface-name`). 
 However, conflicts can occur with other firewall management tools or security software.
 
 ### Symptoms
@@ -369,7 +330,8 @@ However, conflicts can occur with other firewall management tools or security so
 
 ### Understanding the issue
 
-openZro manages firewall rules directly via iptables/nftables (Linux/macOS) or Windows Firewall APIs. 
+openZro manages firewall rules directly via iptables/nftables on Linux or Windows Firewall APIs on Windows; on macOS it
+filters traffic in userspace. 
 When another tool also manages firewall rules, conflicts can occur:
 
 | Tool | Conflict Type |
@@ -476,7 +438,7 @@ masquerading), Windows Firewall may block incoming WireGuard P2P traffic because
 
 **Solution**: Add a firewall rule to allow inbound UDP for WireGuard P2P traffic, scoped to the openZro process:
 ```powershell
-New-NetFirewallRule -DisplayName "openZro P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\openZro\openzro.exe"
+New-NetFirewallRule -DisplayName "openZro P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\Openzro\openzro.exe"
 ```
 
 This rule:
@@ -515,7 +477,7 @@ If you suspect third-party software is blocking openZro:
 3. If it works, add an exception for the openZro process or the `wt0` interface
 
 The openZro process locations:
-- **Windows**: `C:\Program Files\openZro\openzro.exe`
+- **Windows**: `C:\Program Files\Openzro\openzro.exe`
 - **Linux**: `/usr/bin/openzro`
 - **macOS**: `/usr/local/bin/openzro`
 
@@ -559,15 +521,17 @@ Get-NetFirewallProfile
 | UFW (Linux) | `sudo ufw status` | `sudo ufw allow in on wt0` |
 | firewalld (Linux) | `sudo firewall-cmd --get-zone-of-interface=wt0` | `sudo firewall-cmd --permanent --zone=trusted --add-interface=wt0 && sudo firewall-cmd --reload` |
 | Windows | `Get-NetFirewallRule \| Where-Object { $_.DisplayName -like "*openZro*" }` | Check Group Policy or third-party software |
-| Windows (no NAT) | P2P shows as Relayed for local peers | `New-NetFirewallRule -DisplayName "openZro P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\openZro\openzro.exe"` |
+| Windows (no NAT) | P2P shows as Relayed for local peers | `New-NetFirewallRule -DisplayName "openZro P2P" -Direction Inbound -Action Allow -Protocol UDP -LocalPort 49152-65535 -Program "C:\Program Files\Openzro\openzro.exe"` |
 
 ## Client login failures
 
 A single machine can only connect to one openZro account as the same user/login method throughout the lifetime of
-the `config.json` file:
+its profile file. For the default profile, that is:
 
 - `/var/lib/openzro/default.json` for Linux/MacOS
-- `C:\ProgramData\openzro\default.json` for Windows
+- `C:\ProgramData\Openzro\default.json` for Windows
+
+Other profiles (see `openzro profile`) are stored in the user's configuration directory.
 
 You might get errors like below when trying to use Setup Key/different SSO user account during login:
 
@@ -578,17 +542,13 @@ You might get errors like below when trying to use Setup Key/different SSO user 
 2025-04-08T15:03:04+01:00 WARN client/server/server.go:267: failed login: rpc error: code = PermissionDenied desc = invalid user
 ```
 
-<Note>
-  Starting with the release `0.50.0` the `invalid user` message is more descriptive:
-  `peer is already registered by a different User or a Setup Key`
-</Note>
+Current versions describe the problem as `peer is already registered by a different User or a Setup Key`.
 
 
 The most notable examples of encountering the issue are:
 
 - a shared machine and/or machine previously logged in by somebody else,
 - a machine that was previously logged in using Setup Key, but now attempts SSO login,
-- the user makes a mistake and selects
 - the user uses different browser/profile or selects the wrong account during SSO login at the start of the workday,
 
 If you know the exact previous Peer which was logged in, you can just delete it from Dashboard without doing anything
@@ -598,7 +558,7 @@ Otherwise, to resolve the issue, you will need to remove the file manually to us
 Key while the openZro client daemon is stopped:
 
 1. `openzro service stop`
-2. `sudo rm /var/lib/openzro/default.json` (*nix) or `rm C:\ProgramData\openzro\config.json` (Windows)
+2. `sudo rm /var/lib/openzro/default.json` (*nix) or `rm C:\ProgramData\Openzro\default.json` (Windows)
 3. `openzro service start`
 
 ## Debugging access to network resources
@@ -724,8 +684,8 @@ You can confirm the _Policy_ is working by:
 
 1. logging in to `peer-a`,
 2. issuing `openzro status -d` command,
-3. finding `peer-b.openzro.cloud` under `Peers detail`,
-4. finding `10.123.45.0/24` or `10.123.45.17/32` under `peer-b.openzro.cloud`'s _Networks_ field,
+3. finding `peer-b.openzro.selfhosted` under `Peers detail`,
+4. finding `10.123.45.0/24` or `10.123.45.17/32` under `peer-b.openzro.selfhosted`'s _Networks_ field,
 
 In the most specific setup it should have at:
 
@@ -755,7 +715,7 @@ You can start by checking openZro client's configuration with `openzro status -d
 ```shell
 % openzro status -d                                                                                                                    
 Peers detail:
- brys-vm-nbt-ubuntu-isolated-01.openzro.cloud:
+ brys-vm-nbt-ubuntu-isolated-01.openzro.selfhosted:
 ...
   Status: Connected
   -- detail --
