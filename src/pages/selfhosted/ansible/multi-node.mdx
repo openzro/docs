@@ -1,4 +1,4 @@
-import {Note} from "../../../components/mdx";
+import {Note, Warning} from "../../../components/mdx";
 
 # Multi-node HA deployment with Ansible
 
@@ -9,6 +9,17 @@ for AWS or GCP.
 
 For the single-node lab walkthrough, see the
 [Quickstart](/selfhosted/ansible/quickstart).
+
+<Warning>
+**Run a single management host for now.** The roles configure a broker
+between management replicas when the `management` group has more than
+one host, but each host generates its own datastore encryption key and
+WireGuard identity, which replicas must share
+([openzro-ansible#7](https://github.com/openzro/openzro-ansible/issues/7)).
+The repository's own production inventory also ships a single
+management host. The relay tier and the load balancers work with
+several hosts.
+</Warning>
 
 ## Topology
 
@@ -48,28 +59,25 @@ hosts spread across regions for failover. Postgres is managed
 
 ## How relay HA works on bare-metal
 
-The Ansible flow uses a different HA model than the Kubernetes
-multi-pod fabric — worth knowing the trade-off before you commit:
+The roles give management a **single** relay address,
+`rel://<openzro_relay_public_address>:<openzro_relay_port>`. With
+`openzro_cloud` set to `aws` or `gcp`, that name points at the network
+load balancer in front of the `relay` hosts, which spreads client
+connections across them.
 
 | | Ansible (bare-metal) | Kubernetes (chart) |
 |---|---|---|
-| Multiple relays | N hosts in `relay` group | `relay.replicaCount > 1` |
-| Discovery | Static — clients learn all relays via `management.json`'s `Relay.Addresses[]` | Dynamic — Headless Service + DNS |
-| Forwarding between relays | ❌ Each relay is independent | ✅ Inter-pod TCP fabric (ADR-0014) with HMAC auth |
-| Two peers on different relays | Client opens connection to each relay it needs | Pod-to-pod forwarding handled transparently |
-| Load balancer | NLB distributes initial connections | Service `LoadBalancer` |
-| Failover when one relay drops | Client reconnects to next entry in the list (sub-second) | Same — TCP closes, peer reconnects |
+| Multiple relays | N hosts in the `relay` group behind one NLB address | `relay.replicaCount > 1` |
+| What clients see | One relay address | One or more addresses in `relay.addresses` |
+| Two peers on different relay hosts | Not forwarded between relays: both peers must reach the same relay process | Inter-pod fabric (ADR-0014) forwards between pods |
+| Failover when a relay host drops | The NLB health check removes it; clients reconnect to the same address and land on another host | Same, through the Service |
 
-For most deployments the Ansible model is enough — clients have
-the full list, peers reconnect quickly, sticky-session at the LB
-isn't needed. The K8s-only multi-pod fabric matters when you
-want **transparent** cross-relay forwarding without the client
-opening multiple connections; on bare-metal the cost is one
-extra connection per cross-relay peer-pair, which is usually
-invisible.
-
-The two paths target the same SLA at the user-visible level —
-peer connectivity. They differ in how that's delivered.
+Because relay hosts do not forward to each other, two peers that the
+NLB sends to different relay hosts cannot reach each other through the
+relay. For several relays in different regions, list each one in
+`Relay.Addresses` instead, as described in
+[Multi-Region Relays](/selfhosted/maintenance/scaling/multi-region-relays);
+the Ansible template does not render that list today.
 
 ## 1. Inventory
 
@@ -96,7 +104,8 @@ all:
         controller2: {}
     dashboard:
       hosts:
-        controller1: {}           # dashboard co-resident
+        controller1: {}           # dashboard + nginx co-resident
+        controller2: {}
     relay:
       hosts:
         relay-us-east:
@@ -110,6 +119,12 @@ all:
           aws_instance_id: i-0relay3
 ```
 
+nginx and TLS are installed on the hosts in the `dashboard` group, and
+nginx proxies management and signal on `127.0.0.1`, so every controller
+behind the load balancer needs to be in `management`, `signal` and
+`dashboard`. Set `ansible_host` on every management host: the role
+builds the broker peer list from it.
+
 The `aws_instance_id` (or `gcp_instance_name`) per host is what
 the `update.yml` rolling-update playbook uses to drain that host
 from the LB target pool before upgrading. Without it, the playbook
@@ -122,11 +137,14 @@ upgrades in-place — fine for the lab, not fine for production.
 ```yaml
 openzro_public_domain: "openzro.example.com"
 
+openzro_relay_public_address: "relay.{{ openzro_public_domain }}"
+openzro_relay_port: 33080
+openzro_relay_auth_secret: "{{ vault_relay_auth_secret }}"
+
 openzro_oidc_issuer: "https://idp.example.com"
 openzro_oidc_client_id: "openzro-dashboard"
 openzro_oidc_client_secret: "{{ vault_oidc_secret }}"
-
-openzro_admin_email: "ops@example.com"
+openzro_oidc_supported_scopes: "openid profile email groups"
 
 # Postgres is required for HA — SQLite breaks multi-controller writes.
 openzro_datastore_engine: "postgres"
@@ -138,19 +156,38 @@ openzro_postgres_dsn: >-
   dbname=openzro
   sslmode=require
 
-# Real cert via Let's Encrypt
-openzro_tls_mode: "letsencrypt-http01"
-openzro_self_signed_tls: false
+# Real cert via Let's Encrypt (certbot_http | certbot_dns | byo | self_signed)
+openzro_tls_mode: certbot_http
+openzro_tls_email: ops@example.com
 
-# Cluster coordinator (next section)
-openzro_cluster_backend: "embedded"
+# AWS load balancers (the aws_lb role checks these)
+openzro_cloud: aws
+aws_region: us-east-1
+aws_vpc_id: vpc-0123456789abcdef0
+aws_alb_subnets: [subnet-aaa, subnet-bbb]        # at least two
+aws_nlb_subnets: [subnet-aaa, subnet-bbb]        # at least two
+aws_controller_sg_id: sg-0controller
+aws_relay_sg_id: sg-0relay
+aws_controller_instance_ids: [i-0123456789abcdef0, i-0123456789abcdef1]
+aws_relay_instance_ids: [i-0relay1, i-0relay2, i-0relay3]
 ```
 
-`vault_*` values come from `ansible-vault` — encrypt the secrets:
+For GCP, set `openzro_cloud: gcp` and `gcp_project`; see the
+`gcp_lb` role defaults. The cluster coordinator defaults to
+`embedded` when there is more than one management host (next section).
+
+`vault_*` values come from `ansible-vault`. Put them in a file under
+`group_vars/all/` so every host loads them (a file named
+`group_vars/vault.yml` would only apply to a group called `vault`):
 
 ```bash
-ansible-vault create inventories/production/group_vars/vault.yml
+mkdir -p inventories/production/group_vars/all
+mv inventories/production/group_vars/all.yml inventories/production/group_vars/all/main.yml
+ansible-vault create inventories/production/group_vars/all/vault.yml
 ```
+
+Alternatively, encrypt single values inline with
+`ansible-vault encrypt_string`, as the repo's example does.
 
 ## 3. Cluster coordinator (HA management)
 
@@ -172,13 +209,19 @@ auto-derives the peer list from the inventory's `management`
 group — no manual config needed.
 
 **Firewall rule:** TCP/6222 between management hosts (or whatever
-`openzro_cluster_peer_port` is set to).
+`openzro_cluster_peer_port` is set to). On RHEL-family hosts the role
+opens it in firewalld when there is more than one management host;
+elsewhere, open it in your security groups.
 
-For external NATS / Redis (managed brokers, Elasticache /
-Memorystore), set the backend to `nats` or `redis` and configure
-`openzro_cluster_nats_url` / `openzro_cluster_redis_url`. The
-`openzro_nats_cluster` and `openzro_redis_cluster` roles only
-run when you want the broker on the controllers themselves.
+With `nats` or `redis`, management connects to
+`openzro_cluster_nats_url` or `openzro_cluster_redis_url`. `site.yml`
+also installs that broker on the management hosts with the
+`openzro_nats_cluster` or `openzro_redis_cluster` role; to use only an
+external managed broker, skip those plays.
+
+The management activity log stays in SQLite on each host: the roles do
+not set `OZ_ACTIVITY_EVENT_STORE_ENGINE`, so each controller keeps its
+own activity log.
 
 ## 4. Run site.yml (first install)
 
