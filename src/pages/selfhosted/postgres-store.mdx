@@ -4,66 +4,28 @@ PostgreSQL is recommended for production deployments. It supports concurrent acc
 
 ## Configuration
 
-### Combined setup (config.yaml)
-
-To use PostgreSQL, update your `config.yaml`:
-
-```yaml
-server:
-  store:
-    engine: "postgres"
-    dsn: "host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
-```
-
-You can also pass the DSN as an `OPENZRO_` environment variable on the `openzro-server` container in your `docker-compose.yml`:
-
-```yaml
-environment:
-  - OPENZRO_STORE_ENGINE_POSTGRES_DSN=host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>
-```
-
-Restart the server and confirm:
-```bash
-docker compose restart openzro-server
-docker compose logs openzro-server
-```
-You should see:
-```
-INFO management/server/store.go:109: using Postgres store engine
-```
-
-<Note>
-For a full list of available configuration options, see the [config.yaml.example](https://github.com/openzro/openzro/blob/main/combined/config.yaml.example) reference file.
-</Note>
-
-### Older multi-container setup (management.json)
-
-<Note>
-This section applies to deployments using the older multi-container architecture with separate `management`, `signal`, `relay`, and `coturn` containers. If you deployed using the [`getting-started.sh`](/selfhosted/selfhosted-quickstart) script, you are on the combined setup and should use the `config.yaml` instructions above. See the [migration guide](/selfhosted/migration/combined-container) to upgrade.
-</Note>
-
-To enable Postgres, add to your `setup.env`:
+Add the engine and the connection string to your `setup.env`:
 ```bash
 OPENZRO_STORE_CONFIG_ENGINE=postgres
+OPENZRO_STORE_ENGINE_POSTGRES_DSN="host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
 ```
-This sets the following in your `management.json`:
+
+Then re-run `./configure.sh`. It sets the engine in `management.json` and passes the DSN to the `management`
+container; it refuses to continue if the engine is `postgres` and the DSN is missing.
 ```json
 "StoreConfig": {
     "Engine": "postgres"
 }
 ```
 
-Create a `.env` file with the connection string:
+Restart the Management service and confirm:
 ```bash
-OPENZRO_STORE_ENGINE_POSTGRES_DSN="host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
+docker compose up -d management
+docker compose logs management
 ```
-
-Update `docker-compose.yml` to pass the config to the `management` container:
-```yaml
-environment:
-  - OPENZRO_STORE_ENGINE_POSTGRES_DSN=${OPENZRO_STORE_ENGINE_POSTGRES_DSN}
-env_file:
-  - .env
+You should see:
+```
+INFO management/server/store/store.go:360: using Postgres store engine
 ```
 
 <Note>
@@ -79,13 +41,6 @@ This migration process allows users to seamlessly transition between storage opt
 
 1. Backup your data store (`store.db` in `datadir` - default `/var/lib/openzro/`)
 
-For the combined setup:
-```bash
-mkdir backup
-docker compose cp -a openzro-server:/var/lib/openzro/. backup/
-```
-
-For the older multi-container setup:
 ```bash
 mkdir backup
 docker compose cp -a management:/var/lib/openzro/. backup/
@@ -103,7 +58,7 @@ pgloader --type sqlite backup/store.db "postgresql://<PG_USER>:<PG_PASSWORD>@<PG
 3. Resolve any compatibility issues that may arise due to the migration process.
 
 <Note>
-As of version 0.26.0, openZro used SQLite as its default database store. However, SQLite lacked support for cascading deletions,
+SQLite stores do not enforce cascading deletions,
 which means that related entries were not automatically removed when their parent entries were deleted.
  With the migration to PostgreSQL, foreign key constraints are enforced, including cascading deletes, to ensure referential integrity.
 </Note>
@@ -126,41 +81,18 @@ DELETE FROM name_server_groups WHERE name_server_groups.account_id NOT IN (SELEC
 DROP TABLE IF EXISTS rules;
 ```
 
-4. Enable Postgres in your configuration.
+4. Enable Postgres as described in [Configuration](#configuration): set `OPENZRO_STORE_CONFIG_ENGINE` and
+   `OPENZRO_STORE_ENGINE_POSTGRES_DSN` in `setup.env` and re-run `./configure.sh`.
 
-For the combined setup, update `config.yaml`:
-```yaml
-server:
-  store:
-    engine: "postgres"
-    dsn: "host=<PG_HOST> user=<PG_USER> password=<PG_PASSWORD> dbname=<PG_DB_NAME> port=<PG_PORT>"
-```
-
-For the older multi-container setup, update `management.json`:
-```json
-"StoreConfig": {
-    "Engine": "postgres"
-}
-```
-And pass the DSN via environment variable as described in the [older multi-container setup](#older-multi-container-setup-managementjson) section above.
-
-5. Restart the server and confirm:
-
-For the combined setup:
+5. Restart the Management service and confirm:
 ```bash
-docker compose restart openzro-server
-docker compose logs openzro-server
-```
-
-For the older multi-container setup:
-```bash
-docker compose restart management
+docker compose up -d management
 docker compose logs management
 ```
 
 You should see an entry similar to:
 ```
-INFO management/server/store.go:109: using Postgres store engine
+INFO management/server/store/store.go:360: using Postgres store engine
 ```
 
 ## Rollback to SQLite store
@@ -168,49 +100,27 @@ To rollback to the SQLite store, follow these steps:
 
 1. Restore `store.db` backup
 
-For the combined setup:
-```bash
-docker compose cp backup/. openzro-server:/var/lib/openzro/
-```
-
-For the older multi-container setup:
 ```bash
 docker compose cp backup/. management:/var/lib/openzro/
 ```
 
-2. Switch the store engine back to SQLite.
-
-For the combined setup, update `config.yaml`:
-```yaml
-server:
-  store:
-    engine: "sqlite"
-```
-
-For the older multi-container setup, update `management.json`:
+2. Switch the store engine back to SQLite: set `OPENZRO_STORE_CONFIG_ENGINE=sqlite` in `setup.env` and re-run
+   `./configure.sh`, so `management.json` contains:
 ```json
 "StoreConfig": {
     "Engine": "sqlite"
 }
 ```
 
-3. Restart the server and confirm:
-
-For the combined setup:
+3. Restart the Management service and confirm:
 ```bash
-docker compose restart openzro-server
-docker compose logs openzro-server
-```
-
-For the older multi-container setup:
-```bash
-docker compose restart management
+docker compose up -d management
 docker compose logs management
 ```
 
 You should see an entry similar to:
 ```
-INFO management/server/store.go:109: using SQLite file store engine
+INFO management/server/store/store.go:357: using SQLite store engine
 ```
 
 ## Optional Rollback Postgres data to SQLite
@@ -234,29 +144,23 @@ sed \
 -e "s/'true'/1/g" \
 -e "s/'false'/0/g" \
 -e 's/public\.//' \
--e '/^[[:space:]]*SELECT/d' data.sql > data.sql
+-e '/^[[:space:]]*SELECT/d' data.sql > data_sqlite.sql
 ```
 
 3. Generate database schema from SQLite backup
 ```bash
 sqlite3 backup/store.db '.schema' > schema.sql
-````
+```
 
 4. Create SQLite database with Postgres exported data
 ```bash
-sqlite3 store.db '.read schema.sql' && sqlite3 store.db '.read data.sql'
+sqlite3 store.db '.read schema.sql' && sqlite3 store.db '.read data_sqlite.sql'
 ```
 
 5. Copy db to the container
 
-For the combined setup:
-```bash
-docker compose cp store.db openzro-server:/var/lib/openzro/store.db
-```
-
-For the older multi-container setup:
 ```bash
 docker compose cp store.db management:/var/lib/openzro/store.db
 ```
 
-6. Switch the store engine back to SQLite using the instructions in the [Rollback to SQLite store](#rollback-to-sqlite-store) section above.
+6. Switch the store engine back to SQLite using the instructions in the [Rollback to SQLite store](#rollback-to-sq-lite-store) section above.

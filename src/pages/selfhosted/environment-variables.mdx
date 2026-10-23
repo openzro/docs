@@ -2,116 +2,124 @@ import {Note} from "@/components/mdx";
 
 # Environment Variables Configuration
 
-This page provides a comprehensive reference for all environment variables available when self-hosting openZro. Environment variables allow you to configure the Management Server, Signal Server, Relay Server (including the embedded STUN server), and Dashboard services.
+A self-hosted openZro deployment is configured in two places:
 
-<Note>
-Environment variables set in your `setup.env` file are used by the `configure.sh` script to generate the final configuration files. Changes to `setup.env` require re-running `./configure.sh` to take effect.
-</Note>
+- **`setup.env`**, read by `configure.sh` when it renders `docker-compose.yml`, `management.json`,
+  `dex.config.yaml` and `turnserver.conf`. Changes take effect only after you re-run `./configure.sh`.
+- **Runtime environment variables** on the containers, read by the services when they start. Set them in the
+  `environment` section of a service in `docker-compose.yml`. The generated file passes only a few of them, so add the
+  others yourself, and add them again after re-running `configure.sh`.
 
-## Overview
+For the generated files, see [Configuration Files](/selfhosted/configuration-files).
 
-openZro uses two types of environment variables:
+## setup.env
 
-1. **Setup Variables** (`OPENZRO_` prefix) - Used in docker-compose templates and `setup.env` for initial configuration
-2. **Runtime Variables** (`OZ_` prefix) - Can override CLI flags at runtime using the pattern `--flag-name` → `OZ_FLAG_NAME`
+`setup.env.example` lists every variable with comments. The main ones:
 
-## Core Setup Variables
-
-These variables are set in your `setup.env` file before running the configuration script.
-
-### Domain and Network
-
-| Variable | Description | Example |
-|----------|-------------|---------|
-| `OPENZRO_DOMAIN` | Your openZro domain name | `openzro.example.com` |
-| `OPENZRO_LETSENCRYPT_EMAIL` | Email for Let's Encrypt certificates | `admin@example.com` |
-| `OPENZRO_DISABLE_LETSENCRYPT` | Disable automatic Let's Encrypt | `true` |
-
-### Port Configuration
+### Domain and certificates
 
 | Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENZRO_MGMT_API_PORT` | `33073` | Management API port |
-| `OPENZRO_SIGNAL_PORT` | `10000` | Signal server port |
-| `OPENZRO_RELAY_PORT` | `33080` | Relay server port |
-| `NGINX_SSL_PORT` | `443` | Dashboard HTTPS port |
+|---|---|---|
+| `OPENZRO_DOMAIN` | – | Public domain of the deployment, e.g. `openzro.example.com`. |
+| `OPENZRO_LETSENCRYPT_EMAIL` | – | Email for Let's Encrypt; the dashboard container obtains the certificate. |
+| `OPENZRO_DISABLE_LETSENCRYPT` | `false` | Set `true` when a reverse proxy terminates TLS. See [External Reverse Proxy](/selfhosted/external-reverse-proxy). |
 
-### STUN Configuration
-
-<Note>
-The default quickstart deployment uses the relay service's embedded STUN server. The variables below configure STUN functionality within the relay container via `relay.env`.
-</Note>
+### Ports and endpoints
 
 | Variable | Default | Description |
-|----------|---------|-------------|
-| `OZ_ENABLE_STUN` | `true` | Enable embedded STUN server in relay |
-| `OZ_STUN_PORTS` | `3478` | STUN server UDP ports |
-| `OZ_STUN_LOG_LEVEL` | `info` | STUN server log level |
+|---|---|---|
+| `OPENZRO_MGMT_API_PORT` | `33073` | Public port of the management API and gRPC. |
+| `OPENZRO_SIGNAL_PORT` | `10000` | Public port of signal. |
+| `OPENZRO_RELAY_PORT` | `33080` | Port the relay listens on and announces. |
+| `OPENZRO_RELAY_DOMAIN` | `OPENZRO_DOMAIN` | Domain announced for the relay. |
+| `OPENZRO_RELAY_ENDPOINT` | `rel://<relay domain>:<relay port>` | Relay address handed to clients. |
+| `OPENZRO_TURN_DOMAIN` | `OPENZRO_DOMAIN` | Domain of the Coturn server handed to clients. |
+| `OPENZRO_TURN_EXTERNAL_IP` | discovered | Public IP Coturn announces. `configure.sh` looks it up if empty. |
+| `TURN_MIN_PORT`, `TURN_MAX_PORT` | `49152`, `65535` | Coturn relay port range. |
 
-## Management Server Variables
-
-### Database Configuration
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENZRO_STORE_CONFIG_ENGINE` | `sqlite` | Store engine: `sqlite`, `postgres`, or `mysql` |
-| `OPENZRO_STORE_ENGINE_POSTGRES_DSN` | - | PostgreSQL connection string |
-| `OPENZRO_STORE_ENGINE_MYSQL_DSN` | - | MySQL connection string |
-| `OPENZRO_DATASTORE_ENC_KEY` | Auto-generated | Encryption key for sensitive data |
-
-<Note>
-See [Management Postgres Store](/selfhosted/postgres-store) for PostgreSQL setup details.
-</Note>
-
-### Single Account Mode
+### Management
 
 | Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENZRO_MGMT_SINGLE_ACCOUNT_MODE_DOMAIN` | - | Domain for single account mode |
+|---|---|---|
+| `OPENZRO_STORE_CONFIG_ENGINE` | `sqlite` | `sqlite`, `postgres` or `mysql`. |
+| `OPENZRO_STORE_ENGINE_POSTGRES_DSN` | – | PostgreSQL DSN; required with `postgres`. |
+| `OPENZRO_STORE_ENGINE_MYSQL_DSN` | – | MySQL DSN, e.g. `user:password@tcp(host:3306)/openzro`; required with `mysql`. |
+| `OPENZRO_MGMT_SINGLE_ACCOUNT_MODE_DOMAIN` | `OPENZRO_DOMAIN` | All users join one account under this domain. |
+| `OPENZRO_MGMT_DNS_DOMAIN` | `openzro.selfhosted` | DNS domain for peer names. |
+| `OPENZRO_MGMT_DISABLE_DEFAULT_POLICY` | `false` | Do not create the all-to-all `Default` policy. |
+| `OPENZRO_MGMT_IDP_SIGNKEY_REFRESH` | `false` | Refresh the IdP signing keys when they expire. |
+| `OPENZRO_DISABLE_ANONYMOUS_METRICS` | `false` | Disable anonymous usage metrics. |
 
-<Note>
-openZro runs in single account mode by default since v0.10.1. All users joining your self-hosted instance will be part of the same account/network.
-</Note>
+### Identity provider
 
-### Relay Configuration
+With the embedded Dex (the default), `configure.sh` fills in the `OPENZRO_AUTH_*` endpoints itself.
 
 | Variable | Description |
-|----------|-------------|
-| `OPENZRO_RELAY_ENDPOINT` | Relay server endpoint URL |
-| `OPENZRO_RELAY_AUTH_SECRET` | Shared authentication secret for relay |
+|---|---|
+| `OPENZRO_DEX_ADMIN_EMAIL` | Email of the bootstrap admin. |
+| `OPENZRO_DEX_ADMIN_PASSWORD_BCRYPT` | Bcrypt hash of the admin password. If empty, `configure.sh` generates a password and prints it once. |
+| `OPENZRO_DEX_TAG` | Dex image tag. |
 
-### Signal Configuration
-
-| Variable | Description |
-|----------|-------------|
-| `OPENZRO_SIGNAL_PROTOCOL` | Protocol: `http` or `https` |
-
-### DNS Configuration
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENZRO_MGMT_DNS_DOMAIN` | `openzro.selfhosted` | DNS domain for peer resolution |
-
-### TLS/Certificates
+For an [external IdP](/selfhosted/identity-providers), set at least:
 
 | Variable | Description |
-|----------|-------------|
-| `OPENZRO_MGMT_API_CERT_FILE` | Path to TLS certificate file |
-| `OPENZRO_MGMT_API_CERT_KEY_FILE` | Path to TLS certificate key file |
+|---|---|
+| `OPENZRO_AUTH_OIDC_CONFIGURATION_ENDPOINT` | The IdP's discovery URL. Setting it switches `configure.sh` to the external IdP. |
+| `OPENZRO_AUTH_CLIENT_ID`, `OPENZRO_AUTH_CLIENT_SECRET` | The OIDC client for the dashboard and clients. |
+| `OPENZRO_AUTH_AUDIENCE` | Expected token audience. |
+| `OPENZRO_AUTH_SUPPORTED_SCOPES` | Scopes to request, e.g. `openid profile email offline_access`. Required; the dashboard refuses to start without it. |
+| `OPENZRO_AUTH_USER_ID_CLAIM` | Claim used as the user ID (default `sub`). |
+| `OPENZRO_AUTH_DEVICE_AUTH_PROVIDER`, `OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID` | Device-code login for clients without a browser. |
+| `OPENZRO_MGMT_IDP`, `OPENZRO_IDP_MGMT_CLIENT_ID`, `OPENZRO_IDP_MGMT_CLIENT_SECRET` | Optional API access to the IdP, to show user names and emails. |
 
-### Dashboard URL
+### Image tags
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENZRO_DASHBOARD_URL` | - | Public URL of the dashboard, used in the links clients open for [2FA on device sign-in](/manage/settings/multi-factor-authentication#configure-the-dashboard-url). Overrides `HttpConfig.DashboardURL`. Must be `https://`; `http://` only for `localhost` or a loopback address. When unset, clients use the management server's host. |
+`OPENZRO_DASHBOARD_TAG`, `OPENZRO_SIGNAL_TAG`, `OPENZRO_RELAY_TAG`, `OPENZRO_MANAGEMENT_TAG` and `COTURN_TAG` pin the images.
 
-### Metrics and Analytics
+## Management runtime variables
 
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `OPENZRO_DISABLE_ANONYMOUS_METRICS` | `false` | Disable anonymous usage metrics |
+The management binary takes its settings from `management.json` and its command-line flags. It does not map
+`OZ_`-prefixed variables to flags. These variables are read directly:
 
-### Flow Archive (cold storage)
+### Storage and identity
+
+| Variable | Description |
+|---|---|
+| `OPENZRO_STORE_ENGINE_POSTGRES_DSN`, `OPENZRO_STORE_ENGINE_MYSQL_DSN` | DSN of the management store (passed by the generated compose file). |
+| `OZ_ACTIVITY_EVENT_STORE_ENGINE` | Activity log store: `sqlite` (default), `postgres` or `mysql`. |
+| `OZ_ACTIVITY_EVENT_POSTGRES_DSN`, `OZ_ACTIVITY_EVENT_MYSQL_DSN` | DSN of the activity log store. |
+| `OZ_SQL_MAX_OPEN_CONNS` | Maximum open database connections. |
+| `OZ_EVENT_ACTIVITY_LOG_ENABLED` | Set `false` to stop recording the activity log (default on). |
+| `OPENZRO_MGMT_WG_PRIVATE_KEY` | Management's WireGuard identity; several replicas must share it. Overrides `WgPrivateKey`. |
+| `OPENZRO_DASHBOARD_URL` | Public dashboard URL, used in links such as [2FA on device sign-in](/manage/settings/multi-factor-authentication). |
+
+### Embedded Dex
+
+Passed by the generated compose file.
+
+| Variable | Description |
+|---|---|
+| `OPENZRO_DEX_GRPC_ADDR` | Dex gRPC API, `dex:5557`. |
+| `OPENZRO_DEX_GRPC_CA_CERT`, `OPENZRO_DEX_GRPC_CLIENT_CERT`, `OPENZRO_DEX_GRPC_CLIENT_KEY` | mTLS certificates from `grpc-certs/`. |
+| `OPENZRO_DEX_GRPC_INSECURE` | Connect without TLS (development only). |
+| `OPENZRO_SCIM_LOCAL_USERS_ENABLED` | Allow SCIM to create local Dex users. |
+
+### Several management replicas
+
+| Variable | Description |
+|---|---|
+| `OPENZRO_BROKER`, `OPENZRO_REDIS_URL`, `OPENZRO_NATS_URL`, `OPENZRO_CLUSTER_PEERS` | Shared broker that replicas use to coordinate. See [High availability](/selfhosted/kubernetes/high-availability). |
+| `OZ_IDP_CACHE_REDIS_ADDRESS` | Redis URL for a shared IdP user cache. |
+
+### Activity streaming and traffic events
+
+| Prefix | Description |
+|---|---|
+| `OPENZRO_ACTIVITY_EXPORT_*` | Stream the audit log. See [Event streaming](/manage/activity/event-streaming). |
+| `OPENZRO_FLOW_STORE_ENGINE`, `OPENZRO_FLOW_STORE_DSN`, `OPENZRO_FLOW_RETENTION` | Store traffic events. See [Flow Events Store](/selfhosted/flow-events-store). |
+| `OPENZRO_FLOW_EXPORT_*` | Export traffic events to Elasticsearch, Datadog or HTTP. |
+
+### Flow archive (cold storage)
 
 Written by the management server's archive sink and read back by the
 dashboard's network-traffic view. Full guides:
@@ -164,176 +172,60 @@ cold query needs more compaction.
 | `OPENZRO_FLOW_ARCHIVE_THREADS` | DuckDB worker threads. |
 | `OPENZRO_FLOW_ARCHIVE_MAX_CONCURRENT_QUERIES` | Archive queries served at once. |
 
-## Runtime Environment Variables (OZ_ prefix)
-
-These variables can override CLI flags at runtime. The naming convention is `OZ_<FLAG_NAME>` where the flag name is uppercased and hyphens are replaced with underscores.
-
-### Management Server Runtime
-
-| Variable | Description |
-|----------|-------------|
-| `OZ_PORT` | Server port (overrides `--port`) |
-| `OZ_DATADIR` | Data directory (overrides `--datadir`) |
-| `OZ_CONFIG` | Config file path (overrides `--config`) |
-| `OZ_LOG_LEVEL` | Log level: `debug`, `info`, `warn`, `error` |
-| `OZ_LOG_FILE` | Log file path |
-| `OZ_METRICS_PORT` | Prometheus metrics port |
-| `OZ_LETSENCRYPT_DOMAIN` | Let's Encrypt domain |
-| `OZ_CERT_FILE` | TLS certificate file |
-| `OZ_CERT_KEY` | TLS certificate key file |
-| `OZ_DNS_DOMAIN` | DNS domain for peers |
-| `OZ_DISABLE_GEOLITE_UPDATE` | Disable GeoLite database updates |
-
-### Advanced Runtime Variables
-
-| Variable | Description |
-|----------|-------------|
-| `OZ_EVENT_ACTIVITY_LOG_ENABLED` | Enable activity log events |
-| `OZ_GET_ACCOUNT_BUFFER_INTERVAL` | Account buffer interval duration |
-| `OZ_SQL_MAX_OPEN_CONNS` | Maximum SQL database connections |
-| `OZ_STORE_TRANSACTION_TIMEOUT` | Store transaction timeout |
-| `OZ_API_RATE_LIMITING_ENABLED` | Enable API rate limiting |
-| `OZ_API_RATE_LIMITING_RPM` | Rate limit requests per minute |
-| `OZ_API_RATE_LIMITING_BURST` | Rate limit burst size |
-| `OPENZRO_METRICS_INTERVAL_IN_SECONDS` | Metrics push interval |
-
-## Signal Server Variables
-
-### Runtime Variables
-
-| Variable | Description |
-|----------|-------------|
-| `OZ_PORT` | Signal server port |
-| `OZ_METRICS_PORT` | Prometheus metrics port |
-| `OZ_SSL_DIR` | SSL certificates directory |
-| `OZ_LETSENCRYPT_DOMAIN` | Let's Encrypt domain |
-| `OZ_CERT_FILE` | TLS certificate file |
-| `OZ_CERT_KEY` | TLS certificate key file |
-| `OZ_LOG_LEVEL` | Log level |
-| `OZ_LOG_FILE` | Log file path |
-
-## Relay Server Variables
-
-### Setup Variables
-
-| Variable | Description |
-|----------|-------------|
-| `OPENZRO_RELAY_TAG` | Docker image tag |
-| `OPENZRO_RELAY_PORT` | Relay port (default: 33080) |
-| `OPENZRO_RELAY_ENDPOINT` | Relay endpoint address |
-| `OPENZRO_RELAY_AUTH_SECRET` | Authentication secret |
-| `OPENZRO_RELAY_DOMAIN` | Relay server domain |
-
-### Runtime Variables
+### Tuning
 
 | Variable | Default | Description |
-|----------|---------|-------------|
-| `OZ_LOG_LEVEL` | `info` | Log level |
-| `OZ_LISTEN_ADDRESS` | `:443` | Listen address |
-| `OZ_EXPOSED_ADDRESS` | - | Exposed address for peers |
-| `OZ_AUTH_SECRET` | - | Authentication secret |
-| `OZ_METRICS_PORT` | - | Prometheus metrics port |
-| `OZ_TLS_CERT_FILE` | - | TLS certificate file |
-| `OZ_TLS_KEY_FILE` | - | TLS key file |
-| `OZ_LETSENCRYPT_DATA_DIR` | - | Let's Encrypt data directory |
-| `OZ_LETSENCRYPT_DOMAINS` | - | Let's Encrypt domains |
-| `OZ_LETSENCRYPT_EMAIL` | - | Let's Encrypt email |
-| `OZ_HEALTH_LISTEN_ADDRESS` | - | Health check listen address |
-| `OZ_ENABLE_STUN` | `false` | Enable embedded STUN server |
-| `OZ_STUN_PORTS` | `3478` | STUN server UDP ports (comma-separated) |
-| `OZ_STUN_LOG_LEVEL` | `info` | STUN server log level |
+|---|---|---|
+| `OPENZRO_ADMISSION_REVALIDATE_INTERVAL_SECONDS` | `60` | How often [Device Admission](/manage/access-control/posture-checks/device-admission) re-checks connected peers. |
+| `OPENZRO_ADMISSION_BYPASS_SWEEP_INTERVAL_SECONDS` | `3600` | How often expired admission bypasses are cleaned up. |
+| `OPENZRO_PEER_UPDATE_CHANNEL_BUFFER_SIZE` | `1000` | Queued network-map updates per peer before updates are dropped. |
+| `OPENZRO_PEER_UPDATE_FANOUT_CONCURRENCY` | `64` | Peers updated in parallel when the network changes. |
+| `OPENZRO_PEER_STREAM_RECONCILE_INTERVAL_SECONDS` | – | How often each replica reconciles its client streams with the stored peer state. |
+| `OZ_GET_ACCOUNT_BUFFER_INTERVAL` | – | Window for batching account reads (Go duration). |
+| `OPENZRO_METRICS_INTERVAL_IN_SECONDS` | – | Interval of the anonymous metrics push. |
 
-## Dashboard Variables
+## Relay runtime variables
 
-| Variable | Description |
-|----------|-------------|
-| `OPENZRO_MGMT_API_ENDPOINT` | Management API endpoint URL |
-| `OPENZRO_MGMT_GRPC_API_ENDPOINT` | Management gRPC endpoint |
-| `LETSENCRYPT_DOMAIN` | Let's Encrypt domain (set to `none` if using own certs) |
-| `LETSENCRYPT_EMAIL` | Let's Encrypt email |
-
-<Note>
-Dashboard authentication is automatically configured when using the embedded identity provider. The dashboard connects to the management server's built-in OAuth2 endpoints.
-</Note>
-
-## Coturn (TURN Server) Variables (Legacy)
-
-<Note>
-The default quickstart deployment no longer uses a separate Coturn container. STUN functionality is now embedded in the relay service. The variables below are only relevant for legacy deployments or advanced configurations that still use Coturn.
-</Note>
-
-Coturn configuration is generated from templates using these variables:
+The relay maps every flag to an `OZ_` variable (`--listen-address` → `OZ_LISTEN_ADDRESS`).
 
 | Variable | Default | Description |
-|----------|---------|-------------|
-| `TURN_DOMAIN` | - | TURN server domain |
-| `TURN_USER` | - | TURN username |
-| `TURN_PASSWORD` | - | TURN password |
-| `TURN_MIN_PORT` | `49152` | Minimum relay port |
-| `TURN_MAX_PORT` | `65535` | Maximum relay port |
-| `TURN_EXTERNAL_IP_CONFIG` | - | External IP configuration |
+|---|---|---|
+| `OZ_LISTEN_ADDRESS` | `:443` | Listen address. The generated compose file sets `:$OPENZRO_RELAY_PORT`. |
+| `OZ_EXPOSED_ADDRESS` | – | Address announced to clients, e.g. `rels://relay.example.com:443/relay`. |
+| `OZ_AUTH_SECRET` | – | Shared secret; must match `Relay.Secret` in `management.json`. |
+| `OZ_METRICS_PORT` | `9090` | Prometheus metrics port. |
+| `OZ_TLS_CERT_FILE`, `OZ_TLS_KEY_FILE` | – | TLS certificate. With TLS, the relay also accepts QUIC. |
+| `OZ_LETSENCRYPT_DOMAINS`, `OZ_LETSENCRYPT_EMAIL`, `OZ_LETSENCRYPT_DATA_DIR` | – | Obtain a certificate from Let's Encrypt. |
+| `OZ_LETSENCRYPT_AWS_ROUTE53` | `false` | Use the Route 53 DNS challenge. |
+| `OZ_LOG_LEVEL`, `OZ_LOG_FILE` | `info`, `console` | Logging. |
+| `OZ_CLUSTER_HEADLESS`, `OZ_CLUSTER_PORT`, `OZ_POD_IP`, `OZ_CLUSTER_AUTH_SECRET`, `OZ_CLUSTER_LOOKUP_TIMEOUT` | – | Multi-pod relay on Kubernetes ([ADR-0014](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md)). |
 
-The Coturn service uses static ports: `3478` (STUN/TURN) and `5349` (TLS TURN).
+## Signal runtime variables
 
-## Configuration Examples
+Signal reads `OZ_PORT` (its listen port) from the environment. Its other settings are command-line flags. With
+several signal replicas, set the same `OPENZRO_BROKER` / `OPENZRO_REDIS_URL` / `OPENZRO_NATS_URL` as management.
 
-### Basic Setup
+## All services
 
-```bash
-# setup.env
-OPENZRO_DOMAIN="openzro.example.com"
-OPENZRO_LETSENCRYPT_EMAIL="admin@example.com"
-```
+| Variable | Description |
+|---|---|
+| `OZ_LOG_FORMAT` | Log format: `json`, `syslog`, or text (default). |
+| `OZ_LOG_MAX_SIZE_MB` | Log file size in MB before rotation (default 15). |
 
-### PostgreSQL Database
+## Dashboard
 
-```bash
-# setup.env
-OPENZRO_STORE_CONFIG_ENGINE="postgres"
-OPENZRO_STORE_ENGINE_POSTGRES_DSN="postgres://user:password@localhost:5432/openzro?sslmode=disable"
-```
+The dashboard container gets its settings from the compose file, rendered from `setup.env`: the `AUTH_*` OIDC
+settings, `OPENZRO_MGMT_API_ENDPOINT` and `OPENZRO_MGMT_GRPC_API_ENDPOINT`, and `LETSENCRYPT_DOMAIN` /
+`LETSENCRYPT_EMAIL` for its certbot. You can add `AUTH_EXTRA_OIDC_DOMAINS` to list additional domains the login flow may call.
 
-### Custom Ports (Behind Reverse Proxy)
+## Coturn
 
-```bash
-# setup.env
-OPENZRO_DOMAIN="openzro.example.com"
-OPENZRO_DISABLE_LETSENCRYPT="true"
-OPENZRO_MGMT_API_PORT="443"
-OPENZRO_SIGNAL_PORT="443"
-```
+Coturn is configured through `turnserver.conf`, rendered from `TURN_USER`, `TURN_PASSWORD` (generated),
+`TURN_MIN_PORT`, `TURN_MAX_PORT` and `OPENZRO_TURN_EXTERNAL_IP`. It listens on UDP 3478, TLS 5349 and the relay port
+range on the host network.
 
-### Disable Anonymous Metrics
+## See also
 
-```bash
-# setup.env
-OPENZRO_DISABLE_ANONYMOUS_METRICS="true"
-```
-
-### Enable API Rate Limiting
-
-Set these in your container environment or docker-compose:
-
-```yaml
-environment:
-  - OZ_API_RATE_LIMITING_ENABLED=true
-  - OZ_API_RATE_LIMITING_RPM=60
-  - OZ_API_RATE_LIMITING_BURST=10
-```
-
-## Variable Precedence
-
-Configuration values are applied in the following order (later values override earlier):
-
-1. Default values
-2. Configuration file (`config.yaml` for combined setup, `management.json` for older multi-container setup)
-3. Environment variables
-4. Command-line flags
-
-## See Also
-
-- [Self-hosting Quickstart Guide](/selfhosted/selfhosted-quickstart)
-- [Advanced Self-hosting Guide](/selfhosted/selfhosted-guide)
-- [Configuration Files Reference](/selfhosted/configuration-files) - Detailed documentation for docker-compose.yml, config.yaml, and other config files
-- [Management SQLite Store](/selfhosted/sqlite-store)
-- [Management Postgres Store](/selfhosted/postgres-store)
+- [Configuration Files](/selfhosted/configuration-files)
+- [Quickstart](/selfhosted/selfhosted-quickstart)
+- [External Reverse Proxy](/selfhosted/external-reverse-proxy)

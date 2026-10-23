@@ -555,6 +555,10 @@ export const docsNavigation = [
             href: '/selfhosted/activity-postgres-store',
           },
           {
+            title: 'Activity Events MySQL Store',
+            href: '/selfhosted/activity-mysql-store',
+          },
+          {
             title: 'Flow Events Store',
             href: '/selfhosted/flow-events-store',
           },
@@ -652,18 +656,6 @@ export const docsNavigation = [
         title: 'Migration Guides',
         isOpen: false,
         links: [
-          {
-            title: 'Coturn to Embedded STUN',
-            href: '/selfhosted/migration/coturn-to-stun-migration',
-          },
-          {
-            title: 'Combined Container Setup',
-            href: '/selfhosted/migration/combined-container',
-          },
-          {
-            title: 'Enable Reverse Proxy',
-            href: '/selfhosted/migration/enable-reverse-proxy',
-          },
           {
             title: 'External IdP to Embedded IdP',
             href: '/selfhosted/migration/external-to-embedded-idp',

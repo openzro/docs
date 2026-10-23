@@ -179,7 +179,12 @@ management:
       # value is "<secret-name>/<key>"
       OPENZRO_FLOW_ARCHIVE_GCS_HMAC_KEY_ID: "openzro-flow-archive-hmac/keyId"
       OPENZRO_FLOW_ARCHIVE_GCS_HMAC_SECRET: "openzro-flow-archive-hmac/secret"
+      OPENZRO_FLOW_ARCHIVE_GCS_CREDENTIALS_JSON: "openzro-flow-archive-sa/json"
 ```
+
+When the archive is named explicitly, the dashboard destination is never read, so the service account that writes
+the compacted objects must be passed too. Without `OPENZRO_FLOW_ARCHIVE_GCS_CREDENTIALS_JSON`, the job falls back to
+the node's ambient identity, which is usually read-only, and fails on its first write.
 
 <Warning>
 The HMAC pair goes in `archiveCompaction.envFromSecret`, **not** in
