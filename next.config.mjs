@@ -698,6 +698,11 @@ const nextConfig = {
                 destination: '/selfhosted/selfhosted-quickstart',
                 permanent: true,
             },
+            {
+                source: '/selfhosted/operator/install',
+                destination: '/manage/integrations/kubernetes',
+                permanent: true,
+            },
             // selfhosted scaling redirect
             {
                 source: '/scaling-your-self-hosted-deployment',

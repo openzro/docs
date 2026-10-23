@@ -20,7 +20,7 @@ bare-metal multi-node installs via Ansible, see
 | You already operate Kubernetes | ✅ Native fit | ⚠️ Extra moving piece |
 | You want HA out of the box | ✅ Multi-replica per component | ❌ Single host |
 | You need declarative GitOps | ✅ Operator + CRDs | ❌ Compose files |
-| You need autoscaling | ✅ HPA on relay/signal | ❌ Vertical only |
+| You need to scale out | ✅ More replicas per component | ❌ Vertical only |
 | You want a 5-minute first install | ⚠️ ~15min including ingress | ✅ 5min flat |
 | You're prototyping on a laptop | ⚠️ k3d / kind works but heavy | ✅ Single command |
 
@@ -45,7 +45,7 @@ deploys the control plane as a single release:
 
 Storage is **external** — the chart no longer bundles Postgres
 or MySQL subcharts. Point at Cloud SQL, RDS, or any reachable
-PostgreSQL. See [Storage](/selfhosted/kubernetes/storage).
+PostgreSQL or MySQL. See [Storage](/selfhosted/kubernetes/storage).
 
 Routing peers (gateways, exit nodes) are **not** part of this
 chart — they're data plane and live independently. Deploy them
@@ -60,7 +60,8 @@ the full rationale:
 - **Embedded Dex IdP** — every install ships with a federated IdP
   out of the box. Operators configure connectors (Google, GitHub,
   Microsoft, Keycloak, Okta, generic OIDC) at runtime via the
-  dashboard. See [ADR-0006](https://github.com/openzro/openzro/blob/main/docs/adr/0006-embed-dex.md).
+  dashboard, once management is wired to Dex's gRPC API (see the
+  [Helm Quickstart](/selfhosted/kubernetes/helm-quickstart)). See [ADR-0006](https://github.com/openzro/openzro/blob/main/docs/adr/0006-embed-dex.md).
 - **Helm chart + Kubernetes operator** — chart for the control
   plane, operator for the data plane. See
   [ADR-0008](https://github.com/openzro/openzro/blob/main/docs/adr/0008-kubernetes-helm-operator.md).
@@ -76,15 +77,15 @@ the full rationale:
   in 15 minutes from a fresh cluster
 - [High Availability](/selfhosted/kubernetes/high-availability) — multi-replica
   management/signal, multi-pod relay, the `cluster.mode` switch
-- [Storage Backends](/selfhosted/kubernetes/storage) — PostgreSQL or
-  MySQL via the bundled subcharts, manual DSN config for external
-  databases
+- [Storage Backends](/selfhosted/kubernetes/storage) — external
+  PostgreSQL or MySQL, database provisioning, Dex storage
 - [Upgrades](/selfhosted/kubernetes/upgrades) — `helm upgrade`
   workflow + CRD upgrade gotchas
 
 <Note>
 The Helm chart is published on every tag push to
-[https://openzro.github.io/helms](https://openzro.github.io/helms)
-and as an OCI artifact at `oci://ghcr.io/openzro/charts/openzro`.
-Both paths produce the same chart.
+[https://openzro.github.io/helms](https://openzro.github.io/helms).
+All versions are prereleases, so `helm install` needs `--devel`. The
+OCI copy at `oci://ghcr.io/openzro/charts/openzro` is not kept up to
+date; use the HTTPS repository.
 </Note>

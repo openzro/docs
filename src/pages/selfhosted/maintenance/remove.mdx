@@ -1,16 +1,18 @@
 # Remove Your Self-Hosted openZro Installation
 
-To remove the openZro installation and all related data from your server, run these commands from the folder where you installed openZro:
+To remove the openZro installation and all related data from your server, run these commands from the
+`infrastructure_files` directory where you ran `configure.sh`:
 ```bash
-# remove all openZro-related containers and volumes (data)
+cd artifacts
+# remove all openZro containers and volumes (data)
 docker compose down --volumes
-# remove downloaded and generated config files
-rm -f docker-compose.yml dashboard.env config.yaml nginx-openzro.conf caddyfile-openzro.txt npm-advanced-config.txt
+cd ..
+# remove the generated configuration files
+rm -rf artifacts
 ```
+
+`setup.env` is left in place; delete it too if you don't need it.
 
 ## Get In Touch
 
 Feel free to ask in [GitHub Discussions](https://github.com/openzro/openzro/discussions) if you have any questions.
-
-- openZro managed version: [https://your-management.example.com](https://your-management.example.com)
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)

@@ -138,7 +138,9 @@ Mounted at `/etc/openzro/management.json` in the `management` container.
 <Warning>
     The template sets `TrustedPeers` to `0.0.0.0/0`, so the gRPC server takes a client's IP from forwarding headers
     sent by anyone. A client can then report a different IP, which affects the peer location and geolocation posture
-    checks. If peers connect directly, set it to an empty list; behind a proxy, set it to the proxy's addresses.
+    checks. An empty list means the same as `0.0.0.0/0` (the server logs a warning at startup). If peers connect
+    directly, set it to a prefix no client uses, such as `127.0.0.1/32`; behind a proxy, set it to the proxy's
+    addresses.
 </Warning>
 
 ## dex.config.yaml

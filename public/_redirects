@@ -131,6 +131,7 @@
 /selfhosted/reverse-proxy  /selfhosted/external-reverse-proxy  301
 /scaling-your-self-hosted-deployment  /selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment  301
 /selfhosted/migration/combined-container  /selfhosted/selfhosted-quickstart  301
+/selfhosted/operator/install  /manage/integrations/kubernetes  301
 /selfhosted/migration/coturn-to-stun-migration  /selfhosted/selfhosted-quickstart  301
 
 # Rewrites (proxy / no redirect — status 200)

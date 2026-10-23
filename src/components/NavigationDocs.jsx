@@ -479,10 +479,6 @@ export const docsNavigation = [
         isOpen: false,
         links: [
           {
-            title: 'Install',
-            href: '/selfhosted/operator/install',
-          },
-          {
             title: 'CRDs',
             href: '/selfhosted/operator/crds',
           },
@@ -531,10 +527,6 @@ export const docsNavigation = [
               {
                 title: 'Set Up External Signal',
                 href: '/selfhosted/maintenance/scaling/set-up-external-signal',
-              },
-              {
-                title: 'Multiple Proxy Instances',
-                href: '/selfhosted/maintenance/scaling/multiple-proxy-instances',
               },
             ],
           },

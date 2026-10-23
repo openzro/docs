@@ -1,155 +1,93 @@
-# Set Up External Signal Server
-
 import {Note, Warning} from "@/components/mdx";
 
-This guide is part of the [Splitting Your Self-Hosted Deployment](/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment) guide. It covers extracting the Signal server to a dedicated machine.
+# Set Up External Signal Server
 
-In most deployments, the embedded Signal server works well and does not need to be extracted. Consider running an external Signal server if you want to separate it from the Management server for organizational or infrastructure reasons.
-
-For active-active HA across multiple Signal instances, openZro
-ships a [distributed dispatcher](https://github.com/openzro/openzro/tree/main/signal/dispatcher)
-that fans out signaling messages between Signal nodes via Redis or
-NATS — no commercial license required. The single-instance setup
-on this page is the simpler topology that fits most operators;
-graduate to the dispatched mode when the in-memory connection state
-of one Signal node becomes a scaling ceiling.
+This guide moves the `signal` service to its own machine, for example `signal.example.com`.
 
 <Warning>
-Changing the Signal server URL requires all clients to restart. After updating the configuration, each client must run `openzro down` followed by `openzro up` to reconnect to the new Signal server. This limitation will be addressed in a future client release.
+Clients read the Signal address when they connect. After you change it, peers keep using the old address until they
+reconnect, for example with `openzro down && openzro up`. Keep the old signal running until every peer has
+reconnected.
 </Warning>
 
-## Server Requirements
+## Requirements
 
-- A Linux VM with at least **1 CPU** and **1GB RAM**
-- Public IP address
-- A domain name pointing to the server (e.g., `signal.example.com`)
-- Docker installed
-- Firewall ports open: **80/tcp** (Let's Encrypt HTTP challenge) and **443/tcp** (gRPC/WebSocket client communication)
+- A Linux machine with Docker and a public DNS name (`signal.example.com`).
+- TCP port 443 open (or another port of your choice).
 
-## Create Signal Configuration
+## Run Signal
 
-On your signal server, create a directory and configuration:
-
-```bash
-mkdir -p ~/openzro-signal
-cd ~/openzro-signal
-```
-
-Like the relay, the signal server can automatically obtain TLS certificates via Let's Encrypt.
-
-<Note>
-Replace `signal.example.com` with your signal server's domain.
-</Note>
-
-Create `signal.env` with your signal settings:
-
-```bash
-OZ_PORT=443
-OZ_LOG_LEVEL=info
-
-# TLS via Let's Encrypt (automatic certificate provisioning)
-OZ_LETSENCRYPT_DOMAIN=signal.example.com
-```
-
-Create `docker-compose.yml`:
+Signal reads only its port from the environment (`OZ_PORT`); everything else is a command-line flag. With a Let's
+Encrypt certificate:
 
 ```yaml
 services:
   signal:
-    image: openzro/signal:latest
-    container_name: openzro-signal
+    image: ghcr.io/openzro/signal:latest
     restart: unless-stopped
     ports:
-      - '443:443'
-      - '80:80'
-    env_file:
-      - signal.env
+      - "443:443"
+      - "80:80"   # Let's Encrypt HTTP challenge
     volumes:
-      - signal_data:/var/lib/openzro
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "500m"
-        max-file: "2"
+      - signal-data:/var/lib/openzro
+    command: [
+      "--port", "443",
+      "--letsencrypt-domain", "signal.example.com",
+      "--log-file", "console",
+      "--log-level", "info"
+    ]
 
 volumes:
-  signal_data:
+  signal-data:
 ```
 
-## Alternative: TLS with Existing Certificates
+To use your own certificate instead, mount it and replace `--letsencrypt-domain` with
+`--cert-file /certs/fullchain.pem --cert-key /certs/privkey.pem`. Behind a reverse proxy, forward
+`/signalexchange.SignalExchange/` to the signal container as gRPC (h2c) and run signal without TLS on port 80.
 
-If you have existing TLS certificates, replace the Let's Encrypt variable in `signal.env` with:
+Pin the image to the same version as your management server instead of `latest`.
+
+## Point management at the new Signal
+
+Edit `management.json` on the main server:
+
+```json
+"Signal": {
+  "Proto": "https",
+  "URI": "signal.example.com:443"
+},
+"Flow": {
+  "Proto": "https",
+  "URI": "openzro.example.com:33073"
+}
+```
+
+`Flow` is where peers send traffic events. It defaults to the Signal address, but the flow service runs on the
+management server, so set it to the management address (`OPENZRO_DOMAIN:OPENZRO_MGMT_API_PORT`) once Signal moves.
+
+Then remove the `signal` service from the main `docker-compose.yml` and restart management:
 
 ```bash
-# Replace the OZ_LETSENCRYPT_DOMAIN line with:
-OZ_CERT_FILE=/certs/fullchain.pem
-OZ_CERT_KEY=/certs/privkey.pem
+docker compose up -d --remove-orphans
+docker compose restart management
 ```
 
-And add a certificate volume to `docker-compose.yml`:
+Re-running `configure.sh` restores the local signal and the old `Signal` address; repeat these edits afterwards.
 
-```yaml
-    volumes:
-      - /path/to/certs:/certs:ro
-      - signal_data:/var/lib/openzro
-```
+## Verify
 
-## Start the Signal Server
+On a client, after `openzro down && openzro up`, run `openzro status -d` and check that **Signal** shows
+`signal.example.com:443` as connected.
 
-```bash
-docker compose up -d
-```
+## Several Signal instances
 
-Verify it's running:
+Signal instances behind a load balancer must share a broker so a message reaches the instance the other peer is
+connected to:
 
-```bash
-docker compose logs -f
-```
+| Variables | Broker |
+|---|---|
+| `OPENZRO_SIGNAL_DISPATCHER=redis`, `OPENZRO_REDIS_URL=redis://...` | Redis, Valkey or Dragonfly |
+| `OPENZRO_SIGNAL_DISPATCHER=nats`, `OPENZRO_NATS_URL=nats://...` | An external NATS server |
+| `OPENZRO_BROKER=embedded`, `OPENZRO_CLUSTER_PEERS=nats://node2:6222,...` | NATS embedded in each signal instance |
 
-If you configured Let's Encrypt, trigger certificate provisioning with an HTTPS request:
-
-```bash
-curl -v https://signal.example.com/
-```
-
-Confirm the certificate was issued:
-
-```
-* Server certificate:
-*  subject: CN=signal.example.com
-*  issuer: C=US; O=Let's Encrypt; CN=E8
-*  SSL certificate verify ok.
-```
-
-## Update Main Server Configuration
-
-On your main server, add `signalUri` to `config.yaml`. This disables the embedded Signal server:
-
-```yaml
-server:
-  # ... existing settings ...
-
-  # External signal server
-  signalUri: "https://signal.example.com:443"
-```
-
-Restart the main server:
-
-```bash
-docker compose down
-docker compose up -d
-```
-
-## Verify Signal Extraction
-
-Check the main server logs to confirm the embedded Signal is disabled:
-
-```bash
-docker compose logs openzro-server
-```
-
-```
-INFO combined/cmd/root.go:   Management: true (log level: info)
-INFO combined/cmd/root.go:   Signal: false (log level: )
-INFO combined/cmd/root.go:   Relay: false (log level: )
-```
+Without these, signal uses an in-memory dispatcher and supports a single instance.

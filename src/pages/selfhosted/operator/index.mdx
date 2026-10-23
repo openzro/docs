@@ -10,8 +10,14 @@ manage everything from the dashboard.
 
 The operator lives in
 [openzro/openzro-operator](https://github.com/openzro/openzro-operator)
-and ships as its own Helm chart on the same release feed as the
-main `openzro` chart.
+and ships as its own Helm chart, `openzro/openzro-operator`, on the
+same release feed as the main `openzro` chart. All versions are
+prereleases, so install it with `--devel`.
+
+To install and use it, follow
+[Kubernetes integration](/manage/integrations/kubernetes): it covers
+the access token Secret, the chart values, cert-manager, routing
+peers and exposing Services.
 
 ## When to use the operator
 
@@ -54,18 +60,17 @@ control plane:
 ```
 
 Each CR has a `Status` subresource the operator updates after
-each reconcile pass — `kubectl describe ozgroup my-team` shows
-whether the resource is `Reconciled` or what error it hit.
+each reconcile pass — `kubectl describe ozgroup my-team` shows the
+`Ready` condition and, when it is `False`, the error it hit.
 
-The operator authenticates against the management API using a
-**Personal Access Token (PAT)** issued from the dashboard. It
-never holds long-term credentials; rotating the PAT is a Secret
-update + pod restart away.
+The operator authenticates against the management API with the
+access token of a [service user](/manage/public-api), stored in a
+Kubernetes Secret. Rotating it is a Secret update and a pod restart.
 
 ## Section contents
 
-- [Install the operator](/selfhosted/operator/install) — PAT
-  generation + Helm install
+- [Kubernetes integration](/manage/integrations/kubernetes) —
+  install, configuration and usage
 - [CRDs](/selfhosted/operator/crds) — every supported CRD with
   example manifests
 
@@ -73,19 +78,22 @@ update + pod restart away.
 
 | CRD | What it represents |
 |---|---|
-| `OZGroup` | A peer group, used in policies and resource scopes |
+| `OZGroup` | An openZro group |
 | `OZPolicy` | An access control policy between groups |
-| `OZSetupKey` | A reusable enrollment key for new peers |
-| `OZRoutingPeer` | A routing peer / gateway pod that openZro deploys + enrolls |
-| `OZResource` | A network resource (host or subnet) for split tunneling |
+| `OZSetupKey` | A reference to a setup key Secret, used to inject openZro sidecars into pods |
+| `OZRoutingPeer` | A Deployment of routing peers, with the network, group and setup key it needs |
+| `OZResource` | A network resource, usually created from an annotated Service |
+
+The `openzro.io/v1alpha1` kinds (`Group`, `SetupKey`,
+`NetworkResource`, `NetworkRouter`, `SidecarProfile`) back the
+[Gateway API integration](/manage/integrations/kubernetes/gateway-api-beta).
 
 Each CRD is documented with its full spec on the
 [CRDs](/selfhosted/operator/crds) page.
 
 <Note>
-`OZNetworkResource` and `OZHTTPRoute` controllers exist in the
-operator but their server-side handlers are not yet wired in the
-management API. The CRDs apply cleanly; reconciliation returns 404
-until that work lands. Track via
+The Gateway API `HTTPRoute` path (public reverse proxy) depends on a
+reverse-proxy API that the management server does not implement yet;
+those resources apply cleanly but do not reconcile. Track via
 [ADR-0008 Stage 3](https://github.com/openzro/openzro/blob/main/docs/adr/0008-kubernetes-helm-operator.md#stage-3--server-side-handlers-for-dns-zones--reverse-proxy-services).
 </Note>
