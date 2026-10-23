@@ -1,0 +1,648 @@
+export const title = 'MFA'
+
+
+
+## Show a device login waiting for 2FA  {{ tag: 'GET' , label: '/api/mfa/peer-login' }}
+
+<Row>
+  <Col>
+    Opened by the approval page. Authenticated by the page token from the approval link (Authorization Bearer), not a dashboard session. Responses are not cached and send no referrer.
+              </Col>
+
+  <Col sticky>
+    <CodeGroup title="Request" tag="GET" label="/api/mfa/peer-login">
+```bash {{ title: 'cURL' }}
+curl -X GET https://management.example.com/api/mfa/peer-login \
+-H 'Accept: application/json' \
+-H 'Authorization: Token <TOKEN>' 
+```
+
+```js
+const axios = require('axios');
+
+let config = {
+  method: 'get',
+  maxBodyLength: Infinity,
+  url: '/api/mfa/peer-login',
+  headers: {     
+    'Accept': 'application/json',    
+    'Authorization': 'Token <TOKEN>'
+  }  
+};
+
+axios(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});
+```
+
+```python
+import requests
+import json
+
+url = "https://management.example.com/api/mfa/peer-login"
+
+headers = {     
+  'Accept': 'application/json',
+  'Authorization': 'Token <TOKEN>'
+}
+
+response = requests.request("GET", url, headers=headers)
+
+print(response.text)
+```
+
+```go
+package main
+
+import (
+  "fmt"
+  "strings"
+  "net/http"
+  "io/ioutil"
+)
+
+func main() {
+
+  url := "https://management.example.com/api/mfa/peer-login"
+  method := "GET"
+  
+  client := &http.Client {
+  }
+  req, err := http.NewRequest(method, url, nil)
+
+  if err != nil {
+    fmt.Println(err)
+    return
+  {  
+    
+  req.Header.Add("Accept", "application/json")
+  req.Header.Add("Authorization", "Token <TOKEN>")
+
+  res, err := client.Do(req)
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
+  defer res.Body.Close()
+
+  body, err := ioutil.ReadAll(res.Body)
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
+  fmt.Println(string(body))
+}
+```
+
+```ruby
+require "uri"
+require "json"
+require "net/http"
+
+url = URI("https://management.example.com/api/mfa/peer-login")
+
+https = Net::HTTP.new(url.host, url.port)
+https.use_ssl = true
+
+request = Net::HTTP::Get.new(url)
+request["Accept"] = "application/json"
+request["Authorization"] = "Token <TOKEN>"
+
+response = https.request(request)
+puts response.read_body
+```
+
+```java
+OkHttpClient client = new OkHttpClient().newBuilder()
+  .build();
+
+Request request = new Request.Builder()
+  .url("https://management.example.com/api/mfa/peer-login")
+  .method("GET")    
+  .addHeader("Accept", "application/json")
+  .addHeader("Authorization: Token <TOKEN>")
+  .build();
+Response response = client.newCall(request).execute();
+```
+
+```php
+<?php
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'https://management.example.com/api/mfa/peer-login',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'GET',  
+  CURLOPT_HTTPHEADER => array(        
+    'Accept: application/json',
+    'Authorization: Token <TOKEN>'
+  ),
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+echo $response;
+```
+
+    </CodeGroup>
+    
+    
+    <CodeGroup title="Response">
+```json {{ title: 'Example' }}
+{
+  "state": "pending",
+  "hostname": "ana-laptop",
+  "os": "linux",
+  "ip": "203.0.113.7",
+  "geo_country": "BR",
+  "geo_city": "São Paulo",
+  "new_peer": {
+    "description": "True when the login registers a new device, false when it re-activates a login-expired one",
+    "type": "boolean"
+  },
+  "key_fingerprint": "Oxc1yl…CVQ=",
+  "masked_email": "a***@example.com",
+  "account_domain": "example.com",
+  "created_at": {
+    "type": "string",
+    "format": "date-time"
+  },
+  "expires_at": {
+    "type": "string",
+    "format": "date-time"
+  }
+}
+```
+```json {{ title: 'Schema' }}
+{
+  "state": "string",
+  "hostname": "string",
+  "os": "string",
+  "ip": "string",
+  "geo_country": "string",
+  "geo_city": "string",
+  "new_peer": "boolean",
+  "key_fingerprint": "string",
+  "masked_email": "string",
+  "account_domain": "string",
+  "created_at": "string",
+  "expires_at": "string"
+}
+```
+    </CodeGroup>
+    
+ 
+  </Col>
+</Row>
+
+---
+
+
+## Approve a device login with a 2FA code  {{ tag: 'POST' , label: '/api/mfa/peer-login/approve' }}
+
+<Row>
+  <Col>
+    Checks the code with the same verifier and lockout as the dashboard 2FA challenge. Repeating an approval that already happened succeeds without a code, so the body and the code are optional; on a login not yet approved, a missing code is a wrong code. The body is at most 1 KiB.
+            
+    ### Request-Body Parameters
+    
+    <Properties><Property name="code" type="string" required={false}>
+        
+            A TOTP code or a backup code. Optional when repeating an approval that already happened.
+        
+        </Property>
+    </Properties>
+
+    
+       </Col>
+
+  <Col sticky>
+    <CodeGroup title="Request" tag="POST" label="/api/mfa/peer-login/approve">
+```bash {{ title: 'cURL' }}
+curl -X POST https://management.example.com/api/mfa/peer-login/approve \
+-H 'Accept: application/json' \
+-H 'Content-Type: application/json' \
+-H 'Authorization: Token <TOKEN>' \
+--data-raw '{
+  "code": "123456"
+}'
+```
+
+```js
+const axios = require('axios');
+let data = JSON.stringify({
+  "code": "123456"
+});
+let config = {
+  method: 'post',
+  maxBodyLength: Infinity,
+  url: '/api/mfa/peer-login/approve',
+  headers: {     
+    'Accept': 'application/json',    
+    'Content-Type': 'application/json',
+    'Authorization': 'Token <TOKEN>'
+  },  
+  data : data
+};
+
+axios(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});
+```
+
+```python
+import requests
+import json
+
+url = "https://management.example.com/api/mfa/peer-login/approve"
+payload = json.dumps({
+  "code": "123456"
+})
+headers = {   
+  'Content-Type': 'application/json',  
+  'Accept': 'application/json',
+  'Authorization': 'Token <TOKEN>'
+}
+
+response = requests.request("POST", url, headers=headers, data=payload)
+
+print(response.text)
+```
+
+```go
+package main
+
+import (
+  "fmt"
+  "strings"
+  "net/http"
+  "io/ioutil"
+)
+
+func main() {
+
+  url := "https://management.example.com/api/mfa/peer-login/approve"
+  method := "POST"
+  
+  payload := strings.NewReader(`{
+  "code": "123456"
+}`)
+  client := &http.Client {
+  }
+  req, err := http.NewRequest(method, url, payload)
+
+  if err != nil {
+    fmt.Println(err)
+    return
+  {  
+  
+  req.Header.Add("Content-Type", "application/json")  
+  req.Header.Add("Accept", "application/json")
+  req.Header.Add("Authorization", "Token <TOKEN>")
+
+  res, err := client.Do(req)
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
+  defer res.Body.Close()
+
+  body, err := ioutil.ReadAll(res.Body)
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
+  fmt.Println(string(body))
+}
+```
+
+```ruby
+require "uri"
+require "json"
+require "net/http"
+
+url = URI("https://management.example.com/api/mfa/peer-login/approve")
+
+https = Net::HTTP.new(url.host, url.port)
+https.use_ssl = true
+
+request = Net::HTTP::Post.new(url)
+request["Content-Type"] = "application/json"
+request["Accept"] = "application/json"
+request["Authorization"] = "Token <TOKEN>"
+
+request.body = JSON.dump({
+  "code": "123456"
+})
+response = https.request(request)
+puts response.read_body
+```
+
+```java
+OkHttpClient client = new OkHttpClient().newBuilder()
+  .build();
+MediaType mediaType = MediaType.parse("application/json");
+RequestBody body = RequestBody.create(mediaType, '{
+  "code": "123456"
+}');
+Request request = new Request.Builder()
+  .url("https://management.example.com/api/mfa/peer-login/approve")
+  .method("POST", body)  
+  .addHeader("Content-Type", "application/json")  
+  .addHeader("Accept", "application/json")
+  .addHeader("Authorization: Token <TOKEN>")
+  .build();
+Response response = client.newCall(request).execute();
+```
+
+```php
+<?php
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'https://management.example.com/api/mfa/peer-login/approve',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',  
+  CURLOPT_POSTFIELDS => '{
+  "code": "123456"
+}',
+  CURLOPT_HTTPHEADER => array(    
+    'Content-Type: application/json',    
+    'Accept: application/json',
+    'Authorization: Token <TOKEN>'
+  ),
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+echo $response;
+```
+
+    </CodeGroup>
+    
+    
+    <CodeGroup title="Response">
+```json {{ title: 'Example' }}
+{
+  "approved": {
+    "type": "boolean"
+  },
+  "reason": {
+    "description": "Why the code did not approve the login. Set only when approved is false.",
+    "type": "string",
+    "enum": [
+      "wrong_code",
+      "code_reused",
+      "locked"
+    ]
+  },
+  "locked_until": {
+    "description": "Set when the user is locked out after repeated wrong codes",
+    "type": "string",
+    "format": "date-time"
+  }
+}
+```
+```json {{ title: 'Schema' }}
+{
+  "approved": "boolean",
+  "reason": "string",
+  "locked_until": "string"
+}
+```
+    </CodeGroup>
+    
+ 
+  </Col>
+</Row>
+
+---
+
+
+## Deny a device login ("Not me")  {{ tag: 'POST' , label: '/api/mfa/peer-login/deny' }}
+
+<Row>
+  <Col>
+    The device key stays denied until the attempt expires. Denying again is harmless; an approved login cannot be denied.
+              </Col>
+
+  <Col sticky>
+    <CodeGroup title="Request" tag="POST" label="/api/mfa/peer-login/deny">
+```bash {{ title: 'cURL' }}
+curl -X POST https://management.example.com/api/mfa/peer-login/deny \
+-H 'Accept: application/json' \
+-H 'Authorization: Token <TOKEN>' 
+```
+
+```js
+const axios = require('axios');
+
+let config = {
+  method: 'post',
+  maxBodyLength: Infinity,
+  url: '/api/mfa/peer-login/deny',
+  headers: {     
+    'Accept': 'application/json',    
+    'Authorization': 'Token <TOKEN>'
+  }  
+};
+
+axios(config)
+.then((response) => {
+  console.log(JSON.stringify(response.data));
+})
+.catch((error) => {
+  console.log(error);
+});
+```
+
+```python
+import requests
+import json
+
+url = "https://management.example.com/api/mfa/peer-login/deny"
+
+headers = {     
+  'Accept': 'application/json',
+  'Authorization': 'Token <TOKEN>'
+}
+
+response = requests.request("POST", url, headers=headers)
+
+print(response.text)
+```
+
+```go
+package main
+
+import (
+  "fmt"
+  "strings"
+  "net/http"
+  "io/ioutil"
+)
+
+func main() {
+
+  url := "https://management.example.com/api/mfa/peer-login/deny"
+  method := "POST"
+  
+  client := &http.Client {
+  }
+  req, err := http.NewRequest(method, url, nil)
+
+  if err != nil {
+    fmt.Println(err)
+    return
+  {  
+    
+  req.Header.Add("Accept", "application/json")
+  req.Header.Add("Authorization", "Token <TOKEN>")
+
+  res, err := client.Do(req)
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
+  defer res.Body.Close()
+
+  body, err := ioutil.ReadAll(res.Body)
+  if err != nil {
+    fmt.Println(err)
+    return
+  }
+  fmt.Println(string(body))
+}
+```
+
+```ruby
+require "uri"
+require "json"
+require "net/http"
+
+url = URI("https://management.example.com/api/mfa/peer-login/deny")
+
+https = Net::HTTP.new(url.host, url.port)
+https.use_ssl = true
+
+request = Net::HTTP::Post.new(url)
+request["Accept"] = "application/json"
+request["Authorization"] = "Token <TOKEN>"
+
+response = https.request(request)
+puts response.read_body
+```
+
+```java
+OkHttpClient client = new OkHttpClient().newBuilder()
+  .build();
+
+Request request = new Request.Builder()
+  .url("https://management.example.com/api/mfa/peer-login/deny")
+  .method("POST")    
+  .addHeader("Accept", "application/json")
+  .addHeader("Authorization: Token <TOKEN>")
+  .build();
+Response response = client.newCall(request).execute();
+```
+
+```php
+<?php
+
+$curl = curl_init();
+
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'https://management.example.com/api/mfa/peer-login/deny',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',  
+  CURLOPT_HTTPHEADER => array(        
+    'Accept: application/json',
+    'Authorization: Token <TOKEN>'
+  ),
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+echo $response;
+```
+
+    </CodeGroup>
+    
+    
+    <CodeGroup title="Response">
+```json {{ title: 'Example' }}
+{
+  "state": "pending",
+  "hostname": "ana-laptop",
+  "os": "linux",
+  "ip": "203.0.113.7",
+  "geo_country": "BR",
+  "geo_city": "São Paulo",
+  "new_peer": {
+    "description": "True when the login registers a new device, false when it re-activates a login-expired one",
+    "type": "boolean"
+  },
+  "key_fingerprint": "Oxc1yl…CVQ=",
+  "masked_email": "a***@example.com",
+  "account_domain": "example.com",
+  "created_at": {
+    "type": "string",
+    "format": "date-time"
+  },
+  "expires_at": {
+    "type": "string",
+    "format": "date-time"
+  }
+}
+```
+```json {{ title: 'Schema' }}
+{
+  "state": "string",
+  "hostname": "string",
+  "os": "string",
+  "ip": "string",
+  "geo_country": "string",
+  "geo_city": "string",
+  "new_peer": "boolean",
+  "key_fingerprint": "string",
+  "masked_email": "string",
+  "account_domain": "string",
+  "created_at": "string",
+  "expires_at": "string"
+}
+```
+    </CodeGroup>
+    
+ 
+  </Col>
+</Row>
+
+---

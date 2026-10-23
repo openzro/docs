@@ -65,7 +65,7 @@ function renderProperties(properties, required = [], depth = 0) {
         %>>%>
         <% if ((type === 'object' && value.properties) || (type === 'object[]' && value.items.properties)) { %>
             <details className="custom-details" open>
-                <summary><%- value.description || 'More Information' %></summary>
+                <summary><%- (value.description || 'More Information').replace(/\\s+/g, ' ').trim() %></summary>
                 <Properties>
                 <% if (type === 'object[]') { %>
                     <% renderProperties(value.items.properties, value.items.required || [], depth + 1); %>

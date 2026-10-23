@@ -34,7 +34,7 @@ jobs:
         run: mkdir -p generator/openapi
 
       - name: Download openapi.yml
-        run: curl -L -o generator/openapi/openapi.yml "https://raw.githubusercontent.com/openzro/openzro/v${{ steps.semver_parser.outputs.fullversion }}/shared/management/http/api/openapi.yml"
+        run: curl -fsSL -o generator/openapi/openapi.yml "https://raw.githubusercontent.com/openzro/openzro/v${{ steps.semver_parser.outputs.fullversion }}/management/server/http/api/openapi.yml"
 
       - name: Install Go
         uses: actions/setup-go@v6
@@ -48,13 +48,20 @@ jobs:
         run: (cd ./generator && ./expandOpenAPIRef)
 
       - name: Remove old generated files
-        run: rm -rf src/pages/ipa/resources/*
+        run: rm -rf src/pages/ipa/resources && mkdir -p src/pages/ipa/resources
 
       - name: Npm install
         run: npm install
 
       - name: Generate api pages for openzro main openapi definition
         run: npx ts-node generator/index.ts gen --input generator/openapi/expanded.yml --output src/pages/ipa/resources
+
+      - name: Fail if no pages were generated
+        run: |
+          if [ -z "$(ls -A src/pages/ipa/resources 2>/dev/null)" ]; then
+            echo "::error::the generator produced no API pages; check the openapi.yml download"
+            exit 1
+          fi
 
       - name: Check git diff and untracked files
         id: git_diff
