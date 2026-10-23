@@ -4,14 +4,10 @@ import {Note} from "@/components/mdx";
 
 [Zitadel](https://zitadel.com) is an open-source identity infrastructure platform designed for cloud-native environments. It provides multi-tenancy, customizable branding, passwordless authentication, and supports protocols like OpenID Connect, OAuth2, SAML2, and LDAP.
 
-<Note>
-Zitadel was previously used in the openZro quickstart script. If you have an existing Zitadel deployment, you can continue using it as a standalone IdP or migrate to the embedded IdP with Zitadel as an external IdP directly in the openZro Management Dashboard.
-</Note>
-
 ## Standalone Setup (Advanced)
 
 This guide wires Zitadel as openZro's *only* identity provider —
-Dex is disabled and the management daemon talks directly to
+Dex is bypassed (it keeps running but is not used) and the management daemon talks directly to
 Zitadel for both token validation and user lifecycle. Choose
 this path **only** if all three apply:
 
@@ -178,7 +174,6 @@ OPENZRO_AUTH_AUDIENCE="<CLIENT_ID>"
 OPENZRO_AUTH_REDIRECT_URI="/auth"
 OPENZRO_AUTH_SILENT_REDIRECT_URI="/silent-auth"
 
-OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="hosted"
 OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID="<CLIENT_ID>"
 OPENZRO_AUTH_DEVICE_AUTH_AUDIENCE="<CLIENT_ID>"
 
@@ -192,26 +187,6 @@ OPENZRO_MGMT_IDP_SIGNKEY_REFRESH=true
 ### Step 7: Continue with openZro Setup
 
 You've configured all required resources in Zitadel. Continue with the [openZro Self-hosting Guide](/selfhosted/selfhosted-guide#step-4-disable-single-account-mode-optional).
-
----
-
-## Migrating from Zitadel Quickstart
-
-If you deployed openZro using the previous quickstart script with Zitadel:
-
-**Option A - Keep using Zitadel standalone**: Continue with your existing setup. No changes needed.
-
-**Option B - Add Zitadel as external IdP directly in openZro Management Dashboard**:
-1. Deploy new openZro version with embedded IdP
-2. Add your existing Zitadel as an external IdP directly in the openZro Management Dashboard (follow Management Setup above)
-3. Users can continue logging in with Zitadel
-4. Optionally create local user accounts as fallback
-
-**Option C - Migrate fully to embedded IdP**:
-1. Export user list from Zitadel
-2. Deploy new openZro version with embedded IdP
-3. Recreate users in openZro Dashboard
-4. Decommission Zitadel when ready
 
 ---
 
@@ -239,6 +214,6 @@ If you deployed openZro using the previous quickstart script with Zitadel:
 
 - [Zitadel Documentation](https://zitadel.com/docs)
 - [Zitadel GitHub](https://github.com/zitadel/zitadel)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
-- [Migration Guide](/selfhosted/identity-providers#migration-guide)
+- [Identity providers overview](/selfhosted/identity-providers)
+- [Migration guide](/selfhosted/identity-providers#migration-guide-and-backwards-compatibility)
 

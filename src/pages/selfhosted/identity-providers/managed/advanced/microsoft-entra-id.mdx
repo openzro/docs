@@ -1,22 +1,19 @@
 import {Note} from "@/components/mdx";
 
-# Microsoft and Entra ID SSO with openZro Self-Hosted (Legacy)
+# Microsoft and Entra ID SSO with openZro Self-Hosted (Standalone)
 
 Use Microsoft accounts for authentication with openZro. This supports both personal Microsoft accounts and Microsoft Entra ID (formerly Azure AD) for work and school accounts.
 
 ## Standalone Setup (Advanced)
 
 <Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+We recommend adding Microsoft as an authentication provider of openZro's bundled Dex instead: it needs less
+configuration, works alongside local users and other providers, and is managed from the dashboard. See the
+[recommended setup](/selfhosted/identity-providers/managed/microsoft-entra-id#management-setup-recommended).
 
-We highly recommend using the simpler setup that adds Microsoft as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/microsoft-entra-id#management-setup-recommended) section in the main Microsoft Entra ID documentation.
-
-The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Microsoft Entra ID administrators who need full control over authentication and user management.
+The standalone setup below points openZro directly at Microsoft. Dex keeps running but is not used, and providers can no
+longer be added from the dashboard.
 </Note>
-
-Use Microsoft Entra ID as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Microsoft Entra ID administrators as it also requires additional setup and ongoing maintenance.
-
-For most deployments, the [embedded IdP](/selfhosted/identity-providers) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 <Note>
 If you prefer to have full control over authentication, consider self-hosted alternatives like [PocketID](/selfhosted/identity-providers/pocketid).
@@ -157,7 +154,6 @@ OPENZRO_AUTH_SILENT_REDIRECT_URI="/silent-auth"
 OPENZRO_AUTH_USER_ID_CLAIM="oid"
 OPENZRO_TOKEN_SOURCE="idToken"
 
-OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="none"
 
 OPENZRO_MGMT_IDP="azure"
 OPENZRO_IDP_MGMT_CLIENT_ID="<Application (client) ID>"
@@ -165,6 +161,13 @@ OPENZRO_IDP_MGMT_CLIENT_SECRET="<CLIENT_SECRET>"
 OPENZRO_IDP_MGMT_EXTRA_OBJECT_ID="<Object ID>"
 OPENZRO_IDP_MGMT_EXTRA_GRAPH_API_ENDPOINT="https://graph.microsoft.com/v1.0"
 ```
+
+<Note>
+The dashboard only attaches tokens to requests for origins it trusts. Entra serves its endpoints from a different
+path than the discovery authority, so set `AUTH_EXTRA_OIDC_DOMAINS` on the `dashboard` container to
+`https://login.microsoftonline.com/<Directory (tenant) ID>,https://graph.microsoft.com`. `configure.sh` does not pass
+this variable, so add it to the `dashboard` service environment in `docker-compose.yml`.
+</Note>
 
 ### Step 8: Continue with openZro Setup
 
@@ -199,14 +202,8 @@ You've configured all required resources in Azure AD. Continue with the [openZro
 
 ---
 
-<Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
-
-We highly recommend using the simpler setup that adds Microsoft as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/microsoft-entra-id#management-setup-recommended) section in the main Microsoft Entra ID documentation.
-</Note>
-
 ## Related Resources
 
 - [Microsoft Identity Platform Documentation](https://docs.microsoft.com/en-us/azure/active-directory/develop/)
 - [Azure Portal](https://portal.azure.com/)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
+- [Identity providers overview](/selfhosted/identity-providers)

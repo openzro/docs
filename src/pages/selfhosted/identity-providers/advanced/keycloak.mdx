@@ -7,7 +7,7 @@ import {Note} from "@/components/mdx";
 ## Standalone Setup (Advanced)
 
 This guide wires Keycloak as openZro's *only* identity provider —
-Dex is disabled and the management daemon talks directly to
+Dex is bypassed (it keeps running but is not used) and the management daemon talks directly to
 Keycloak for both token validation and user lifecycle. Choose
 this path **only** if all three apply:
 
@@ -36,7 +36,7 @@ If you prefer not to self-host an Identity and Access Management solution, you c
 
 ### Expected Result
 
-After completing this guide, you can log in to your self-hosted openZro Dashboard and add machines to your network using the [Interactive SSO Login feature](/get-started/install#running-net-bird-with-sso-login) over Keycloak.
+After completing this guide, you can log in to your self-hosted openZro Dashboard and add machines to your network using the [Interactive SSO Login feature](/get-started/install#running-open-zro-with-sso-login) over Keycloak.
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/keycloak-auth-grant.gif" alt="Keycloak auth flow" className="imagewrapper-big"/>
@@ -111,7 +111,7 @@ Ensure your Keycloak instance is available at `https://YOUR-KEYCLOAK-HOST-AND-PO
 1. Go to **Clients** → **openzro-client**
 2. In **Access Settings**, fill in:
    - **Root URL**: `https://YOUR_DOMAIN/`
-   - **Valid redirect URIs**: `https://YOUR_DOMAIN/*` and `http://localhost:53000`
+   - **Valid redirect URIs**: `https://YOUR_DOMAIN/auth`, `https://YOUR_DOMAIN/silent-auth` and `http://localhost:53000`
    - **Valid post logout redirect URIs**: `https://YOUR_DOMAIN/*`
    - **Web origins**: `+`
 3. Click **Save**
@@ -231,6 +231,8 @@ OPENZRO_USE_AUTH0=false
 OPENZRO_AUTH_CLIENT_ID="openzro-client"
 OPENZRO_AUTH_SUPPORTED_SCOPES="openid profile email offline_access api"
 OPENZRO_AUTH_AUDIENCE="openzro-client"
+OPENZRO_AUTH_REDIRECT_URI="/auth"
+OPENZRO_AUTH_SILENT_REDIRECT_URI="/silent-auth"
 
 OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID="openzro-client"
 OPENZRO_AUTH_DEVICE_AUTH_AUDIENCE="openzro-client"
@@ -268,5 +270,5 @@ You've configured all required resources in Keycloak. Continue with the [openZro
 ## Related Resources
 
 - [Keycloak Documentation](https://www.keycloak.org/documentation)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
+- [Identity providers overview](/selfhosted/identity-providers)
 
