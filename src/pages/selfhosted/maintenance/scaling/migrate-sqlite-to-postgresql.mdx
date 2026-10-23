@@ -1,238 +1,73 @@
-# Migrate from SQLite to PostgreSQL
-
 import {Note, Warning} from "@/components/mdx";
 
-This guide is part of the [Splitting Your Self-Hosted Deployment](/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment) guide. It covers migrating your Management server database from SQLite to PostgreSQL.
+# Migrate from SQLite to PostgreSQL
 
-The default openZro deployment uses SQLite, which stores all data in a single file. This works well for smaller setups, but you may want to migrate to PostgreSQL if:
-- You want the database on a separate, dedicated machine
-- You need better concurrency handling for larger deployments
-- You prefer the operational tooling and backup options that PostgreSQL provides
+A default deployment keeps its data in three SQLite databases. Each can move to PostgreSQL separately:
 
-For smaller teams, SQLite is perfectly capable and migration is not required.
+| Data | Default location | How to move it |
+|---|---|---|
+| Management store (accounts, peers, policies, …) | `store.db` in the `management` container's `/var/lib/openzro` | `OPENZRO_STORE_CONFIG_ENGINE` and `OPENZRO_STORE_ENGINE_POSTGRES_DSN` in `setup.env` |
+| Activity log | `events.db` in the same directory | `OZ_ACTIVITY_EVENT_STORE_ENGINE` and `OZ_ACTIVITY_EVENT_POSTGRES_DSN` on the `management` container |
+| Embedded Dex | `dex.db` in the `dex` container's `/var/lib/dex` | `storage` in `dex.config.yaml` |
 
-## Set Up PostgreSQL
-
-If you don't already have a PostgreSQL instance, you can run one in Docker:
-
-```bash
-docker run -d \
-  --name postgres-server \
-  -e POSTGRES_USER=postgres \
-  -e POSTGRES_PASSWORD=password \
-  -p 5432:5432 \
-  -v postgres_data:/var/lib/postgresql/data \
-  postgres:16
-```
+PostgreSQL is required to run several management instances against the same data.
 
 <Warning>
-Replace the default `password` with a strong, unique password for production deployments.
+Back up everything first, as described in [Backup](/selfhosted/maintenance/backup), and plan a maintenance window:
+the management service must be stopped while its data is copied.
 </Warning>
 
-## Back Up the SQLite Store
+## Management store
 
-Before migrating, create a backup of your SQLite database:
+Follow [Migrating from SQLite store to Postgres store](/selfhosted/postgres-store#migrating-from-sq-lite-store-to-postgres-store):
+copy `store.db` out of the container, import it with `pgloader`, clean up orphaned rows, then set
+`OPENZRO_STORE_CONFIG_ENGINE=postgres` and `OPENZRO_STORE_ENGINE_POSTGRES_DSN` in `setup.env` and re-run
+`./configure.sh`.
 
+The PostgreSQL server must be reachable from the `management` container: add it as a service to the compose file, or
+use a host name the container can resolve.
+
+## Activity log
+
+1. Import `events.db` the same way:
 ```bash
-mkdir backup
-docker compose cp -a openzro-server:/var/lib/openzro/. backup/
+docker compose cp management:/var/lib/openzro/events.db backup/events.db
+pgloader --type sqlite backup/events.db "postgresql://<user>:<password>@<host>:5432/<activity_db>"
+```
+2. Add the activity store variables to the `environment` of the `management` service in `docker-compose.yml`. The
+   generated file does not include them, so add them again after re-running `configure.sh`:
+```yaml
+      - OZ_ACTIVITY_EVENT_STORE_ENGINE=postgres
+      - OZ_ACTIVITY_EVENT_POSTGRES_DSN=host=<host> port=5432 user=<user> password=<password> dbname=<activity_db>
+```
+3. Restart management and look for `using postgres as activity event store engine` in its logs.
+
+See [Activity Events Postgres store](/selfhosted/activity-postgres-store) for details and rollback.
+
+## Embedded Dex
+
+Dex keeps sessions, refresh tokens, the connectors added in the dashboard, and local users created by
+[SCIM](/manage/team/idp-sync) in its own database. To use PostgreSQL, change the `storage` section of
+`artifacts/dex.config.yaml`:
+
+```yaml
+storage:
+  type: postgres
+  config:
+    host: <host>
+    port: 5432
+    database: dex
+    user: <user>
+    password: <password>
+    ssl:
+      mode: require
 ```
 
-## Install pgloader
-
-The migration uses [pgloader](https://github.com/dimitri/pgloader) to transfer data from SQLite to PostgreSQL:
-
-```bash
-# Debian/Ubuntu
-sudo apt-get install pgloader
-
-# macOS
-brew install pgloader
-```
-
-## Create the Migration File
-
-Create a file called `sqlite.load` with the following content:
-
-```
-LOAD DATABASE
-     FROM sqlite:///root/combined/backup/store.db
-     INTO postgresql://postgres:password@localhost:5432/postgres
-
-WITH include drop, create tables, create indexes, reset sequences
-
-CAST
-     column accounts.is_domain_primary_account                    to boolean,
-     column accounts.settings_peer_login_expiration_enabled       to boolean,
-     column accounts.settings_peer_inactivity_expiration_enabled  to boolean,
-     column accounts.settings_regular_users_view_blocked          to boolean,
-     column accounts.settings_groups_propagation_enabled          to boolean,
-     column accounts.settings_jwt_groups_enabled                  to boolean,
-     column accounts.settings_routing_peer_dns_resolution_enabled to boolean,
-     column accounts.settings_extra_peer_approval_enabled         to boolean,
-     column accounts.settings_extra_user_approval_required        to boolean,
-     column accounts.settings_lazy_connection_enabled             to boolean
-;
-```
+Then restart Dex with `docker compose restart dex`. Re-running `configure.sh` resets `dex.config.yaml` from its
+template, so repeat the edit afterwards.
 
 <Note>
-Update the SQLite path and PostgreSQL connection string to match your environment.
+openZro does not migrate Dex's data between storage backends. After the switch, users log in again, and connectors
+and SCIM-created local users that lived only in `dex.db` must be recreated. Connectors and the bootstrap admin defined
+in `dex.config.yaml` itself are unaffected.
 </Note>
-
-## Run the Migration
-
-```bash
-pgloader sqlite.load
-```
-
-## Update config.yaml
-
-On your main server, update the `store` section in `config.yaml` to use PostgreSQL:
-
-```yaml
-server:
-  # ... existing settings ...
-
-  store:
-    engine: "postgres"
-    dsn: "host=postgres-server user=postgres password=password dbname=postgres port=5432"
-```
-
-Alternatively, you can pass the connection string as an environment variable instead of putting it in the config file:
-
-```yaml
-  openzro-server:
-    environment:
-      - OPENZRO_STORE_ENGINE_POSTGRES_DSN=host=postgres-server user=postgres password=password dbname=postgres port=5432
-```
-
-## Restart and Verify
-
-```bash
-docker compose up -d
-```
-
-Check the logs to confirm PostgreSQL is being used:
-
-```bash
-docker compose logs openzro-server | grep store
-```
-
-You should see:
-```
-using Postgres store engine
-```
-
-## Migrate Auth Store
-
-The embedded identity provider (Dex) uses a separate SQLite database (`idp.db`) to store authentication data such as users, passwords, connectors, sessions, and tokens. You can optionally migrate this to PostgreSQL as well.
-
-### Create the Auth Database
-
-```bash
-docker exec postgres-server psql -U postgres -c "CREATE DATABASE openzro_auth;"
-```
-
-### Create the Auth Migration File
-
-Create a file called `auth-sqlite.load` with the following content:
-
-```
-LOAD DATABASE
-     FROM sqlite:///root/combined/backup/idp.db
-     INTO postgresql://postgres:password@localhost:5432/openzro_auth
-
-WITH include drop, create tables, create indexes, reset sequences
-
-CAST
-     column client.public                            to boolean,
-     column auth_request.force_approval_prompt       to boolean,
-     column auth_request.logged_in                   to boolean,
-     column auth_request.claims_email_verified       to boolean,
-     column auth_code.claims_email_verified          to boolean,
-     column refresh_token.claims_email_verified      to boolean
-;
-```
-
-<Note>
-Update the SQLite path and PostgreSQL connection string to match your environment.
-</Note>
-
-### Run the Auth Migration
-
-```bash
-pgloader auth-sqlite.load
-```
-
-### Update config.yaml
-
-Add the `authStore` section to your `config.yaml`:
-
-```yaml
-server:
-  # ... existing settings ...
-
-  authStore:
-    engine: "postgres"
-    dsn: "host=postgres-server port=5432 user=postgres password=password dbname=openzro_auth sslmode=disable"
-```
-
-### Restart and Verify
-
-```bash
-docker compose up -d
-```
-
-## Migrate Activity Store
-
-The activity events store uses a separate SQLite database (`events.db`) to record user and system activity. You can optionally migrate this to PostgreSQL as well.
-
-### Create the Activity Database
-
-```bash
-docker exec postgres-server psql -U postgres -c "CREATE DATABASE openzro_events;"
-```
-
-### Create the Activity Migration File
-
-Create a file called `activity-sqlite.load` with the following content:
-
-```
-LOAD DATABASE
-     FROM sqlite:///root/combined/backup/events.db
-     INTO postgresql://postgres:password@localhost:5432/openzro_events
-
-WITH include drop, create tables, create indexes, reset sequences
-;
-```
-
-<Note>
-No boolean CAST rules are needed for the activity store — all columns use standard integer and text types.
-
-Update the SQLite path and PostgreSQL connection string to match your environment.
-</Note>
-
-### Run the Activity Migration
-
-```bash
-pgloader activity-sqlite.load
-```
-
-### Update config.yaml
-
-Add the `activityStore` section to your `config.yaml`:
-
-```yaml
-server:
-  # ... existing settings ...
-
-  activityStore:
-    engine: "postgres"
-    dsn: "host=postgres-server port=5432 user=postgres password=password dbname=openzro_events sslmode=disable"
-```
-
-### Restart and Verify
-
-```bash
-docker compose up -d
-```
