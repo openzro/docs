@@ -25,7 +25,7 @@ deletes them; openZro keeps the openZro account and the Dex credential in sync.
 - The embedded Dex is configured (`OPENZRO_DEX_GRPC_ADDR`) and uses **Postgres** storage.
 - **Every** management replica runs a version that supports SCIM local users before you
   enable creation. Older replicas do not protect local users from some account-wide writes.
-- A [service user](/manage/public-api) with the **admin** role and a personal
+- A [service user](/manage/public-api) with the **Admin** or **Owner** role and a personal
   access token for it. Your IGA authenticates with that token.
 
 ## Enabling local user creation
@@ -52,7 +52,7 @@ Every request uses the service user's token:
 
 ```bash
 SCIM=https://<your-management-domain>/scim/v2
-TOKEN=nbp_...   # personal access token of an admin service user
+TOKEN=nbp_...   # personal access token of an admin or owner service user
 ```
 
 ## Create a user

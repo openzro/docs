@@ -128,7 +128,7 @@ Helm: `dex.config.connectors`), as in the
 4. Optionally configure **JWT allow group** to restrict access
 
 <Note>
-Entra ID returns group **object IDs** (GUIDs) by default, not group names. Your openZro groups will appear as IDs like `a1b2c3d4-5678-90ab-cdef-1234567890ab`. To use display names instead, you need Azure AD Premium and cloud-only groups, or provision users and groups with [SCIM](/manage/team/idp-sync) instead of JWT group sync.
+Entra ID returns group **object IDs** (GUIDs) by default, not group names. Your openZro groups will appear as IDs like `a1b2c3d4-5678-90ab-cdef-1234567890ab`. To use display names instead, you need Azure AD Premium and cloud-only groups, or configure the claim to emit `sAMAccountName` for groups synchronized from on-premises Active Directory.
 </Note>
 
 ---

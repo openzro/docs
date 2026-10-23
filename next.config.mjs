@@ -396,6 +396,111 @@ const nextConfig = {
             },
             // documentation redirects for team
             {
+                source: '/manage/team/approve-users',
+                destination: '/manage/peers/approve-peers',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/entra-id-app-enablement',
+                destination: '/selfhosted/identity-providers/managed/microsoft-entra-id',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/single-sign-on',
+                destination: '/selfhosted/identity-providers',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/single-sign-on/auth0',
+                destination: '/selfhosted/identity-providers/managed/auth0',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/single-sign-on/authentik',
+                destination: '/selfhosted/identity-providers/authentik',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/single-sign-on/cidaas',
+                destination: '/selfhosted/identity-providers/generic-oidc',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/single-sign-on/duo-security',
+                destination: '/selfhosted/identity-providers/managed/duo',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/single-sign-on/jumpcloud',
+                destination: '/selfhosted/identity-providers/managed/jumpcloud',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/single-sign-on/keycloak',
+                destination: '/selfhosted/identity-providers/keycloak',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/single-sign-on/zitadel',
+                destination: '/selfhosted/identity-providers/zitadel',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/google-workspace-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/microsoft-entra-id-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/okta-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/microsoft-entra-id-scim-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/jumpcloud-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/keycloak-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/embedded/jumpcloud-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/embedded/keycloak-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/embedded/google-workspace-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/embedded/microsoft-entra-id-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/manage/team/idp-sync/embedded/microsoft-entra-id-scim-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
                 source: '/how-to/idp-sync',
                 destination: '/manage/team/idp-sync',
                 permanent: true,
@@ -422,7 +527,7 @@ const nextConfig = {
             },
             {
                 source: '/how-to/approve-users',
-                destination: '/manage/team/approve-users',
+                destination: '/manage/peers/approve-peers',
                 permanent: true,
             },
             {
@@ -432,32 +537,32 @@ const nextConfig = {
             },
             {
                 source: '/how-to/single-sign-on',
-                destination: '/manage/team/single-sign-on',
+                destination: '/selfhosted/identity-providers',
                 permanent: true,
             },
             {
                 source: '/how-to/microsoft-entra-id-sync',
-                destination: '/manage/team/idp-sync/microsoft-entra-id-sync',
+                destination: '/manage/team/idp-sync',
                 permanent: true,
             },
             {
                 source: '/how-to/okta-sync',
-                destination: '/manage/team/idp-sync/okta-sync',
+                destination: '/manage/team/idp-sync',
                 permanent: true,
             },
             {
                 source: '/how-to/google-workspace-sync',
-                destination: '/manage/team/idp-sync/google-workspace-sync',
+                destination: '/manage/team/idp-sync',
                 permanent: true,
             },
             {
                 source: '/how-to/jumpcloud-sync',
-                destination: '/manage/team/idp-sync/jumpcloud-sync',
+                destination: '/manage/team/idp-sync',
                 permanent: true,
             },
             {
                 source: '/how-to/keycloak-sync',
-                destination: '/manage/team/idp-sync/keycloak-sync',
+                destination: '/manage/team/idp-sync',
                 permanent: true,
             },
             // documentation redirects for settings

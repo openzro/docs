@@ -305,37 +305,11 @@ export const docsNavigation = [
             title: 'Add Users to Your Network',
             href: '/manage/team/add-users-to-your-network',
           },
-          { title: 'Approve Users', href: '/manage/team/approve-users' },
-          {
-            title: 'Enable openZro for Entra ID',
-            href: '/manage/team/entra-id-app-enablement',
-          },
           {
             title: 'Provision Users & Groups',
             href: '/manage/team/idp-sync',
             isOpen: false,
             links: [
-              {
-                title: 'Microsoft Entra ID (API)',
-                href: '/manage/team/idp-sync/microsoft-entra-id-sync',
-              },
-              {
-                title: 'Microsoft Entra ID (SCIM)',
-                href: '/manage/team/idp-sync/microsoft-entra-id-scim-sync',
-              },
-              { title: 'Okta', href: '/manage/team/idp-sync/okta-sync' },
-              {
-                title: 'Google Workspace',
-                href: '/manage/team/idp-sync/google-workspace-sync',
-              },
-              {
-                title: 'JumpCloud',
-                href: '/manage/team/idp-sync/jumpcloud-sync',
-              },
-              {
-                title: 'Keycloak',
-                href: '/manage/team/idp-sync/keycloak-sync',
-              },
               {
                 title: 'Local users (SCIM)',
                 href: '/manage/team/idp-sync/scim-local-users',
@@ -343,20 +317,14 @@ export const docsNavigation = [
             ],
           },
           {
-            title: 'Auto-Offboard Users',
+            title: 'Offboard Users',
             href: '/manage/team/auto-offboard-users',
             isOpen: false,
           },
           {
             title: 'Single Sign-On',
-            href: '/manage/team/single-sign-on',
+            href: '/selfhosted/identity-providers',
             isOpen: false,
-            //                        links: [
-            //                            { title: 'Authentik', href: '/manage/team/single-sign-on/authentik' },
-            //                            { title: 'Keycloak', href: '/manage/team/single-sign-on/keycloak' },
-            //                            { title: 'Auth0', href: '/manage/team/single-sign-on/auth0' },
-            //                            { title: 'JumpCloud', href: '/manage/team/single-sign-on/jumpcloud' },
-            //                        ]
           },
         ],
       },
@@ -533,7 +501,7 @@ export const docsNavigation = [
           { title: 'Backup', href: '/selfhosted/maintenance/backup' },
           { title: 'Upgrade', href: '/selfhosted/maintenance/upgrade' },
           { title: 'Remove', href: '/selfhosted/maintenance/remove' },
-          { title: 'Reverse Proxy', href: '/selfhosted/reverse-proxy' },
+          { title: 'Reverse Proxy', href: '/selfhosted/external-reverse-proxy' },
           {
             title: 'Management SQLite Store',
             href: '/selfhosted/sqlite-store',
@@ -664,7 +632,7 @@ export const docsNavigation = [
         links: [
           {
             title: 'Allow SSH',
-            href: '/client/allow-ssh',
+            href: '/manage/peers/ssh',
           },
           {
             title: 'Block Inbound Connections',
@@ -676,7 +644,7 @@ export const docsNavigation = [
           },
           {
             title: 'Enable Lazy Connections',
-            href: '/client/enable-lazy-connections',
+            href: '/manage/peers/lazy-connection',
           },
           {
             title: 'Enable Quantum-Resistance',
