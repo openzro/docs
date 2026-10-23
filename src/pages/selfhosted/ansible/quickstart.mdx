@@ -9,10 +9,11 @@ self-signed cert. For production / HA, see
 
 ## Prerequisites
 
-- A Linux VM (Debian 12+ / Ubuntu 22.04+ / RHEL 9 / Rocky 9 /
-  Fedora) reachable via SSH from your workstation
+- A Linux VM (Debian 12+, Ubuntu 22.04+, RHEL / Rocky / AlmaLinux 9+,
+  or Fedora 41+) reachable via SSH from your workstation
 - Root or sudo access on the VM
-- Ansible 2.15+ on your workstation
+- ansible-core **2.18+** on your workstation (needed for dnf5 on
+  Fedora and RHEL 10)
 - A DNS record (or `/etc/hosts` entry on test machines) pointing
   at the VM's public IP — this guide uses `openzro.example.com`
 
@@ -21,7 +22,11 @@ self-signed cert. For production / HA, see
 ```bash
 git clone https://github.com/openzro/openzro-ansible.git
 cd openzro-ansible
+ansible-galaxy install -r requirements.yml
 ```
+
+`requirements.yml` installs the collections the roles use
+(certificates, firewalld, SELinux, cloud load balancers).
 
 ## 2. Configure the inventory
 
@@ -32,12 +37,25 @@ all:
   hosts:
     openzro1:
       ansible_host: 203.0.113.5     # your VM's IP
-      ansible_user: ubuntu          # SSH user
+      ansible_user: root            # SSH user
+
+  children:
+    management:
+      hosts:
+        openzro1:
+    signal:
+      hosts:
+        openzro1:
+    relay:
+      hosts:
+        openzro1:
+    dashboard:
+      hosts:
+        openzro1:
 ```
 
-The default lab inventory expects a single all-in-one host called
-`openzro1`. Multiple hosts in lab mode is also fine — the playbook
-just runs the same all-in-one on each.
+Keep the `children` section: each component is installed on the hosts
+of its group, so the all-in-one host must be in all four.
 
 ## 3. Configure group vars
 
@@ -53,30 +71,36 @@ Open `inventories/lab/group_vars/all.yml` and set:
 ```yaml
 openzro_public_domain: "openzro.example.com"
 
-openzro_oidc_issuer: "https://dex.openzro.example.com"
+openzro_relay_public_address: "{{ openzro_public_domain }}"
+openzro_relay_port: 33080
+openzro_relay_auth_secret: "REPLACE_WITH_BASE64_RANDOM_32B"   # openssl rand -base64 32
+
+openzro_oidc_issuer: "https://idp.example.com"
 openzro_oidc_client_id: "openzro-dashboard"
-openzro_oidc_client_secret: "REPLACE_WITH_DEX_OR_KEYCLOAK_SECRET"
+openzro_oidc_client_secret: "REPLACE_WITH_IDP_SECRET"
+openzro_oidc_supported_scopes: "openid profile email groups"
 
-openzro_admin_email: "you@example.com"
-
-# SQLite is fine for the lab. Postgres recommended for prod.
+# SQLite is fine for the lab. Postgres is required for HA.
 openzro_datastore_engine: "sqlite"
 
-# Self-signed cert for the lab — flip to letsencrypt later.
-openzro_self_signed_tls: true
+# certbot_http | certbot_dns | byo | self_signed (lab only)
+openzro_tls_mode: self_signed
+
+openzro_cloud: none
 ```
 
-The full file has more knobs (relay port, signal port, OIDC scope
-list, etc.) — read its inline comments. Lab defaults are sane;
-the values above are the minimum the playbook needs to render
-working configs.
+The file's inline comments describe the other settings: the dashboard
+install method, firewalld and SELinux handling, version pinning, and a
+custom package mirror (`openzro_repo_baseurl_apt`,
+`openzro_repo_baseurl_rpm`) for air-gapped hosts.
 
 <Note>
-The lab assumes a Dex-or-equivalent OIDC issuer is reachable at
-`dex.<openzro_public_domain>`. Stand up a Dex container alongside
-on the same VM for a self-contained lab — see the
-[OIDC providers](/selfhosted/identity-providers) section for
-options.
+The Ansible roles install management, signal, relay, the dashboard and
+nginx. They do **not** install an identity provider (Dex or other) or
+Coturn: point `openzro_oidc_issuer` at an existing OIDC provider (see
+[Identity Providers](/selfhosted/identity-providers)). No STUN or TURN
+servers are configured, so peers rely on the openZro Relay when a
+direct connection fails.
 </Note>
 
 ## 4. Run the playbook
@@ -87,15 +111,18 @@ ansible-playbook -i inventories/lab playbooks/site.yml
 
 What happens, idempotently:
 
-1. Imports `pkg.openzro.io`'s GPG key + adds the APT/YUM repo
-2. Installs the native packages (`openzro-management`,
+1. On RHEL-family hosts, enables EPEL, opens the needed firewalld
+   ports and sets the SELinux boolean nginx needs
+2. Imports `pkg.openzro.io`'s signing key and adds the APT or RPM repo
+3. Installs the native packages (`openzro-management`,
    `openzro-signal`, `openzro-relay`)
-3. Pulls the dashboard container (`ghcr.io/openzro/dashboard`)
-4. Renders `/etc/openzro/management.json` from the role's template
-5. Drops `/etc/default/openzro-{management,signal,relay}` env files
-6. Provisions nginx with a self-signed cert (since
-   `openzro_self_signed_tls: true`)
-7. `daemon-reload` + `enable --now` for every systemd unit
+4. Installs the dashboard: the `openzro-dashboard` package on
+   Debian/Ubuntu, or the `ghcr.io/openzro/dashboard` container under
+   podman elsewhere
+5. Renders `/etc/openzro/management.json` and the
+   `/etc/default/openzro-{management,signal,relay}` env files
+6. Provisions nginx with the certificate from `openzro_tls_mode`
+7. Enables and starts every systemd unit
 
 Total time on a 2 vCPU / 4 GB VM: ~3–5 minutes (most of it is
 package downloads).
@@ -109,8 +136,8 @@ ansible -i inventories/lab all -m shell -a "systemctl is-active openzro-manageme
 # Dashboard reachable?
 curl -k https://openzro.example.com/
 
-# Management gRPC + REST?
-curl -k https://openzro.example.com/api/users
+# Management REST API up? (401 without a token is the expected answer)
+curl -k -o /dev/null -w "%{http_code}\n" https://openzro.example.com/api/users
 ```
 
 Open `https://openzro.example.com/` in a browser — accept the
@@ -145,9 +172,10 @@ for HA management, and cloud-LB integration.
 - **APT repo signature error** — the role imports the openZro
   signing key automatically; if it fails, your VM has no outbound
   HTTPS to `pkg.openzro.io`. Whitelist that host in egress rules.
-- **Dashboard 502** — nginx is up but the container isn't ready
-  yet. Wait ~30 s after the playbook finishes; the container
-  pulls on first start.
+- **Dashboard 502 on RHEL/Fedora** — usually SELinux blocking nginx
+  from reaching the upstreams; check that `openzro_manage_selinux` was
+  left on. With the container install method, the container may also
+  still be pulling on first start.
 - **OIDC redirect mismatch** — the IdP needs the dashboard's
   callback URL whitelisted. Check the dashboard
   [identity-providers docs](/selfhosted/identity-providers) for
