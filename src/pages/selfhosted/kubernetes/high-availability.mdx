@@ -71,8 +71,10 @@ Trade-offs:
 - ⚠️ All replicas must boot within ~60s for first leader election
   (the management coordinator retries bucket creation with backoff)
 
-This is the default recommendation. Operators don't need to manage
-external NATS or Redis.
+This needs no external NATS or Redis. For production, the chart's own
+values recommend `external` (next section): management and signal stay
+Deployments, so rolling upgrades and storage are simpler, and NATS HA is
+handled by its own chart.
 
 ### Mode 3a — `external` with bundled NATS subchart
 
@@ -142,7 +144,7 @@ Trade-offs:
 - ✅ Allows cross-workload subject namespacing
 - ⚠️ openzro publishes under `oz.cluster.*` and `oz.signal.*` —
   ensure these subjects don't collide with other tenants
-- ⚠️ JetStream KV bucket `openzro_locks` is created on first start
+- ⚠️ JetStream KV bucket `oz_cluster_locks` is created on first start
   if absent (you can pre-create it for stricter access control)
 
 ### Mode 3c — `external` with Redis
@@ -159,6 +161,10 @@ cluster:
 
 management:
   replicaCount: 3
+  # Several replicas cannot share the default ReadWriteOnce volume;
+  # management state lives in postgres or mysql instead.
+  persistentVolume:
+    enabled: false
   envRaw:
     - name: OPENZRO_REDIS_URL
       value: "redis://my-redis.shared.svc.cluster.local:6379"
@@ -189,9 +195,7 @@ Trade-offs:
   ordering guarantees) — fine for openzro's signaling pattern
 - ⚠️ KV locks via Redis use SET NX EX (TTL-based), no Raft consensus
 
-Track [openzro/helms#X](https://github.com/openzro/helms/issues)
-for the proposal to add `cluster.mode: external-redis` as a first-class
-option in a future alpha.
+First-class Redis support in `cluster.mode` is not available yet.
 
 ## Relay multi-pod fabric (ADR-0014)
 
@@ -379,7 +383,7 @@ Deployment in front of the management gRPC port, with
 globally without breaking other workloads). LoadBalancer Service
 in front of the proxy, TLS terminated by the proxy itself via
 cert-manager, peers route there for FlowService.Events while
-zt.example.com (the main host) keeps serving Login / Sync /
+openzro.example.com (the main host) keeps serving Login / Sync /
 dashboard / Dex / `/api` through the cluster ingress unchanged.
 
 ```yaml
@@ -403,7 +407,7 @@ After `helm upgrade`:
 
 1. **Get the LB IP** allocated by the cloud:
    ```bash
-   kubectl -n openzro get svc <release>-openzro-management-grpc-proxy
+   kubectl -n openzro get svc openzro-management-grpc-proxy   # <fullname>-management-grpc-proxy
    ```
 2. **Create the DNS A record** `mgmt-grpc.example.com → <IP>`.
 3. **Wait for cert-manager** to issue the certificate
@@ -465,7 +469,7 @@ instead and skip `grpcProxy.enabled: true` entirely:
 | Alternative | Notes |
 |---|---|
 | **HAProxy ingress controller** | gRPC streaming works out of the box. Common pattern in shops that already use HAProxy. |
-| **Envoy Gateway** | Modern Gateway API + GRPCRoute. Cleanest if you're greenfield. |
+| **Envoy Gateway** | Gateway API. Route gRPC with an `HTTPRoute` that sets `timeouts.request: 0s`, not a `GRPCRoute`: Envoy's default 15s route timeout cuts the long-lived Sync and Flow streams, and `GRPCRoute` has no timeout field. The chart's `gatewayApi.*` values render these routes. |
 | **Contour** (Envoy-based) | Same Envoy lineage, packaged for VMware Tanzu / Bitnami stacks. |
 | **GKE Gateway API + HTTPS LB** | Native to GCP. Works well for GKE-only deploys; ties you to Google. |
 
@@ -503,11 +507,11 @@ kubectl exec -n openzro openzro-management-0 -- env | grep OPENZRO_REDIS_URL
 ```bash
 kubectl logs -n openzro -l app.kubernetes.io/name=openzro-relay \
   | grep "cluster discovery"
-# Expected: cluster discovery: openzro-relay-internal reconciled — +N peers
+# Expected: cluster discovery: openzro-relay-internal reconciled — +N / -0 (now N peers)
 ```
 
-Prometheus metrics on the cluster fabric (when
-`metrics.serviceMonitor.enabled: true`):
+Prometheus metrics on the cluster fabric (with `relay.metrics.enabled: true`
+and a ServiceMonitor):
 
 | Metric | Type | Healthy steady-state |
 |---|---|---|

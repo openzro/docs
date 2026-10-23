@@ -43,12 +43,10 @@ helm repo add openzro https://openzro.github.io/helms
 helm repo update
 ```
 
-OCI also works:
-
-```bash
-helm install --version 2.1.0-alpha.27 \
-  openzro oci://ghcr.io/openzro/charts/openzro
-```
+Every published chart version is a prerelease (`2.1.0-alpha.N`), so
+`helm install` and `helm upgrade` need `--devel`, or an explicit
+`--version`. Use the HTTPS repository above: the OCI copy at
+`ghcr.io/openzro/charts/openzro` is not kept up to date.
 
 ## 2. Author your values override
 
@@ -169,10 +167,16 @@ management:
     annotations:
       cert-manager.io/cluster-issuer: letsencrypt-prod
       nginx.ingress.kubernetes.io/backend-protocol: GRPC
+      # Sync and Flow are long-lived streams; nginx's 60s default cuts them.
+      nginx.ingress.kubernetes.io/proxy-read-timeout: "3600"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: "3600"
     hosts:
       - host: grpc.openzro.example.com
         paths:
           - path: /management.ManagementService
+            pathType: ImplementationSpecific
+          # Traffic events: the chart points peers' Flow endpoint at this host
+          - path: /flow.FlowService
             pathType: ImplementationSpecific
     tls:
       - secretName: grpc-openzro-tls
@@ -291,13 +295,18 @@ dashboard:
 
 ```bash
 helm install openzro openzro/openzro \
+  --devel \
   --create-namespace \
   --namespace openzro \
   -f my-openzro.yaml
 ```
 
-Pre-install Job creates the 4 PostgreSQL databases if they don't
-exist (`postgres`, `openzro_flow`, `openzro_activity`, `dex`).
+With `provisioning.enabled: true`, a pre-install Job creates the four
+PostgreSQL databases if they don't exist (`openzro`, `openzro_flow`,
+`openzro_activity`, `dex`).
+
+Peers then use `--management-url https://grpc.openzro.example.com`,
+the host that carries management gRPC in this example.
 After that, management and Dex run their own schema migrations on
 boot.
 
@@ -348,14 +357,28 @@ curl -sI https://openzro.example.com/api/users
 
 Open `https://openzro.example.com/`, sign in with the bootstrap
 admin email + the password you put behind the bcrypt hash. From
-**Settings → Identity Providers** wire your corporate IdP
+**Settings → Authentication Providers** wire your corporate IdP
 (Microsoft Entra, Google Workspace, Okta, Keycloak, generic OIDC)
 at runtime.
+
+<Note>
+The tab manages Dex connectors over Dex's gRPC API, which the chart does
+not wire on its own. Add this to your values:
+
+```yaml
+management:
+  envRaw:
+    - name: OPENZRO_DEX_GRPC_ADDR
+      value: "openzro-dex:5557"
+    - name: OPENZRO_DEX_GRPC_INSECURE   # plaintext in-cluster; use mTLS for production
+      value: "true"
+```
+</Note>
 
 ## JWT Group Sync (when using an upstream IdP)
 
 When you wire a corporate IdP (Keycloak, Microsoft Entra, Google
-Workspace, Okta, generic OIDC) under **Settings → Identity Providers**,
+Workspace, Okta, generic OIDC) under **Settings → Authentication Providers**,
 groups from the upstream can flow into openZro Groups and be used
 in Policies — but only if four moving parts line up:
 
@@ -364,11 +387,28 @@ in Policies — but only if four moving parts line up:
    scope, with `Add to ID token: On` and `Token Claim Name: groups`.
    See the [Keycloak guide](/selfhosted/identity-providers/keycloak#configuring-jwt-groups-claim).
 
-2. **Dex requests groups from upstream and re-emits them.** When
-   you add the IdP via the dashboard, openZro creates a Dex OIDC
-   connector with `insecureEnableGroups: true`, `scopes`
-   including `groups`, and `getUserInfo: false`. The
-   `getUserInfo: false` matters: with `true`, Dex calls the
+2. **Dex requests groups from upstream and re-emits them.** The
+   Dex OIDC connector needs `insecureEnableGroups: true`, `scopes`
+   including `groups`, and `getUserInfo: false`. Connectors added
+   from the dashboard do not set these, so declare the connector in
+   `dex.config.connectors` in your values instead:
+   ```yaml
+   dex:
+     config:
+       connectors:
+         - type: oidc
+           id: keycloak
+           name: Keycloak
+           config:
+             issuer: https://auth.example.com/realms/corp
+             clientID: openzro
+             clientSecret: REPLACE
+             redirectURI: https://openzro.example.com/dex/callback
+             scopes: [openid, profile, email, groups]
+             insecureEnableGroups: true
+             getUserInfo: false
+   ```
+   The `getUserInfo: false` matters: with `true`, Dex calls the
    upstream `/userinfo` endpoint after token exchange and
    *overwrites* the claims — and Keycloak's userinfo doesn't carry
    groups by default, so the claim disappears.
@@ -391,7 +431,7 @@ in Policies — but only if four moving parts line up:
    the management ignores the claim even if it's present in the JWT.
 
 After all four are aligned, log out and log back in. The groups
-appear in **Team → Groups** auto-created, and the user gets them
+appear in **Identity → Users & Groups → Groups** auto-created, and the user gets them
 as `auto_groups`. Empty groups list after a fresh login is a
 strong signal that step 2 or 3 is misaligned — inspect the
 id_token in the browser DevTools (Application → Storage → look
@@ -406,7 +446,7 @@ in a Vault and are referenced via `<path:vault/path#field>`
 markers in the values. The chart was hardened in `2.1.0-alpha.20+`
 to use `mustToRawJson` so the markers survive intact through
 `management.json` rendering — without that fix the markers got
-HTML-escaped to `<` and the plugin couldn't resolve them.
+escaped to `\u003c` and the plugin couldn't resolve them.
 
 ```yaml
 postgres:

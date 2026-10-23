@@ -10,21 +10,26 @@ notes apply.
 ```bash
 helm repo update
 helm upgrade openzro openzro/openzro \
+  --devel \
   --namespace openzro \
   -f my-openzro.yaml
 ```
 
-The chart preserves operator-supplied secrets across upgrades via
-the Helm `lookup` function:
+Every published chart version is a prerelease, hence `--devel` (or
+an explicit `--version`).
 
-- Relay inter-pod HMAC secret (auto-generated on first install,
-  preserved on upgrade)
-- Management WireGuard private key (provisioned by a pre-install
-  Helm hook, preserved across upgrades)
-- Database bootstrap credentials (idempotent provisioning Job)
+Two generated secrets survive upgrades:
 
-You shouldn't need to back these up before an upgrade — they
-travel through the upgrade unchanged. Operators who use external
+- **Relay inter-pod HMAC secret** — generated on first install and
+  kept through Helm's `lookup`. `lookup` returns nothing under
+  ArgoCD or `helm template`, so with GitOps the secret is
+  regenerated on every render: pin `relay.cluster.authSecret.value`
+  or use `existingSecret`.
+- **Management WireGuard private key** — created by a pre-install /
+  pre-upgrade hook Job that does nothing when the Secret already
+  exists.
+
+You shouldn't need to back these up before an upgrade. Operators who use external
 secret managers (SealedSecrets, sops, vault-csi) feed values via
 `existingSecret` references and bypass the chart's auto-gen
 entirely.
@@ -33,8 +38,8 @@ entirely.
 
 | Component | Upgrade behavior |
 |---|---|
-| `management` | RollingUpdate. Peer connections continue talking to whichever replica is up. |
-| `signal` | RollingUpdate. Peers reconnect on disconnect — sub-second reconnect. |
+| `management` | Depends on `cluster.mode`: `disabled` (default) uses Recreate, a short outage; `embedded` is a StatefulSet updated pod by pod; `external` is a Deployment with RollingUpdate and `maxUnavailable: 0`. |
+| `signal` | Deployment, or StatefulSet with `cluster.mode: embedded`. Peers reconnect on disconnect. |
 | `relay` | RollingUpdate. Peer TCP connections drop → reconnect via load balancer onto a (possibly different) pod. With multi-pod fabric on, peers on different pods continue communicating throughout. |
 | `dashboard` | RollingUpdate. UI is stateless. |
 | `dex` | RollingUpdate per upstream Dex chart. |
@@ -80,25 +85,36 @@ Steps:
    kubectl get certificate -n openzro openzro-signal-tls
    ```
 
-4. Get the new external IP and update DNS:
+4. Point peers at the new signal address in your values, so
+   management announces it:
+   ```yaml
+   management:
+     config:
+       signal:
+         uri: "signal.example.com:443"
+   ```
+   Without it, the chart keeps announcing `<ingress host>:443`.
+
+5. Get the new external IP and update DNS:
    ```bash
    kubectl get svc -n openzro openzro-signal -o jsonpath='{.status.loadBalancer.ingress[0].ip}'
    ```
    Point `signal.example.com` at that IP.
 
-5. Existing peers reconnect on next sync (within ~30s after the
-   management broadcasts the new signal URL via `Signal.URI`).
+6. Existing peers pick up the new signal address when they
+   reconnect (`openzro down && openzro up` forces it).
 
 For operators on Envoy / Traefik / NGINX-Plus controllers, the bug
 doesn't apply — keep `signal.ingress.enabled: true`.
 
-## CRD upgrades
+## CRD upgrades (operator chart)
 
-Helm doesn't upgrade CRDs by default. After every chart bump,
-re-apply the CRDs:
+The `openzro` chart has no CRDs. If you also run the
+[operator](/selfhosted/operator), its chart ships CRDs, which Helm
+does not upgrade. After every operator chart bump, re-apply them:
 
 ```bash
-helm pull openzro/openzro-operator --untar --untardir /tmp/op
+helm pull openzro/openzro-operator --devel --untar --untardir /tmp/op
 kubectl apply -f /tmp/op/openzro-operator/crds/
 ```
 
@@ -118,9 +134,18 @@ taken before the upgrade.
 
 ## Dex storage migration
 
-When `postgres.enabled: true` (the recommended setup), the chart
-auto-routes Dex's storage to the `dex` database via the same
-Postgres credentials. No PVC, no SQLite, no manual values flip.
+With `postgres.enabled: true`, the chart renders a Dex configuration
+that uses the `dex` database, but the Dex subchart only uses it when
+you point it there:
+
+```yaml
+dex:
+  configSecret:
+    create: false
+    name: openzro-dex-config   # <release>-dex-config
+```
+
+Without these two lines Dex keeps its own SQLite configuration.
 
 If you started in lab mode (sqlite) and want to migrate to
 Postgres later:
@@ -140,6 +165,8 @@ postgres path skip this entirely.
 ## Verifying a successful upgrade
 
 ```bash
+# With cluster.mode: embedded, management and signal are StatefulSets:
+# use statefulset/openzro-management and statefulset/openzro-signal.
 kubectl -n openzro rollout status deployment/openzro-management
 kubectl -n openzro rollout status deployment/openzro-signal
 kubectl -n openzro rollout status deployment/openzro-relay
@@ -152,10 +179,11 @@ curl -s https://openzro.example.com/dex/.well-known/openid-configuration | jq .i
 If a rollout hangs, `kubectl describe pod` and
 `kubectl logs --previous` are the first diagnostics. Probes:
 
-- **Management / signal / dashboard** — TCP probe on the service
-  port. Stuck rollout usually means the new image can't reach
-  its database (postgres) or its broker (NATS embedded peer
-  connection refused) — check the management/signal logs first.
+- **Management / signal** — TCP probe on the service port. A stuck
+  rollout usually means the new image can't reach its database
+  (postgres) or its broker (NATS embedded peer connection refused) —
+  check the management/signal logs first.
+- **Dashboard** — `httpGet /` on the HTTP port.
 - **Relay** — `httpGet /metrics` on port 9090 (HTTP plaintext).
   TLS handshake on the public port (33080) does not pollute logs.
 

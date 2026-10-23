@@ -11,14 +11,15 @@ or MySQL server when either is enabled:
 - **dex** — IdP storage (when Dex is enabled)
 
 All four databases share the same connection user (`openzro` by
-default). A pre-install Helm hook creates them if they don't
-exist; the management daemon and Dex run their own schema
+default). With `postgres.provisioning.enabled: true` (off by default),
+a pre-install Helm hook creates them if they don't exist; the
+management daemon and Dex run their own schema
 migrations on first boot.
 
 ## PostgreSQL (recommended)
 
 The chart points at an external Postgres — Cloud SQL, AWS RDS,
-Cloud Spanner with PG dialect, self-hosted with replication, etc.
+self-hosted with replication, etc.
 Bundled subchart was removed; for HA the production target is a
 managed service.
 
@@ -62,15 +63,19 @@ grant.
 
 Cloud-managed Postgres (Cloud SQL, RDS) often restricts the
 `CREATEDB` global privilege to a separate admin user. Two ways
-to live without it:
+to live with that:
 
-```yaml
-postgres:
-  provisioning:
-    enabled: false
-```
-
-Then ask your DBA to pre-create the four databases:
+1. Give the provisioning Job that admin user, while the services
+   keep using `postgres.username`:
+   ```yaml
+   postgres:
+     provisioning:
+       enabled: true
+       username: postgres-admin
+       password: "REPLACE"
+   ```
+2. Leave provisioning off and ask your DBA to pre-create the four
+   databases:
 
 ```sql
 CREATE DATABASE openzro            OWNER openzro;
@@ -90,7 +95,7 @@ postgres:
   sslMode: require
 ```
 
-`require` cifrates the connection without validating the server
+`require` encrypts the connection without validating the server
 certificate — sufficient when the DB is in a peered VPC or
 otherwise trusted at the network layer.
 
@@ -104,8 +109,7 @@ For full validation:
 | `verify-full` | ✅ | ✅ | ✅ |
 
 `verify-ca`/`verify-full` need the server CA mounted in the pod
-via a Secret + `PGSSLROOTCERT` env var. See the management deploy
-guide for the full mount pattern.
+via a Secret + `PGSSLROOTCERT` env var.
 
 ## MySQL
 
@@ -140,15 +144,22 @@ labs.
 
 ## Dex storage
 
-Dex storage routes through the same `postgres:` block when
-postgres is enabled. The chart renders `dex.config.storage` to
-point at the `dex` database with the same credentials. No
-duplication needed.
+With postgres (or mysql) enabled, the chart renders a Dex
+configuration that stores Dex's data in the `dex` database with the
+same credentials, as the Secret `<release>-dex-config`. The Dex
+subchart only uses it when you point it there:
 
-For lab installs (sqlite), the upstream Dex chart provisions a
-1Gi PVC at `/var/lib/dex` — flip `dex.persistence.enabled: true`
-and uncomment the `dex-data` volume in `dex.volumes` /
-`dex.volumeMounts`.
+```yaml
+dex:
+  configSecret:
+    create: false
+    name: openzro-dex-config
+```
+
+Without these lines Dex keeps its SQLite default. For lab installs
+on SQLite, the openZro chart's own PVC (`openzro-dex-data`) keeps
+`/var/lib/dex` across restarts; the chart skips it when an external
+database is configured.
 
 ## Backup
 
@@ -167,17 +178,21 @@ invalidates the encrypted columns. Back it up alongside the DB.
 
 Independent of the SQL backend, the management binary fetches a
 GeoLite2 database for posture checks. The chart pulls from the
-openZro mirror by default (`pkg.openzro.io/geolocation-dbs`), no
-operator action needed. To pin a MaxMind license key for direct
-upstream pulls:
+openZro mirror by default
+([`openzro/geolocation-dbs`](https://github.com/openzro/geolocation-dbs)
+releases), no operator action needed. To pull directly from MaxMind
+with your own license key:
 
 ```yaml
 management:
-  config:
-    geoLite:
-      licenseKey:
-        existingSecret: openzro-maxmind
-        existingSecretKey: licenseKey
+  geoLite:
+    licenseKey:
+      existingSecret: openzro-maxmind
+      existingSecretKey: licenseKey
+  # The chart passes the key as the OZ_MAXMIND_LICENSE_KEY environment
+  # variable, which management does not read; pass it as a flag too:
+  extraArgs:
+    - --maxmind-license-key=$(OZ_MAXMIND_LICENSE_KEY)
 ```
 
 Or use `value:` directly. With license key empty, the openZro
