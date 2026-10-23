@@ -4,94 +4,59 @@ import {
 
 # Manage JWT-Claim Groups
 
-You followed a `Manage in your IdP` link from the openZro
-dashboard's Groups page. The group you came from has `Issued: jwt`
-in openZro — its membership is derived from a **JWT claim** that
-your identity provider emits at login time, not from a SCIM push or
-a Graph poll.
+You followed a **Manage in JWT provisioning** link from the openZro dashboard's Groups page. The group shows **Issued
+via JWT**: its membership comes from a group claim in the token your identity provider issues, not from SCIM or the
+dashboard. To change who is in it, change the claim at the identity provider.
 
-JWT-claim groups are stateless on the openZro side: there is no
-periodic sync interval. The group memberships you see in openZro
-are a projection of the most recent login from each user, computed
-on the fly from the `id_token` your IdP returned. To change
-membership, change the claim at the IdP — the next login reflects
-the new state.
+## How JWT group sync works
 
-This page covers the two operator tasks that come up: adjusting
-which claim openZro reads, and re-scoping a JWT-claim group's
-lifecycle.
+JWT group sync is configured per account under **Settings → Groups**, in the **JWT group sync** card:
 
-## How JWT-claim groups work
+- **Enable JWT group sync** turns it on.
+- **JWT claim** is the name of the claim that holds the user's groups, for example `groups`. There is no default; if
+  it is empty, nothing is synced.
+- **JWT allow group** (optional): only users who have this group in the claim may sign in.
 
-When a user signs in:
+Each time a user calls the openZro API with a token (the dashboard does this on every page) or signs in a device with
+SSO, openZro reads the claim and updates the user's groups:
 
-1. The IdP issues an `id_token` carrying a configurable group claim
-   (default key: `roles`; the key is set per account in `Settings`
-   → `Authentication` → `JWT group sync claim`).
-2. openZro reads the claim, splits it into individual group names,
-   and binds the user to those groups for the duration of the
-   session.
-3. Groups that the user already belonged to and that no longer
-   appear in the new claim are dropped from the user — but only
-   for groups previously created via `Issued: jwt`. Groups with
-   `Issued: api` or `Issued: integration` are untouched by JWT
-   sync (they have their own lifecycle).
+1. A group named in the claim that doesn't exist yet is created with **Issued via JWT**.
+2. The user is added to every JWT group named in the claim, and removed from JWT groups that are no longer in it. The
+   result is saved on the user.
+3. Groups created in the dashboard, through the API or by SCIM are never added or removed by JWT sync.
 
-A group named in the JWT claim that doesn't exist on the openZro
-side is created automatically with `Issued: jwt`. A group that no
-longer appears in any active session's JWT claim does NOT get
-auto-deleted — it stays as an empty group until an operator removes
-it from the openZro dashboard or until it gets re-bound on a future
-login.
+The claim must be a JSON array of strings, for example `"groups": ["devops", "support"]`. Any other shape, such as a
+single string, is read as no groups.
 
-## Adjust which claim openZro reads
-
-The group-claim key is account-wide:
-
-* Open openZro → `Settings` → `Authentication`.
-* Edit `JWT group sync claim` (default: `roles`). Common
-  alternative values: `groups`, `memberOf`, `cognito:groups`.
-* Save. The next login from any user will read the new claim key.
+Peers follow their owner's groups only when **Enable user group propagation** is on, in the same tab. Without it,
+JWT groups are assigned to users, and to their peers only when the peers are registered.
 
 <Note>
-The claim must be either a JSON array of strings or a single
-string (treated as a one-element list). Nested objects, claim URIs
-with mixed-case path segments, and claims keyed on the user object
-rather than the token are not supported — flatten them at your IdP
-or use a token-mapper to project them into the top-level claim.
+On self-hosted openZro, Dex forwards upstream groups only from connectors configured with `insecureEnableGroups: true`
+and the `groups` scope. See [JWT Group Sync](/selfhosted/identity-providers#jwt-group-sync) for how to set this up and
+how to configure group claims in common identity providers.
 </Note>
 
 ## Rename a JWT-claim group
 
-Renaming a JWT-claim group on the openZro side alone is a no-op —
-the next login from a user carrying the old claim will re-create
-the original name as a new group. To rename properly:
+Renaming a JWT group in openZro has no effect: the next request from a user whose claim still carries the old name
+re-creates a group with the old name. To rename it:
 
-1. Update the source-of-truth claim at your IdP (Auth0 Rules, Okta
-   token inline hooks, Keycloak protocol mappers, Cognito pre-token
-   trigger Lambda — the exact path depends on the IdP).
-2. Have any logged-in users sign out and back in (or wait for their
-   session to refresh).
-3. The new group name appears on the next login. The old name
-   stays empty in openZro until you remove it manually.
+1. Change the group name in the claim at your identity provider.
+2. Have users sign in again so their tokens carry the new name.
+3. A new JWT group with the new name appears and users move into it. The old group stays, empty, until you delete it.
 
 ## Decommission a JWT-claim group
 
-Remove the group name from the claim at your IdP. Existing user
-sessions retain the old group binding until they log out / their
-session expires; new logins drop the binding.
+Remove the group from the claim at your identity provider. Users leave the group the next time they use openZro with a
+new token.
 
-Once no logged-in user carries the group name in their claim, the
-group sits empty on the openZro side. A regular admin CAN delete
-an empty `Issued: jwt` group from the openZro dashboard — unlike
-`Issued: integration` groups, JWT groups are not protected against
-manual deletion. If openZro policies, routes, or resources still
-reference the group, the dashboard rejects the deletion until you
-clear those references.
+JWT groups are not deleted automatically. The dashboard does not allow editing or deleting them; an administrator can
+delete an empty JWT group through the API (`DELETE /api/groups/{groupId}`). The deletion is rejected while policies,
+routes, or other resources still reference the group.
 
-## Backlinks
+## Related
 
-* [JWT Authentication](/selfhosted/identity-providers/) — the
-  underlying OIDC / JWT auth setup for self-hosted openZro.
-* [Manage Access with Groups and Policies](/manage/access-control/manage-network-access) — how to
-  use JWT-claim groups as source / destination selectors.
+* [Identity providers](/selfhosted/identity-providers): Dex and upstream identity provider setup.
+* [Manage Access with Groups and Policies](/manage/access-control/manage-network-access): using groups as policy sources
+  and destinations.

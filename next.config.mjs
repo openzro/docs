@@ -273,17 +273,17 @@ const nextConfig = {
             // documentation redirects for use-cases
             {
                 source: '/how-to/examples',
-                destination: '/use-cases/cloud/aws-ecs-terraform',
+                destination: '/use-cases',
                 permanent: true,
             },
             {
                 source: '/how-to/netbird-on-faas',
-                destination: '/use-cases/cloud/netbird-on-faas',
+                destination: '/use-cases',
                 permanent: true,
             },
             {
                 source: '/how-to/routing-peers-and-kubernetes',
-                destination: '/use-cases/cloud/routing-peers-and-kubernetes',
+                destination: '/use-cases',
                 permanent: true,
             },
             {
@@ -293,7 +293,7 @@ const nextConfig = {
             },
             {
                 source: '/how-to/distributed-multi-cloud-ai-argocd-microk8s-vllm',
-                destination: '/use-cases/cloud/distributed-multi-cloud-ai',
+                destination: '/use-cases',
                 permanent: true,
             },
             // documentation redirects for networks
@@ -397,6 +397,21 @@ const nextConfig = {
             // documentation redirects for team
             {
                 source: '/how-to/idp-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/how-to/idp-google-workspace-group-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/how-to/idp-okta-group-sync',
+                destination: '/manage/team/idp-sync',
+                permanent: true,
+            },
+            {
+                source: '/how-to/idp-azure-ad-group-sync',
                 destination: '/manage/team/idp-sync',
                 permanent: true,
             },
@@ -653,17 +668,17 @@ const nextConfig = {
             // Use-cases flat pages -> categorized
             {
                 source: '/use-cases/examples',
-                destination: '/use-cases/cloud/aws-ecs-terraform',
+                destination: '/use-cases',
                 permanent: true,
             },
             {
                 source: '/use-cases/netbird-on-faas',
-                destination: '/use-cases/cloud/netbird-on-faas',
+                destination: '/use-cases',
                 permanent: true,
             },
             {
                 source: '/use-cases/routing-peers-and-kubernetes',
-                destination: '/use-cases/cloud/routing-peers-and-kubernetes',
+                destination: '/use-cases',
                 permanent: true,
             },
             {
@@ -678,7 +693,7 @@ const nextConfig = {
             },
             {
                 source: '/use-cases/distributed-multi-cloud-ai-argocd-microk8s-vllm',
-                destination: '/use-cases/cloud/distributed-multi-cloud-ai',
+                destination: '/use-cases',
                 permanent: true,
             },
             // selfhosted reverse proxy rename
