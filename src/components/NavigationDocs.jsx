@@ -501,7 +501,7 @@ export const docsNavigation = [
           { title: 'Backup', href: '/selfhosted/maintenance/backup' },
           { title: 'Upgrade', href: '/selfhosted/maintenance/upgrade' },
           { title: 'Remove', href: '/selfhosted/maintenance/remove' },
-          { title: 'Reverse Proxy', href: '/selfhosted/reverse-proxy' },
+          { title: 'Reverse Proxy', href: '/selfhosted/external-reverse-proxy' },
           {
             title: 'Management SQLite Store',
             href: '/selfhosted/sqlite-store',
@@ -632,7 +632,7 @@ export const docsNavigation = [
         links: [
           {
             title: 'Allow SSH',
-            href: '/client/allow-ssh',
+            href: '/manage/peers/ssh',
           },
           {
             title: 'Block Inbound Connections',
@@ -644,7 +644,7 @@ export const docsNavigation = [
           },
           {
             title: 'Enable Lazy Connections',
-            href: '/client/enable-lazy-connections',
+            href: '/manage/peers/lazy-connection',
           },
           {
             title: 'Enable Quantum-Resistance',
