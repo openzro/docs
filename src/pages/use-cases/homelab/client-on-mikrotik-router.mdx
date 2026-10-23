@@ -33,7 +33,7 @@ Running openZro directly on field routers removes the need for a lot of complexi
 ## Limitations
 <Note>
   Use at your own risk. All [RouterOS containers warnings](https://help.MikroTik.com/docs/display/ROS/Container#Container-Disclaimer) apply.\
-  This is unsupported by both MikroTik and openZro because it uses MikroTik's beta and openZro's legacy features.
+  This setup is not officially supported by MikroTik or openZro: RouterOS containers are still limited, and openZro has to run in legacy routing mode.
 </Note>
 
 There are quite a few caveats to this approach because containers on RouterOS are still
@@ -44,9 +44,9 @@ Also, very few current MikroTik devices are optimized for running containers, so
 - openZro in RouterOS containers can not use an exit node (because it uses legacy routing mode).
 - openZro in RouterOS containers can't perform NAT, but it can do direct routing, and we can do NAT on RouterOS instead.
 
-## Tested on
-- Cloud Hosted Router (a.k.a CHR, x86) v7.15.3, v7.16b7
-- D53G-5HacD2HnD (a.k.a. Chateau, arm) v7.15.3, v7.16b7
+## Supported hardware
+The openZro client image `ghcr.io/openzro/openzro` is published for `amd64` and `arm64` only. It runs on Cloud Hosted
+Router (CHR, x86) and on ARM64 MikroTik devices, but not on 32-bit ARM devices.
 
 ## Step-by-step guide
 
@@ -88,11 +88,11 @@ We should also allow remote DNS queries from the container to the router's DNS s
 Ensure the router's firewall rules are set to block external access to DNS ports, and also allow access to DNS ports from containers.
 This is beyond the scope of this guide's, though important as we'll be setting container's resolvers to router's IP addresses.
 
-Enable container functionality logging in RouterOS and configure DockerHub registry cache on the external disk.
+Enable container functionality logging in RouterOS and point the container registry at GitHub Container Registry, with the pull cache on the external disk.
 This assumes that our USB drive is mounted as `/usb1`:
 ```shell
 /system/logging add topics=container
-/container/config/set registry-url=https://registry-1.docker.io tmpdir=/usb1/pull
+/container/config/set registry-url=https://ghcr.io tmpdir=/usb1/pull
 ```
 
 ### Prepare the openZro container
@@ -104,30 +104,28 @@ and getting access to router's private keys. This file doesn't really change all
 
 ```shell
 /container envs
-add key=NB_SETUP_KEY name=openzro value=YOUR_OPENZRO_SETUP_KEY
-add key=NB_NAME name=openzro value=CONTAINER_HOSTNAME
-add key=NB_HOSTNAME name=openzro value=CONTAINER_HOSTNAME
-add key=NB_LOG_LEVEL name=openzro value=info
-add key=NB_DISABLE_CUSTOM_ROUTING name=openzro value=true
-add key=NB_USE_LEGACY_ROUTING name=openzro value=true
+add key=OZ_SETUP_KEY name=openzro value=YOUR_OPENZRO_SETUP_KEY
+add key=OZ_MANAGEMENT_URL name=openzro value=https://YOUR_OPENZRO_DOMAIN
+add key=OZ_ADMIN_URL name=openzro value=https://YOUR_OPENZRO_DOMAIN
+add key=OZ_HOSTNAME name=openzro value=CONTAINER_HOSTNAME
+add key=OZ_LOG_LEVEL name=openzro value=info
+add key=OZ_DISABLE_CUSTOM_ROUTING name=openzro value=true
+add key=OZ_USE_LEGACY_ROUTING name=openzro value=true
 ```
-We had to set `NB_DISABLE_CUSTOM_ROUTING` and `NB_USE_LEGACY_ROUTING` because RouterOS containers don't allow access to netfilter kernel module.
-We also set `NB_NAME` and `NB_HOSTNAME` to match our router's identity as seen in `/system/identity/print`
-because RouterOS won't allow us to set container's hostname to the same value as router's hostname.
-If using a self-hosted openZro server we'll also want to add the correct URLs to our server:
-```shell
-add key=NB_MANAGEMENT_URL name=openzro value=YOUR_OPENZRO_MANAGEMENT_URL
-add key=NB_ADMIN_URL name=openzro value=YOUR_OPENZRO_ADMIN_URL
-```
+- `OZ_MANAGEMENT_URL` and `OZ_ADMIN_URL` point the client at your openZro server.
+- `OZ_DISABLE_CUSTOM_ROUTING` and `OZ_USE_LEGACY_ROUTING` are needed because RouterOS containers don't allow access to
+  the netfilter kernel module.
+- `OZ_HOSTNAME` sets the peer name shown in openZro. Set it to the router's identity, as seen in
+  `/system/identity/print`, because RouterOS won't allow the container's hostname to match the router's hostname.
 
-Create the container and trigger image pull from DockerHub:
+Create the container and trigger the image pull:
 ```shell
-/container/add remote-image=openzro/openzro interface=openzro root-dir=/usb1/openzro_filesystem mounts=openzro_etc envlist=openzro dns=10.71.71.1 hostname=openzro logging=yes                                                                 │
+/container/add remote-image=openzro/openzro:latest interface=openzro root-dir=/usb1/openzro_filesystem mounts=openzro_etc envlist=openzro dns=10.71.71.1 hostname=openzro logging=yes
 ```
 Note that we had to set container's hostname to something other than router's identity because RouterOS doesn't allow hostname conflicts.\
 We have also set container's DNS resolver to router's DNS server. Feel free to tweak this if needed.
 
-Our container is now ready and container image pull from DockerHub should have been triggered. We can check the RouterOS logs to see if the pull was successful and we should see that RouterOS created our image cache directory in `/usb1/pull`.
+Our container is now ready and the image pull should have been triggered. We can check the RouterOS logs to see if the pull was successful and we should see that RouterOS created our image cache directory in `/usb1/pull`.
 
 ### Start the container
 We can verify that the container is created by running
@@ -141,12 +139,12 @@ We can now start it using the appropriate number from the `print` command:
 ```
 
 At this point we should see the container in our openZro dashboard and we should be able to create routes through it in openZro.
-Via the openZro dashboard, create a route through the container to the router's bridge IP address.
-Address will be 172.17.0.1/32 and routing peer will be our container. Don't forget to disable NAT on this route.
+In the openZro dashboard, create a network route through the container to the router's bridge IP address.
+The network range is 172.17.0.1/32 and the routing peer is our container. Turn off **Masquerade** on this route.
 
 
 ## Troubleshooting
-1. Increase openZro's verbosity by setting `NB_LOG_LEVEL` env var to `trace`.\
+1. Increase openZro's verbosity by setting the `OZ_LOG_LEVEL` env var to `trace`.\
 2. Check the logs to see what's going on:
     ```shell
     /log/print without-paging  where topics~"container"
@@ -167,39 +165,14 @@ When done revert the entrypoint back to openZro:
 ```
 
 ### openZro starts and logs into management server but it doesn't show up as online
-Log shows something like this:
+The log shows the client connecting to management, then errors such as:
 ```
-DEBG client/internal/login.go:93: connecting to the Management service https://api.openzro.io:443
-DEBG client/internal/login.go:63: connected to the Management service https://api.openzro.io:443
-DEBG client/internal/login.go:93: connecting to the Management service https://api.openzro.io:443
-DEBG client/internal/login.go:63: connected to the Management service https://api.openzro.io:443
-INFO client/internal/connect.go:119: starting openZro client version 0.28.6 on linux/amd64
-DEBG client/internal/connect.go:180: connecting to the Management service api.openzro.io:443
-DEBG client/internal/connect.go:188: connected to the Management service api.openzro.io:443
-DEBG signal/client/grpc.go:81: connected to Signal Service: signal.openzro.io:443
-INFO iface/tun_usp_unix.go:33: using userspace bind mode
-DEBG client/internal/routemanager/sysctl/sysctl_linux.go:86: Set sysctl net.ipv4.conf.all.src_valid_mark from 0 to 1
 ERROR client/internal/routemanager/systemops/systemops_linux.go:100: Error setting up sysctl: 1 errors occurred:
-t* read sysctl net.ipv4.conf.eth0.rp_filter: open /proc/sys/net/ipv4/conf/eth0/rp_filter: no such file or directory
-INFO client/internal/routemanager/manager.go:135: Routing setup complete
-INFO iface/tun_usp_unix.go:48: create tun interface
-DEBG iface/tun_link_linux.go:113: adding address 100.80.100.176/16 to interface: wt0
-DEBG iface/wg_configurer_usp.go:39: adding Wireguard private key
-INFO client/firewall/create_linux.go:58: no firewall manager found, trying to use userspace packet filtering firewall
-DEBG iface/tun_usp_unix.go:95: device is ready to use: wt0
-INFO client/internal/dns/host_unix.go:68: System DNS manager discovered: file
-DEBG signal/client/grpc.go:126: signal connection state READY
+	* read sysctl net.ipv4.conf.eth0.rp_filter: open /proc/sys/net/ipv4/conf/eth0/rp_filter: no such file or directory
 WARN signal/client/grpc.go:141: disconnected from the Signal Exchange due to an error: didn't receive a registration header from the Signal server while connecting to the streams
-DEBG signal/client/grpc.go:126: signal connection state IDLE
-ERROR util/grpc/dialer.go:38: Failed to dial: dial: dial tcp: lookup signal.openzro.io on 172.17.0.1:53: read udp 172.17.0.2:34638->172.17.0.1:53: i/o timeout
 ```
-Solution: double-check environment variables:
+Solution: double-check the environment variables:
 ```
-NB_DISABLE_CUSTOM_ROUTING=true
-NB_USE_LEGACY_ROUTING=true
+OZ_DISABLE_CUSTOM_ROUTING=true
+OZ_USE_LEGACY_ROUTING=true
 ```
-
-
-
-[Environment]::SetEnvironmentVariable("NB_DISABLE_CUSTOM_ROUTING", "true", "Machine")
-[Environment]::SetEnvironmentVariable("NB_USE_LEGACY_ROUTING", "true", "Machine")
