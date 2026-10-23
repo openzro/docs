@@ -1,63 +1,37 @@
 
+import {Note} from "@/components/mdx";
+
 # Add users to your network
 
-Whether you have a network for personal use or manage your company's corporate network, you'd probably want to invite
-people to your account and join your openZro network.
+Users join an openZro account in three ways: by signing in through an identity provider, as local users created in
+the dashboard, or provisioned over SCIM. Every user lands in the same account: self-hosted openZro runs in single-account
+mode by default.
 
-There are three ways of adding users to a openZro account - indirect, direct, and via IdP (Identity Provider) sync.
+## Sign in through an identity provider
 
-## Indirect user invites
-This way of adding users is managed by the openZro system and doesn't require administrator input.
-It works only for organizations with private domains.
+The usual way to add people is to let them sign in. Connect your identity provider to openZro's bundled Dex under
+**Settings → Auth Providers** (see [Identity providers](/selfhosted/identity-providers)). A user who signs in for the
+first time is added to the account with the **User** role.
 
-Whenever a new user signs up with a private domain (e.g., @openzro.io),
-openZro creates a new account and associates it with the openzro.io organization (domain) automatically.
-Every consequent user signup with the same @openzro.io domain in their email address will end up under the same organization.
+- To restrict who can sign in, limit access to the openZro application at your identity provider, or use a **JWT allow
+  group** (see [JWT group sync](/how-to/jwt-groups)).
+- To bring groups from the identity provider, use [JWT group sync](/how-to/jwt-groups).
 
-<Note>
-    This feature isn't available in the self-hosted setup. By default, all users are joining the same network instead.
-</Note>
+## Create local users
 
-How does it work? Every time a previously unknown user registers at [your-management.example.com](https://your-management.example.com/),
-the system classifies the domain part of the email.
-The domain can fall into one of the following categories - `public`, `private`, or `unclassified`.
-The domains of the private category are the ones that are automatically grouped under the same account.
-Public domains are the ones of the public email providers like Gmail.
+Local users sign in with an email and password stored in openZro's bundled Dex, without an external identity provider.
+Under **Identity → Users & Groups → Users**, click **Create local user**, enter the email, an optional name, a password
+and, optionally, groups to assign. The user can sign in right away.
 
-<Note>
-    It might happen (unlikely) that the domain classification system didn't classify your company's domain as private.
-    Our system was unsure about your domain and assigned an unclassified or public category to be on the safe side.
-    Just email us at [hello@openzro.io](mailto:hello@openzro.io) or ask in [GitHub Discussions](https://github.com/openzro/openzro/discussions) to fix this.
-</Note>
+The button appears only when local user creation is enabled on the management service
+(`OPENZRO_SCIM_LOCAL_USERS_ENABLED=true`) and Dex is configured. See
+[Provision local users via SCIM](/manage/team/idp-sync/scim-local-users) for the requirements; in particular, Dex must
+use Postgres storage. We recommend turning on **Require 2FA for local accounts** under **Settings → Authentication**.
 
-## Direct user invites
-As the name stands, this way of inviting users is straightforward and works through the web UI.
-To invite a new user, proceed to `Team` then select the `Users` tab and click the <button name="button" className="button-6">Invite User</button> button.
-A window will appear, allowing you to specify the name and email address of the user you want to invite. Optionally, you could select a set of groups with which you want this user to be associated.
+## Provision users over SCIM
 
-The invited users will receive an email invitation that they have to confirm.
-After logging in to the system, they will join your network automatically.
-
-<p>
-    <img src="/docs-static/img/manage/team/user-invites.png" alt="high-level-dia" className="imagewrapper"/>
-</p>
-
-<Note>
-    If a user already has a openZro account, you can't invite them.
-    This is a limitation that is likely to be removed in future versions.
-</Note>
-
-## Identity Provider (IdP) Sync
-
-openZro's IdP-Sync automates user access management by integrating with your IdP and automatically
-provisioning users and groups. You can enable this feature from the `Users` tab by clicking the `Identity Provider Sync`
-button.
-
-<p>
-    <img src="/docs-static/img/manage/team/idp-sync-reference.png" alt="idp-sync-reference" className="imagewrapper"/>
-</p>
-
-See the [Provision Users and Groups From Your Identity Provider](/manage/team/idp-sync) section for more details.
+An identity governance tool or identity provider can create and manage users and groups through openZro's SCIM 2.0
+endpoint. See [Provision Users and Groups From Your Identity Provider](/manage/team/idp-sync).
 
 ## Manage user roles
 openZro has five user roles - `Owner`, `Admin`, `Network Admin`, `Auditor` and `User`. The roles allow you to control the level of access to the management API of your account. 
@@ -85,20 +59,8 @@ openZro has five user roles - `Owner`, `Admin`, `Network Admin`, `Auditor` and `
 |✅ = Full access \| 📖 = Read only \| ❌ = No access|
 
 
-To manage user roles, proceed to the `Users` tab and click on the user you want to update:
-<p>
-  <img src="/docs-static/img/manage/team/user-tab-list.png" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
-After that, select the desired role from the dropdown:
-<p>
-  <img src="/docs-static/img/manage/team/user-update-role.png" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
-Click the `Save` button to save the changes.
+To change a user's role, go to **Identity → Users & Groups → Users**, click the user, select the role from the dropdown
+and click **Save**.
 <Note>
     Only users with the `Owner` role can assign another user as `Owner`; this action will transfer the `Owner` role to another user, making the current user `Admin`.
 </Note>
-
-## Get started
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Ask questions in [GitHub Discussions](https://github.com/openzro/openzro/discussions)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub

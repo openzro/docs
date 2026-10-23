@@ -20,9 +20,8 @@ deployment running a recent enough version to pick them up.
 
 This guide uses:
 
-- **[User and group provisioning from your IdP](/manage/team/idp-sync)**
-  for automatic group sync (Okta, Microsoft Entra, Google Workspace,
-  JumpCloud, Keycloak, Auth0, Authentik, Zitadel, or generic SCIM).
+- **Groups from your IdP**, through [JWT group sync](/how-to/jwt-groups)
+  or [SCIM provisioning](/manage/team/idp-sync).
 - **[Audit event logging](/manage/activity)** for policy and
   configuration change history.
 - **Device posture checks** to gate access based on OS version,
@@ -220,7 +219,7 @@ The next sections show how to turn these phases into concrete openZro configurat
 
 Connect openZro to your IdP (Identity Provider, for example Microsoft Entra ID, Google Workspace, Okta) and enable SSO (Single Sign-On) with MFA (Multi-Factor Authentication). This allows users to log in to openZro using their existing corporate credentials instead of separate openZro accounts.
 
-Where to do this: [Integrations → Identity Provider Sync](/manage/team/idp-sync).
+Where to do this: **Settings → Auth Providers** (see [Identity providers](/selfhosted/identity-providers)). To bring groups from the IdP, use [JWT group sync](/how-to/jwt-groups).
 
 Map:
 

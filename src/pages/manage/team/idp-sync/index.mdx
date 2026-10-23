@@ -1,61 +1,72 @@
+import {Note, Warning} from "@/components/mdx";
+
 # Provision Users and Groups From Your Identity Provider
 
-<p>
-    <img src="/docs-static/img/manage/team/idp-sync/supported-identity-providers.png" alt="supported-identity-providers"
-         className="imagewrapper-big"/>
-</p>
+openZro includes a [SCIM 2.0](https://www.rfc-editor.org/rfc/rfc7644) server in the management service. Your identity
+provider (or identity governance tool) pushes users and groups to it, so group memberships and deprovisioning follow
+the identity provider instead of manual changes in the dashboard.
 
-Managing private network access in a business environment is a critical yet often cumbersome task.
-As companies grow and evolve, the manual process of granting access for new employees and revoking it for
-departing ones becomes increasingly time-consuming and error-prone. This challenge strains IT resources, poses significant
-security risks, and impacts productivity.
+Groups pushed over SCIM can be used in [access control policies](/manage/access-control/manage-network-access) like any
+other group. A user's membership in a SCIM group becomes part of that user's groups and, with group propagation on,
+reaches their peers.
 
-openZro's IdP-Sync automates user access management to private networks by integrating with your identity provider (IdP)
-and automatically provisioning users and groups. This integration ensures that changes to groups and users are
-synchronized from your identity provider to openZro, granting appropriate network access to new users and immediately
-revoking access for departing employees.
+<Warning>
+**Users who sign in through an identity provider are not yet linked to their SCIM record.** A user created over SCIM
+gets its own ID, and the first SSO login creates a second openZro user with no groups. Until this is fixed
+([openzro#255](https://github.com/openzro/openzro/issues/255)), SCIM group memberships and deprovisioning do not reach
+users who sign in through an external identity provider. They work for [local users](/manage/team/idp-sync/scim-local-users),
+which SCIM creates in openZro's bundled Dex. For SSO users, use [JWT group sync](/how-to/jwt-groups) to bring groups
+from the identity provider.
+</Warning>
 
-openZro allows you to use synchronized groups to create [access control policies](/manage/access-control/manage-network-access#creating-policies),
-or update network configurations like [DNS](/manage/dns#distribution-groups),
-eliminating the need for manual grouping.
+## Set up SCIM
 
-<Note>
-    IdP-Sync is implemented end-to-end in openZro and ships in the same binary
-    as the rest of the management server — see the
-    [SCIM 2.0 server](https://github.com/openzro/openzro/tree/main/management/server/http/handlers/scim)
-    in the core repo. There is no cloud-tier or licensing gate.
-</Note>
+The dashboard shows the values to use under **System → Integrations → Identity Provider Sync**.
 
-This video guide walks you through an example integration with Microsoft Entra ID, covering both user onboarding and
-offboarding scenarios:
+1. **Tenant URL:** `https://<your-openzro-domain>/scim/v2`.
+2. **Token:** create a [service user](/manage/public-api) with the **Admin** or **Owner** role under
+   **Identity → Users & Groups → Service Users**, and create a personal access token for it. Your identity provider
+   sends this token as a bearer token.
+3. Configure provisioning in your identity provider with these two values (see below), then test the connection.
 
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="RxYWTpf7cgY" /> */}
+Any SCIM 2.0 client can use the endpoint. `https://<your-openzro-domain>/scim/v2/ServiceProviderConfig` describes what
+the server supports, without authentication.
 
-## Supported Identity Providers
+### Okta
 
-The openZro management binary ships native sync drivers for **8 IdPs**
-under [`management/server/idp/`](https://github.com/openzro/openzro/tree/main/management/server/idp):
+1. In the Okta admin console, go to **Applications** → your openZro app → **Provisioning** → **Integration**.
+2. Click **Enable API integration**. Set **Base URL** to the tenant URL and **API Token** to the personal access token.
+3. Click **Test API Credentials**, then **Save**.
+4. Under **To App**, enable **Create Users**, **Update User Attributes** and **Deactivate Users**.
+5. Under **Push Groups**, add the groups to send to openZro.
 
-| Provider | Walkthrough | Native sync driver |
+### Microsoft Entra ID
+
+1. In **Enterprise applications**, open your openZro app and go to **Provisioning**.
+2. Set **Provisioning Mode** to **Automatic**.
+3. Set **Tenant URL** to the tenant URL and **Secret Token** to the personal access token.
+4. Click **Test Connection**, save, and set **Provisioning Status** to **On**.
+5. Under **Users and groups**, assign the users and groups to provision. Entra provisions in cycles of about 40
+   minutes.
+
+### JumpCloud, Authentik and others
+
+Use the tenant URL as the SCIM base URL and the personal access token as the bearer token. Keycloak has no built-in
+SCIM client and needs a third-party extension.
+
+## What the server supports
+
+| Resource | Operations | Notes |
 |---|---|---|
-| Microsoft Entra ID (Azure AD) | [API](/manage/team/idp-sync/microsoft-entra-id-sync) · [SCIM](/manage/team/idp-sync/microsoft-entra-id-scim-sync) | `azure.go` |
-| Okta | [API](/manage/team/idp-sync/okta-sync) | `okta.go` |
-| Google Workspace | [API](/manage/team/idp-sync/google-workspace-sync) | `google_workspace.go` |
-| JumpCloud | [API](/manage/team/idp-sync/jumpcloud-sync) | `jumpcloud.go` |
-| Keycloak | [API](/manage/team/idp-sync/keycloak-sync) | `keycloak.go` |
-| Auth0 | TODO walkthrough | `auth0.go` |
-| Authentik | TODO walkthrough | `authentik.go` |
-| Zitadel | TODO walkthrough | `zitadel.go` |
+| Users | Create, read, list, replace, patch, delete | Filter: `userName eq "…"`. Patch handles `active`, `userName`, `displayName` and `name.formatted`; other attributes are ignored. |
+| Groups | Create, read, list, replace, patch, delete | Filter: `displayName eq "…"`. Patch handles `replace` of `displayName` (with a path) and `add`/`remove` of `members`. |
 
-### Generic SCIM
+- **Roles are not synchronized.** SCIM users are created with the **User** role; change roles in the dashboard.
+- **Deleting a user** over SCIM blocks it and expires its peers; the user stays listed. Local users are deleted.
+- **SCIM groups** are marked as managed by the integration, and only the identity provider should change them.
 
-For any IdP not in the list above, use the
-[SCIM 2.0 server](https://github.com/openzro/openzro/tree/main/management/server/http/handlers/scim)
-that openZro exposes natively. The IdP-Sync side only requires the
-provider to push SCIM events at the openZro endpoint — no openZro-side
-driver is needed.
+## Related
 
-<p>
-    <img src="/docs-static/img/manage/team/idp-sync/generic-scim.png" alt="generic-scim"
-         className="imagewrapper-big"/>
-</p>
+- [Provision local users via SCIM](/manage/team/idp-sync/scim-local-users): password users in openZro's bundled Dex,
+  for identity governance tools.
+- [Identity providers](/selfhosted/identity-providers): how users sign in.
