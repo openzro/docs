@@ -6,93 +6,58 @@ import {Note} from "@/components/mdx";
 
 ## Management Setup (Recommended)
 
-Add Auth0 as an external IdP directly in the openZro Management Dashboard. This is the simplest approach and recommended for most deployments.
+Add Auth0 as an authentication provider of openZro's embedded Dex from the dashboard. This is the simplest approach and recommended for most deployments.
 
 ### Prerequisites
 
-- openZro self-hosted with embedded IdP enabled
-- Auth0 account (sign up at https://auth0.com/)
+- An openZro self-hosted deployment with the embedded Dex (the default), and the dashboard's
+  **Settings → Auth Providers** page working (management needs `OPENZRO_DEX_GRPC_ADDR`; the Docker Compose stack sets
+  it)
+- An Auth0 account (sign up at https://auth0.com/)
 
-### Step 1: Start Creating Application in Auth0
+### Step 1: Create an Application in Auth0
 
-1. Log in to your Auth0 dashboard at https://manage.auth0.com/
-2. Go to **Applications** → **Applications**
-3. Click **Create Application**
+1. Log in to your Auth0 dashboard at https://manage.auth0.com/ and go to **Applications** → **Applications**.
+2. Click **Create Application**, name it `openZro`, choose **Regular Web Application**, and click **Create**.
+3. On the **Settings** tab, under **Allowed Callback URLs**, add `https://<your-domain>/dex/callback` and click **Save Changes**.
+4. Note the **Client ID**, **Client Secret** and **Domain** (e.g. `your-tenant.auth0.com`) shown on the same tab.
 
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/auth0/1_create-app-auth0.png" alt="Create application" className="imagewrapper-big"/>
-</p>
+### Step 2: Add Auth0 in openZro
 
-4. Fill in:
-   - **Name**: `openZro`
-   - **Application type**: `Regular Web Application`
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/auth0/2_create-web-app-auth0.png" alt="Create web application" className="imagewrapper-big"/>
-</p>
-
-5. Click Create
-
-### Step 2: Get Redirect URL from openZro
-
-1. Open a new tab or window and log in to your openZro Dashboard
-2. Navigate to **Settings** → **Identity Providers**
-3. Click **Add Identity Provider**
-4. Fill in the fields:
+1. In the openZro dashboard, go to **Settings → Auth Providers** and click **Add provider**.
+2. Fill in the form:
 
 | Field | Value |
 |-------|-------|
+| ID | `auth0` |
 | Type | Generic OIDC |
-| Name | Auth0 (or your preferred display name) |
-| Client ID | From Auth0 application (will fill after Step 3) |
-| Client Secret | From Auth0 application (will fill after Step 3) |
-| Issuer | `https://your-tenant.auth0.com/` **(must include trailing slash)** (will fill after Step 3) |
+| Display name | `Auth0` |
+| Issuer URL | `https://your-tenant.auth0.com/` **(with the trailing slash)** |
+| Client ID | From Step 1 |
+| Client Secret | From Step 1 |
+| Redirect URI | Prefilled: `https://<your-domain>/dex/callback` |
 
-5. **Copy the Redirect URL** that openZro displays (but don't click **Add Provider** yet)
-
-### Step 3: Complete Auth0 Application Setup
-
-1. Return to the Auth0 tab
-2. Go to **Settings** tab
-3. Under **Allowed Callback URLs**, add the redirect URL you copied from openZro
-4. Click **Save Changes**
+3. Click **Add provider**.
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/auth0/3_add-save-callback-url-auth0.png" alt="Add and save callback URL" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/openzro-add-provider-oidc.png" alt="Add authentication provider dialog" className="imagewrapper-big"/>
 </p>
 
-5. Note the **Client ID**, **Client Secret**, and **Domain** (e.g., `your-tenant.auth0.com`) at the top of the setting tab — you'll need these for Step 4
+### Step 3: Test the Connection
 
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/auth0/4_copy-client-secret-ids-auth0.png" alt="Copy client secret and IDs" className="imagewrapper-big"/>
-</p>
-
-### Step 4: Complete openZro Setup
-
-1. Return to the openZro tab
-2. Fill in the **Client ID** and **Client Secret** from Step 3
-3. Update the **Issuer** field with your Auth0 domain if needed (e.g., `https://your-tenant.auth0.com/`)
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/auth0/5_openzro-idp-config-auth0.png" alt="openZro IdP configuration" className="imagewrapper-big"/>
-</p>
-
-4. Click **Add Provider**
-
-### Step 5: Test the Connection
-
-1. Log out of openZro Dashboard
-2. On the login page, you should see an "Auth0" button
-3. Click it and authenticate
-4. You should be redirected back to openZro and logged in. Unless your user approval setting were changed you will need to log back into your local admin account to approve the user.
+1. Log out of the openZro dashboard.
+2. The sign-in page now shows **Log in with Auth0**.
+3. Click it and authenticate with your Auth0 credentials.
+4. You are redirected back to openZro and logged in. A user who logs in for the first time is added to the account
+   with the default role.
 
 ---
 
 ## Standalone Setup (Advanced)
 
-Use Auth0 as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Auth0 administrators as it also requires additional setup and ongoing maintenance.
-
-For most deployments, the [embedded IdP](/selfhosted/identity-providers) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
+Point openZro's management server and dashboard directly at Auth0, without Dex in between. This gives you full
+control over authentication but needs more setup, and some features (such as adding providers from the dashboard) do
+not apply.
 
 For detailed instructions on the standalone setup, see the [Auth0 SSO with openZro Self-Hosted (Legacy)](/selfhosted/identity-providers/managed/advanced/auth0) documentation.
 
@@ -116,4 +81,4 @@ If you prefer to have full control over authentication, consider self-hosted alt
 
 - [Auth0 Documentation](https://auth0.com/docs/)
 - [Auth0 Dashboard](https://manage.auth0.com/)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
+- [Identity providers overview](/selfhosted/identity-providers)
