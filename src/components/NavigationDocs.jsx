@@ -555,6 +555,10 @@ export const docsNavigation = [
             href: '/selfhosted/activity-postgres-store',
           },
           {
+            title: 'Activity Events MySQL Store',
+            href: '/selfhosted/activity-mysql-store',
+          },
+          {
             title: 'Flow Events Store',
             href: '/selfhosted/flow-events-store',
           },

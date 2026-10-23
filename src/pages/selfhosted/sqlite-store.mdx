@@ -1,53 +1,19 @@
 # Management SQLite store
 
-SQLite is the default storage engine for openZro Management. It requires no external dependencies and works out of the box for new installations.
+SQLite is the default storage engine for the openZro Management service. It needs no external database and works out
+of the box. The data lives in `store.db` in the management data directory (`/var/lib/openzro/` in the container).
 
 <Note>
-If you need concurrent access or high availability with multiple management instances, consider using [PostgreSQL](/selfhosted/postgres-store) instead.
+If you need concurrent access or several management instances for high availability, use
+[PostgreSQL](/selfhosted/postgres-store) instead. MySQL is also supported: set `OPENZRO_STORE_CONFIG_ENGINE=mysql` and
+`OPENZRO_STORE_ENGINE_MYSQL_DSN` (format `user:password@tcp(host:3306)/database`) in `setup.env`.
 </Note>
-
-## SQLite entity relationship diagram
-
-For a high-level overview of the SQLite schema, refer to the Entity Relationship Diagram (ERD) below:
-
-<p>
-    <img src="/docs-static/img/selfhosted/sqlite-erd.png" alt="high-level-dia" className="imagewrapper-big"/>
-</p>
 
 ## Configuration
 
-### Combined setup (config.yaml)
-
-SQLite is the default engine. If you need to explicitly set it in your `config.yaml`:
-
-```yaml
-server:
-  store:
-    engine: "sqlite"
-```
-
-Confirm SQLite is active by checking the server logs on startup:
+SQLite is the default. To set it explicitly, add this to your `setup.env` and re-run `./configure.sh`:
 ```bash
-docker compose logs openzro-server
-```
-You should see:
-```
-INFO management/server/store.go:77: using SQLite store engine
-```
-
-<Note>
-For a full list of available configuration options, see the [config.yaml.example](https://github.com/openzro/openzro/blob/main/combined/config.yaml.example) reference file.
-</Note>
-
-### Older multi-container setup (management.json)
-
-<Note>
-This section applies to deployments using the older multi-container architecture with separate `management`, `signal`, `relay`, and `coturn` containers. If you deployed using the [`getting-started.sh`](/selfhosted/selfhosted-quickstart) script, you are on the combined setup and should use the `config.yaml` instructions above. See the [migration guide](/selfhosted/migration/combined-container) to upgrade.
-</Note>
-
-To enable SQLite, add to your `setup.env`:
-```bash
-OPENZRO_STORE_ENGINE=sqlite
+OPENZRO_STORE_CONFIG_ENGINE=sqlite
 ```
 This sets the following in your `management.json`:
 ```json
@@ -56,87 +22,48 @@ This sets the following in your `management.json`:
     }
 ```
 
+Confirm SQLite is active by checking the management logs on startup:
+```bash
+docker compose logs management
+```
+You should see:
+```
+INFO management/server/store/store.go:357: using SQLite store engine
+```
+
 ## Migrating from JSON store to SQLite store
 
-<Note>
-This migration only applies to the older multi-container setup. The combined setup has always used SQLite by default and does not support JSON file storage.
-</Note>
+Very old deployments kept their data in a `store.json` file. If the management service starts with no store engine
+configured and finds a `store.json`, it migrates it to SQLite automatically. You can also run the migration by hand
+with the `sqlite-migration upgrade` subcommand, which is part of the management binary in the official image.
 
 <Note>
-Since version [0.28.0](https://github.com/openzro/openzro/releases/tag/v0.28.0), support for JSON file storage has been removed. All installations should be on SQLite or PostgreSQL.
+    The following commands assume Docker with the compose plugin. If you have the standalone docker-compose, use
+    `docker-compose` instead.
 </Note>
 
-This migration process allows users to seamlessly transition from JSON file storage to SQLite while maintaining data integrity.
-Ensure that you are running the commands described below after upgrading to version 0.24.0 or later.
-
-### Migration commands
-
-Starting from version 0.24.0, openZro Management provides a subcommand to facilitate migration to SQLite. This command is part of the binary shipped within the official docker image.
-<Note>
-    The following commands assume you use the latest docker version with the compose plugin. If you have docker-compose installed as a standalone, please use docker-compose as a command.
-</Note>
+1. In the directory that contains your `docker-compose.yml` and `management.json`, stop the Management service:
 ```bash
-$ docker exec -it openzro-management /go/bin/openzro-mgmt sqlite-migration
+docker compose stop management
 ```
-This will produce an output similar to:
+2. Back up the data directory (`store.json` is in `/var/lib/openzro/`):
 ```bash
-Contains sub-commands to perform JSON file store to SQLite store migration and rollback
-
-Usage:
-  openzro-mgmt sqlite-migration [command]
-
-Available Commands:
-  downgrade   Rollback SQLite store to JSON file store. Please make a backup of the SQLite file before running this command.
-  upgrade     Migrate JSON file store to SQLite store. Please make a backup of the JSON file before running this command.
-
-Flags:
-      --datadir string   server data directory location (default "/var/lib/openzro/")
-  -h, --help             help for sqlite-migration
-
-Global Flags:
-      --log-file string    sets openZro log path. If console is specified the the log will be output to stdout (default "/var/log/openzro/management.log")
-      --log-level string   (default "info")
-
-Use "openzro-mgmt sqlite-migration [command] --help" for more information about a command.
+mkdir backup
+docker compose cp -a management:/var/lib/openzro/ backup/
 ```
-
-### Follow these steps for migration:
-To migrate from JSON file store to SQLite, follow these steps:
-<Note>
-    The following commands assume you use the latest docker version with the compose plugin. If you have docker-compose installed as a standalone, please use docker-compose as a command.
-</Note>
-1. After accessing the path that contains your docker-compose.yml and management.json files, stop the openZro Management service.
+3. Run the migration:
 ```bash
-  docker compose stop management
+docker compose run --rm --entrypoint /go/bin/openzro-mgmt management \
+  sqlite-migration upgrade --datadir /var/lib/openzro/ --log-file console
 ```
-2. Backup your data store (`store.json` in `datadir` - default "/var/lib/openzro/").
-```bash
-  mkdir backup
-  docker compose cp -a management:/var/lib/openzro/ backup/
-```
-3. Start openZro Management service:
-```bash
-  docker compose start management
-```
-4. Run the migration to SQLite subcommand:
-```bash
-  docker exec -it openzro-management /go/bin/openzro-mgmt sqlite-migration upgrade --log-file console
-```
-5. Enable SQLite by updating the `management.json` file and setting the `Engine` field to `sqlite`:
+4. Set the `Engine` field to `sqlite` in `management.json`:
 ```json
     "StoreConfig": {
         "Engine": "sqlite"
     }
 ```
-6. Restart the Management service.
+5. Start the Management service and check the logs for the store engine line shown above:
 ```bash
-  docker compose restart management
-```
-7. Check logs to confirm the store switch:
-```bash
-  docker compose logs management
-```
-You should see an entry similar to:
-```
-2023-10-19T18:55:29Z INFO management/server/store.go:75: using SQLite store engine
+docker compose start management
+docker compose logs management
 ```
