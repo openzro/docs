@@ -1,11 +1,12 @@
 import {Note, Warning} from "@/components/mdx";
 
-# Google Workspace SSO with openZro Self-Hosted (Legacy)
+# Google Workspace SSO with openZro Self-Hosted (Standalone)
 
 <Warning>
-The client secret has been removed from the authentication flow. The secret was originally included to support providers like Google Workspace that don't offer a proper PKCE flow, but this is no longer necessary with the embedded IdP.
-
-If you are using this standalone Google Workspace setup, we strongly recommend migrating to the [embedded IdP setup with Google as an external provider](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended). The embedded IdP approach is simpler, fully supported, and does not rely on the deprecated client secret.
+In the standalone setup the dashboard signs users in without a client secret (public client with PKCE), and Google's
+web application clients expect one, so dashboard sign-in may not work with Google standalone. Prefer the
+[recommended setup with Google as a Dex provider](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended).
+`OPENZRO_AUTH_CLIENT_SECRET` is only used by the `openzro` CLI login flow.
 </Warning>
 
 Use Google accounts for authentication with openZro. This supports both personal Google accounts and Google Workspace (formerly G Suite) organizations.
@@ -13,19 +14,16 @@ Use Google accounts for authentication with openZro. This supports both personal
 ## Standalone Setup (Advanced)
 
 <Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+We recommend adding Google as an authentication provider of openZro's bundled Dex instead: it needs less
+configuration, works alongside local users and other providers, and is managed from the dashboard. See the
+[recommended setup](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended).
 
-We highly recommend using the simpler setup that adds Google as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended) section in the main Google Workspace documentation.
-
-The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Google Workspace administrators who need full control over authentication and user management.
+The standalone setup below points openZro directly at Google. Dex keeps running but is not used, and providers can no
+longer be added from the dashboard.
 </Note>
 
-Use Google Workspace as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Google Workspace administrators as it also requires additional setup and ongoing maintenance.
-
-For most deployments, the [embedded IdP](/selfhosted/identity-providers) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
-
 <Note>
-Beginning with openZro version v0.23.6 and onwards, the Google Workspace IdP manager no longer requires the custom admin role called `User and Schema Management`. We now use a read-only role for user information.
+The Google Workspace IdP manager only needs a read-only role for user information, not the custom admin role `User and Schema Management`.
 </Note>
 
 ### Prerequisites
@@ -181,7 +179,6 @@ OPENZRO_AUTH_REDIRECT_URI="/auth"
 OPENZRO_AUTH_SILENT_REDIRECT_URI="/silent-auth"
 OPENZRO_TOKEN_SOURCE="idToken"
 
-OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="none"
 
 OPENZRO_MGMT_IDP="google"
 OPENZRO_MGMT_IDP_SIGNKEY_REFRESH=true
@@ -222,15 +219,9 @@ You've configured all required resources in Google Workspace. Continue with the 
 
 ---
 
-<Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
-
-We highly recommend using the simpler setup that adds Google as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/google-workspace#management-setup-recommended) section in the main Google Workspace documentation.
-</Note>
-
 ## Related Resources
 
 - [Google Cloud Console](https://console.cloud.google.com/)
 - [Google OAuth 2.0 Documentation](https://developers.google.com/identity/protocols/oauth2)
 - [Google Workspace Admin Console](https://admin.google.com/)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
+- [Identity providers overview](/selfhosted/identity-providers)

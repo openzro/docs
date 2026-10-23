@@ -6,107 +6,70 @@ import {Note} from "@/components/mdx";
 
 ## Management Setup
 
-Add Duo as an external IdP directly in the openZro Management Dashboard. This is the simplest approach and recommended for most deployments.
+Add Duo as an authentication provider of openZro's embedded Dex from the dashboard. This is the simplest approach and recommended for most deployments.
 
 ### Prerequisites
 
-- openZro self-hosted with embedded IdP enabled
+- An openZro self-hosted deployment with the embedded Dex (the default), and the dashboard's
+  **Settings → Auth Providers** page working (management needs `OPENZRO_DEX_GRPC_ADDR`; the Docker Compose stack sets
+  it)
 - Duo account with admin permissions (Duo Premier, Duo Advantage, or Duo Essentials plan)
 - Duo Single Sign-On [configured with an authentication source](https://duo.com/docs/sso#configure-duo-single-sign-on)
 
-### Step 1: Create OIDC Application in Duo
+### Step 1: Create an OIDC Application in Duo
 
-1. Log in to the [Duo Admin Panel](https://admin.duosecurity.com/)
-2. Navigate to **Applications** → **Application Catalog**
+1. Log in to the [Duo Admin Panel](https://admin.duosecurity.com/) and go to **Applications** → **Application Catalog**.
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/1_application-catalog.png" alt="Application Catalog" className="imagewrapper-big"/>
 </p>
 
-3. Search for **Generic OIDC Relying Party** (look for the "SSO" label)
-4. Click the **+ Add** button
+2. Search for **Generic OIDC Relying Party** (look for the "SSO" label) and click **+ Add**.
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/2_generic-oidc.png" alt="Generic OIDC Relying Party" className="imagewrapper-big"/>
 </p>
 
-5. Give the application a name such as `openZro SSO`
-6. Under **User access**, grant access to users in selected Duo groups or to all users
-7. Scroll down to the **Metadata** section and note the following values (you'll need these in Step 3):
-    - **Client ID**
-    - **Client Secret**
-    - **Issuer**
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/3_metadata.png" alt="Duo Metadata" className="imagewrapper-big"/>
-</p>
-
-8. Keep this tab open and proceed to Step 2
-
-### Step 2: Get Redirect URL from openZro
-
-1. Open a new tab or window and log in to your openZro Dashboard
-2. Navigate to **Settings** → **Identity Providers**
-3. Click **Add Identity Provider**
-4. Fill in the fields:
-
-| Field | Value |
-|-------|-------|
-| Type | Generic OIDC |
-| Name | Duo (or your preferred display name) |
-| Issuer | From Duo Metadata |
-| Client ID | From Duo application Metadata (will fill after Step 3) |
-| Client Secret | From Duo application Metadata (will fill after Step 3) |
-
-<Note>
-**Important:** Copy the Issuer URL exactly as shown in Duo's Metadata section. The format is `https://sso-{your-id}.sso.duosecurity.com/oidc/{application-id}`.
-</Note>
-
-5. **Copy the Redirect URL** that openZro displays (but don't click **Add Provider** yet)
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/4_copy-redirect.png" alt="Copy redirect URL" className="imagewrapper-big"/>
-</p>
-
-### Step 3: Complete Duo Application Setup
-
-1. Return to the Duo Admin Panel tab
-2. Scroll down to the **Relying Party** section
-3. Under **Sign-In Redirect URLs**, enter the redirect URL you copied from openZro (e.g., `https://openzro.example.com/oauth2/callback`)
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/5_redirect-urls.png" alt="Configure Redirect URLs" className="imagewrapper-big"/>
-</p>
-
-4. Under **Scopes**, ensure the following are enabled:
-    - **openid** (required, cannot be disabled)
-    - **profile** (check the box)
-    - **email** (check the box)
+3. Name the application, for example `openZro SSO`.
+4. Under **User access**, grant access to users in selected Duo groups or to all users.
+5. In the **Metadata** section, note the **Client ID**, **Client Secret** and **Issuer**.
+6. In the **Relying Party** section, under **Sign-In Redirect URLs**, enter `https://<your-domain>/dex/callback`.
+7. Under **Scopes**, make sure **openid**, **profile** and **email** are enabled.
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/6_scopes.png" alt="Configure Scopes" className="imagewrapper-big"/>
 </p>
 
-5. Scroll down and click **Save**
+8. Click **Save**.
 
-### Step 4: Complete openZro Setup
+### Step 2: Add Duo in openZro
 
-1. Return to the openZro tab
-2. Fill in the **Client ID** and **Client Secret** from Duo's Metadata section
+1. In the openZro dashboard, go to **Settings → Auth Providers** and click **Add provider**.
+2. Fill in the form:
+
+| Field | Value |
+|-------|-------|
+| ID | `duo` |
+| Type | Generic OIDC |
+| Display name | `Duo` |
+| Issuer URL | From the Duo Metadata, exactly as shown: `https://sso-{your-id}.sso.duosecurity.com/oidc/{application-id}` |
+| Client ID | From Step 1 |
+| Client Secret | From Step 1 |
+| Redirect URI | Prefilled: `https://<your-domain>/dex/callback` |
+
+3. Click **Add provider**.
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/managed/duo/7_openzro-config.png" alt="Duo configuration in openZro" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/openzro-add-provider-oidc.png" alt="Add authentication provider dialog" className="imagewrapper-big"/>
 </p>
 
-3. Click **Add Provider**
+### Step 3: Test the Connection
 
-### Step 5: Test the Connection
-
-1. Log out of openZro Dashboard
-2. On the login page, you should see a "Duo" button
-3. Click it and authenticate with your Duo credentials
-4. Complete Duo two-factor authentication when prompted
-5. You should be redirected back to openZro and logged in. Unless your user approval settings were changed, you will need to log back into your local admin account to approve the user.
+1. Log out of the openZro dashboard.
+2. The sign-in page now shows **Log in with Duo**.
+3. Click it, authenticate with your Duo credentials and complete Duo two-factor authentication.
+4. You are redirected back to openZro and logged in. A user who logs in for the first time is added to the account
+   with the default role.
 
 <Note>
 Duo Single Sign-On requires users to complete two-factor authentication. Make sure your users have enrolled in Duo MFA before attempting to log in.
@@ -134,12 +97,20 @@ To sync Duo groups with openZro, you need to add a custom scope with group claim
 The group attribute name depends on your Duo authentication source. For Active Directory, this is typically the group membership attribute. For SAML IdPs, verify your IdP sends group information in the expected attribute.
 </Note>
 
+<Note>
+Dex passes upstream groups on only when its connector sets `insecureEnableGroups: true` and requests the `groups`
+scope. Connectors added from **Settings → Auth Providers** do not set these, so the claim does not reach openZro.
+To use JWT group sync, declare the connector in `dex.config.yaml` instead (Docker Compose: `artifacts/dex.config.yaml`;
+Helm: `dex.config.connectors`), as in the
+[Helm quickstart](/selfhosted/kubernetes/helm-quickstart#jwt-group-sync-when-using-an-upstream-id-p).
+</Note>
+
 #### Step 2: Enable JWT Group Sync in openZro
 
 1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to `groups`
-4. Optionally configure **JWT allow groups** to restrict access
+4. Optionally configure **JWT allow group** to restrict access
 
 ---
 
@@ -168,7 +139,7 @@ The group attribute name depends on your Duo authentication source. For Active D
 ### Two-factor authentication issues
 
 - Duo requires MFA for all SSO logins — ensure users have set up their Duo authentication methods
-- Check Duo's [authentication policy](/docs/policy) settings for your application
+- Check Duo's [authentication policy](https://duo.com/docs/policy) settings for your application
 - Verify the user's device is registered in Duo
 
 ### Groups not syncing
@@ -184,4 +155,4 @@ The group attribute name depends on your Duo authentication source. For Active D
 - [Duo Single Sign-On Documentation](https://duo.com/docs/sso)
 - [Duo Admin Panel](https://admin.duosecurity.com/)
 - [Duo Generic OIDC Documentation](https://duo.com/docs/sso-oidc-generic)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
+- [Identity providers overview](/selfhosted/identity-providers)

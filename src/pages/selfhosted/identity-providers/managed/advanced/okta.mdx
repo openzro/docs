@@ -1,22 +1,19 @@
 import {Note} from "@/components/mdx";
 
-# Okta SSO with openZro Self-Hosted (Legacy)
+# Okta SSO with openZro Self-Hosted (Standalone)
 
 [Okta](https://www.okta.com/) is a cloud-based identity and access management service for enterprise use, providing single sign-on, multi-factor authentication, and lifecycle management.
 
 ## Standalone Setup (Advanced)
 
 <Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+We recommend adding Okta as an authentication provider of openZro's bundled Dex instead: it needs less
+configuration, works alongside local users and other providers, and is managed from the dashboard. See the
+[recommended setup](/selfhosted/identity-providers/managed/okta#management-setup-recommended).
 
-We highly recommend using the simpler setup that adds Okta as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/okta#management-setup-recommended) section in the main Okta documentation.
-
-The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced Okta administrators who need full control over authentication and user management.
+The standalone setup below points openZro directly at Okta. Dex keeps running but is not used, and providers can no
+longer be added from the dashboard.
 </Note>
-
-Use Okta as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced Okta administrators as it also requires additional setup and ongoing maintenance.
-
-For most deployments, the [embedded IdP](/selfhosted/identity-providers) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 <Note>
 If you prefer to have full control over authentication, consider self-hosted alternatives like [PocketID](/selfhosted/identity-providers/pocketid).
@@ -134,7 +131,6 @@ OPENZRO_AUTH_REDIRECT_URI="/auth"
 OPENZRO_AUTH_SILENT_REDIRECT_URI="/silent-auth"
 OPENZRO_TOKEN_SOURCE="idToken"
 
-OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="hosted"
 OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID="<OPENZRO_NATIVE_CLIENT_ID>"
 OPENZRO_AUTH_DEVICE_AUTH_AUDIENCE="<OPENZRO_NATIVE_CLIENT_ID>"
 OPENZRO_AUTH_DEVICE_AUTH_SCOPE="openid email"
@@ -175,14 +171,8 @@ You've configured all required resources in Okta. Continue with the [openZro Sel
 
 ---
 
-<Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
-
-We highly recommend using the simpler setup that adds Okta as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/okta#management-setup-recommended) section in the main Okta documentation.
-</Note>
-
 ## Related Resources
 
 - [Okta Developer Documentation](https://developer.okta.com/docs/)
 - [Okta Admin Console](https://help.okta.com/en/prod/Content/Topics/Apps/Apps_App_Integration_Wizard_OIDC.htm)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
+- [Identity providers overview](/selfhosted/identity-providers)

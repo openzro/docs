@@ -4,111 +4,64 @@ export const description = 'Disable local email/password authentication in your 
 
 # Disable Local Authentication
 
-If you prefer to delegate all credential storage and authentication to your IdP while still utilizing openZro's new,
-simplified IdP connection flow, you can completely disable local (email/password) authentication.
+If you prefer to delegate all credential storage and authentication to your identity provider, you can turn off local
+(email/password) sign-in in the bundled Dex. All users then sign in through an
+[external identity provider](/selfhosted/identity-providers).
 
 This is useful when you want to:
 
 - Enforce that all users authenticate via external identity providers only
-- Simplify end user login by directing users to your external IdP when logging in to openZro
-- Prevent local password-based logins while still using openZro's simplified IdP connection flow
-- Maintain a single source of truth for user credentials in your external IdP
+- Centralize credential management and password policies in your IdP
+- Remove the bootstrap administrator account once SSO works
 
-<Note>
-Disabling local authentication preserves existing local user accounts in the database.
-If you re-enable local authentication later, those users will be able to log in again with their existing credentials.
-</Note>
-
-## Prerequisites
-
-Before disabling local authentication:
-
-1. Configure an external IdP connector following the [Authentication Guide](/selfhosted/identity-providers).
-2. Log out and log in with your new admin account via the external IdP. openZro will notify you that the user requires approval.
-3. Log back in as your original openZro-local admin and navigate to **Team > Users**. You should see the new IdP user pending approval:
-
-<img src="/docs-static/img/selfhosted/identity-providers/approve_user.png" alt="Approve User" className="imagewrapper-big"/>
-
-4. Approve the request, click on the user, select **Owner** as the role, confirm the ownership transfer, and save.
-
-<img src="/docs-static/img/selfhosted/identity-providers/change-owner.png" alt="Change Owner" className="imagewrapper-big"/>
-
-5. Verify you can log in via the external IdP with full owner access.
+## Before you start
 
 <Warning>
-Complete all prerequisite steps before disabling local authentication. If you disable local login without first
-promoting an external IdP user to Owner, you will lose administrative access to your instance.
+openZro does not check whether another administrator can still sign in. If you disable local sign-in before an
+external identity provider works and one of its users has the Owner or Admin role, nobody can sign in to the dashboard.
 </Warning>
 
-<Note>
-openZro will refuse to disable local authentication if no external identity provider connectors are configured.
-    This prevents you from being locked out of your instance.
-</Note>
-
-## Configuration
-
-### Combined setup (config.yaml)
+1. Add and test at least one external identity provider (see [Identity Providers](/selfhosted/identity-providers)).
+2. Sign in with an external account, then, as the bootstrap administrator, give that user the **Owner** role (transfer
+   ownership) or the **Admin** role under **Identity → Users & Groups**.
+3. Sign in again with the external account and check that you can open **Settings**.
 
 <Note>
-If you deployed using the [`getting-started.sh`](/selfhosted/selfhosted-quickstart) quickstart script (post v0.65.0) or have
-already [migrated to the combined container](/selfhosted/migration/combined-container), your deployment uses
-`config.yaml`.
+Local users provisioned over [SCIM](/manage/team/idp-sync/scim-local-users) also sign in with Dex passwords. Turning
+off the password database stops them from signing in too.
 </Note>
 
-Set `localAuthDisabled` to `true` under the `server.auth` section of your `config.yaml`:
+## Disable local sign-in
+
+Local sign-in is controlled by Dex's configuration:
+
+- `enablePasswordDB` turns the email/password login form on or off;
+- `staticPasswords` holds the bootstrap administrator account.
+
+### Docker Compose
+
+1. Edit `artifacts/dex.config.yaml`: set `enablePasswordDB: false` and remove the `staticPasswords` block.
+2. Restart Dex:
+   ```bash
+   cd artifacts
+   docker compose restart dex
+   ```
+
+`configure.sh` regenerates `dex.config.yaml` from its template on every run, which turns local sign-in back on. Repeat
+the edit after re-running it.
+
+### Kubernetes (Helm)
+
+Set the same values in your chart values and upgrade:
 
 ```yaml
-server:
-  auth:
-    issuer: "https://openzro.example.com/oauth2"
-    localAuthDisabled: true
-    signKeyRefreshEnabled: true
-    dashboardRedirectURIs:
-      - "https://openzro.example.com/nb-auth"
-      - "https://openzro.example.com/nb-silent-auth"
-    cliRedirectURIs:
-      - "http://localhost:53000/"
+dex:
+  config:
+    enablePasswordDB: false
+    staticPasswords: []
 ```
 
-Restart the server to apply the change:
-```bash
-docker compose restart openzro-server
-```
+## Re-enable local sign-in
 
-### Older multi-container setup (management.json)
-
-<Note>
-This section applies to deployments using the older multi-container architecture with separate dashboard, management,
-signal, relay, and coturn containers. If you deployed using [`getting-started.sh`](/selfhosted/selfhosted-quickstart) post-v0.65.0,
-you are on the combined setup and should use the `config.yaml` instructions above. See the
-[migration guide](/selfhosted/migration/combined-container) to upgrade.
-</Note>
-
-Update your `management.json`:
-
-```json
-{
-  "EmbeddedIdP": {
-    "Enabled": true,
-    "LocalAuthDisabled": true
-  }
-}
-```
-
-Restart the Management service:
-```bash
-docker compose restart management
-```
-
----
-
-After updating the configuration, the local login option will no longer appear on the login page — users will only see the configured external identity providers.
-
-## Re-enabling Local Authentication
-
-To restore local authentication, reverse the configuration change and restart the server:
-
-- **Combined setup:** set `localAuthDisabled` back to `false` in `config.yaml` and run `docker compose restart openzro-server`.
-- **Older multi-container setup:** set `LocalAuthDisabled` to `false` in `management.json` and run `docker compose restart management`.
-
-All previously created local users will be able to log in again with their existing passwords.
+Set `enablePasswordDB: true` again and restore the `staticPasswords` entry (on Docker Compose, re-running
+`configure.sh` does this), then restart Dex. This is also the recovery path if no external account can sign in.

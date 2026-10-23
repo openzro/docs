@@ -566,10 +566,6 @@ export const docsNavigation = [
             title: 'Management Geolocation Database',
             href: '/selfhosted/geo-support',
           },
-          {
-            title: 'CrowdSec IP Reputation',
-            href: '/selfhosted/maintenance/crowdsec',
-          },
         ],
       },
       {

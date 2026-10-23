@@ -4,17 +4,15 @@ import {Note} from "@/components/mdx";
 
 [PocketID](https://pocket-id.org/) is a simplified identity management solution designed for self-hosted environments, offering a lightweight and easy-to-deploy option for authentication.
 
-<Note>
-PocketID is secure and effective but makes some tradeoffs in terms of features. Notably, it does not allow scoping the access of API Tokens. Keep careful track of the token used by openZro for management.
-</Note>
-
 ## Management Setup (Recommended)
 
-Add PocketID as an external IdP directly in the openZro Management Dashboard. This is the simplest approach and recommended for most deployments.
+Add PocketID as an authentication provider of openZro's embedded Dex from the dashboard. This is the simplest approach and recommended for most deployments.
 
 ### Prerequisites
 
-- openZro self-hosted with embedded IdP enabled
+- An openZro self-hosted deployment with the embedded Dex (the default), and the dashboard's
+  **Settings → Auth Providers** page working (management needs `OPENZRO_DEX_GRPC_ADDR`; the Docker Compose stack sets
+  it)
 - PocketID instance with admin access
 
 ### Step 1: Create OIDC Client in PocketID
@@ -32,6 +30,7 @@ Add PocketID as an external IdP directly in the openZro Management Dashboard. Th
    - **Name**: `openZro`
    - **Public Client**: Off (for confidential client)
    - **PKCE**: Off
+   - **Callback URLs**: `https://<your-domain>/dex/callback`
 6. Click **Save**
 
 <p>
@@ -44,50 +43,32 @@ Add PocketID as an external IdP directly in the openZro Management Dashboard. Th
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/3_note-client-id-pocketid.png" alt="Note client ID" className="imagewrapper-big"/>
 </p>
 
-### Step 2: Add Identity Provider in openZro
+### Step 2: Add PocketID in openZro
 
-1. Log in to your openZro Dashboard
-2. Navigate to **Settings** → **Identity Providers**
-3. Click **Add Identity Provider**
-4. Fill in the fields:
+1. In the openZro dashboard, go to **Settings → Auth Providers** and click **Add provider**.
+2. Fill in the form:
 
 | Field | Value |
 |-------|-------|
-| Type | PocketID |
-| Name | PocketID (or your preferred display name) |
-| Client ID | From PocketID |
-| Client Secret | From PocketID |
-| Issuer | `https://pocketid.example.com` |
+| ID | `pocketid` |
+| Type | Generic OIDC |
+| Display name | `PocketID` |
+| Issuer URL | `https://pocketid.example.com` (no trailing slash) |
+| Client ID | From Step 1 |
+| Client Secret | From Step 1 |
+| Redirect URI | Prefilled: `https://<your-domain>/dex/callback` |
+
+3. Click **Add provider**.
+
+<p>
+    <img src="/docs-static/img/selfhosted/identity-providers/openzro-add-provider-oidc.png" alt="Add authentication provider dialog" className="imagewrapper-big"/>
+</p>
 
 <Note>
 **Important:** Make sure not to add a trailing slash "/" after the issuer URL for PocketID. This differs from some of the other providers.
 </Note>
 
-5. Click **Save**
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/4_openzro-config-pocketid.png" alt="openZro configuration" className="imagewrapper-big"/>
-</p>
-
-### Step 3: Configure Redirect URI
-
-After saving, openZro displays the **Redirect URL**. Copy this URL and add it to your PocketID client:
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/5_copy-redirect-openzro-pocketid.png" alt="Copy redirect URL from openZro" className="imagewrapper-big"/>
-</p>
-
-1. Return to PocketID console → **OIDC Clients**
-2. Edit your openZro client
-3. Add the redirect URL to **Callback URLs**
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/pocketid/6_add-callback-url-pocketid.png" alt="Add callback URL" className="imagewrapper-big"/>
-</p>
-
-4. Click **Save**
-
-### Step 4: Create User Group and Assign to Client
+### Step 3: Create a User Group and Assign It to the Client
 
 1. Return to PocketID console → **User Groups**
 2. Click **Add** to create a new group
@@ -119,12 +100,13 @@ After saving, openZro displays the **Redirect URL**. Copy this URL and add it to
 
 9. Click **Save**
 
-### Step 5: Test the Connection
+### Step 4: Test the Connection
 
-1. Log out of openZro Dashboard
-2. On the login page, you should see a "PocketID" button
-3. Click it and authenticate with your PocketID credentials
-4. You should be redirected back to openZro and logged in
+1. Log out of the openZro dashboard.
+2. The sign-in page now shows **Log in with PocketID**.
+3. Click it and authenticate with your PocketID credentials.
+4. You are redirected back to openZro and logged in. A user who logs in for the first time is added to the account
+   with the default role.
 
 ### Configuring JWT 'groups' Claim
 
@@ -136,12 +118,20 @@ PocketID includes user groups in the ID token by default when you've assigned gr
 2. Ensure users are assigned to the group
 3. Ensure the group is linked to your openZro OIDC client
 
+<Note>
+Dex passes upstream groups on only when its connector sets `insecureEnableGroups: true` and requests the `groups`
+scope. Connectors added from **Settings → Auth Providers** do not set these, so the claim does not reach openZro.
+To use JWT group sync, declare the connector in `dex.config.yaml` instead (Docker Compose: `artifacts/dex.config.yaml`;
+Helm: `dex.config.connectors`), as in the
+[Helm quickstart](/selfhosted/kubernetes/helm-quickstart#jwt-group-sync-when-using-an-upstream-id-p).
+</Note>
+
 #### Enable JWT Group Sync in openZro
 
 1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to `groups`
-4. Optionally configure **JWT allow groups** to restrict access to users in specific PocketID groups
+4. Optionally configure **JWT allow group** to restrict access to users in specific PocketID groups
 
 <Note>
 PocketID restricts OIDC client access based on group membership. Only users in groups assigned to the OIDC client can authenticate. This is configured in Step 4 above.
@@ -152,7 +142,7 @@ PocketID restricts OIDC client access based on group membership. Only users in g
 ## Standalone Setup (Advanced)
 
 The standalone setup wires PocketID as openZro's *only* identity
-provider — Dex is disabled and the management daemon talks
+provider — Dex is bypassed (it keeps running but is not used) and the management daemon talks
 directly to PocketID for token validation. Choose this path
 **only** if all three apply:
 
@@ -186,11 +176,11 @@ For detailed standalone instructions, see
 ### "Invalid redirect URI" error
 
 - Ensure all callback URLs are properly configured in PocketID
-- Include both HTTP (localhost) and HTTPS (domain) variants
+- The callback URL must be exactly `https://<your-domain>/dex/callback`
 
 ---
 
 ## Related Resources
 
 - [PocketID Documentation](https://pocket-id.org/docs)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
+- [Identity providers overview](/selfhosted/identity-providers)

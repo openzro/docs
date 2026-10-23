@@ -2,168 +2,128 @@ import {Note} from "../../../components/mdx";
 
 # Authentication and Identity Providers (IdPs)
 
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/idp-main.png" alt="Identity Providers List" className="imagewrapper-big"/>
-</p>
-
 openZro's self-hosted implementation uses the OpenID Connect (OIDC) protocol for authentication, an industry-standard
 identity layer built on top of OAuth 2.0. OIDC is used both for user authentication to access the Management Service
 Dashboard and for user device authorization when accessing internal resources.
 
-<Note> 
-While we maintain a list of 'supported' (tested) IdPs, **any OIDC provider should work with openZro's 'OIDC (Generic)' connector**.
+<Note>
+**Any OIDC-compliant provider works with openZro**, through the **Generic OIDC** provider type. The pages below cover
+tested providers in detail.
 </Note>
 
 ## How Authentication Works in openZro
 
-When a user attempts to access the openZro dashboard from a web browser or an internal resource from their device,
-authentication is handled by the configured identity provider. Upon successful authentication, the identity provider
-issues a [JSON Web Token (JWT)](https://en.wikipedia.org/wiki/JSON_Web_Token) containing the user's identity and claims. The Management Service validates this token to
-verify the user's identity and grant access.
+When a user signs in to the openZro dashboard or authorizes a device, authentication is handled by the identity provider.
+After a successful sign-in, the identity provider issues a [JSON Web Token (JWT)](https://en.wikipedia.org/wiki/JSON_Web_Token)
+containing the user's identity and claims. The Management Service validates this token to verify the user's identity and
+grant access.
 
-openZro does not require an external identity provider. It bundles [Dex](https://dexidp.io/), which signs users in,
-and new installations start with a bootstrap administrator account for the first login. External identity providers are
-optional. Add them when you need SSO with Google, Microsoft, Okta, or self-hosted identity providers like Keycloak or
-Authentik.
+openZro does not require an external identity provider. It bundles [Dex](https://dexidp.io/) as its identity provider,
+served at `https://<your-domain>/dex`, and new installations start with a bootstrap administrator account for the first
+login. External identity providers are optional: Dex federates to them, so users can sign in with Google, Microsoft,
+Okta, or self-hosted identity providers like Keycloak or Authentik.
 
 ## Local Users
 
-Local users are email and password accounts stored in the bundled Dex. They are provisioned by an identity governance or
-provisioning system over SCIM 2.0. See [Provision Local Users via SCIM](/manage/team/idp-sync/scim-local-users).
+Local users are email and password accounts stored in the bundled Dex: the bootstrap administrator from
+`dex.config.yaml`, and users provisioned by an identity governance or provisioning system over SCIM 2.0. See
+[Provision Local Users via SCIM](/manage/team/idp-sync/scim-local-users).
 
 ## External Identity Providers
 
-openZro supports connecting **multiple external identity providers** [alongside local users](/manage/team/idp-sync/scim-local-users).
-This allows users to sign in with their existing accounts from services like Google, Microsoft and your corporate or self-hosted identity
-provider, while still maintaining the option for local username/password authentication.
+You can connect **several external identity providers** at once, alongside local users. Each one becomes a
+**Log in with …** button on the sign-in page.
 
-openZro supports any OIDC-compliant identity providers. Here are some popular providers and their setup instructions:
-
-| Provider | Type | Best For |
+| Provider | Provider type in the dashboard | Best For |
 |----------|------|----------|
-| [**Generic OIDC**](/selfhosted/identity-providers/generic-oidc) | `oidc` | Any OIDC-compliant provider (custom/unsupported IdPs) |
-| [**Google**](/selfhosted/identity-providers/managed/google-workspace) | `google` | Google Workspace, personal Google accounts |
-| [**Microsoft**](/selfhosted/identity-providers/managed/microsoft-entra-id) | `microsoft` / `entra` | Personal accounts, Azure AD / Entra ID |
-| [**Okta**](/selfhosted/identity-providers/managed/okta) | `okta` | Enterprise SSO |
-| [**Zitadel**](/selfhosted/identity-providers/zitadel) | `zitadel` | Open-source IAM with multi-tenancy and passwordless auth |
-| [**Keycloak**](/selfhosted/identity-providers/keycloak) | `keycloak` |  Popular open source IAM with extensive enterprise features |
-| [**Authentik**](/selfhosted/identity-providers/authentik) | `authentik` | Flexible open source IdP with SSO, MFA, and policy engine |
-| [**Pocket ID**](/selfhosted/identity-providers/pocketid) | `pocketid` | Lightweight OIDC provider with passkey authentication |
-| [**Duo SSO**](/selfhosted/identity-providers/managed/duo) | `oidc` | Provides secure one-login access with MFA |
+| [**Generic OIDC**](/selfhosted/identity-providers/generic-oidc) | Generic OIDC | Any OIDC-compliant provider |
+| [**Google**](/selfhosted/identity-providers/managed/google-workspace) | Google | Google Workspace, personal Google accounts |
+| [**Microsoft**](/selfhosted/identity-providers/managed/microsoft-entra-id) | Microsoft Entra ID | Entra ID (Azure AD) and personal Microsoft accounts |
+| [**Okta**](/selfhosted/identity-providers/managed/okta) | Okta | Enterprise SSO |
+| [**Keycloak**](/selfhosted/identity-providers/keycloak) | Keycloak | Popular open source IAM with extensive enterprise features |
+| [**Zitadel**](/selfhosted/identity-providers/zitadel) | Generic OIDC | Open-source IAM with multi-tenancy and passwordless auth |
+| [**Authentik**](/selfhosted/identity-providers/authentik) | Generic OIDC | Flexible open source IdP with SSO, MFA, and policy engine |
+| [**Pocket ID**](/selfhosted/identity-providers/pocketid) | Generic OIDC | Lightweight OIDC provider with passkey authentication |
+| [**Auth0**](/selfhosted/identity-providers/managed/auth0) | Generic OIDC | Managed authentication service |
+| [**JumpCloud**](/selfhosted/identity-providers/managed/jumpcloud) | Generic OIDC | Cloud directory |
+| [**Duo SSO**](/selfhosted/identity-providers/managed/duo) | Generic OIDC | Single sign-on with Duo MFA |
 
-<Note>
-    Any identity provider that supports OpenID Connect can be integrated with openZro. If your provider isn't listed above,
-    use the generic OIDC configuration.
-</Note>
+GitHub is also available as a provider type. LDAP and SAML connectors can be managed through the
+[API](#managing-providers-via-api) with Dex's connector configuration.
 
 ### Adding an Identity Provider
 
-#### Via Dashboard
+1. Create an application (client) in your identity provider with the redirect URI
+   `https://<your-domain>/dex/callback`, and note its client ID and client secret.
+2. In the openZro dashboard, go to **Settings → Auth Providers** and click **Add provider**.
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/idp-list.png" alt="Identity Providers List" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/openzro-auth-providers.png" alt="Auth Providers settings" className="imagewrapper-big"/>
 </p>
 
-1. Log in to your openZro Dashboard
-2. Navigate to **Settings** → **Identity Providers**
-3. Click **Add Identity Provider**
-4. Select your provider type from the dropdown
-5. Configure the required fields:
-   - **Name** - Display name for the login button
-   - **Client ID** - From your identity provider
-   - **Client Secret** - From your identity provider
-   - **Issuer** - From your identity provider
-6. Copy the **Redirect URL** and configure it in your identity provider
-7. Click **Save**
+3. Fill in the form and click **Add provider**:
 
-<Note>
-    Make sure you are creating a confidential OIDC client in your identity provider. The secret will be stored privately in
-    your openZro installation and will never be exposed to the public.
-</Note>
+| Field | Description |
+|-------|-------------|
+| ID | Short lowercase identifier used in `/dex/auth/<id>`. Cannot be changed later. |
+| Type | The provider type (see the table above). |
+| Display name | Shown on the sign-in button as **Log in with …**. |
+| Issuer URL | For Generic OIDC, Keycloak and Okta: the provider's issuer. |
+| Tenant | For Microsoft Entra ID: your tenant ID, or `organizations`, `consumers` or `common`. |
+| Client ID / Client Secret | From the application in your identity provider. |
+| Redirect URI | Prefilled with `https://<your-domain>/dex/callback`; register this exact URL at your provider. |
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/add-idp.png" alt="Identity Providers List" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/openzro-add-provider-oidc.png" alt="Add authentication provider dialog" className="imagewrapper"/>
 </p>
 
-#### Via API
+The provider is stored in Dex and takes effect immediately. The page requires management to reach Dex's gRPC API
+(`OPENZRO_DEX_GRPC_ADDR`), which the Docker Compose stack sets up; on Kubernetes, see the
+[Helm quickstart](/selfhosted/kubernetes/helm-quickstart).
+
+### Managing Providers via API
+
+The dashboard uses the management API at `/api/admin/auth-providers`:
 
 ```bash
-curl -X POST "https://openzro.example.com/api/identity-providers" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "type": "oidc",
-    "name": "My SSO Provider",
-    "client_id": "your-client-id",
-    "client_secret": "your-client-secret",
-    "issuer": "https://sso.example.com"
-  }'
+# List providers
+curl -H "Authorization: Token ${OPENZRO_TOKEN}" https://openzro.example.com/api/admin/auth-providers
+
+# Add a provider (config is passed to Dex as the connector configuration)
+curl -X POST -H "Authorization: Token ${OPENZRO_TOKEN}" -H "Content-Type: application/json" \
+  https://openzro.example.com/api/admin/auth-providers \
+  -d '{"id":"corp","type":"oidc","name":"Corp IdP","config":{"issuer":"https://idp.example.com","clientID":"…","clientSecret":"…","redirectURI":"https://openzro.example.com/dex/callback"}}'
+
+# Update or delete a provider
+curl -X PUT    ... https://openzro.example.com/api/admin/auth-providers/corp -d '{…}'
+curl -X DELETE -H "Authorization: Token ${OPENZRO_TOKEN}" https://openzro.example.com/api/admin/auth-providers/corp
 ```
 
-For instance setup endpoints, see [Accounts API](/api/resources/accounts). For user creation with embedded IdP, see [Users API](/api/resources/users).
-
-### Managing Identity Providers via API
-
-```bash
-# List configured identity providers
-curl "https://openzro.example.com/api/identity-providers" \
-  -H "Authorization: Bearer ${TOKEN}"
-
-# Update an identity provider
-curl -X PUT "https://openzro.example.com/api/identity-providers/{id}" \
-  -H "Authorization: Bearer ${TOKEN}" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "Updated Name"
-  }'
-
-# Delete an identity providers
-curl -X DELETE "https://openzro.example.com/api/identity-providers/{id}" \
-  -H "Authorization: Bearer ${TOKEN}"
-```
+See [Generic OIDC](/selfhosted/identity-providers/generic-oidc#api-configuration) for a full example.
 
 ### How It Works
 
-1. User clicks the provider button on the login page
-2. User is redirected to the identity provider to authenticate
-3. After successful authentication, user is redirected back to openZro
-4. openZro validates the token and creates/updates the user account
-5. User is logged in and can access the Dashboard
-
-Users who authenticate via an external identity provider appear in your Users list with a badge showing their identity provider.
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/user-list.png" alt="Identity Providers List" className="imagewrapper-big"/>
-</p>
-
-### Multiple Identity Providers
-
-You can configure **multiple identity providers simultaneously**:
-
-- All configured providers appear as buttons on the login page
-- "Continue with Email" (local authentication) is always available first
-- Users can authenticate with any configured provider
-- Each user's provider is tracked and displayed in the Dashboard
-
-This allows you to support different authentication methods for different user groups.
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/idp-login.png" alt="Multiple Identity Providers" className="imagewrapper"/>
-</p>
+1. The user clicks a provider button on the sign-in page.
+2. Dex redirects the user to the identity provider to authenticate.
+3. The identity provider redirects back to Dex at `/dex/callback`.
+4. Dex issues its own token to openZro, which validates it and creates or updates the user.
+5. The user is logged in. A user who logs in for the first time joins the account with the default role.
 
 ### User Provisioning
 
-#### JWT Group Sync 
+#### JWT Group Sync
 
-If you've connected an external IdP, openZro can optionally fetch a user's groups via JWT claim. These groups automatically obtain representations within openZro and will be applied to the corresponding openZro user. To enable JWT group sync, 
-navigate to Settings > Groups and toggle 'Enable JWT group sync'. 
+openZro can read a user's groups from a JWT claim. These groups are created in openZro and assigned to the user on each
+login. To enable it, go to **Settings → Groups**, turn on **Enable JWT group sync**, and set the **JWT claim** (normally
+`groups`). Optionally set a **JWT allow group**: only users who have that group in the claim may sign in.
 
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/jwt-group-sync.png" alt="JWT Group Sync Settings" className="imagewrapper"/>
-</p>
+<Note>
+Dex forwards upstream groups only from connectors configured with `insecureEnableGroups: true` and the `groups`
+scope. Connectors added from the dashboard form do not set these; declare the connector in `dex.config.yaml` or create
+it [through the API](/selfhosted/identity-providers/generic-oidc#api-configuration) with those options.
+</Note>
 
-Specify the JWT claim to be used as the user's groups list (normally 'groups'). You can optionally specify a 'JWT allow groups' - this group will need to exist in your chosen claim for the user in order for that user to be granted access to openZro. 
-Your IdP may require specific configuration in order to pass a groups claim to openZro. For detailed per-IdP implementation steps, see below. If your IdP isn't on the list, refer to the project's documentation. 
+Your IdP may also need configuration to put groups in its tokens. See:
 
 - [Google](/selfhosted/identity-providers/managed/google-workspace#configuring-jwt-groups-claim)
 - [Microsoft Entra ID](/selfhosted/identity-providers/managed/microsoft-entra-id#configuring-jwt-groups-claim)
@@ -174,60 +134,55 @@ Your IdP may require specific configuration in order to pass a groups claim to o
 - [Authentik](/selfhosted/identity-providers/authentik#configuring-jwt-groups-claim)
 - [Keycloak](/selfhosted/identity-providers/keycloak#configuring-jwt-groups-claim)
 
-<Note> 
+<Note>
 Groups with matching names in openZro and your IdP will **not** sync. To import a group from your IdP, first delete the existing group with that name in openZro.
 </Note>
 
 #### SCIM
+
 openZro ships a [SCIM 2.0 server](https://github.com/openzro/openzro/tree/main/management/server/http/handlers/scim)
-in the management binary — available in self-host with no licensing
-gate. Tested against Okta and Microsoft Entra; setup walkthrough at
+in the management binary. Tested against Okta and Microsoft Entra; setup walkthrough at
 [Manage → Team → IdP Sync](/manage/team/idp-sync).
 
 ### Best Practices
 
-1. **Start simple** - Begin with local users, add external providers as needed
+1. **Start simple** - Begin with the bootstrap administrator, add external providers as needed
 2. **Test thoroughly** - Verify the provider works before announcing to users
 3. **Communicate changes** - Let users know about new login options
-4. **Keep a fallback** - Local authentication remains available if an external provider has issues
+4. **Keep a fallback** - Keep a working local administrator in case an external provider has issues
 
 ### Troubleshooting
 
-#### Provider not appearing on login page
+#### Provider not appearing on the sign-in page
 
-- Verify the provider was saved successfully in Settings → Identity Providers
-- Check that the provider is enabled
-- Clear browser cache and reload the login page
+- Verify the provider is listed under **Settings → Auth Providers**
+- Clear the browser cache and reload the sign-in page
 
 #### "Invalid redirect URI" error
 
-- Copy the exact Redirect URL from openZro after creating the provider
+- Register exactly `https://<your-domain>/dex/callback` at the identity provider
 - Ensure no trailing slashes or typos
 - Some providers are case-sensitive
 
 #### Authentication succeeds but user not created
 
-- Check Management service logs for errors
-- Verify the token contains required claims (email, name)
-- Ensure the user's email domain is not blocked by any policies in your IdP. Some providers like Pocket ID block all users by default unless you unrestrict groups in the OIDC client configuration.
+- Check the Management and Dex logs for errors
+- Verify the token contains the required claims (email, name)
+- Ensure your IdP allows the user to use the application. Some providers like Pocket ID block all users by default unless you unrestrict groups in the OIDC client configuration.
 
-#### External connector not working
+#### Auth Providers page shows an error
 
-1. Verify Client ID and Secret are correct
-2. Check redirect URIs are properly configured in the external IdP
-3. Review Management logs for OIDC/SAML errors
+- Check that the `management` service has `OPENZRO_DEX_GRPC_ADDR` and the `OPENZRO_DEX_GRPC_*` certificate settings
+- Check that the `dex` service has `DEX_API_CONNECTORS_CRUD=true`
 
 For provider-specific troubleshooting, see the individual provider pages.
 
 ## Migration Guide and Backwards Compatibility
 
-If you have an existing openZro deployment using a standalone IdP (like Zitadel from the previous quickstart), you have several options:
+If you have an existing openZro deployment that uses an identity provider directly, without Dex (the standalone setup
+described on each provider page, or the legacy Zitadel installer), you can:
 
-1. **Keep using your standalone IdP** - No changes required, your setup continues to work
-2. **Add your IdP as an external provider** - Keep your IdP but add it as an OIDC provider alongside local users.
-This option requires a migration as user IDs have a different format. See below.
-
-<Note>
-    We are working on a migration tool to automate the process of switching from standalone IdPs to external providers.
-    Please contact us at [](mailto:support@openzro.io) if you are interested in this feature.
-</Note>
+1. **Keep using your standalone IdP.** No changes required.
+2. **Add your IdP as a Dex connector.** Users keep logging in with the same IdP, but Dex gives them new user IDs, so
+   they come back as new openZro users. See
+   [Switching from an External IdP to the Embedded Dex](/selfhosted/migration/external-to-embedded-idp).

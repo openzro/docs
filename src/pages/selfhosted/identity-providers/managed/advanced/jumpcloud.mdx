@@ -1,22 +1,19 @@
 import {Note} from "@/components/mdx";
 
-# JumpCloud SSO with openZro Self-Hosted (Legacy)
+# JumpCloud SSO with openZro Self-Hosted (Standalone)
 
 [JumpCloud](https://jumpcloud.com/) is a cloud-based directory platform that provides identity, access, and device management. It offers single sign-on (SSO), multi-factor authentication (MFA), and centralized user management.
 
 ## Standalone Setup (Advanced)
 
 <Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
+We recommend adding JumpCloud as an authentication provider of openZro's bundled Dex instead: it needs less
+configuration, works alongside local users and other providers, and is managed from the dashboard. See the
+[recommended setup](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended).
 
-We highly recommend using the simpler setup that adds JumpCloud as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended) section in the main JumpCloud documentation.
-
-The standalone setup below replaces your embedded IdP entirely and is only recommended for experienced JumpCloud administrators who need full control over authentication and user management.
+The standalone setup below points openZro directly at JumpCloud. Dex keeps running but is not used, and providers can no
+longer be added from the dashboard.
 </Note>
-
-Use JumpCloud as your primary identity provider instead of openZro's embedded IdP. This option gives you full control over authentication and user management, is recommended for experienced JumpCloud administrators as it also requires additional setup and ongoing maintenance.
-
-For most deployments, the [embedded IdP](/selfhosted/identity-providers) is the simpler choice — it's built into openZro, fully integrated, and requires minimal configuration to get started. For this implementation, go back up to the [Management Setup (Recommended)](#management-setup-recommended) section above.
 
 ### Prerequisites
 
@@ -151,7 +148,6 @@ OPENZRO_AUTH_REDIRECT_URI="/auth"
 OPENZRO_AUTH_SILENT_REDIRECT_URI="/silent-auth"
 OPENZRO_TOKEN_SOURCE="idToken"
 
-OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="none"
 
 OPENZRO_MGMT_IDP="jumpcloud"
 OPENZRO_IDP_MGMT_EXTRA_API_TOKEN="<API_TOKEN>"
@@ -164,86 +160,6 @@ You've configured all required resources in JumpCloud. Continue with the [openZr
 ---
 
 ## Troubleshooting
-
-### "Issuer did not match" or "Unauthenticated" error
-
-If you see an error like:
-
-```
-FATL ... oidc: issuer did not match the issuer returned by provider, expected "https://oauth.id.jumpcloud.com" got "https://oauth.id.jumpcloud.com/"
-```
-
-This means there's a trailing slash mismatch in the Issuer URL. OIDC validation is strictly character-for-character.
-
-**The Cause:**
-- **Configured in openZro:** `https://oauth.id.jumpcloud.com` (missing trailing slash)
-- **Returned by JumpCloud:** `https://oauth.id.jumpcloud.com/` (has trailing slash)
-
-Because the service fails to initialize the IDP manager, the Management container will often crash or restart loop, making it impossible to fix this via the Web UI.
-
-**Resolution:**
-
-If you can still access openZro Dashboard:
-1. Navigate to **Settings** → **Identity Providers**
-2. Edit the JumpCloud identity provider
-3. Change the **Issuer** field to exactly `https://oauth.id.jumpcloud.com/` (with trailing slash)
-4. Click **Save**
-5. Restart the management container: `docker restart openzro-management`
-
-If you cannot access the dashboard (locked out), you must fix it directly in the SQLite database:
-
-1. **Locate the Volume:**
-   ```bash
-   docker volume inspect root_openzro_management
-   # Look for "Mountpoint", e.g., /var/lib/docker/volumes/root_openzro_management/_data
-   ```
-
-2. **Access the Database:**
-   ```bash
-   cd /var/lib/docker/volumes/root_openzro_management/_data
-   
-   # Backup the database first!
-   cp idp.db idp.db.bak
-   
-   # Open the database
-   sqlite3 idp.db
-   ```
-
-3. **Update the Issuer URL:**
-   Inside the SQLite prompt, run the following:
-   ```sql
-   -- Check current config to confirm missing slash
-   SELECT config FROM connector;
-   
-   -- Update the config to add trailing slash to match JumpCloud
-   UPDATE connector 
-   SET config = replace(config, 'jumpcloud.com"', 'jumpcloud.com/"') 
-   WHERE config LIKE '%jumpcloud.com"%';
-   
-   -- Verify the change
-   SELECT config FROM connector;
-   
-   -- Exit
-   .quit
-   ```
-
-4. **Restart Service:**
-   ```bash
-   docker restart openzro-management
-   ```
-
-The service should now start successfully, and the error should be resolved.
-
-
-### "Connector failed to initialize" error
-
-- Ensure **Attribute Mapping** has both **Email** and **Profile** scopes enabled
-- Verify at least one **User Group** is assigned to the application before activation
-- Check that **Redirect URIs** exactly matches the URL from openZro (no trailing slashes)
-- Ensure **Client Authentication Type** is set to `Client Secret POST`
-- Verify **Login URL** matches your openZro domain exactly
-- Make sure the application is **Activated** and you have the correct **Client ID** and **Client Secret**
-- Remove any duplicate attributes in **Attribute Mapping** (e.g., `email` and `email_verified`)
 
 ### "Invalid redirect URI" error
 
@@ -264,18 +180,12 @@ The service should now start successfully, and the error should be resolved.
 ### Device authorization not available
 
 - JumpCloud has limited device auth support
-- Set `OPENZRO_AUTH_DEVICE_AUTH_PROVIDER="none"`
+- Leave `OPENZRO_AUTH_DEVICE_AUTH_CLIENT_ID` empty to turn off the device authorization flow
 
 ---
-
-<Note>
-openZro includes built-in [local user management](/selfhosted/identity-providers) powered by an embedded IdP, allowing you to create and manage users directly without requiring an external identity provider. You can also add **multiple external identity providers** alongside local users, giving users multiple login options.
-
-We highly recommend using the simpler setup that adds JumpCloud as an external IdP directly in the openZro Management Dashboard. This approach requires minimal configuration, works alongside local users, and doesn't require replacing your embedded IdP. See the [Management Setup (Recommended)](/selfhosted/identity-providers/managed/jumpcloud#management-setup-recommended) section in the main JumpCloud documentation.
-</Note>
 
 ## Related Resources
 
 - [JumpCloud Documentation](https://jumpcloud.com/support)
 - [JumpCloud Admin Console](https://console.jumpcloud.com/)
-- [Embedded IdP Overview](/selfhosted/identity-providers)
+- [Identity providers overview](/selfhosted/identity-providers)
