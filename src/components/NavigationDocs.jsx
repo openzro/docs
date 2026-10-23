@@ -479,10 +479,6 @@ export const docsNavigation = [
         isOpen: false,
         links: [
           {
-            title: 'Install',
-            href: '/selfhosted/operator/install',
-          },
-          {
             title: 'CRDs',
             href: '/selfhosted/operator/crds',
           },
