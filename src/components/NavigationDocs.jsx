@@ -653,18 +653,6 @@ export const docsNavigation = [
         isOpen: false,
         links: [
           {
-            title: 'Coturn to Embedded STUN',
-            href: '/selfhosted/migration/coturn-to-stun-migration',
-          },
-          {
-            title: 'Combined Container Setup',
-            href: '/selfhosted/migration/combined-container',
-          },
-          {
-            title: 'Enable Reverse Proxy',
-            href: '/selfhosted/migration/enable-reverse-proxy',
-          },
-          {
             title: 'External IdP to Embedded IdP',
             href: '/selfhosted/migration/external-to-embedded-idp',
           },

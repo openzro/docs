@@ -687,6 +687,17 @@ const nextConfig = {
                 destination: '/selfhosted/external-reverse-proxy',
                 permanent: true,
             },
+            // NetBird-only migration guides removed: openZro has no combined container or embedded STUN
+            {
+                source: '/selfhosted/migration/combined-container',
+                destination: '/selfhosted/selfhosted-quickstart',
+                permanent: true,
+            },
+            {
+                source: '/selfhosted/migration/coturn-to-stun-migration',
+                destination: '/selfhosted/selfhosted-quickstart',
+                permanent: true,
+            },
             // selfhosted scaling redirect
             {
                 source: '/scaling-your-self-hosted-deployment',
