@@ -27,12 +27,11 @@ This guide uses:
   configuration change history.
 - **Device posture checks** to gate access based on OS version,
   client version, geolocation, CIDR ranges, running processes, and
-  MDM/EDR compliance — see [Section 4.2](#42-posture-checks-and-their-limits)
+  MDM/EDR compliance — see [Section 4.2](#4-2-posture-checks-and-their-limits)
   and the [Posture Checks guide](/manage/access-control/posture-checks).
 - **Connection traffic event logging** for flow visibility — see
   [Section 7](#7-visibility-traffic-events-siem-and-control-center)
   and [Traffic Events](/manage/activity/traffic-events-logging).
-  Requires the openZro client at v0.39 or newer.
 - **Audit and traffic event streaming** to Datadog, Elastic, or any
   generic HTTP endpoint for SIEM integration — see
   [Section 7](#7-visibility-traffic-events-siem-and-control-center)
@@ -53,7 +52,7 @@ so these features all line up.
 openZro peers do not need inbound ports open. They initiate outbound connections to openZro's Management, Signal, and Relay services (as well as other peers) over HTTPS (TCP port 443) and UDP/STUN/TURN protocols. If your network firewall restricts outbound traffic (egress filtering), you must allow these specific endpoints and ports.
 
 <Note>
-For a complete list of openZro endpoints, IP addresses, and detailed firewall configuration examples, see the [FAQ: What firewall ports should I open to use openZro?](/about-openzro/faq#what-firewall-ports-should-i-open-to-use-openzro-network-firewalls)
+For a complete list of openZro endpoints, IP addresses, and detailed firewall configuration examples, see the [FAQ: What firewall ports should I open to use openZro?](/about-openzro/faq#what-firewall-ports-should-i-open-to-use-open-zro-network-firewalls)
 </Note>
 
 **Understanding the services:**
@@ -70,7 +69,7 @@ For a complete list of openZro endpoints, IP addresses, and detailed firewall co
 </p>
 
 <Note>
-- For the openZro client-side outbound port reference, see the [FAQ: What firewall ports should I open to use openZro?](/about-openzro/faq#what-firewall-ports-should-i-open-to-use-openzro-network-firewalls)
+- For the openZro client-side outbound port reference, see the [FAQ: What firewall ports should I open to use openZro?](/about-openzro/faq#what-firewall-ports-should-i-open-to-use-open-zro-network-firewalls)
 - For the server-side port matrix of a self-hosted deployment, see the [self-hosted guide](/selfhosted/selfhosted-guide#port-requirements)
 </Note>
 ---
@@ -95,7 +94,7 @@ This section defines how terms are used in this guide and in openZro.
 
 - **Routing peer**
 
-    A openZro peer that acts as a gateway, forwarding traffic between the openZro overlay network and one or more internal subnets (private network ranges). Routing peers typically run in a VPC (Virtual Private Cloud, such as AWS VPC or Azure VNet), data center, or office LAN (Local Area Network). Think of it as a bridge between openZro's virtual network and your physical or internal networks.
+    An openZro peer that acts as a gateway, forwarding traffic between the openZro overlay network and one or more internal subnets (private network ranges). Routing peers typically run in a VPC (Virtual Private Cloud, such as AWS VPC or Azure VNet), data center, or office LAN (Local Area Network). Think of it as a bridge between openZro's virtual network and your physical or internal networks.
 
 - **Overlay network and overlay IP**
 
@@ -103,7 +102,7 @@ This section defines how terms are used in this guide and in openZro.
 
 - **Network (openZro object)**
 
-    A openZro configuration object that maps your internal networks (such as VPCs, LANs, or office networks) and organizes routing peers and resources. [Networks](/manage/networks) group routing peers that provide access to the same internal subnets. Resources within Networks (IP addresses, ranges, or DNS names) serve as destinations in access policies. Networks replaced the older "Network Routes" concept starting with openZro v0.35.0. Resources within a Network must be assigned to groups, and access is controlled through policies. Resources only become visible to peers after a policy explicitly grants access.
+    An openZro configuration object that maps your internal networks (such as VPCs, LANs, or office networks) and organizes routing peers and resources. [Networks](/manage/networks) group routing peers that provide access to the same internal subnets. Resources within Networks (IP addresses, ranges, or DNS names) serve as destinations in access policies. Networks is the newer alternative to [Network Routes](/manage/network-routes); both are supported. Resources within a Network must be assigned to groups, and access is controlled through policies. Resources only become visible to peers after a policy explicitly grants access.
 
 - **Posture check**
 
@@ -111,7 +110,7 @@ This section defines how terms are used in this guide and in openZro.
 
 - **SIEM (Security Information and Event Management)**
 
-    A security platform that collects, analyzes, and stores security events from various sources. Examples include Datadog, AWS Firehose, and S3-based pipelines. SIEMs ingest openZro events (traffic flows, policy changes, authentication events) for visibility, alerting, and compliance reporting.
+    A security platform that collects, analyzes, and stores security events from various sources. Examples include Datadog, Elastic, and S3-based pipelines. SIEMs ingest openZro events (traffic flows, policy changes, authentication events) for visibility, alerting, and compliance reporting.
 
 
 ### 1.2 Resources and scopes
@@ -231,7 +230,7 @@ Map:
 Do not expose production Networks yet. At this stage, you only need authenticated identities and a few test peers.
 
 <Note>
-For the full traffic discovery workflow that you can reuse per scope, see [Section 7.2](#72-use-the-siem-for-discovery-and-verification), which covers flow discovery using event logs. Enable Traffic Events and streaming now so you can use that workflow as soon as peers are enrolled.
+For the full traffic discovery workflow that you can reuse per scope, see [Section 7.2](#7-2-use-the-siem-for-discovery-and-verification), which covers flow discovery using event logs. Enable Traffic Events and streaming now so you can use that workflow as soon as peers are enrolled.
 </Note>
 
 ### 3.2 Groups and naming conventions
@@ -249,7 +248,7 @@ Use groups for two things:
     <img src="/docs-static/img/manage/access-control/associate-peer-groups.png" alt="Peer groups for resource groups" className="imagewrapper"/>
 </p>
 
-Where to manage groups: [Access Control → Groups](/manage/access-control).
+Where to manage groups: **Identity → Users & Groups → Groups** in the dashboard (see [Access Control](/manage/access-control)).
 
 Recommended naming:
 
@@ -348,7 +347,7 @@ Posture checks are not a security boundary against compromised endpoints. They v
 Recommended posture checks per policy:
 
 - **Client version**
-    - Enforce minimum openZro version (for example `>= 0.45.0`) for critical access.
+    - Enforce a minimum openZro client version for critical access.
 - **OS and version**
     - Block unsupported or unpatched OS versions on production access.
 - **Geolocation or peer network range**
@@ -478,15 +477,23 @@ When creating policies via API, the configuration looks like this:
   "name": "Users to Web",
   "description": "Allow DevOps and Support to access orders web tier",
   "enabled": true,
-  "source_groups": ["peer-devops-prod", "peer-support"],
-  "destination_groups": ["svc-orders-web-prod"],
-  "protocol": "tcp",
-  "ports": ["443"]
+  "rules": [
+    {
+      "name": "Users to Web",
+      "enabled": true,
+      "action": "accept",
+      "bidirectional": false,
+      "protocol": "tcp",
+      "ports": ["443"],
+      "sources": ["peer-devops-prod", "peer-support"],
+      "destinations": ["svc-orders-web-prod"]
+    }
+  ]
 }
 ```
 
 <Note>
-The example above uses group names for readability. The actual API requires group IDs (UUIDs), not names. You can retrieve group IDs via the [Groups API endpoint](/api/resources/groups#list-all-groups).
+The example above uses group names for readability. The actual API requires group IDs, not names. You can list group IDs with `GET /api/groups`.
 </Note>
 
 **Deliberately not allowed**
@@ -513,23 +520,23 @@ Broken DNS is the most common cause of "openZro is broken" complaints. For every
 Use routing peers and Networks when you need to reach private subnets (LAN, VPC, on-premises) rather than only openZro overlay peers.
 
 <Warning>
-**Network Routes vs Networks:** Legacy [Network Routes](/manage/network-routes) bypass Access Control policies by default unless [Access Control Groups are explicitly configured](/manage/network-routes/use-cases/by-configuration/access-control). The newer [Networks](/manage/networks) feature (v0.35.0+) handles this automatically—resources only become visible to peers after a policy explicitly grants access. For Zero Trust implementations, we recommend using Networks instead of legacy Network Routes.
+**Network Routes vs Networks:** Legacy [Network Routes](/manage/network-routes) bypass Access Control policies by default unless [Access Control Groups are explicitly configured](/manage/network-routes/use-cases/by-configuration/access-control). The newer [Networks](/manage/networks) feature handles this automatically—resources only become visible to peers after a policy explicitly grants access. For Zero Trust implementations, we recommend using Networks instead of legacy Network Routes.
 </Warning>
 
 ### 5.1 Requirements for a routing peer
 
-A routing peer is a openZro peer that:
+A routing peer is an openZro peer that:
 
 - Has network access to one or more internal subnets (for example `10.10.0.0/16`)
 - Is selected as a routing peer in a [Network](/manage/networks) or [Network Route](/manage/network-routes) configuration
 
 <p>
-    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes.png" alt="high-level-dia" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/network-routes/concepts/openzro-network-routes.png" alt="Network routes concept" className="imagewrapper-big"/>
 </p>
 
 ### 5.2 Direction of traffic with routing peers
 
-openZro Network access policies are unidirectional. They allow traffic from openZro peers toward the routing peer and the routed network. Replies to that traffic work as expected, but new connections cannot originate from the private network toward a openZro peer through the routing peer.
+openZro Network access policies are unidirectional. They allow traffic from openZro peers toward the routing peer and the routed network. Replies to that traffic work as expected, but new connections cannot originate from the private network toward an openZro peer through the routing peer.
 
 If you need true bidirectional initiation between two endpoints, run openZro on both machines and create an access policy that allows traffic in both directions.
 
@@ -555,9 +562,6 @@ General rules:
 - Add a DNS server in openZro with the right match domain (for example `corp.internal`) under [DNS → Nameservers](/manage/dns/internal-dns-servers#configuring-nameservers-for-internal-domains).
 - Add explicit policies allowing peers to reach the DNS servers themselves (UDP and TCP 53 to the resolver IPs).
 
-<Note>
-Starting with openZro v0.59.0, the local DNS forwarder port changed from 5353 to 22054. The Management Service only applies the new port when all peers in the account run v0.59.0 or newer. If you have mixed client versions, DNS forwarding may behave differently across peers.
-</Note>
 
 <Note>
 **Verification checklist:**
@@ -607,7 +611,7 @@ This usually works out of the box because internal firewalls already trust the r
 
 - Internal firewall log:
     - `100.64.1.45 → 10.10.1.10:5432`
-    - where `100.64.1.45` is a openZro overlay address (always within `100.64.0.0/10`)
+    - where `100.64.1.45` is an openZro overlay address (always within `100.64.0.0/10`)
 
 To make non-masqueraded traffic work you must:
 
@@ -654,7 +658,7 @@ At larger scale, you will care about:
 openZro has route selection tools and an experimental lazy connections feature for large networks. In practice:
 
 - Use network/route selection to avoid accidental routing into the wrong VPC or site when CIDRs overlap. You can do this in the systray application or via the command line.
-- [Lazy connections](/manage/peers/lazy-connection) reduce CPU and battery usage on devices by establishing tunnels only when traffic is sent, rather than maintaining keep-alive with every peer in the mesh. Note that lazy connections is an experimental feature that requires openZro client version 0.50.1 or later and does NOT support accessing resources through routing peers (Networks). Review the current scaling guidance and lazy connections documentation before rolling out to thousands of peers.
+- [Lazy connections](/manage/peers/lazy-connection) reduce CPU and battery usage on devices by establishing tunnels only when traffic is sent, rather than maintaining keep-alive with every peer in the mesh. Note that lazy connections is an experimental feature. Review the current scaling guidance and lazy connections documentation before rolling out to thousands of peers.
 
 <Note>
 **Verification checklist:**
@@ -674,7 +678,7 @@ Enable these as soon as possible, ideally right after IdP integration:
 - [Traffic Events](/manage/activity/traffic-events-logging) in the openZro dashboard
 - [Activity event streaming](/manage/activity/event-streaming) to your SIEM or log platform
 
-Where to configure: Activity → Traffic Events & Integrations → Event Streaming
+Where to configure: **System → Integrations** → **Flow Exports** (traffic events) and **Activity Streamer** (audit events). Traffic events are viewed under **Flow Traffic**.
 
 Use them to:
 
@@ -847,23 +851,15 @@ What to do:
 - Use network listing and selection on the client to see which routes are active:
 
     ```bash
-    # Networks (v0.35.0+) - recommended for Zero Trust
+    # Lists both Networks and Network Routes (`openzro routes` is an alias)
     openzro networks ls
-
-    # Legacy Network Routes
-    openzro routes ls
     ```
 
 - Temporarily deselect problematic routes and see if the issue disappears.
 
     ```bash
-    # For Networks
-    openzro networks deselect "network_name"
-    openzro networks select "network_name"
-
-    # For legacy routes
-    openzro routes deselect "route_id"
-    openzro routes select "route_id"
+    openzro networks deselect "network_id"
+    openzro networks select "network_id"
     ```
 
 
@@ -928,21 +924,19 @@ Configure these settings to strengthen peer and user verification.
 
 Where to configure: **Settings → Authentication** in the openZro dashboard.
 
-- **Manual peer approval**
+- **Peer approval**
 
-    Require administrator approval before new peers can join the network. This prevents unauthorized devices from automatically connecting and gives you control over which devices gain access.
-
-- **User approval**
-
-    Require administrator approval for new user accounts before they can access openZro. This ensures only authorized personnel can enroll devices and access resources.
+    Turn on **Require peer approval** to require administrator approval before new peers can join the network. This prevents unauthorized devices from automatically connecting and gives you control over which devices gain access.
 
 - **Peer session expiration (24 hours or lower)**
 
     Configure peer sessions to expire after 24 hours or less, requiring users to re-authenticate regularly. This limits the window of opportunity if credentials are compromised and ensures access is periodically re-verified.
 
-- **Global MFA (if your IdP does not enforce it)**
+- **Two-factor authentication (TOTP)**
 
-    Enable Multi-Factor Authentication at the openZro level if your Identity Provider does not enforce MFA. This adds a second authentication factor to protect against credential theft and unauthorized access.
+    Turn on **Require 2FA for local accounts** so local users must use an authenticator app, and **Require 2FA for
+    federated accounts** if your Identity Provider does not enforce MFA. See
+    [Multi-factor authentication](/manage/settings/multi-factor-authentication).
 
 ### 10.2 Permission settings
 
@@ -1004,11 +998,8 @@ Where to configure: **Settings → Permissions** in the openZro dashboard.
 # Check detailed status
 openzro status -d
 
-# Networks (v0.35.0+) - the newer feature with policy-based access control
+# Networks and Network Routes available to this peer
 openzro networks ls
-
-# Legacy Network Routes - may bypass Access Control unless explicitly configured
-openzro routes ls
 ```
 
 ### B.2 High availability for routing peers

@@ -1,17 +1,3 @@
-{/*
-  ──────────────────────────────────────────────────────────────────────
-  openZro · Site-to-Site Connectivity — MDX with inline SVG diagrams
-  ──────────────────────────────────────────────────────────────────────
-
-  Drop-in replacement for the original page. The four ASCII diagrams
-  ("Your Laptop ──► openZro Tunnel ──► …") are replaced with self-
-  contained SVG figures. No imports, no global CSS — every diagram is
-  themed for a dark card and works on any page background.
-
-  Tested against MDX 2 (Next.js, Docusaurus 3, Nextra).
-  ──────────────────────────────────────────────────────────────────────
-*/}
-
 import { Tiles } from '@/components/Tiles'
 
 # Site-to-Site Connectivity
@@ -24,7 +10,7 @@ openZro supports three distinct remote access scenarios. Understanding which one
 
 ### VPN-to-Site
 
-A openZro peer (device running the openZro client) accesses devices on a remote network that don't have openZro installed.
+An openZro peer (device running the openZro client) accesses devices on a remote network that don't have openZro installed.
 
 {/* ════════════════════════════════════════════════════════════════════
     01 · VPN-to-Site — peer reaches a clientless device
@@ -461,7 +447,7 @@ openZro offers two features for routing traffic to private networks: [Networks](
 
 **Use Networks** for VPN-to-Site scenarios where you want a guided setup experience and per-resource access policies.
 
-**Use Network Routes** when you need Site-to-VPN or Site-to-Site connectivity, or require advanced options like disabling masquerade.
+**Use Network Routes** when you need Site-to-VPN or Site-to-Site connectivity, or need an exit node.
 
 ### Scenario Support
 
@@ -481,9 +467,11 @@ openZro offers two features for routing traffic to private networks: [Networks](
 | Per-route configuration | No (routing peers serve all resources) | Yes (each route needs peer, groups, range) |
 | Edit resources after creation | Yes | No |
 | Wildcard domains | Yes | No |
-| Masquerade control | Always on | Configurable |
+| Masquerade control | Configurable per routing peer (on by default) | Configurable per route |
 | Exit node support | No | Yes |
 
 ### Future Direction
 
-The goal is to migrate all routing functionality into Networks for a unified experience. **Network Routes will not be deprecated without advance notice**, and any migration path will be documented. For now, use whichever feature fits your scenario.
+openZro intends to bring the remaining Network Routes capabilities (Site-to-VPN, Site-to-Site and exit nodes) into
+Networks over time. Today both features ship in openZro and are maintained; Network Routes will not be deprecated
+without advance notice, and any migration path will be documented. For now, use whichever feature fits your scenario.
