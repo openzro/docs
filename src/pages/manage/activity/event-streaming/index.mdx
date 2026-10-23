@@ -2,45 +2,61 @@ import {Note} from "@/components/mdx";
 
 # Stream Activity Events to Third-Party SIEMs
 
-<p>
-    <img src="/docs-static/img/manage/activity/event-streaming/event-streaming-integration.png" alt="event-streaming-integration" className="imagewrapper-big"/>
-</p>
+openZro can send every [audit event](/manage/activity) to your SIEM or log pipeline as it happens: peer and user
+changes, policy and settings updates, logins, admission decisions and more. The management server sends the events
+itself; no extra component is needed.
 
-openZro emits a structured stream of activity events — peer logins,
-posture decisions, admission gate verdicts, policy changes,
-configuration updates, IdP-Sync runs — that you can fan out to your
-SIEM in real time. The feature ships in the management binary and
-is configured via environment variables; see
-[`management/server/activity/exporter`](https://github.com/openzro/openzro/tree/main/management/server/activity/exporter)
-for the implementation.
+<p>
+    <img src="/docs-static/img/manage/activity/event-streaming/event-streaming-integration.png" alt="Activity Streamer tab" className="imagewrapper-big"/>
+</p>
 
 ## Supported destinations
 
-| Destination | Wire protocol | Use when |
+| Destination | How events are sent | Use when |
 |---|---|---|
-| **Datadog** | Logs Intake API (HTTPS) | You're already on Datadog and want events alongside the rest of your observability |
-| **Elastic** | Bulk API + ECS-shaped JSON | You run Elastic / Kibana / OpenSearch as your primary SIEM |
-| **Generic HTTP** | POST / PUT to any URL | Anything else — Splunk via HEC, Grafana Loki, Vector, Fluent Bit, a custom endpoint. Optionally with a [custom payload template](/manage/activity/event-streaming/payload-templates) |
+| **Datadog** | Datadog Logs Intake API, in batches | You already use Datadog and want events alongside the rest of your logs. |
+| **Elasticsearch** | Bulk API, ECS-shaped documents, in batches | You run Elastic, Kibana or OpenSearch as your SIEM. |
+| **HTTP webhook** | One JSON `POST` per event, optionally with a [custom payload template](/manage/activity/event-streaming/payload-templates) | Anything else: Splunk HEC, Grafana Loki, Vector, Fluent Bit or your own endpoint. |
 
-The destinations are independent — you can run any combination of
-the three concurrently. Slow downstreams don't block each other,
-and a transient outage at one doesn't drop events for the others.
+Destinations are independent. You can run several at once, and a slow or failing destination does not hold up the
+others. The HTTP webhook sends each event right away; Datadog and Elasticsearch send a batch every 5 seconds by
+default.
 
-<Note>
-    Activity streaming is implemented end-to-end in the BSD-3
-    open-source build — there is no licensing gate. The streamer
-    runs alongside the rest of the management binary; events are
-    emitted within ~1 second of the originating action.
-</Note>
+Exporters cannot reach the management server's own loopback address or cloud metadata endpoints. Private network
+addresses (for example `http://10.0.0.5/collector`) are allowed.
 
-## Per-destination guides
+## Configure destinations
+
+There are two ways to configure a destination, and you can combine them:
+
+- **In the dashboard**, per account: go to **System → Integrations**, open the **Activity Streamer** tab and click
+  **Add exporter**. Credentials are stored encrypted in the management database.
+- **With environment variables** on the management server, for all accounts. See below.
+
+### Per-destination guides
 
 - [Datadog](/manage/activity/event-streaming/datadog)
-- [Generic HTTP](/manage/activity/event-streaming/generic-http)
-- [Custom Payload Templates](/manage/activity/event-streaming/payload-templates)
+- [HTTP webhook](/manage/activity/event-streaming/generic-http)
+- [Custom payload templates](/manage/activity/event-streaming/payload-templates)
 
-Elastic doesn't have its own walkthrough yet; configure it via the
-environment variables documented at
-[`activity/exporter/factory.go`](https://github.com/openzro/openzro/blob/main/management/server/activity/exporter/factory.go)
-(`OPENZRO_ACTIVITY_EXPORT_ELASTIC_*`). A walkthrough is on the
-[roadmap](https://github.com/openzro/openzro/blob/main/docs/ROADMAP.md).
+### Elasticsearch
+
+In the **Add activity exporter** dialog, choose **Elasticsearch (ECS)** and fill in the **URL** of the cluster, the
+**Index** (default `openzro-events`), and either an **API key** or a **Username** and **Password**.
+
+With environment variables:
+
+| Variable | Description |
+|---|---|
+| `OPENZRO_ACTIVITY_EXPORT_ELASTIC_URL` | Cluster URL, e.g. `https://es.example.com:9200`. Enables the exporter. |
+| `OPENZRO_ACTIVITY_EXPORT_ELASTIC_INDEX` | Index name (default `openzro-events`). |
+| `OPENZRO_ACTIVITY_EXPORT_ELASTIC_API_KEY` | API key. Use this or the username and password. |
+| `OPENZRO_ACTIVITY_EXPORT_ELASTIC_USERNAME`, `OPENZRO_ACTIVITY_EXPORT_ELASTIC_PASSWORD` | Basic authentication. |
+| `OPENZRO_ACTIVITY_EXPORT_ELASTIC_BATCH_SIZE` | Events per bulk request (default `100`). |
+| `OPENZRO_ACTIVITY_EXPORT_ELASTIC_FLUSH_INTERVAL` | Maximum time between bulk requests (default `5s`). |
+| `OPENZRO_ACTIVITY_EXPORT_ELASTIC_BUFFER_SIZE` | Events queued in memory (default `10000`). |
+
+<Note>
+    Activity streaming covers the audit log. To export network traffic events, use the **Flow Exports** tab on the
+    same page; see [Traffic events](/manage/activity/traffic-events-logging#export-traffic-events).
+</Note>

@@ -2,8 +2,8 @@ import { Note } from '@/components/mdx'
 
 # Custom Payload Templates
 
-Activity Streamer destinations (HTTP webhook, Datadog, Elastic)
-ship a default JSON payload that openZro defines. That shape works
+The HTTP webhook exporter of the Activity Streamer sends a default
+JSON payload that openZro defines. That shape works
 for most receivers but is wrong for some — a legacy SIEM that
 expects a flat key=value alert line, an internal SOC pipeline keyed
 on a specific JSON schema, a chat receiver that wants a Markdown
@@ -16,18 +16,27 @@ no JSON wrapping, no second-guessing. The receiver gets exactly
 the shape it expects.
 
 <Note>
-  Templates are off by default. The default payload is what the
-  upstream HTTP webhook always shipped — if your receiver was
-  happy with that, do nothing. Configure a template only when
+  Templates are off by default. If your receiver accepts the
+  [default payload](/manage/activity/event-streaming/generic-http#default-payload),
+  do nothing. Configure a template only when
   you have a specific receiver shape to match.
 </Note>
 
 ## Configuring a template
 
-Settings → Integrations → Activity Streamer → **Add exporter**
-(or **Edit** on an existing one). The modal exposes a multi-line
+**System → Integrations → Activity Streamer → Add exporter**
+(or edit an existing one). The dialog has a multi-line
 **Custom payload template** field at the bottom plus a **Validate
 template** button.
+
+The dialog shows the field for every type, but only the **HTTP
+webhook** uses it; a template saved on a Datadog or Elasticsearch
+exporter is ignored.
+
+With environment variables, set `OPENZRO_ACTIVITY_EXPORT_TEMPLATE`
+to the template text, or to `@/path/to/file` to read it from a
+file. It applies to the exporter configured with
+`OPENZRO_ACTIVITY_EXPORT_URL`.
 
 ### Validate before save
 
@@ -115,24 +124,16 @@ Pair this with `Content-Type: text/plain` in the headers.
 
 ### Slack incoming webhook
 
+The function set has no list constructor, so write the JSON
+envelope literally and use `json` to quote each value:
+
 ```text
-{{ json (dict
-  "username" "openZro"
-  "icon_emoji" ":lock:"
-  "text" (printf "%s — %s" .Message (default "system" .InitiatorEmail))
-  "attachments" (list (dict
-    "color" "warning"
-    "fields" (list
-      (dict "title" "Activity" "value" .Activity "short" true)
-      (dict "title" "Account"  "value" .AccountID "short" true)
-    )
-  ))
-) }}
+{"username":"openZro","icon_emoji":":lock:","text":{{ json (printf "%s — %s" .Message (default "system" .InitiatorEmail)) }},"attachments":[{"color":"warning","fields":[{"title":"Activity","value":{{ json .Activity }},"short":true},{"title":"Account","value":{{ json .AccountID }},"short":true}]}]}
 ```
 
-(Slack-shaped output omitted; matches Slack's
+The output matches Slack's
 [incoming webhook](https://api.slack.com/messaging/webhooks)
-contract verbatim.)
+format.
 
 ## Limits
 
