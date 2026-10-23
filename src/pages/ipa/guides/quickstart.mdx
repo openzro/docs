@@ -12,7 +12,7 @@ For this guide, we'll be using cURL to make our first API request. If you don't 
 
 ## Get an access token
 
-Before making your first API request, you need to create an access token to authenticate requests to the API. You can create an access token in the [openZro dashboard](https://your-management.example.com) under [Users &raquo; Me](https://your-management.example.com/).
+Before making your first API request, you need to create an access token to authenticate requests to the API. You can create an access token in the openZro dashboard on your user's page, or on a service user's page (see [Creating an access token](/manage/public-api#creating-an-access-token)).
 After the token was created successfully make sure to store it as we need it for the next step.
 
 ## Making your first API request
@@ -22,14 +22,14 @@ After creating your access token, you are ready to make your first call to the o
 <CodeGroup tag="GET" label="/api/peers">
 
 ```bash {{ title: 'cURL' }}
-curl -X GET https://api.openzro.io/api/peers \
+curl -X GET https://openzro.example.com/api/peers \
     -H 'Accept: application/json' \
     -H 'Authorization: Token <TOKEN>'
 ```
 
 </CodeGroup>
 
-NOTE: If you are self-hosting openzro, and used the advanced guide, you may need to use port 33073 with your management URL.
+Replace `openzro.example.com` with your management server's address, including the port if it does not listen on 443.
 
 <div className="not-prose">
   <Button
