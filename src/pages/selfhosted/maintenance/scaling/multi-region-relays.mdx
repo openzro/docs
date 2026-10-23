@@ -41,7 +41,7 @@ they've connected to, and the relay forwards bytes between them.
 **Each peer connects to ONE relay (the home relay)**; if peer A's
 home relay differs from peer B's home relay, the peers exchange
 traffic via [foreign-relay
-dialing](https://github.com/openzro/openzro/blob/main/relay/client/dialer/ws/ws.go),
+dialing](https://github.com/openzro/openzro/blob/main/relay/client/manager.go),
 which means the path is:
 
 ```
@@ -55,9 +55,10 @@ in São Paulo, both forced through a relay in Iowa.
 ## How the client picks a relay
 
 The management distributes a list of relay URLs to every peer via the
-Sync stream. At session start, the openZro client opens TCP
-connections in **parallel** to every configured relay (up to 7) and
-keeps the **first one that completes the TLS handshake**:
+Sync stream. At session start, the openZro client connects to every
+configured relay in **parallel** (up to 7 at a time), dialing each over
+WebSocket (TCP) and QUIC (UDP) at once, and keeps the **first relay
+whose handshake, including authentication, completes**:
 
 ```
 peer in SP → relay-us:    300 ms (TLS done)
@@ -98,8 +99,9 @@ The picker runs **once** at daemon start. The relay choice is
 durable until either:
 
 1. The daemon restarts (full re-pick on next boot)
-2. The TCP connection to the chosen relay actually drops AND the
-   URL was removed from the management's distribution list
+2. The connection to the chosen relay drops and the quick reconnect
+   to the same relay fails, or the relay's URL is no longer in the
+   management's list
 
 Network blips, mgmt restarts, signal disconnects — none of these
 trigger a re-pick. The
@@ -125,10 +127,11 @@ should benefit:
    any cluster-headless DNS names you publish (peers may connect
    via a DNS that round-robins to the actual relay IPs; the cert
    needs both the per-host name AND the cluster name).
-2. **Add the new relay to `management.relay.addresses`** alongside
-   the existing entries. Pushing this through the management
-   triggers a Sync update; peers learn about the new URL but stay
-   on whatever they already picked.
+2. **Add the new relay to `Relay.Addresses`** in `management.json`
+   (or `management.config.relay.addresses` in the Helm chart) alongside the
+   existing entries, and restart management: it reads the list only
+   at startup. Peers learn about the new URL on their next Sync but
+   stay on whatever they already picked.
 3. **Restart the openzro daemon on peers that should re-pick** —
    typically every routing peer in the target region, plus the
    workstations of users physically in that region. A rolling
@@ -136,7 +139,7 @@ should benefit:
    identity is unchanged so other peers see no churn beyond a
    brief reconnect.
 4. **Validate** with `openzro status --detail` on a sample peer:
-   the `Relay server address` field should show the new URL.
+   the **Relays** section should show the new URL as the home relay.
    Cross-region peers (e.g. a US peer) should still show the US
    relay — the picker's regional preference is observable here.
 
@@ -147,7 +150,7 @@ underutilised and operators wonder why latency didn't drop.
 
 If you run more than one relay process per region (for HA), publish
 a single multi-A DNS record that resolves to every relay's public
-IP, and put THAT name in `management.relay.addresses`:
+IP, and put THAT name in `Relay.Addresses`:
 
 ```
 relay-cluster-br.example.com.  IN A  34.95.249.1
@@ -155,11 +158,19 @@ relay-cluster-br.example.com.  IN A  34.95.135.229
 ```
 
 Peers connecting to `relay-cluster-br.example.com` round-robin
-between the two via DNS. Within the cluster, the relays use the
+between the two via DNS. To let a peer connected to relay node 1
+reach a peer connected to relay node 2 without a foreign relay hop,
+enable the
 [ADR-0014 fabric](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md)
-to forward peer state across pods, so a peer connected to relay
-node 1 can reach a peer connected to relay node 2 without going
-through a foreign relay hop.
+on every node. It is off by default and is configured separately
+from the public name:
+
+| Variable | Description |
+|---|---|
+| `OZ_CLUSTER_HEADLESS` | An internal DNS name that resolves to every relay node's reachable IP (on Kubernetes, a headless Service). Enables the fabric. |
+| `OZ_POD_IP` | This node's IP on that internal network. Required with `OZ_CLUSTER_HEADLESS`. |
+| `OZ_CLUSTER_PORT` | Port the nodes use between themselves (default 7090). |
+| `OZ_CLUSTER_AUTH_SECRET` | Shared secret that authenticates nodes to each other. Set it unless the network between nodes is isolated. |
 
 For this to work, **every relay's TLS cert needs both names as
 SANs**:
@@ -181,7 +192,7 @@ Periodic spot-checks worth scripting:
 
 ```bash
 # What relay is each peer using right now?
-sudo openzro status --detail | grep -E "FQDN|Relay server address"
+sudo openzro status --detail | grep -A4 "Relays:"
 
 # Cluster-headless DNS publishes all members?
 dig +short relay-cluster-br.example.com
@@ -220,7 +231,7 @@ during a routine check than during an incident.
 
 - [Set Up External Relay Servers](./set-up-external-relays) —
   the per-relay deployment walkthrough
-- [Scaling Your Self-Hosted Deployment](./scaling-your-self-hosted-deployment) —
+- [Splitting Your Self-Hosted Deployment](./scaling-your-self-hosted-deployment) —
   the parent doc this slots into
 - [ADR-0014: Coordinated multi-pod relay](https://github.com/openzro/openzro/blob/main/docs/adr/0014-coordinated-multi-pod-relay.md) —
   the cluster fabric internals
