@@ -32,13 +32,14 @@ kubectl apply --server-side -f https://github.com/kubernetes-sigs/gateway-api/re
 4. Add openZro API token. You can create a PAT by following the steps [here](/manage/public-api#creating-a-service-user).
 ```shell
 kubectl create namespace openzro
-kubectl -n openzro create secret generic openzro-mgmt-api-key --from-literal=NB_API_KEY=nbp_iVkOxFHOpx5K3Gc7qMqwCTqBWkHRpH2KunpX
+kubectl -n openzro create secret generic openzro-mgmt-api-key --from-literal=OZ_API_KEY=<your-access-token>
 ```
 <Note>
-  Replace `~/nb-pat.secret` with your openZro API key.
+  Replace `<your-access-token>` with the access token of a service user. The operator creates networks, resources,
+  groups and policies, so the service user needs the **Admin** role.
 </Note>
 
-4. (Recommended) Create a [`values.yaml`](https://github.com/openzro/kubernetes-operator/blob/main/examples/ingress/values-kubernetes-operator.yaml) file, check `helm show values openzro/kubernetes-operator` for more info.
+5. (Recommended) Create a `values.yaml` file. Run `helm show values --devel openzro/openzro-operator` to see every option. `managementURL` is not listed there but is required.
 ```yaml
 # Required: point this at your self-hosted openZro management server.
 managementURL: "https://management.example.com:443"
@@ -48,20 +49,20 @@ ingress:
 openzroAPI:
   keyFromSecret: 
     name: "openzro-mgmt-api-key"
-    key: "NB_API_KEY"
+    key: "OZ_API_KEY"
 ```
-5. Install using helm install:
+6. Install using helm install:
 ```shell
-helm install --create-namespace -f values.yaml -n openzro openzro-operator openzro/kubernetes-operator
+helm install --devel --create-namespace -f values.yaml -n openzro openzro-operator openzro/openzro-operator
 ```
-6. Check installation
+7. Check installation
 ```shell
 kubectl -n openzro get pods
 ```
 Output should be similar to:
 ```
 NAME                                                    READY   STATUS    RESTARTS   AGE
-openzro-operator-kubernetes-operator-67769f77db-tmnfn   1/1     Running   0          42m
+openzro-operator-67769f77db-tmnfn   1/1     Running   0          42m
 ```
 ```shell
 kubectl -n openzro get services
@@ -69,10 +70,18 @@ kubectl -n openzro get services
 Output should be similar to:
 ```shell
 NAME                                                   TYPE        CLUSTER-IP        EXTERNAL-IP   PORT(S)    AGE
-openzro-operator-kubernetes-operator-metrics           ClusterIP   192.168.194.165   <none>        8080/TCP   47m
-openzro-operator-kubernetes-operator-webhook-service   ClusterIP   192.168.194.222   <none>        443/TCP    47m
+openzro-operator-metrics                              ClusterIP   192.168.194.165   <none>        8080/TCP   47m
+openzro-operator-webhook-service                      ClusterIP   192.168.194.222   <none>        443/TCP    47m
 ```
-7.(Optional) Install Routing Peer and Policies, create a [`values.yaml`](https://github.com/openzro/kubernetes-operator/blob/main/examples/ingress/values-openzro-operator-config.yaml) file, check `helm show values openzro/openzro-operator-config` for more info.
+8. (Optional) Install routing peers and policies with the `openzro-operator-config` chart. Create a `values.yaml` file;
+   run `helm show values openzro/openzro-operator-config` to see every option.
+
+<Note>
+    The `openzro-operator-config` chart currently renders the upstream `NBPolicy` and `NBRoutingPeer` kinds, which the
+    openZro operator does not serve, so installing it fails ([openzro/helms#20](https://github.com/openzro/helms/issues/20)).
+    Until that is fixed, create `OZRoutingPeer` and `OZPolicy` objects directly.
+</Note>
+
 ```yaml
 router:
   enabled: true
@@ -82,7 +91,7 @@ policies:
     sourceGroups:
       - All
 ```
-8. Install using helm install:
+9. Install using helm install:
 ```shell
 helm install -f values.yaml -n openzro openzro-operator-config openzro/openzro-operator-config
 ```
@@ -92,7 +101,7 @@ The configuration or version update of the operator can be done with `helm upgra
 
 #### Operator version updates
 ```shell
-helm upgrade -f values.yaml -n openzro openzro-operator openzro/kubernetes-operator
+helm upgrade --devel -f values.yaml -n openzro openzro-operator openzro/openzro-operator
  ```
 
  #### Configuration Update 
@@ -119,6 +128,13 @@ The operator will create a openZro network resource similar to the example below
 Kubernetes services is a common way to route traffic to your application pods. With the openZro operator `ingress` you can expose services to your
 openZro network as resources by using annotations in your services. The operator will create networks, resources,
 and add routing peers to your openZro configuration.
+
+<Note>
+    The chart marks the annotation-based `ingress` mode as deprecated in favour of the `NetworkRouter` and
+    `NetworkResource` resources. It still works and is documented here because the replacement depends on the
+    reverse-proxy API the openZro management server does not implement yet (see the
+    [Gateway API page](/manage/integrations/kubernetes/gateway-api-beta)).
+</Note>
 
 By default, the ingress configuration is disabled. You can enable it with the following values using the `openzro-operator-config` helm chart:
 ```yaml
@@ -162,7 +178,7 @@ Other annotations can be used to further configure the resources created by the 
 |`openzro.io/expose`| Expose service using openZro Network Resource ||(`null`, `true`)|
 |`openzro.io/groups`| Comma-separated list of group names to assign to Network Resource. If non-existing, the operator will create them for you. |`{ClusterName}-{Namespace}-{Service}`|Any comma-separated list of strings.|
 |`openzro.io/resource-name`| Network Resource name |`{Namespace}-{Service}`|Any valid network resource name, make sure they're unique!|
-|`openzro.io/policy`| Name(s) of NBPolicy to propagate service ports as destination. ||Comma-separated list of names of any NBPolicy resource|
+|`openzro.io/policy`| Name(s) of OZPolicy to propagate service ports as destination. ||Comma-separated list of names of any OZPolicy resource|
 |`openzro.io/policy-ports`| Narrow down exposed ports in a policy. Leave empty for all ports. ||Comma-separated integer list, integers must be between 0-65535|
 |`openzro.io/policy-protocol`| Narrow down protocol for use in a policy. Leave empty for all protocols. ||(`tcp`,`udp`)|
 
@@ -241,7 +257,7 @@ You can reference multiple policy bases using a comma separated list of policy b
 ### Policy auto-creation
 
 1. Ensure `ingress.allowAutomaticPolicyCreation` is set to true in the Helm chart and apply.
-2. Annotate a service with `openzro.io/policy` with the name of the policy as a kubernetes object, for example `openzro.io/policy: default`. This will create an NBPolicy with the name `default-<Service Namespace>-<Service Name>`.
+2. Annotate a service with `openzro.io/policy` with the name of the policy as a kubernetes object, for example `openzro.io/policy: default`. This will create an OZPolicy with the name `default-<Service Namespace>-<Service Name>`.
 3. Annotate the same service with `openzro.io/policy-source-groups` with a comma-separated list of group names to allow as a source, for example `openzro.io/policy-source-groups: dev`.
 4. (Optional) Annotate the service with `openzro.io/policy-name` for a human-friendly name, for example `openzro.io/policy-name: "default:Default policy for kubernetes cluster"`.
 Example:
@@ -285,9 +301,9 @@ or by following [this guide](/manage/peers/register-machines-using-setup-keys) f
     <img src="/docs-static/img/manage/integrations/kubernetes/side-cars-setup-key.png" alt="Setup Keys" className="imagewrapper"/>
 </p>
 
-Next, you'll create a secret in Kubernetes and add a new resource called `NBSetupKey`. The `NBSetupKey` name can then be
+Next, you'll create a secret in Kubernetes and add a new resource called `OZSetupKey`. The `OZSetupKey` name can then be
 referenced in your deployments or daemon sets to specify which setup key should be used when injecting a sidecar into
-your application pods. Below is an example of a secret and an `NBSetupKey` resource:
+your application pods. Below is an example of a secret and an `OZSetupKey` resource:
 
 ```yaml
 apiVersion: v1
@@ -297,22 +313,22 @@ kind: Secret
 metadata:
   name: app-setup-key
 ```
-NBSetupKey:
+OZSetupKey:
 ```yaml
 apiVersion: openzro.io/v1
-kind: NBSetupKey
+kind: OZSetupKey
 metadata:
   name: app-setup-key
 spec:
   # Optional, overrides management URL for this setupkey only
-  # defaults to https://api.openzro.io
+  # defaults to the operator's managementURL
   # managementURL: https://openzro.example.com
   secretKeyRef:
     name: app-setup-key # Required
     key: setupkey # Required
 ```
 
-After adding the resource, you can reference the `NBSetupKey` in your deployments or daemon-sets as shown below:
+After adding the resource, you can reference the `OZSetupKey` in your deployments or daemon-sets as shown below:
 
 ```yaml
 kind: Deployment
@@ -322,7 +338,7 @@ spec:
   template:
     metadata:
       annotations:
-        openzro.io/setup-key: app-setup-key # Must match the name of an NBSetupKey object in the same namespace
+        openzro.io/setup-key: app-setup-key # Must match the name of an OZSetupKey object in the same namespace
 ...
     spec:
       containers:
@@ -350,7 +366,7 @@ spec:
   template:
     metadata:
       annotations:
-        openzro.io/setup-key: app-setup-key # Must match the name of an NBSetupKey object in the same namespace
+        openzro.io/setup-key: app-setup-key # Must match the name of an OZSetupKey object in the same namespace
         openzro.io/init-sidecar: "true"
 ...
     spec:
@@ -359,7 +375,7 @@ spec:
 ```
 
 ### Using Extra Labels to Access Multiple Pods Using the Same Name
-Starting with `v0.27.0`, openZro supports extra DNS labels, allowing you to define extended DNS names for peers. This enables grouping peers under a shared DNS name and distributing traffic using DNS round-robin load balancing.
+openZro supports extra DNS labels, allowing you to define extended DNS names for peers. This enables grouping peers under a shared DNS name and distributing traffic using DNS round-robin load balancing.
 
 To use this feature, create a setup key with the “Allow Extra DNS Labels” option enabled. See the example below for reference:
 
@@ -377,7 +393,7 @@ spec:
   template:
     metadata:
       annotations:
-        openzro.io/setup-key: app-setup-key # Must match the name of an NBSetupKey object in the same namespace
+        openzro.io/setup-key: app-setup-key # Must match the name of an OZSetupKey object in the same namespace
         openzro.io/extra-dns-labels: "app"
 ...
     spec:
@@ -389,57 +405,22 @@ With this setup, other peers in your openZro network can reach these pods using 
 
 ## Uninstallation
 
-### v0.2.0+
-
-To uninstall the openZro Kubernetes Operator and its associated resources, you can use the following Helm commands:
 ```shell
 helm uninstall -n openzro openzro-operator-config
-helm uninstall -n openzro kubernetes-operator
+helm uninstall -n openzro openzro-operator
 ```
 
 <Note>
-  Order of uninstallation is important; make sure to uninstall `openzro-operator-config` first to avoid orphaned resources. If you have any routing peers or policies in the cluster, uninstalling `kubernetes-operator` first may lead to issues.
+  Uninstall `openzro-operator-config` first to avoid orphaned resources. Deleting an `OZRoutingPeer` is blocked while
+  Services with the annotation `openzro.io/expose: "true"` exist in the cluster; remove the annotation from those
+  Services first.
 </Note>
 
-### &lt; v0.2.0
-To uninstall the openZro Kubernetes Operator and its associated resources, you'll need to manually delete all NBRoutingPeers and NBPolicies created by the operator before uninstalling the Helm chart. You can do this using the following commands:
-```shell
-kubectl -A delete nbroutingpeers --all
-kubectl delete nbpolicies --all
-helm uninstall -n openzro kubernetes-operator-operator
-```
+## Migrating from the NetBird operator
 
-<Note>
-  NBRoutingPeer deletion will be blocked if there are any Services with the annotation `openzro.io/expose: "true"` present in the cluster. Make sure to remove the annotation from those Services or delete the Services themselves before proceeding with the deletion of NBRoutingPeers.
-</Note>
-
-<Note>
-  Make sure to delete all NBRoutingPeers and NBPolicies before uninstalling the Helm chart to avoid orphaned resources.
-</Note>
-
-## Upgrade Notes
-
-### Upgrading from Helm Chart v0.1.0 to v0.2.0 and above
-Starting from version v0.2.0, the openZro Kubernetes Operator Helm chart has been split into two separate charts:
-- `kubernetes-operator`: This chart contains the core operator functionality.
-- `openzro-operator-config`: This chart is responsible for configuring the openZro operator, including routing peers and policies.
-
-The configuration files responsible for creating NBRoutingPeers and NBPolicies have been moved to the `openzro-operator-config` chart, allowing for easier uninstallation of the operator without affecting existing routing peers and policies, as well as uninstalling configuration with a proper cleanup.
-
-During Helm versions v0.2.x, `kubernetes-operator` chart will still install NBRoutingPeers and NBPolicies if they are defined in the `values.yaml` file. However, this behavior will be deprecated in future releases. It is recommended to migrate your configuration to the `openzro-operator-config` chart to ensure compatibility with future updates.
-
-You can migrate to the new chart by following these steps:
-1. Create a new `values.yaml` file for the `openzro-operator-config`
-2. Move the routing peer and policy configurations from your existing `values.yaml` file to the new file.
-3. Install or upgrade the `openzro-operator-config` chart using Helm with the new `values.yaml` file using the `--take-ownership` flag.
-```shell
-helm install -f values.yaml -n openzro openzro-operator-config openzro/openzro-operator-config --take-ownership
-```
-4. Remove routing peer and policy configurations from the `kubernetes-operator` `values.yaml` file to avoid duplication.
-5. Upgrade the `kubernetes-operator` chart using Helm with the updated `values.yaml` file.
-```shell
-helm upgrade -f values.yaml -n openzro openzro-operator openzro/kubernetes-operator
-```
+The openZro operator uses its own API group and kinds (`OZGroup`, `OZPolicy`, `OZSetupKey`, `OZResource`,
+`OZRoutingPeer`), so objects created by the NetBird operator are not taken over. Uninstall the NetBird operator, delete
+its custom resources, then install the openZro operator and recreate the objects with the new kinds.
 
 ## Get started
 - Make sure to [star us on GitHub](https://github.com/openzro/openzro)

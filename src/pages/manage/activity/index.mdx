@@ -1,134 +1,202 @@
+import {Note} from "@/components/mdx";
+
 # Audit Events Logging
 
-The Audit events logging functionality in openZro allows you to observe and track changes to your network infrastructure.
-This includes events such as when a new machine or user has joined your network, when access control policies have been modified,
-and many other key network events.
+openZro records an audit event for every change made through the management server: peers and users joining, policy
+and group changes, settings updates, logins and more. Use the log to see who changed what and when.
 
-## Related Video Content
-
-To get started with event logging in openZro, watch this introductory video:
-
-{/* TODO(docs): record openZro walkthrough — upstream had: <YouTube videoId="UlnMo1KYXPU" /> */}
-
-
-## Access the Audit Events Logging View
-The audit events logging feature is enabled by default for every openZro network. You can access the activity log in the web UI under the [Audit Events tab](https://your-management.example.com/). This view provides a centralized log of network events. You can use the search bar to search by activity name, and apply filters for timeframes, event types, and users.
+## View audit events
+Audit events are always on. In the dashboard, go to **Identity → Activity**. Use the search bar to search events, and
+filter by date range, event type and the user who made the change.
 
 <p>
-    <img src="/docs-static/img/manage/activity/activity-monitoring.png" alt="activity-monitoring" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/activity/activity-monitoring.png" alt="Activity page" className="imagewrapper-big"/>
 </p>
 
-The current version of openZro tracks a wide range of network changes that occur in the Management server, such as modifications to peers, groups, system settings, setup keys, and access control policies.
+Each event shows a human-readable description and a stable code (on the right). The code is what streamed events and the API carry, so use it
+when you filter events in a SIEM.
 
 <details>
-  <summary>Click here to view the full list of tracked events</summary>
+  <summary>Click here to view the full list of audit events</summary>
 
-  - **Peer Management:**
-    - Peer added by user
-    - Peer added with setup key
-    - Peer removed by user
-    - Peer renamed
-    - Peer SSH server enabled
-    - Peer SSH server disabled
-    - Peer login expiration enabled
-    - Peer login expiration disabled
+  **Peers**
 
-  - **Remote Job Management:**
-    - Remote job created for peer
+  | Event | Code |
+  |---|---|
+  | Peer added | `peer.user.add` |
+  | Peer added | `peer.setupkey.add` |
+  | Group added to peer | `peer.group.add` |
+  | Group removed from peer | `peer.group.delete` |
+  | Peer SSH server enabled | `peer.ssh.enable` |
+  | Peer SSH server disabled | `peer.ssh.disable` |
+  | Peer renamed | `peer.rename` |
+  | Peer login expiration enabled | `peer.login.expiration.enable` |
+  | Peer login expiration disabled | `peer.login.expiration.disable` |
+  | Peer login expired | `peer.login.expire` |
+  | Peer approved | `peer.approve` |
+  | Peer approval revoked | `peer.approval.revoke` |
+  | Peer inactivity expiration enabled | `peer.inactivity.expiration.enable` |
+  | Peer inactivity expiration disabled | `peer.inactivity.expiration.disable` |
+  | Peer admission denied | `peer.admission.deny` |
+  | Peer admission bypass granted | `peer.admission.bypass.granted` |
+  | Peer admission bypass revoked | `peer.admission.bypass.revoked` |
+  | Device login waiting for 2FA approval | `peer.login.mfa.require` |
+  | Device login approved with 2FA | `peer.login.mfa.approve` |
+  | Device login 2FA approval failed | `peer.login.mfa.fail` |
+  | Device login denied through the approval link | `peer.login.mfa.deny` |
+  | Device login 2FA approval expired | `peer.login.mfa.expire` |
 
-  - **User Management:** 
-    - User joined
-    - User invited
-    - User role updated
-    - User blocked
-    - User unblocked
-    - User deleted
+  **Users**
 
-  - **Group Management:** 
-    - Group created
-    - Group updated
-    - Group deleted
-    - Group added to peer
-    - Group removed from peer
-    - Group added to user
-    - Group removed from user
-    - Group added to setup key
-    - Group removed from setup key
-    - Group added to disabled management DNS setting
-    - Group removed from disabled management DNS setting
+  | Event | Code |
+  |---|---|
+  | User joined | `user.join` |
+  | User invited | `user.invite` |
+  | Peer deleted | `user.peer.delete` |
+  | Group added to user | `user.group.add` |
+  | Group removed from user | `user.group.delete` |
+  | User role updated | `user.role.update` |
+  | User blocked | `user.block` |
+  | User unblocked | `user.unblock` |
+  | User deleted | `user.delete` |
+  | User logged in peer | `user.peer.login` |
+  | User join denied by email domain | `user.join.denied_domain` |
+  | Local user password reset | `user.password.reset` |
+  | User 2FA reset | `user.mfa.reset` |
+  | User 2FA disabled | `user.mfa.disable` |
+  | Dashboard login | `dashboard.login` |
 
-  - **Policy Management:** 
-    - Policy added
-    - Policy updated
-    - Policy removed
+  **Account settings**
 
-  - **Rule Management:** 
-    - Rule added
-    - Rule updated
-    - Rule removed
+  | Event | Code |
+  |---|---|
+  | Account created | `account.create` |
+  | Account deleted | `account.delete` |
+  | Account peer login expiration duration updated | `account.setting.peer.login.expiration.update` |
+  | Account peer login expiration enabled | `account.setting.peer.login.expiration.enable` |
+  | Account peer login expiration disabled | `account.setting.peer.login.expiration.disable` |
+  | Account peer approval enabled | `account.setting.peer.approval.enable` |
+  | Account peer approval disabled | `account.setting.peer.approval.disable` |
+  | Account peer inactivity expiration enabled | `account.peer.inactivity.expiration.enable` |
+  | Account peer inactivity expiration disabled | `account.peer.inactivity.expiration.disable` |
+  | Account peer inactivity expiration duration updated | `account.peer.inactivity.expiration.update` |
+  | User group propagation enabled | `account.setting.group.propagation.enable` |
+  | User group propagation disabled | `account.setting.group.propagation.disable` |
+  | Account routing peer DNS resolution enabled | `account.setting.routing.peer.dns.resolution.enable` |
+  | Account routing peer DNS resolution disabled | `account.setting.routing.peer.dns.resolution.disable` |
+  | Account DNS domain updated | `account.dns.domain.update` |
+  | Account lazy connection enabled | `account.setting.lazy.connection.enable` |
+  | Account lazy connection disabled | `account.setting.lazy.connection.disable` |
+  | Admission enforcement enabled | `account.setting.admission.enforcement.enable` |
+  | Admission enforcement disabled | `account.setting.admission.enforcement.disable` |
+  | Admission posture checks updated | `account.setting.admission.checks.update` |
+  | Admission exempt groups updated | `account.setting.admission.exempt_groups.update` |
+  | Client update directive updated | `account.setting.client_update.update` |
+  | Account allowed email domains updated | `account.setting.allowed_email_domains.update` |
+  | Account peer approval exempt groups updated | `account.setting.peer.approval.exempt_groups.update` |
+  | Account device login 2FA enabled | `account.setting.mfa.peer_login.enable` |
+  | Account device login 2FA disabled | `account.setting.mfa.peer_login.disable` |
+  | Transferred owner role | `transferred.owner.role` |
 
-  - **Setup Key Management:** 
-    - Setup key created
-    - Setup key updated
-    - Setup key revoked
-    - Setup key overused
+  **Policies**
 
-  - **Route Management:** 
-    - Route created
-    - Route removed
-    - Route updated
+  | Event | Code |
+  |---|---|
+  | Policy added | `policy.add` |
+  | Policy updated | `policy.update` |
+  | Policy deleted | `policy.delete` |
 
-  - **Account Management:** 
-    - Account created
-    - Account peer login expiration duration updated
-    - Account peer login expiration enabled
-    - Account peer login expiration disabled
-    - Account peer approval enabled
-    - Account peer approval disabled
+  **Setup keys**
 
-  - **Nameserver Group Management:** 
-    - Nameserver group created
-    - Nameserver group deleted
-    - Nameserver group updated
+  | Event | Code |
+  |---|---|
+  | Setup key created | `setupkey.add` |
+  | Setup key revoked | `setupkey.revoke` |
+  | Group added to setup key | `setupkey.group.add` |
+  | Group removed from user setup key | `setupkey.group.delete` |
+  | Setup key deleted | `setupkey.delete` |
 
-  - **Token Management:** 
-    - Personal access token created
-    - Personal access token deleted
+  **Groups**
 
-  - **Service User Management:** 
-    - Service user created
-    - Service user deleted
+  | Event | Code |
+  |---|---|
+  | Group created | `group.add` |
+  | Group deleted | `group.delete` |
 
-  - **Integration Management:** 
-    - Integration created
-    - Integration updated
-    - Integration deleted
+  **DNS**
 
-  - **Other Events:** 
-    - Transferred owner role
-    - Posture check created
-    - Posture check updated
-    - Posture check deleted
-    - User logged in peer
-    - Peer login expired
-    - Dashboard login
+  | Event | Code |
+  |---|---|
+  | Group added to disabled management DNS setting | `dns.setting.disabled.management.group.add` |
+  | Group removed from disabled management DNS setting | `dns.setting.disabled.management.group.delete` |
+  | DNS zone created | `dns.zone.add` |
+  | DNS zone updated | `dns.zone.update` |
+  | DNS zone deleted | `dns.zone.delete` |
+  | DNS record created | `dns.record.add` |
+  | DNS record updated | `dns.record.update` |
+  | DNS record deleted | `dns.record.delete` |
+
+  **Network routes**
+
+  | Event | Code |
+  |---|---|
+  | Route created | `route.add` |
+  | Route deleted | `route.delete` |
+  | Route updated | `route.update` |
+
+  **Nameservers**
+
+  | Event | Code |
+  |---|---|
+  | Nameserver group created | `nameserver.group.add` |
+  | Nameserver group deleted | `nameserver.group.delete` |
+  | Nameserver group updated | `nameserver.group.update` |
+
+  **Service users and access tokens**
+
+  | Event | Code |
+  |---|---|
+  | Personal access token created | `personal.access.token.create` |
+  | Personal access token deleted | `personal.access.token.delete` |
+  | Service user created | `service.user.create` |
+  | Service user deleted | `service.user.delete` |
+
+  **Posture checks**
+
+  | Event | Code |
+  |---|---|
+  | Posture check created | `posture.check.create` |
+  | Posture check updated | `posture.check.update` |
+  | Posture check deleted | `posture.check.delete` |
+
+  **Networks**
+
+  | Event | Code |
+  |---|---|
+  | Network created | `network.create` |
+  | Network updated | `network.update` |
+  | Network deleted | `network.delete` |
+  | Network resource created | `network.resource.create` |
+  | Network resource updated | `network.resource.update` |
+  | Network resource deleted | `network.resource.delete` |
+  | Network router created | `network.router.create` |
+  | Network router updated | `network.router.update` |
+  | Network router deleted | `network.router.delete` |
+  | Resource added to group | `resource.group.add` |
+  | Resource removed from group | `resource.group.delete` |
 
 </details>
 
-Future versions will also support connection events that occur in openZro agents (e.g., peer A connected to peer B).
-
 <Note>
-    The `unknown` name or `unknown@unknown.com` email address may be displayed in the activity event store if the encryption key has been corrupted or lost. This issue is most relevant for self-hosted setups. In this case, the events returned by the API could show `unknown@unknown.com` for the email address field and `unknown` for the name field.
-    
-    For the combined setup, the encryption key is the <b>server.store.encryptionKey</b> field in <b>config.yaml</b>. For older multi-container setups generated by the <b>configure.sh</b> script, look for the <b>DataStoreEncryptionKey</b> field in the <b>management.json</b> backup file.
+    The `unknown` name or `unknown@unknown.com` email address may be displayed in the activity log if the encryption key
+    has been corrupted or lost. The events returned by the API then show `unknown@unknown.com` for the email address
+    and `unknown` for the name. The key is the <b>DataStoreEncryptionKey</b> field in <b>management.json</b>; restore
+    it from your backup.
 </Note>
 
-## Enable Audit Events Streaming to SIEM Systems
+## Stream audit events to a SIEM
 
-openZro can stream audit events to your Security Information and Event Management (SIEM) system in real-time. With this feature enabled, you can monitor and analyze openZro network changes within your SIEM infrastructure. Check the [integrations guide](/manage/activity/event-streaming) for more information about the supported integrations and how to enable them.
+openZro can send audit events to an HTTP endpoint, Datadog or Elasticsearch as they happen. See
+[Event streaming](/manage/activity/event-streaming).
 
-## Get Started
-
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
-- Ask questions in [GitHub Discussions](https://github.com/openzro/openzro/discussions)
-- openZro [latest release](https://github.com/openzro/openzro/releases) on GitHub
+Network traffic between peers is recorded separately; see [Traffic events](/manage/activity/traffic-events-logging).

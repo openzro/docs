@@ -1,102 +1,81 @@
-# Stream Network Activity to a Generic HTTP Endpoint
+import {Note} from "@/components/mdx";
 
-The Generic HTTP integration allows you to stream your openZro network activity events to any custom HTTP/S endpoint. This provides a flexible way to connect openZro with a wide range of third-party systems, including custom SIEMs, log management tools like Grafana Loki, or any service that can receive POST requests.
+# Stream Activity Events to an HTTP Endpoint
 
-For every event, openZro will send a POST request to your configured endpoint. You have full control over the request's body format and headers, allowing for seamless integration with various APIs.
+The HTTP webhook exporter sends each openZro [audit event](/manage/activity) to an HTTP or HTTPS endpoint of your
+choice: a custom SIEM, Splunk HEC, Grafana Loki, Vector, Fluent Bit, or any service that accepts `POST` requests.
 
-<Note>
-    This feature is only available in the cloud version of openZro.
-</Note>
+## How events are sent
 
-## Prerequisites
+- One `POST` request per event, sent as soon as the event is recorded.
+- The default body is JSON with `Content-Type: application/json`. You can replace it with a
+  [custom payload template](/manage/activity/event-streaming/payload-templates).
+- Server errors (5xx) and network errors are retried with exponential backoff, 3 attempts in total by default.
+  Client errors (4xx) are not retried.
+- The endpoint can be on a private network. The management server's own loopback address and cloud metadata
+  endpoints are refused.
 
-Before you start, ensure you have an HTTP/S endpoint that is publicly accessible and ready to receive POST requests from openZro. You will also need any necessary authentication details, such as an API key or credentials for Basic Authentication.
+## Add the exporter in openZro
 
-## Create an Integration in openZro
-
-1.  Navigate to the **Integrations** tab in the openZro dashboard and select **Event Streaming**.
-2.  Find the **Generic HTTP** option and click **Connect**.
-3.  A configuration panel will open with several tabs: **General**, **Headers**, **Body Template**, and **Danger Zone**.
-
-### General Configuration
-
-This tab is for the essential endpoint details.
-
-<p>
-    <img src="/docs-static/img/manage/activity/event-streaming/generic-http/general-config.png" alt="Generic HTTP General Configuration" className="imagewrapper-big"/>
-</p>
-
--   **Endpoint URL**: Enter the full HTTPS or HTTP URL where openZro should send the events. This field is mandatory.
--   **Authentication**: Select the authentication method required by your endpoint.
-    -   **No Authentication**: Sends requests without an `Authorization` header.
-    -   **Bearer Token**: Adds an `Authorization: Bearer <your-token>` header to each request. You will need to provide your API key or token.
-    -   **Basic Auth**: Adds an `Authorization: Basic <credentials>` header. You must provide the credentials in the format `username:password`.
-    -   **Custom Authentication**: Allows you to specify a custom HTTP header for authentication. You will need to provide both the header name (e.g., `X-API-Key`) and its value.
-
-<Note>
-After saving the integration, the configured authentication details will be converted into an HTTP header and will appear in the **Headers** tab.
-</Note>
-
-### HTTP Headers (Optional)
-
-You can add custom HTTP headers to every outgoing request in the **Headers** tab. This is useful for passing static tokens, setting a custom `Content-Type`, or other API requirements. By default, the `Content-Type` is `application/json`.
+1. In the openZro dashboard, go to **System → Integrations** and open the **Activity Streamer** tab.
+2. Click **Add exporter**.
+3. Fill in the dialog:
+   - **Name**: a label, for example `SIEM webhook`.
+   - **Type**: **HTTP webhook**.
+   - **URL**: the endpoint, for example `https://siem.example.com/webhooks/audit`.
+   - **Headers (JSON)** (optional): extra request headers as a JSON object. Use them for authentication, for example
+     `{"Authorization": "Bearer <token>"}`.
+   - **Custom payload template** (optional): see [Custom payload templates](/manage/activity/event-streaming/payload-templates).
+     Click **Validate template** to check it before saving.
+4. Click **Create exporter**.
 
 <p>
-    <img src="/docs-static/img/manage/activity/event-streaming/generic-http/headers-config.png" alt="Generic HTTP Headers Configuration" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/activity/event-streaming/generic-http/http-exporter.png" alt="Add activity exporter dialog with type HTTP webhook" className="imagewrapper"/>
 </p>
 
-### Custom Body Template (Optional)
+To change or remove the exporter later, use **Manage** or the delete icon on its card in the **Activity Streamer** tab.
 
-The **Body Template** tab gives you powerful control over the structure of the JSON payload sent to your endpoint.
+## Default payload
 
-<p>
-    <img src="/docs-static/img/manage/activity/event-streaming/generic-http/body-template-config.png" alt="Generic HTTP Body Template Configuration" className="imagewrapper-big"/>
-</p>
-
-If this option is disabled, openZro sends a default JSON object for each event. When enabled, you can define your own payload structure using Go's `text/template` templating engine.
-
-This is especially useful for integrating with services that expect a specific format, like Grafana Loki.
-
-#### Available Template Variables
-
-You can use the following variables from the `StreamEvent` object in your template:
-
-| Variable      | Type                 | Description                                                                          | Example Usage                     |
-|---------------|----------------------|--------------------------------------------------------------------------------------|-----------------------------------|
-| `.ID`         | `any`                | The unique ID of the event.                                                          | `{"event_id": "{{.ID}}"}`         |
-| `.Timestamp`  | `time.Time`          | The timestamp of when the event occurred. Can be formatted.                          | `{{.Timestamp.UnixNano}}` / `{{.Timestamp.Format "2006-01-02T15:04:05.999Z07:00"}}`          |
-| `.Message`    | `string`             | A human-readable message describing the event.                            | `{"text": "{{.Message}}"}`        |
-| `.InitiatorID`| `string`             | The ID of the object that initiated the event (e.g., a user or peer ID).    | `{"user": "{{.InitiatorID}}"}`     |
-| `.TargetID`   | `string`             | The ID of the object that was affected by the event (e.g., a peer or group ID). | `{"resource": "{{.TargetID}}"}`    |
-| `.Meta`       | `map[string]any`     | A map containing additional metadata about the event.                                | `{"source": "{{.Meta.source}}"}`   |
-| `.Reference`  | `string`             | A URL to the event in the openZro activity log for easy cross-referencing. | `{"ref": "{{.Reference}}"}`       |
-
-### Danger Zone
-
-This tab allows you to delete the integration. This action is irreversible and will immediately stop events from being sent to your endpoint.
-
-<p>
-    <img src="/docs-static/img/manage/activity/event-streaming/generic-http/danger-zone.png" alt="Generic HTTP Danger Zone" className="imagewrapper-big"/>
-</p>
-
-After configuring all settings, click **Save Changes**.
-
-## Verify the Integration
-
-Once you save the integration, openZro sends a test event to your endpoint to confirm that the connection and authentication are successful.
-
-Check the logs of your receiving service for a new POST request. You should find a JSON payload similar to this (if custom template wasn't set up):
+Without a template, each request body looks like this:
 
 ```json
 {
-    "ID": "test-event-1685635200",
-    "Timestamp": "2025-06-01T16:00:00Z",
-    "Message": "integration test event for generic http endpoint",
-    "InitiatorID": "openzro-test-system",
-    "TargetID": "target-id",
-    "Meta": {
-        "purpose": "configuration-test",
-        "source": "openzro-test"
-    },
-    "Reference": "openzro:test:generichttp"
+  "id": 4127,
+  "timestamp": "2026-10-22T21:12:15.402183Z",
+  "activity": "personal.access.token.create",
+  "activity_code": 41,
+  "initiator_id": "c2e1d6f0-7f3a-4b0e-9d6c-1f0a2b3c4d5e",
+  "initiator_name": "Alice",
+  "initiator_email": "alice@example.com",
+  "target_id": "9b990297-dabd-4976-9586-1cd8f9c4c2df",
+  "account_id": "d1e4f6g8h0j2k4l6m8n0",
+  "meta": {
+    "is_service_user": true,
+    "name": "terraform-ci",
+    "user_name": "terraform"
+  }
 }
+```
+
+- `activity` is the event's code from the [audit event list](/manage/activity); `activity_code` is its numeric ID.
+- `meta` depends on the event type.
+- Fields without a value are left out.
+
+## Configure with environment variables
+
+To stream the events of every account, set these on the management server instead:
+
+| Variable | Description |
+|---|---|
+| `OPENZRO_ACTIVITY_EXPORT_URL` | Endpoint URL. Enables the exporter. |
+| `OPENZRO_ACTIVITY_EXPORT_HEADERS` | Extra headers as a JSON object, e.g. `{"Authorization":"Bearer <token>"}`. |
+| `OPENZRO_ACTIVITY_EXPORT_TIMEOUT` | Timeout per attempt (default `5s`). |
+| `OPENZRO_ACTIVITY_EXPORT_MAX_ATTEMPTS` | Attempts per event (default `3`). |
+| `OPENZRO_ACTIVITY_EXPORT_INITIAL_BACKOFF` | Delay before the first retry, doubled after each attempt (default `200ms`). |
+| `OPENZRO_ACTIVITY_EXPORT_TEMPLATE` | Custom payload template, inline or as `@/path/to/file`. |
+
+<Note>
+    This page covers audit events. To send network traffic events to an HTTP endpoint, use a
+    [flow export](/manage/activity/traffic-events-logging#export-traffic-events).
+</Note>

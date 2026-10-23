@@ -1,59 +1,64 @@
-# Stream Network Activity to Datadog Cloud SIEM
+import {Note} from "@/components/mdx";
 
-Datadog is a monitoring and analytics platform for cloud-scale applications. Datadog Cloud SIEM provides real-time threat
-detection and security monitoring for cloud environments. By using the openZro-Datadog integration, you can stream [network activity](/manage/activity/traffic-events-logging) to Datadog Cloud SIEM for real-time monitoring
-and threat detection across your private network.
+# Stream Activity Events to Datadog
 
-openZro integrates with Datadog using the [Datadog Log Collection HTTP API](https://docs.datadoghq.com/api/latest/logs/#send-logs)
-and sends activity events to Datadog in real-time once they occur. The events appear in the [Datadog Log Explorer](https://docs.datadoghq.com/logs/explorer/), where you can
-search, filter, and analyze them right away.
-
-<Note>
-    This feature is only available in the cloud version of openZro.
-</Note>
+openZro sends [audit events](/manage/activity) to the
+[Datadog Logs Intake API](https://docs.datadoghq.com/api/latest/logs/#send-logs). The events appear in the
+[Datadog Log Explorer](https://docs.datadoghq.com/logs/explorer/), where you can search, filter and alert on them, and
+use them in Datadog Cloud SIEM.
 
 ## Prerequisites
 
-Before you start creating and configuring a Datadog event streaming integration, ensure that you have the following:
-- A Datadog account with permissions to create and manage API keys. If you don't have the required permissions,
-ask your Datadog administrator to grant them to you.
+- A Datadog account with permission to create API keys.
 
-## Create a Datdog API Key
-- Navigate to the [API Keys](https://app.datadoghq.eu/organization-settings/api-keys) page
-- Click `+ New Key` at the top
-- Give it a descriptive name like `openZro Event Streaming`
-- Click `Create Key`
-- Copy the key. You will need this key when configuring an integration in openZro.
+## Create a Datadog API key
 
-## Create an Integration in openZro
-- Navigate to the [Integrations &raquo; Event Streaming](https://preview.openzro.io/integrations) tab in the openZro Dashboard
-<p>
-    <img src="/docs-static/img/manage/activity/event-streaming/event-streaming-integration.png" alt="event-streaming-integration" className="imagewrapper-big"/>
-</p>
+1. In Datadog, go to **Organization Settings → API Keys**.
+2. Click **+ New Key** and give it a descriptive name, such as `openZro Event Streaming`.
+3. Click **Create Key** and copy the key.
 
-- Enable and configure the Datadog integration
-  - First select the region of your Datadog account (for more details see [Datadog Documentation](https://docs.datadoghq.com/getting_started/site/))
-<p>
-  <img src="/docs-static/img/manage/activity/event-streaming/datadog/datadog-region-select.png" alt="datadog-region-select" className="imagewrapper" />
-</p>
-  - Then enter the API key you created in [Step 1](#step-1-create-a-datdog-api-key) and click `Connect`
-<p>
-    <img src="/docs-static/img/manage/activity/event-streaming/datadog/datadog-api-key.png" alt="datadog-api-key" className="imagewrapper" />
-</p>
+## Add the exporter in openZro
 
-## Verify the Integration
-
-After configuring the Datadog integration in openZro, you can verify that the integration is working correctly by checking
-the Datadog Log Explorer for incoming events. If the integration is successful, you should see two events from the openzro service
-in the Log Explorer:
-- `integration test`
-- `integration created`
+1. In the openZro dashboard, go to **System → Integrations** and open the **Activity Streamer** tab.
+2. Click **Add exporter**.
+3. Fill in the dialog:
+   - **Name**: a label, for example `Datadog prod`.
+   - **Type**: **Datadog Logs Intake**.
+   - **Site**: your [Datadog site](https://docs.datadoghq.com/getting_started/site/): US1, US3, US5, EU1 or AP1.
+   - **API key**: the key you created.
+   - **Service** and **Tags** (optional): the `service` value (default `openzro`) and extra tags such as
+     `env:prod,team:secops`.
+   - **URL override** (optional): only if you send logs through a proxy or forwarder.
+4. Click **Create exporter**.
 
 <p>
-    <img src="/docs-static/img/manage/activity/event-streaming/datadog/verify-datadog-integration.png" alt="verify-datadog-integration" className="imagewrapper"/>
+    <img src="/docs-static/img/manage/activity/event-streaming/datadog/datadog-exporter.png" alt="Add activity exporter dialog with type Datadog Logs Intake" className="imagewrapper"/>
 </p>
 
-The `integration test` event is sent to validate whether the provided credentials are correct and openZro can stream events.
-The `integration created` event is sent when the integration is successfully created.
+## Verify
 
-The integration is now set up and ready to stream network activity events to Datadog.
+Make a change in the dashboard, for example rename a peer. Within a few seconds the event appears in the Datadog Log
+Explorer with `service:openzro` (or the service you set). The `hostname` of each event is the openZro account ID, which
+separates accounts when several send to the same Datadog organization.
+
+## Configure with environment variables
+
+To stream the events of every account, set these on the management server instead:
+
+| Variable | Description |
+|---|---|
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_API_KEY` | Datadog API key. Enables the exporter. |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_SITE` | `us1`, `us3`, `us5`, `eu1` or `ap1`. |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_URL` | Intake URL override, without the path. |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_SERVICE` | `service` value (default `openzro`). |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_SOURCE` | `ddsource` value (default `openzro`). |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_TAGS` | Extra tags, e.g. `env:prod,team:security`. |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_HOSTNAME` | `hostname` value (default: the account ID). |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_BATCH_SIZE` | Events per request (default `100`). |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_FLUSH_INTERVAL` | Maximum time between requests (default `5s`). |
+| `OPENZRO_ACTIVITY_EXPORT_DATADOG_BUFFER_SIZE` | Events queued in memory (default `10000`). |
+
+<Note>
+    This page covers audit events. To send network traffic events to Datadog, use a
+    [flow export](/manage/activity/traffic-events-logging#export-traffic-events).
+</Note>

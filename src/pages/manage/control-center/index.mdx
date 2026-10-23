@@ -5,14 +5,15 @@ export const description =
 
 # Visualize Remote Access with Control Center
 
-Control Center is a read-only topology view in the openZro dashboard that shows **which connections your access-control policies permit**. It maps **Peers**, **Users**, **Groups**, and **Networks** to the resources they can reach, through the policies that permit those connections, with port and protocol labels on every edge.
+Control Center is a read-only topology view in the openZro dashboard that shows **which connections your access-control policies permit**. It maps **Peers**, **Users**, **Groups**, and **Networks** to the resources they can reach, through the policies that permit those connections. Each policy card shows its ports and protocol.
 
 It reflects your **policy configuration**, posture-aware — not live device connectivity. The graph is derived on the server from the same policy engine that enforces access, so it never disagrees with what the engine would decide.
 
 <Note>
-    **Permissions:** Control Center is **admin-only** — it exposes the
-    whole workspace's access wiring, so it is restricted to full
-    account Admins. Admins can also edit policies from Control Center.
+    **Permissions:** Control Center exposes the whole workspace's access
+    wiring, so only the **Owner** and **Admin** roles can open it. Network
+    Admins and Auditors cannot. Owners and Admins can also edit policies from
+    Control Center.
     Learn more about [user roles](/manage/team/add-users-to-your-network#manage-user-roles).
 </Note>
 
@@ -31,18 +32,28 @@ The columns always read left → right, with **Policy as the middle pivot**:
 - **User:** focus → **Peers** (the user's machines) → **Policies** → Resources
 - **Networks:** the inverse fan-in — **Groups** → **Policies** → the selected network resource ("who can reach this resource")
 
-Edges are coloured by enforcement state:
+Open it from **Security → Control Center**. The view is marked **Beta**.
 
-- **Green** — the policy permits the connection and its posture checks pass.
-- **Red** — the policy permits the connection but a posture check **blocks** it (the failing check is named on the edge).
+Edges are coloured by enforcement state, as the legend at the bottom of the graph shows:
+
+- **Policy-permitted** (green): the policy permits the connection and its posture checks pass.
+- **Posture-blocked** (red): the policy permits the connection but a posture check **blocks** it.
+- **Policy flow** (dashed): the path through a policy. In the User view, the solid edges from the user to their peers
+  are ownership, not policy.
+
+For a group source, an edge is green when at least one member passes the posture checks, and red only when every
+member fails them.
+
+Hover over a node to highlight only the paths through it; the edges then also show their ports and protocol. The
+footer shows how many connections are drawn and has a **Refresh** button.
 
 For a group source, the edge also shows how many of the group's members the policy currently applies to (e.g. *3 of 5 members*), so partial reach is never mistaken for full reach. An empty or stale group produces no green edge.
 
-Everything is read-only except the policy editor (below). To change focus, click the focus card and search or pick another entity from the inline list; opening a tab automatically focuses the first available entity.
+Everything is read-only except the policy editor (below). To change focus, click the focus card and search or pick another entity from the inline list; opening a tab automatically focuses the first available entity. You can also click a peer or group in the graph to focus on it, or click a network resource to open it in the Networks tab. The current tab and focus are kept in the URL, so you can bookmark or share a view.
 
 ## Views
 
-### Peers view
+### Peer view
 
 Use this to understand what a specific machine is permitted to reach.
 
@@ -52,10 +63,10 @@ Use this to understand what a specific machine is permitted to reach.
 </p>
 
 - Click the peer (focus) card, then search or choose another peer from the inline picker to switch focus.
-- The graph shows the policies that apply to the peer and the resources they permit, with port/protocol labels.
+- The graph shows the policies that apply to the peer and the resources they permit, with each policy's ports and protocol.
 - Click a policy to open it in an editor **on this page** — changes you save are reflected in the graph immediately.
 
-### Users view
+### User view
 
 Use this to see what a specific user is permitted to reach, across all of their machines.
 
@@ -74,7 +85,7 @@ Use this to see what a specific user is permitted to reach, across all of their 
 - Click a peer to re-focus the graph on that specific machine.
 - Click a policy to edit it in place; the graph refreshes on save.
 
-### Groups view
+### Group view
 
 Use this to validate team-level access.
 
@@ -85,7 +96,7 @@ Use this to validate team-level access.
 
 - Click the group (focus) card, then search or choose another group from the inline picker.
 - The layout shows which resources that group is permitted to reach and via which policies, with the *k of n members* indicator on each edge.
-- Topology is view-only here; create or delete groups in the Groups section. Group-based access is the recommended way to manage permissions.
+- Topology is view-only here; create or delete groups under **Identity → Users & Groups → Groups**. Group-based access is the recommended way to manage permissions.
 
 Common checks:
 
@@ -119,7 +130,7 @@ Use this to see **who can reach a resource** in your routed [networks](/manage/n
 
 ## Quick start
 
-1. Open **Control Center** in the openZro dashboard.
+1. Open **Security → Control Center** in the openZro dashboard.
 2. Pick a tab: **Peer**, **User**, **Group**, or **Networks**.
 3. The first entity is focused automatically — or click the focus card and search for another.
 4. Follow the policy path to the target resource; green means policy-permitted, red means posture-blocked.
@@ -129,7 +140,7 @@ Use this to see **who can reach a resource** in your routed [networks](/manage/n
 
 - **Sanity-check a team:** In **Group** view, select a group and verify the resources and ports its policies grant match your intent. Adjust policies in place if needed.
 - **Prepare a change:** In **Networks** view, review which groups can reach a sensitive resource before tightening ports or destinations.
-- **Investigate access:** In **Peer** or **User** view, confirm why a host can reach a database by following the policy path and port labels — and whether a posture check is blocking an otherwise-permitted path.
+- **Investigate access:** In **Peer** or **User** view, confirm why a host can reach a database by following the policy path and its ports — and whether a posture check is blocking an otherwise-permitted path.
 
 ## Related docs
 

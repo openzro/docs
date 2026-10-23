@@ -1,403 +1,196 @@
+import {Note} from "@/components/mdx";
+
 # Traffic Events Logging
 
-<Note>
-Traffic events logging is implemented in the openZro management server
-([flow_service.go](https://github.com/openzro/openzro/blob/main/management/server/flow_service.go))
-and is available in self-host with no licensing gate. The wire protocol
-between the client and the management was added in upstream NetBird
-v0.39 — operators on older versions need to upgrade.
-</Note>
+Traffic events record the connections that go through your openZro network: who opened a connection to what, on which
+protocol and port, whether it was allowed or blocked, which policy allowed it, and how much data it carried. Use them
+for audits, troubleshooting and checking that your access policies match real traffic.
 
+Peers report the events to the management server. The management server stores them, shows them in the dashboard and
+can export them to your SIEM or to object storage.
 
-The traffic events logging functionality enables comprehensive monitoring and analysis of connections across your infrastructure.
-It captures network activity, including peer-to-peer, site-to-site, peer-to-resource, and other network traffic events.
-
-It provides detailed visibility into connections and network traffic flow, helping to answer key questions such as who initiated
-the connection, what resource was accessed, when it happened, where it originated, and why it was allowed. By enhancing
-network monitoring capabilities, it strengthens security measures and delivers actionable operational insights, empowering
-you to better manage and secure your environment.
-
-## How Traffic Events Logging Works
-
-openZro offers flexibility as a peer-to-peer (p2p) overlay network and a remote network access solution. You can use openZro to connect
-machines directly (p2p) when running the openZro client on each machine. You can also use openZro to organize remote employee access
-to internal networks like VPCs, office networks, and internal services without running the openZro client on the remote resources using the [openZro Networks](/manage/networks) feature.
-The way you use openZro influences the way traffic events are captured and logged. Below are the two main scenarios for traffic events logging
-that describe how openZro logs traffic events for different types of connections.
+## How traffic events are captured
 
 ### Where the events come from
 
-The openZro client captures connection state at two layers, depending on the platform:
+The openZro client captures connections in one of two ways, depending on how it runs:
 
-| Platform | Capture mechanism | Coverage |
-|---|---|---|
-| **Linux** (server, desktop, headless) | Kernel **netfilter conntrack** via netlink. The same connection tracker that `iptables` / `nftables` already use; the client subscribes to `NEW` / `UPDATE` / `DESTROY` events and emits a flow record per state transition. | Every TCP / UDP / ICMP connection the kernel sees, including traffic that does NOT enter the openZro WireGuard tunnel. |
-| **Windows / macOS / Android / BSD** | **Userspace filter** inside the WireGuard data plane. The userspace WireGuard implementation processes every tunnel packet; the filter instruments that path to produce the same flow records. | Tunnel traffic only — packets that bypass the WireGuard interface are not visible to the capture. |
+| Client | Capture mechanism |
+|---|---|
+| **Linux with kernel WireGuard** | The kernel's **conntrack** connection tracker, the same one `iptables` and `nftables` use. Only connections that go through the openZro tunnel are reported. |
+| **macOS, Windows, Linux in userspace mode, netstack** | The **userspace packet filter** that processes every tunnel packet. |
 
-Both paths emit the same wire format ([`flow/proto/flow.proto`](https://github.com/openzro/openzro/blob/main/flow/proto/flow.proto))
-to the management server's `FlowService` gRPC stream, so the dashboard
-and any configured SIEM exporter see a unified event shape regardless
-of which OS the peer is running.
+Both produce the same event format, so the dashboard and exports look the same whatever the peer's operating system.
 
-This is the **same model NetBird upstream uses** — openZro inherits
-the capture pipeline unchanged and adds the storage / partitioning
-layer on the management side (see
-[Self-hosted → Flow Events Store](/selfhosted/flow-events-store)).
+### Peer-to-peer connections
 
-No eBPF program is loaded for traffic capture on Linux. (eBPF is used
-inside `client/internal/ebpf/` for the WireGuard userspace proxy on
-restricted platforms, but that's a separate pipeline.) Conntrack was
-chosen because it gives kernel-level visibility without requiring
-elevated capabilities beyond what the openZro client already needs to
-manage WireGuard interfaces.
-
-### Peer-to-Peer Connections
-
-When two peers are connected directly (p2p), openZro captures and logs the traffic events for that connection on both peers.
-For example, if a user accessed an internal CRM server from their laptop via a browser and port 443, openZro would log the traffic events for that
-connection on both the user's machine and the CRM server. If the connection was blocked, such as when there is a
-[policy](/manage/access-control/manage-network-access#managing-policies) that restricts access to the CRM server,
-openZro would log the blocked event on the peer that refused the connection.
+When two peers connect directly, both report the connection. For example, when a user opens a CRM server that runs the
+openZro client from their laptop on TCP port 443, the laptop reports that it started the connection and the CRM server
+reports that it received it. If a policy does not allow the connection, the CRM server reports a blocked event.
 
 <p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-traffic-events.png" alt="traffic-events-p2p-diagram" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-traffic-events.png" alt="Both peers of a peer-to-peer connection report it to the management server" className="imagewrapper-big"/>
 </p>
 
-#### Successful P2P Connection Events
+### Connections to network resources
 
-openZro helps you better understand connection flows by correlating related events and presenting them in a clear, organized manner.
-
-For example, in a successful peer-to-peer connection scenario, a user initiates a connection from the peer `Alice` to the peer `server`.
-This is illustrated in the screenshot below.
+When a peer connects to a [network resource](/manage/networks#resources), the peer that opened the connection and the
+[routing peer](/manage/networks#routing-peers) that forwards it both report it. The resource itself does not run the
+openZro client, so it reports nothing. If the connection is not allowed, the routing peer reports the blocked event.
 
 <p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-successful-connection.png" alt="traffic-events-p2p-successful-connection" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/activity/traffic-events-logging/routed-traffic-events.png" alt="The initiating peer and the routing peer report a connection to a network resource" className="imagewrapper-big"/>
 </p>
 
-You'll see two grouped sets of events, one from each peer (source and destination). The source peer `Alice` initiates the
-connection and then terminates it after a few seconds.
+## Enable traffic events
 
-On the other side, the destination peer `server` receives the connection request and also terminates it shortly afterward,
-following the disconnection from `Alice`. Since `server` allows the connection, the log includes the policy `IT Admins to Servers`
-that authorized the connection over the `ICMP` protocol.
+Traffic events are off by default. To turn them on:
+
+1. Go to **Settings → Networks**.
+2. In the **Network traffic events** card, turn on **Enable network traffic events**.
+3. Optionally, turn on **Count bytes and packets**. This enables kernel connection accounting on the peers, so events
+   from Linux peers with kernel WireGuard carry the bytes and packets transferred; without it, their traffic volume is
+   zero. Peers that filter traffic in userspace always count. It costs a little CPU per connection.
+
+<p>
+    <img src="/docs-static/img/manage/activity/traffic-events-logging/traffic-events-logging-settings.png" alt="Network traffic events settings" className="imagewrapper-big"/>
+</p>
+
+In the same card you can:
+
+- **Limit to specific groups**: select groups and click **Save filter** to collect events only from peers in those
+  groups. With no group selected, every peer reports events.
+- Choose the **Default time range on Flow Traffic**, the date filter the Flow Traffic page starts with.
 
 <Note>
-     Use the `P2P` filter in the table to view only peer-to-peer connection events.
+    The management server only keeps traffic events when a flow events store is configured. Without one, peers still
+    report events and [exports](#export-traffic-events) still receive them, but the Flow Traffic page and the API have
+    nothing to show. See [Storage and retention](#storage-and-retention).
 </Note>
 
-#### Blocked P2P Connections Events
+## View traffic events
 
-If a connection is refused, openZro logs the blocked event on the peer that denies the connection, in this case, `server`.
-The initiating peer `Alice` will still report the connection attempt but won't be aware that it was blocked.
-
-In this scenario, the `IT Admins to Servers` policy is configured to allow only ping requests (`ICMP`),
-meaning all `HTTP` requests are intentionally not allowed. The screenshot below illustrates this behavior.
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-blocked-connection.png" alt="traffic-events-p2p-blocked-connection" className="imagewrapper-big"/>
-</p>
-
-### Peer-to-Network Resource Connections
-
-When a peer connects to a [network resource](/manage/networks#resources), openZro captures and logs the traffic
-events for that connection on the peer that initiated the connection, and on the [routing peer](/manage/networks#routing-peers) that connects the peer to
-the internal network resource.
-
-A slightly modified example of the CRM server connection scenario would be if instead of running the openZro client on the CRM server,
-you used the [openZro Networks feature](/manage/networks) and created a network resource for the CRM server. In this case, if a user accessed an internal CRM from their laptop via a browser
-and port 443, openZro would log the traffic events for that connection on the user's machine and the routing peer that
-routed the connection to the CRM server. If the connection was blocked, openZro would log the blocked event on the routing peer.
+Go to **Identity → Flow Traffic**. Each row is one event, with its **Source**, **Destination**, **Protocol & Port**,
+**Traffic** volume and **Status**. Events that belong to the same connection are grouped together.
 
 <p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/routed-traffic-events.png" alt="traffic-events-routed-diagram" className="imagewrapper-big"/>
+    <img src="/docs-static/img/manage/activity/traffic-events-logging/flow-traffic.png" alt="Flow Traffic page" className="imagewrapper-big"/>
 </p>
 
-#### Successful Peer-to-Network Resource Events
+Use the search box to find events by peer, IP address or policy, and narrow them down by date range and peer.
 
-The screenshot below illustrates a successful connection from `Alice` to the network resource `CRM` running in the AWS VPC.
-The traffic is routed through a routing peer, which logs the connection event and reports it to the openZro servers.
-The access is permitted by the policy `IT Admins to AWS Servers`, which allows connections over the `TCP` protocol on port `443`.
-Note the `ROUTER` column in the table, which identifies the routing peer responsible for routing to the internal network resource.
+Events usually appear within a minute. A connection's end event is reported when the connection closes, so for
+long-lived TCP connections it can arrive much later than the start event.
 
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/network-resource-successful-connection.png" alt="network-resource-succesful-connection" className="imagewrapper-big"/>
-</p>
+## Read and correlate events
+
+Every event has a type:
+
+| Type | Meaning |
+|---|---|
+| `start` | A connection was opened. |
+| `end` | A connection was closed. For UDP and ICMP, which have no closing handshake, this happens after a period of inactivity. |
+| `drop` | A connection was blocked by the reporting peer's access rules. |
+
+Each peer reports the connection from its own point of view, so one connection produces up to four events. For
+example, when peer A opens a TCP connection to peer B and it is allowed, you see a `start` and an `end` event from
+each of them. Match them with the source port, which is the same in all four.
+
+If peer B blocks the connection, peer A still reports `start` and `end` events, because it does not know the
+connection was blocked, and peer B reports one or more `drop` events, one for each retry the application on peer A
+makes.
 
 <Note>
-    Use the `Routed` filter in the table to view only peer-to-network resource connection events.
+    Blocked (`drop`) events are only reported by peers that filter traffic in userspace: macOS, Windows, netstack mode
+    and Linux in userspace mode. A Linux peer with kernel WireGuard blocks the traffic but does not report it. To get
+    blocked events from a Linux peer, run it with `OZ_WG_KERNEL_DISABLED=true` and `OZ_FORCE_USERSPACE_ROUTER=true`
+    (see [client environment variables](/client/environment-variables)).
 </Note>
 
-#### Blocked Peer-to-Network Resource Events
+## Event data
 
-In the event of a blocked connection, the initiating peer logs the connection attempt, while the routing peer records the blocked event.
-The screenshot below demonstrates this behavior: the routing peer blocks a connection to the network resource `CRM` because
-the policy `IT Admins to AWS Servers` does not permit connections over the `HTTP` protocol on port `6432`.
-You can see multiple blocked events reported by the routing peer, which indicates that the initiating peer `Alice` attempted to connect multiple times
-in one TCP session, but the routing peer blocked all attempts.
+Each event contains:
 
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/network-resource-blocked-connection.png" alt="network-resource-succesful-connection" className="imagewrapper-big"/>
-</p>
+- **Timestamps**: when the event happened on the peer, and when the management server received it.
+- **Flow ID**: shared by the events of one connection, as seen by one peer.
+- **Type**: `start`, `end` or `drop`.
+- **Direction**: `ingress` or `egress`, from the point of view of the reporting peer.
+- **Protocol**, **source and destination IP addresses**, and **ports** for TCP and UDP or **ICMP type and code**.
+- **Volume**: packets and bytes received and sent, when **Count bytes and packets** is on.
+- **Rule ID**: the policy that allowed the connection.
+- **Resource IDs**: the network resource or route the connection was going to or coming from, when there is one.
 
-<Note>
-    For all the examples above, we used the `nc` command to initiate the connection to the CRM server from the peer `Alice`.
-    E.g., `nc -v crm.openzro.cloud 443`.
-</Note>
-
-## Enabling Traffic Events Logging
-
-Traffic events logging feature is disabled by default. To enable it on the openZro dashboard, navigate to `Settings > Networks`.
-Under the Experimental section, you'll find the `Enable Traffic Events` option. Toggle the switch to enable traffic event logging.
-
-By default, traffic reporting in userspace is always enabled, providing basic logging of network interactions.
-However, packet size reporting at the kernel level is disabled by default to minimize CPU usage.
-
-<Note>
-You can optionally enable `Traffic Reporting (Kernel)` to capture additional details, such as network packet sizes,
-at the kernel level. Be aware that enabling this option may lead to higher CPU usage on the openZro client.
-</Note>
-
-
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/traffic-events-logging-settings.png" alt="traffic-events-logging-settings" className="imagewrapper-big"/>
-</p>
-
-### Limiting Traffic Events to Specific Groups
-
-You can scope traffic events logging to only the peers that belong to specific groups.
-
-- When you select one or more groups, only peers that are members of the selected groups will report traffic events.
-- If no group is selected, logging applies to all peers in the account (default behavior).
-
-To configure this setting, navigate to `Settings > Networks` in the Experimental section, open the Group Selector under `Enable Traffic Events`
-choose the groups you want to include, and click `Save Groups`.
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/traffic-events-groups-logging-settings.png" alt="traffic-events-groups-logging-settings" className="imagewrapper-big"/>
-</p>
-
-## Log Retention
-
-Default retention is **30 days** (`OPENZRO_FLOW_RETENTION=720h`),
-configurable per deployment. The retention loop runs once a day and:
-
-- on **PostgreSQL**, drops the monthly partition whose upper bound
-  fell out of the window — constant time, frees disk immediately,
-  no autovacuum chase;
-- on **MySQL / SQLite**, deletes rows older than the cutoff at the
-  row level and relies on autovacuum / `VACUUM` for reclaim.
-
-The dashboard API currently returns up to **50,000 events** per query,
-filterable by peer / IP / port / protocol / time range. The store
-itself holds far more — the cap is just on a single API response
-to keep payloads bounded.
-
-For full setup details (engine matrix, env vars, DSN format,
-database creation, capacity sizing), see
-[Self-hosted → Flow Events Store](/selfhosted/flow-events-store).
-
-## Report rate
-The events might take up to **ten minutes** to become available via API and Dashboard. For some TCP connections, the full event cycle might take longer, depending on OS settings and connection termination.
-
-## Enable Traffic Events Streaming to SIEM Systems
-
-openZro allows you to stream traffic events directly to your Security Information and Event Management (SIEM) system in real time.
-By enabling this feature, you can seamlessly monitor and analyze openZro network flow events within your existing SIEM infrastructure,
-enhancing your ability to detect and respond to security events.
-
-For detailed instructions on supported integrations and how to set them up, refer to the [integrations guide](/manage/activity/event-streaming).
-
-## Traffic Events Data
-
-When enabled, a openZro peer will record metadata for each network flow that it participates in. The data collected by peers includes:
-
-* **Timestamp**: When the flow started and ended.
-* **Flow ID**: A unique identifier for the traffic event flow.
-* **Type**: The type of traffic event, such as Start, End, or Blocked.
-* **Source and Destination IP Addresses**: The IP of the peer (source) and the IP of the remote endpoint (destination). For peer-to-peer traffic,
-these will be the openZro network IPs (e.g. 100.x.x.x addresses of each peer). For traffic to an external resource (like a private server or subnet), the destination might be an IP in that remote network.
-* **Source and Destination Ports**: The network ports used by the connection (for TCP/UDP flows).
-* **ICMP Code and Type**: For ICMP traffic, the ICMP code and type.
-* **Protocol**: The protocol of the traffic, such as TCP, UDP, or ICMP.
-* **Direction**: Whether the flow was inbound or outbound. This takes into consideration the perspective of the **peer reporting the traffic** and the openZro interface.
-* **Volume of Data**: The amount of data transferred, measured in number of packets and bytes sent/received for the duration of the flow.
-* **Resource ID**: Network route or Networks resource ID that the flow is associated with. This is useful for identifying the routing configuration that allowed the flow. DNS route information is **available only** on the routing client.
-* **Rule ID**: The ID of the policy that allowed the flow. This is useful for identifying the access control policy that allowed the flow. This information is **available only** on the receiving side of the traffic.
-
-In addition to the data collected by the peers, the openZro API provides additional context about the peers and resources involved in the traffic event. These details include:
-* **Peer Name**: The name of the peer.
-* **Peer ID**: The unique identifier of the peer.
-* **Resource name**: The name of the resource or network route.
-* **Policy Name**: The name of the policy that allowed the flow.
-* **User ID, name, and email**: The name and email of the user associated with the source peer.
-* **Reporter ID**: The unique identifier of the peer that reported the traffic event.
-* **Received timestamp**: The timestamp when the event was received by the openZro servers.
+The API serves the events at `GET /api/network-traffic-events`. It returns up to 50,000 events per request and accepts
+these query parameters: `peer_id`, `source_ip`, `dest_ip`, `source_port`, `dest_port`, `protocol`, `type`,
+`direction`, `rule_id`, `since` and `until` (RFC 3339 timestamps), `limit` and `offset`.
 
 <details>
 <summary>API sample response</summary>
+
 ```json
-  {
-    "destination": {
-      "address": "142.250.185.206:443",
-      "dns_label": "*.google.com",
-      "geo_location": {
-        "city_name": "",
-        "country_code": ""
-      },
-      "id": "cvco2st9q2cs73btphmg",
-      "name": "Any google.com domain",
-      "os": "",
-      "type": "DOMAIN_RESOURCE"
-    },
-    "direction": "EGRESS",
-    "flow_id": "9682d060-3b28-4fa3-8b47-98595a51bbda",
-    "icmp_code": 0,
-    "icmp_type": 0,
-    "id": "c94e398c-dbfb-4344-8c47-a731b984d86e",
-    "policy_id": "ndkslcanlksncl",
-    "policy_name": "Allow google access",
-    "protocol": 6,
-    "receive_timestamp": "2025-03-22T20:26:19.491144Z",
-    "reporter_id": "ldkfnwklenfklernl",
-    "rx_bytes": 0,
-    "rx_packets": 0,
-    "source": {
-      "address": "100.89.67.186:50229",
-      "dns_label": "macbook-pro-10-2",
-      "geo_location": {
-        "city_name": "Frankfurt",
-        "country_code": "DE"
-      },
-      "id": "ldkfnwklenfklernl",
-      "name": "MacBook-Pro-10.local",
-      "os": "Darwin",
-      "type": "PEER"
-    },
-    "timestamp": "2025-03-22T20:26:16.937522Z",
-    "tx_bytes": 64,
-    "tx_packets": 1,
-    "type": "TYPE_START",
-    "user_email": "john@example.com",
-    "user_id": "google-oauth2|xyz0123",
-    "user_name": "John Doe"
-  }
+{
+  "events": [
+    {
+      "event_id": "0b5d5f1e7c9a4e3f8a2b6c1d0e9f8a7b",
+      "flow_id": "4f2a9c7e1b3d5f6a8c0e2b4d6f8a1c3e",
+      "peer_id": "d7tlq3jr42ds73fq66m0",
+      "is_initiator": true,
+      "occurred_at": "2026-10-22T20:26:16.937522Z",
+      "received_at": "2026-10-22T20:26:19.491144Z",
+      "type": "start",
+      "direction": "egress",
+      "protocol": 6,
+      "source_ip": "100.92.14.7",
+      "dest_ip": "10.10.0.20",
+      "source_port": 50229,
+      "dest_port": 443,
+      "rx_packets": 0,
+      "tx_packets": 1,
+      "rx_bytes": 0,
+      "tx_bytes": 64,
+      "rule_id": "d7tlqcbr42ds73fq66n0",
+      "dest_resource_id": "d7tlqebr42ds73fq66ng"
+    }
+  ],
+  "limit": 100,
+  "offset": 0
+}
 ```
+
 </details>
 
-## Viewing Traffic Events on the Dashboard
-There are two places where you can see the traffic events on the openZro dashboard:
-1. **Traffic events**: Under Activity, you will find the Traffic events menu. This view shows the traffic events in a table format for all peers in your network.
-2. **Peer details**: When you click on a peer, you will see the traffic events for that peer in the Peer details view.
+## Storage and retention
 
-### Filters
-You can use various filters to search and filter received events. The filters include:
-- **Peer name**: Name of the peer that is the source or destination of the traffic event
-- **Resource name**: Name of the resource or network route
-- **IP address**: Source or destination IP addresses
-- **Ports**: Source or destination ports
-- **User**: User from the peer that initiated the connection
-- **Timestamp**: Time range of the event
-- **Protocol**: ICMP,  TCP, UDP
-- **Type of event**:
-    - **P2P connection started (inbound/outbound)**: Events with started status and initiated by peers to other peers
-    - **P2P connection stopped (inbound/outbound)**: Events with stopped status and initiated by peers to other peers
-    - **P2P connection blocked (inbound/outbound)**: Events with blocked status and initiated by peers to other peers
-    - **Routed connection started (inbound/outbound)**: Events with started status and with a remote resource destination
-    - **Routed connection stopped (inbound/outbound)**: Events with stopped status and with a remote resource destination
-    - **Routed connection blocked (inbound/outbound)**: Events with blocked status and with a remote resource destination
+Persistence is off by default. To store traffic events, set `OPENZRO_FLOW_STORE_ENGINE` (`postgres`, `mysql` or
+`sqlite`) and `OPENZRO_FLOW_STORE_DSN` on the management server.
 
-## Correlating events
-Events can be correlated by observing the traffic from both peers involved in a traffic session. Let's say you have two peers, Peer A and Peer B, and Peer A initiates a connection to Peer B. In the traffic events,
-you will see up to 4 events from these peers. If the connection was successful, you will see a started and a stopped event from Peer A and Peer B. But, if one peer blocks the connection, then you will see a started and stopped events from the initiator and
-a blocked event from the responder.
+Events are kept for 7 days by default; set `OPENZRO_FLOW_RETENTION` (for example `720h` for 30 days) to change it. A
+cleanup runs once a day. On PostgreSQL, events are stored in monthly partitions and old partitions are dropped; on
+MySQL and SQLite, old rows are deleted.
+
+For the full setup, see [Flow Events Store](/selfhosted/flow-events-store).
+
+## Export traffic events
+
+You can send traffic events to other systems as well as, or instead of, storing them:
+
+| Destination | Use |
+|---|---|
+| **Elasticsearch** | Search and dashboards in your SIEM. |
+| **Datadog** | Logs and Cloud SIEM. |
+| **HTTP** | Any other receiver, such as Splunk HEC or Vector. |
+| **Amazon S3** (or S3-compatible) | Long-term archive. |
+| **Google Cloud Storage** | Long-term archive. |
+
+Configure exports in the dashboard under **System → Integrations → Flow Exports** with **Add destination**, or with
+`OPENZRO_FLOW_EXPORT_*` (Elasticsearch, Datadog, HTTP) and `OPENZRO_FLOW_ARCHIVE_*` (S3, GCS) environment variables on
+the management server. Archives are written as NDJSON by default, or as Parquet with
+`OPENZRO_FLOW_ARCHIVE_FORMAT=parquet`.
+
+For archive setup, see [Flow archive on GCS](/selfhosted/flow-archive-gcs) and
+[Flow archive compaction](/selfhosted/flow-archive-compaction).
+
 <Note>
- The blocked event will be available only if the destination uses the openZro client in userspace mode.
- This is the case for Windows and MacOs nodes. For Linux, you can enable userspace mode with the environment variable `NB_WG_KERNEL_DISABLED=true` and `NB_FORCE_USERSPACE_ROUTER=true`
+    Flow exports carry traffic events. To stream the audit log (configuration changes, logins), use the
+    [Activity Streamer](/manage/activity/event-streaming).
 </Note>
-
-### Viewing TCP and UDP connections
-You can use source ports to correlate TCP and UDP. Below we will analyze a few examples for a connection between a user computer and a Web and FTP servers.
-
-The peer Maycons-MacBook-Pro.local initiates a connection to the Web server. The source port is `51997` and the destination port is TCP/80. The connection is successful, and the event is marked as started and stopped. See screenshot below:
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-tcp-allow.png" alt="P2P TCP Allowed" className="imagewrapper-big"/>
-</p>
-Besides the ports and protocol information, we can review the event description in the screenshot above to understand what happened. For all four events we have the following:
-- **Peer `Maycons-MacBook-Pro-2.local` requested P2P connection to Peer `webserver`**: This is the event from the perspective of the peer that initiated the connection. The sources and destination provide the IPs and ports used in the connection.
-- **Peer `webserver` received P2P connection from Peer `Maycons-MacBook-Pro-2.local`**: This is the event from the perspective of the peer that received the connection.
-- **Peer `Maycons-MacBook-Pro-2.local` stopped P2P connection to Peer `webserver`**: This is the event from the perspective of the peer that initiated the connection when the connection ended on its side.
-- **Peer `webserver` stopped P2P connection from Peer `Maycons-MacBook-Pro-2.local`**: This is the event from the perspective of the peer that received the connection when the connection has ended on its side.
-In case of the peer receiving the connection, the stopped status might arrive several minutes later, due to TCP sessions.
-
-
-The UDP connection is very similar:
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-udp-allow.png" alt="P2P UDP Allowed" className="imagewrapper-big"/>
-</p>
-<Note>
- The UDP connection is stateless, so the stopped event will be generated right after a certain period of inactivity.
-</Note>
-
-When a connection is blocked, you may see similar entries to the following events but with a few differences:
-
-**TCP**:
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-tcp-blocked.png" alt="P2P TCP Blocked" className="imagewrapper-big"/>
-</p>
-
-**UDP**:
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-udp-blocked.png" alt="P2P UDP Blocked" className="imagewrapper-big"/>
-</p>
-Key differences:
-- There are no events that have started or stopped on the refusing side. The connection is blocked right after the request.
-- Depending on the application making a request in the initiator, you may see multiple blocked events from the receiving side of the connection due to retries:
-<Note>
- The blocked event will be available only if the destination is using the openZro client in userspace mode.
- This is the case for Windows and MacOs nodes. For Linux, you can enable userspace mode with the environment variable `NB_WG_KERNEL_DISABLED=true` and `NB_FORCE_USERSPACE_ROUTER=true`
-</Note>
-
-### Viewing ICMP connections
-ICMP events are similar to TCP and UDP events. The main difference is that ICMP doesn't have ports:
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/p2p-icmp-allowed.png" alt="P2P ICMP Allowed" className="imagewrapper-big"/>
-</p>
-<Note>
- The ICMP connection is stateless, so the stopped event will be generated right after a certain period of inactivity.
-</Note>
-### Routed events
-Routed events follow the same pattern as P2P events. The main difference is that the destination or source can be a resource or network route. Below, we have a few examples of a connection from a peer to a resource:
-
-**ICMP**:
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/routed-icmp-allowed.png" alt="Routed ICMP Allowed" className="imagewrapper-big"/>
-</p>
-**TCP**:
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/routed-tcp-allowed.png" alt="Routed TCP Allowed" className="imagewrapper-big"/>
-</p>
-Key differences:
-- The source or destination is a resource or network route.
-- On the receiver side, we will have an indication of which routing peer reported the event.
-- The source or destination identifier will be unknown on the routing peer side if the route or resource is of a DNS type.
-
-For site-2-site connections, the events will be similar to the above examples, but you will see a routing peer for each event:
-<p>
-    <img src="/docs-static/img/manage/activity/traffic-events-logging/s2s-tcp-allowed.png" alt="S2S TCP Allowed" className="imagewrapper-big"/>
-</p>
-
-## Limitations
-There are a few differences between the different WireGuard modes openZro supports and the data captured by the openZro client.
-| Feature | Kernel Mode | Userspace Mode | Netstack Mode |
-|:---------:|:-------------:|:----------------:|:---------------:|
-| Blocked traffic event | No | Yes | Yes |
-| Site-2-Site events | No | Yes | Yes |
-| Rule IDs | No | Yes | Yes |
-| Allowed rule ID for routed events | Yes | No | No |
-| Byte counters for routed events | Yes | No | No |
-
-We are actively working to improve the data captured by the openZro client in Kernel and userspace modes to align with customers' expectations.
-
-## Conclusion
-Traffic events logging provides a powerful tool for monitoring and analyzing network traffic across your infrastructure.
-Enabling this feature can provide valuable insights into network activity, enhance security measures, and improve operational efficiency.
-The ability to correlate events, view detailed traffic data, and stream events to SIEM systems empowers you to make informed decisions
-and take proactive steps to protect your network environment.
