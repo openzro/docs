@@ -1,41 +1,37 @@
 # Back Up Your Self-Hosted openZro Installation
 
-To back up your openZro installation, you need to copy the configuration files and the Management service databases.
+To back up an openZro installation, copy the generated configuration files and the data of the Management service and
+the embedded Dex.
 
-The configuration files are located in the folder where you ran [the installation script](/selfhosted/selfhosted-quickstart#installation-script). To back up, copy the files to a backup location:
+The configuration files are in the `artifacts/` directory that `configure.sh` created. Copy them, together with your
+`setup.env`, to a backup location:
 ```bash
-mkdir backup
-cp docker-compose.yml dashboard.env config.yaml backup/
+cd openzro/infrastructure_files
+mkdir -p backup
+cp setup.env backup/
+cp -r artifacts/docker-compose.yml artifacts/management.json artifacts/dex.config.yaml \
+  artifacts/turnserver.conf artifacts/grpc-certs backup/
 ```
+
+`management.json` holds the `DataStoreEncryptionKey`. Without it, the encrypted fields in the database cannot be read,
+so keep it with the database backup.
 
 <Note>
-For detailed information about each configuration file and its options, see the [Configuration Files Reference](/selfhosted/configuration-files).
+For detailed information about each configuration file, see the [Configuration Files Reference](/selfhosted/configuration-files).
 </Note>
-To save the server databases, stop the server and copy the files from the data directory:
+
+To save the databases, stop the services and copy their data directories:
 ```bash
-docker compose stop openzro-server
-docker compose cp -a openzro-server:/var/lib/openzro/ backup/
-docker compose start openzro-server
+cd artifacts
+docker compose stop management dex
+docker compose cp -a management:/var/lib/openzro/ ../backup/management/
+docker compose cp -a dex:/var/lib/dex/ ../backup/dex/
+docker compose start management dex
 ```
 
-## Older Setup (Separate Containers)
-
-If your deployment uses the older setup with separate containers (`management`, `signal`, `relay`, `coturn`), back up the configuration files:
-```bash
-mkdir backup
-cp docker-compose.yml Caddyfile dashboard.env management.json relay.env backup/
-```
-
-To save the Management service database:
-```bash
-docker compose stop management
-docker compose cp -a management:/var/lib/openzro/ backup/
-docker compose start management
-```
+If you use PostgreSQL or MySQL for the management store, back up that database with its own tools (`pg_dump`,
+`mysqldump`) instead of, or in addition to, the data directory.
 
 ## Get In Touch
 
 Feel free to ask in [GitHub Discussions](https://github.com/openzro/openzro/discussions) if you have any questions.
-
-- openZro managed version: [https://your-management.example.com](https://your-management.example.com)
-- Make sure to [star us on GitHub](https://github.com/openzro/openzro)
