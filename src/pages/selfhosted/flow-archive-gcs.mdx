@@ -230,7 +230,7 @@ Walk the path top-down before assuming the sink is broken:
    `/api/network-traffic-events?limit=10` returns rows. If
    empty, the problem is upstream of any sink — peers aren't
    delivering. Most common cause is the
-   [bidi-streaming bug with cluster ingress-nginx](/selfhosted/kubernetes/high-availability#management-grpc-bidi-streaming-and-the-flowservice-trap);
+   [bidi-streaming bug with cluster ingress-nginx](/selfhosted/kubernetes/high-availability#management-g-rpc-bidi-streaming-and-the-flow-service-trap);
    peers see "flow receiver sent no headers" in their logs and
    never push events. The fix is `management.grpcProxy.enabled`
    on Kubernetes, or a non-buggy ingress controller.
