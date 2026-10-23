@@ -1,543 +1,166 @@
-import {Note, Warning} from "@/components/mdx";
-import {Properties, Property} from "@/components/mdx";
+import {Note, Warning} from "@/components/mdx"
 
-# Self-Hosted Deployment Configuration Files Reference
+# Configuration Files Reference
 
-This page provides a comprehensive reference for all configuration files used when self-hosting openZro with the `getting-started.sh` deployment method. Understanding these files helps you customize your deployment, troubleshoot issues, and integrate with existing infrastructure.
+`configure.sh` reads `setup.env` and renders the files below into `infrastructure_files/artifacts/`. Each run keeps the
+previous `docker-compose.yml`, `management.json` and `turnserver.conf` as `<file>.bkp.<timestamp>`.
 
-<Note>
-Configuration files are **generated automatically** by the `getting-started.sh` script. Modifying files directly is only necessary for advanced customization after initial setup.
-</Note>
+| File | Used by | Purpose |
+|---|---|---|
+| `docker-compose.yml` | Docker Compose | The services, images, ports and volumes |
+| `management.json` | `management` | Management server configuration |
+| `dex.config.yaml` | `dex` | Embedded Dex identity provider |
+| `turnserver.conf` | `coturn` | STUN/TURN server |
+| `grpc-certs/` | `management`, `dex` | mTLS certificates for the management ↔ Dex gRPC channel |
+| `web/themes/openzro/` | `dex` | openZro theme for the Dex login pages |
+| `openid-configuration.json` | `configure.sh` | Discovery document of an external IdP (only with an external IdP) |
 
-## Overview
+For the variables in `setup.env`, see [Environment Variables](/selfhosted/environment-variables).
 
-A standard openZro self-hosted deployment uses the following configuration files:
-
-| File | Purpose |
-|------|---------|
-| `docker-compose.yml` | Defines all services (dashboard, openzro-server, optionally traefik), their Docker images, port mappings, volumes, and startup order. Structure varies depending on the reverse proxy option chosen during setup. |
-| `config.yaml` | Unified server configuration for the combined openZro server: listen addresses, STUN, relay authentication, embedded IdP, and database settings. Replaces the old `management.json` and `relay.env` files. |
-| `dashboard.env` | Configures the web dashboard including API endpoints, OAuth2/OIDC settings, and optional SSL settings for standalone deployments without a reverse proxy. |
-
-### File Locations
-
-After running the installation script, configuration files are located in the directory where you ran the script (typically `~/openzro/` or the current working directory):
-
-```
-./
-├── docker-compose.yml
-├── config.yaml
-├── dashboard.env
-└── nginx-openzro.conf      # Only when using Nginx reverse proxy
-    npm-advanced-config.txt  # Only when using Nginx Proxy Manager
-    caddyfile-openzro.txt    # Only when using Caddy reverse proxy
-```
-
----
+<Warning>
+    Edit `setup.env` and re-run `configure.sh` rather than editing the generated files: a re-run overwrites them. Before
+    re-running, copy `artifacts/management.json` to `infrastructure_files/` so the datastore encryption key is kept
+    ([openzro#247](https://github.com/openzro/openzro/issues/247)).
+</Warning>
 
 ## docker-compose.yml
 
-The Docker Compose file defines all openZro services, their dependencies, networking, and volumes.
+| Service | Image | Ports (host:container) | Volume |
+|---|---|---|---|
+| `dex` | `ghcr.io/dexidp/dex:$OPENZRO_DEX_TAG` | none | `openzro-dex` → `/var/lib/dex` |
+| `dashboard` | `ghcr.io/openzro/dashboard` | `80:80`, `443:443` | `openzro-letsencrypt` → `/etc/letsencrypt` |
+| `signal` | `ghcr.io/openzro/signal` | `$OPENZRO_SIGNAL_PORT:80` (10000) | `openzro-signal` → `/var/lib/openzro` |
+| `relay` | `ghcr.io/openzro/relay` | `$OPENZRO_RELAY_PORT` (33080) | none |
+| `management` | `ghcr.io/openzro/management` | `$OPENZRO_MGMT_API_PORT:443` (33073) | `openzro-mgmt` → `/var/lib/openzro` |
+| `coturn` | `coturn/coturn` | host network: 3478, 5349, UDP 49152-65535 | none |
 
-### Services Overview
+The image tags come from `OPENZRO_*_TAG` in `setup.env`. Docker Compose prefixes volume names with the project name,
+which is the directory name (`artifacts` by default).
 
-| Service | Image | Internal Port | External (Exposed) | Description |
-|---------|-------|---------------|-------------------|-------------|
-| `traefik` | `traefik:v3.6` | 80, 443 | 80:80, 443:443 | Handles TLS termination via Let's Encrypt and routes incoming HTTPS requests to the appropriate openZro services. Only included when using the built-in Traefik option (option 0). |
-| `dashboard` | `openzro/dashboard` | 80 | 8080:80 | The web-based management console where administrators configure networks, manage peers, create access policies, and view activity logs. Includes an embedded nginx server for serving the UI. |
-| `openzro-server` | `openzro/openzro-server` | 80, 3478/udp | 8081:80, 3478:3478/udp | Combined server that includes management, signal, relay, and embedded STUN in a single container. Configured via `config.yaml`. |
+The dashboard container obtains the Let's Encrypt certificate for `OPENZRO_DOMAIN` with certbot and serves the
+dashboard on 443. Management reads the same certificate from the shared `openzro-letsencrypt` volume to serve its API
+and gRPC on 33073.
 
-<Note>
-**Internal vs External ports**: Internal ports are what services listen on inside their containers. External (Exposed) ports show the host-to-container mapping used when running without the built-in Traefik (e.g., with Nginx or other reverse proxies). When using the default Traefik deployment, only Traefik exposes ports externally.
-</Note>
-
-<Note>
-The `openzro-server` container combines what were previously separate management, signal, relay, and STUN containers into a single service. This simplifies the deployment architecture while maintaining the same functionality.
-</Note>
-
-### Traefik Service
-
-The Traefik service is only present when using the built-in reverse proxy option (option 0 during setup). It handles automatic TLS certificate provisioning via Let's Encrypt and routes requests to the correct backend services.
+The `management` service runs with these flags:
 
 ```yaml
-traefik:
-  image: traefik:v3.6
-  container_name: openzro-traefik
-  restart: unless-stopped
-  networks: [openzro]
-  command:
-    - "--providers.docker=true"
-    - "--providers.docker.exposedbydefault=false"
-    - "--providers.docker.network=openzro"
-    - "--entrypoints.web.address=:80"
-    - "--entrypoints.websecure.address=:443"
-    - "--entrypoints.websecure.transport.respondingTimeouts.readTimeout=0"
-    - "--entrypoints.web.http.redirections.entrypoint.to=websecure"
-    - "--entrypoints.web.http.redirections.entrypoint.scheme=https"
-    - "--certificatesresolvers.letsencrypt.acme.tlschallenge=true"
-    - "--certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json"
-  ports:
-    - '443:443'
-    - '80:80'
-  volumes:
-    - /var/run/docker.sock:/var/run/docker.sock:ro
-    - openzro_traefik_letsencrypt:/letsencrypt
-  logging:
-    driver: "json-file"
-    options:
-      max-size: "500m"
-      max-file: "2"
+command: [
+  "--port", "443",
+  "--log-file", "console",
+  "--log-level", "info",
+  "--disable-anonymous-metrics=$OPENZRO_DISABLE_ANONYMOUS_METRICS",
+  "--single-account-mode-domain=$OPENZRO_MGMT_SINGLE_ACCOUNT_MODE_DOMAIN",
+  "--dns-domain=$OPENZRO_MGMT_DNS_DOMAIN"
+]
 ```
 
-<Note>
-The `readTimeout=0` setting on the websecure entrypoint disables read timeouts, which is required for long-lived gRPC and WebSocket connections used by the signal and relay services.
-</Note>
+Other management flags you can add here include `--disable-single-account-mode`, `--disable-geolite-update`,
+`--maxmind-license-key`, `--user-delete-from-idp` and `--metrics-port` (default 9090). The management binary does not
+read its flags from environment variables.
 
-### Dashboard Service
+The repository also contains `nginx.tmpl.conf` and `docker-compose.yml.tmpl.traefik`. `configure.sh` does not render
+them; they are starting points for running behind a reverse proxy. See
+[External Reverse Proxy](/selfhosted/external-reverse-proxy).
 
-**With built-in Traefik (default):**
-```yaml
-dashboard:
-  image: openzro/dashboard:latest
-  container_name: openzro-dashboard
-  restart: unless-stopped
-  networks: [openzro]
-  env_file:
-    - ./dashboard.env
-  labels:
-    - traefik.enable=true
-    - traefik.http.routers.openzro-dashboard.rule=Host(`openzro.example.com`)
-    - traefik.http.routers.openzro-dashboard.entrypoints=websecure
-    - traefik.http.routers.openzro-dashboard.tls=true
-    - traefik.http.routers.openzro-dashboard.tls.certresolver=letsencrypt
-    - traefik.http.routers.openzro-dashboard.priority=1
-    - traefik.http.services.openzro-dashboard.loadbalancer.server.port=80
-  logging:
-    driver: "json-file"
-    options:
-      max-size: "500m"
-      max-file: "2"
+## management.json
+
+Mounted at `/etc/openzro/management.json` in the `management` container.
+
+### Connectivity
+
+```json
+"Stuns": [
+  { "Proto": "udp", "URI": "stun:openzro.example.com:3478" }
+],
+"TURNConfig": {
+  "Turns": [
+    { "Proto": "udp", "URI": "turn:openzro.example.com:3478", "Username": "self", "Password": "<generated>" }
+  ],
+  "CredentialsTTL": "12h",
+  "Secret": "secret",
+  "TimeBasedCredentials": false
+},
+"Relay": {
+  "Addresses": ["rel://openzro.example.com:33080"],
+  "CredentialsTTL": "24h",
+  "Secret": "<generated>"
+},
+"Signal": {
+  "Proto": "http",
+  "URI": "openzro.example.com:10000"
+}
 ```
 
-<Note>
-The dashboard service is configured via the `dashboard.env` file. See the [dashboard.env section](#dashboardenv) for the full list of environment variables. When using the built-in Traefik, no ports are exposed directly from the dashboard container; Traefik routes traffic to it internally via Docker labels.
-</Note>
+| Field | Description |
+|---|---|
+| `Stuns` | STUN servers handed to clients for NAT discovery. |
+| `TURNConfig` | TURN servers for the ICE fallback, with static credentials or, with `TimeBasedCredentials`, credentials derived from `Secret`. |
+| `Relay.Addresses` | openZro Relay endpoints handed to clients. Several addresses are allowed; clients pick the first that answers. |
+| `Relay.Secret` | Shared secret the relay uses to check client tokens; must match the relay's `OZ_AUTH_SECRET`. |
+| `Signal` | Signal endpoint handed to clients. |
+| `Flow` | Optional endpoint for traffic events. Defaults to the Signal URI. |
 
-### openZro Server Service
+### Authentication
 
-The combined server runs management, signal, relay, and STUN in a single container, configured by `config.yaml`.
+| Field | Description |
+|---|---|
+| `HttpConfig.AuthIssuer` | OIDC issuer. With the embedded Dex: `https://<your-domain>/dex`. |
+| `HttpConfig.AuthAudience` | Expected audience of access tokens. |
+| `HttpConfig.ExtraAuthAudience` | An additional accepted audience. |
+| `HttpConfig.AuthKeysLocation` | JWKS URL used to verify tokens. |
+| `HttpConfig.AuthUserIDClaim` | Claim used as the user ID (default `sub`). |
+| `HttpConfig.OIDCConfigEndpoint` | OIDC discovery URL. |
+| `HttpConfig.IdpSignKeyRefreshEnabled` | Refresh signing keys when the cache headers say they expire. |
+| `HttpConfig.CertFile`, `HttpConfig.CertKey` | TLS certificate for the API and gRPC port. |
+| `HttpConfig.DashboardURL` | Public dashboard URL, used in links the server generates. |
+| `IdpManagerConfig` | Optional API access to an external IdP, to show user names and emails. |
+| `DeviceAuthorizationFlow` | Device-code login (`openzro up` on machines without a browser). |
+| `PKCEAuthorizationFlow` | Browser login for the clients: authorization and token endpoints, client ID, scopes and redirect URLs. |
 
-**With built-in Traefik (default):**
-```yaml
-openzro-server:
-  image: openzro/openzro-server:latest
-  container_name: openzro-server
-  restart: unless-stopped
-  networks: [openzro]
-  ports:
-    - '3478:3478/udp'
-  volumes:
-    - openzro_data:/var/lib/openzro
-    - ./config.yaml:/etc/openzro/config.yaml
-  command: ["--config", "/etc/openzro/config.yaml"]
-  labels:
-    - traefik.enable=true
-    # gRPC router (needs h2c backend for HTTP/2 cleartext)
-    # runs on a separate host or a different Docker network. If the proxy is on
-    # the same Docker network as openzro-server, it connects directly and this
-    # path prefix can be omitted.
-    - traefik.http.routers.openzro-grpc.rule=Host(`openzro.example.com`) && (PathPrefix(`/signalexchange.SignalExchange/`) || PathPrefix(`/management.ManagementService/`))
-    - traefik.http.routers.openzro-grpc.entrypoints=websecure
-    - traefik.http.routers.openzro-grpc.tls=true
-    - traefik.http.routers.openzro-grpc.tls.certresolver=letsencrypt
-    - traefik.http.routers.openzro-grpc.service=openzro-server-h2c
-    # Backend router (relay, WebSocket, API, OAuth2)
-    - traefik.http.routers.openzro-backend.rule=Host(`openzro.example.com`) && (PathPrefix(`/relay`) || PathPrefix(`/ws-proxy/`) || PathPrefix(`/api`) || PathPrefix(`/oauth2`))
-    - traefik.http.routers.openzro-backend.entrypoints=websecure
-    - traefik.http.routers.openzro-backend.tls=true
-    - traefik.http.routers.openzro-backend.tls.certresolver=letsencrypt
-    - traefik.http.routers.openzro-backend.service=openzro-server
-    # Services
-    - traefik.http.services.openzro-server.loadbalancer.server.port=80
-    - traefik.http.services.openzro-server-h2c.loadbalancer.server.port=80
-    - traefik.http.services.openzro-server-h2c.loadbalancer.server.scheme=h2c
-  logging:
-    driver: "json-file"
-    options:
-      max-size: "500m"
-      max-file: "2"
-```
+### Storage and identity
 
-**With external reverse proxy (exposed ports):**
-```yaml
-openzro-server:
-  image: openzro/openzro-server:latest
-  container_name: openzro-server
-  restart: unless-stopped
-  networks: [openzro]
-  ports:
-    - '127.0.0.1:8081:80'
-    - '3478:3478/udp'
-  volumes:
-    - openzro_data:/var/lib/openzro
-    - ./config.yaml:/etc/openzro/config.yaml
-  command: ["--config", "/etc/openzro/config.yaml"]
-  logging:
-    driver: "json-file"
-    options:
-      max-size: "500m"
-      max-file: "2"
-```
+| Field | Description |
+|---|---|
+| `StoreConfig.Engine` | `sqlite` (default), `postgres` or `mysql`. The DSN comes from `OPENZRO_STORE_ENGINE_POSTGRES_DSN` or `OPENZRO_STORE_ENGINE_MYSQL_DSN`. See [SQLite](/selfhosted/sqlite-store) and [PostgreSQL](/selfhosted/postgres-store). |
+| `Datadir` | Data directory. Empty means the `--datadir` flag (default `/var/lib/openzro/`). |
+| `DataStoreEncryptionKey` | Key that encrypts sensitive fields in the database. Generated on first start if empty; keep it, or encrypted data becomes unreadable. |
+| `WgPrivateKey` | The management server's WireGuard identity. Generated and saved on first start if empty. Several management replicas must share it. |
+| `DisableDefaultPolicy` | Do not create the all-to-all `Default` policy for new accounts. |
 
-#### Traefik Routing Labels
+### Reverse proxy and client IPs
 
-When using the built-in Traefik, the `openzro-server` service uses two routers to handle different traffic types:
-
-| Router | Path Prefixes | Backend Service | Purpose |
-|--------|---------------|-----------------|---------|
-| `openzro-grpc` | `/signalexchange.SignalExchange/`, `/management.ManagementService/` | `openzro-server-h2c` (h2c scheme) | gRPC traffic for signal exchange and the management API. Uses HTTP/2 cleartext (h2c) backend because gRPC requires HTTP/2. |
-| `openzro-backend` | `/relay`, `/ws-proxy/`, `/api`, `/oauth2` | `openzro-server` (http scheme) | HTTP traffic for relay connections, WebSocket proxying, REST API, and OAuth2/OIDC endpoints. |
-
-The dashboard router has `priority=1` (lowest), so it acts as a catch-all for requests that don't match the more specific server routes.
-
-<Note>
-The STUN port (3478/udp) must always be exposed publicly, regardless of reverse proxy configuration. STUN uses UDP for NAT detection and cannot be proxied through HTTP reverse proxies. The STUN server is embedded in the combined `openzro-server` container and configured via the `server.stunPorts` field in `config.yaml`.
-</Note>
-
-### Volume Configuration
-
-| Volume | Mount Point | Purpose |
-|--------|-------------|---------|
-| `openzro_data` | `/var/lib/openzro` | Stores the management database (SQLite by default), encryption keys, and persistent state. Back up this volume regularly to preserve your accounts, peers, policies, and setup keys. |
-| `openzro_traefik_letsencrypt` | `/letsencrypt` | Stores Traefik's Let's Encrypt TLS certificates. Only used when deploying with the built-in Traefik reverse proxy (option 0). Preserve this volume to maintain TLS certificates across restarts. |
-
----
-
-## config.yaml
-
-The unified configuration file controls the combined openZro server. It replaces the separate `management.json` and `relay.env` files from older deployments.
-See an example `config.yaml` file in the [openZro GitHub repository](https://github.com/openzro/openzro/blob/main/combined/config.yaml.example).
-
-### Complete Structure
-
-Below are the main sections of the `config.yaml` file.
-See an example `config.yaml` file in the [openZro GitHub repository](https://github.com/openzro/openzro/blob/main/combined/config.yaml.example) for a complete configuration example.
-
-### Server Settings
-
-<Properties>
-  <Property name="server.listenAddress" type="string">
-    The address and port the combined server listens on inside the container. Default: `:80`. TLS is handled by the reverse proxy.
-  </Property>
-  <Property name="server.exposedAddress" type="string">
-    The public-facing URL where peers connect to the server. Format: `https://hostname:port`. This address is distributed to peers and must be reachable from all clients.
-  </Property>
-  <Property name="server.stunPorts" type="array">
-    List of UDP ports for the embedded STUN server. Default: `[3478]`. These ports must be exposed in `docker-compose.yml` and reachable through firewalls.
-  </Property>
-  <Property name="server.metricsPort" type="number">
-    Port to expose Prometheus metrics endpoint. Default: `9090`. Metrics are available at `/metrics` for monitoring.
-  </Property>
-  <Property name="server.healthcheckAddress" type="string">
-    Address for health check endpoint. Default: `:9000`. Exposes `/health` for container orchestration and load balancer health probes.
-  </Property>
-  <Property name="server.logLevel" type="string">
-    Controls log verbosity. Options: `debug`, `info`, `warn`, `error`. Default: `info`. Use `debug` for troubleshooting connection issues.
-  </Property>
-  <Property name="server.logFile" type="string">
-    Where to write log output. Use `console` for Docker logging (recommended) or specify a file path. Default: `console`.
-  </Property>
-  <Property name="server.authSecret" type="string">
-    Shared secret for relay authentication. Auto-generated by the setup script. This secret is used internally by the combined server for relay credential validation.
-  </Property>
-  <Property name="server.dataDir" type="string">
-    Data directory path where the server stores its database and state files. Default: `/var/lib/openzro`. Maps to the `openzro_data` Docker volume.
-  </Property>
-</Properties>
-
-### Authentication Settings
-
-Configures the built-in identity provider (embedded IdP) that handles user authentication and management.
-
-<Properties>
-  <Property name="server.auth.issuer" type="string">
-    The issuer URL for OAuth2/OIDC tokens. Format: `https://your-domain/oauth2`. This URL is used to validate JWT tokens and must be accessible to clients.
-  </Property>
-  <Property name="server.auth.localAuthDisabled" type="boolean">
-    Disables the embedded local identity provider. Default: `false`. Set to `true` when using an external OIDC provider exclusively and you want to prevent local authentication.
-  </Property>
-  <Property name="server.auth.signKeyRefreshEnabled" type="boolean">
-    Enables automatic refresh of IdP signing keys. Recommended: `true`. Ensures tokens remain valid by periodically rotating signing keys.
-  </Property>
-  <Property name="server.auth.dashboardRedirectURIs" type="array">
-    Allowed redirect URIs for OAuth2 authorization flow. Must include the dashboard authentication callbacks, typically `/nb-auth` and `/nb-silent-auth` on your domain.
-  </Property>
-  <Property name="server.auth.cliRedirectURIs" type="array">
-    Redirect URIs for CLI-based authentication. Default: `["http://localhost:53000/"]`. Used when authenticating via the `openzro` CLI tool.
-  </Property>
-  <Property name="server.auth.owner.email" type="string">
-    Email address for the initial admin user. Optional. When set together with `owner.password`, the server creates this user on first startup with admin privileges.
-  </Property>
-  <Property name="server.auth.owner.password" type="string">
-    Password for the initial admin user. Optional. Used together with `owner.email` to bootstrap the first admin account on initial deployment.
-  </Property>
-</Properties>
-
-When the embedded IdP is active, the server automatically hosts these OIDC endpoints:
-
-- **Discovery**: `https://your-domain/oauth2/.well-known/openid-configuration`
-- **JWKS (signing keys)**: `https://your-domain/oauth2/keys`
-- **Token issuance**: `https://your-domain/oauth2/token`
-- **Device authorization**: `https://your-domain/oauth2/device/authorize`
-
-<Note>
-openZro also supports integration with external OIDC-compatible identity providers for Single Sign-On (SSO), Multi-Factor Authentication (MFA), and centralized user management. See the [Authentication & IdPs page](/selfhosted/identity-providers) for configuration details.
-</Note>
-
-### Store Settings
-
-Configures the database backend for storing all openZro management data including accounts, peers, groups, access policies, routes, DNS configuration, setup keys, and activity logs.
-
-<Properties>
-  <Property name="server.store.engine" type="string">
-    Database engine. Options: `sqlite`, `postgres`, `mysql`. Default: `sqlite`.
-  </Property>
-  <Property name="server.store.dsn" type="string">
-    Connection string for postgres or mysql engines. For postgres: `host=localhost user=openzro password=secret dbname=openzro port=5432`. Alternatively, use the `OPENZRO_STORE_ENGINE_POSTGRES_DSN` or `OPENZRO_STORE_ENGINE_MYSQL_DSN` environment variables.
-  </Property>
-  <Property name="server.store.encryptionKey" type="string">
-    base64 string of a 32-byte (256-bit) encryption key for sensitive data at rest. Used to encrypt setup keys, API tokens, and other secrets stored in the database. Auto-generated by the setup script.
-  </Property>
-</Properties>
-
-**What data is stored?**
-
-- **Accounts and users** - User accounts, roles, and permissions
-- **Peers** - Registered devices, their WireGuard keys, IP assignments, and metadata
-- **Groups** - Peer groupings used for access control
-- **Access policies** - Network access rules
-- **Routes** - Network routes for external subnets
-- **DNS configuration** - Custom DNS settings
-- **Setup keys** - Keys for automated peer enrollment
-- **Activity logs** - Audit trail
-
-| Engine | Storage | Notes |
-|--------|---------|-------|
-| SQLite (default) | `/var/lib/openzro/` volume | File-based database stored in the `openzro_data` Docker volume. Zero configuration required, but does not support concurrent writes or running multiple management instances. Best for testing or small deployments. |
-| PostgreSQL | External database server | Recommended for production deployments. Supports concurrent access, enabling multiple management instances for high availability. |
-| MySQL | External database server | Alternative to PostgreSQL for organizations that have standardized on MySQL/MariaDB. Provides similar benefits including concurrent access. |
-
-For PostgreSQL or MySQL, set the connection string via the `server.store.dsn` field in `config.yaml` or environment variables on the `openzro-server` container. See [Using an External Database](#using-an-external-database) below.
-
-See [Management Postgres Store](/selfhosted/postgres-store) for detailed PostgreSQL setup.
+| Field | Description |
+|---|---|
+| `ReverseProxy.TrustedHTTPProxies` | IP prefixes of HTTP proxies whose `X-Forwarded-For` the HTTP API trusts. |
+| `ReverseProxy.TrustedHTTPProxiesCount` | Number of proxies in front of the server, as an alternative to listing them. |
+| `ReverseProxy.TrustedPeers` | IP prefixes whose forwarded client IP the gRPC server trusts. |
 
 <Warning>
-Keep `server.store.encryptionKey` secure and backed up. This key encrypts sensitive data in your database, including setup keys and API tokens. Losing this key means losing access to encrypted data, and you will need to regenerate all setup keys and API tokens.
+    The template sets `TrustedPeers` to `0.0.0.0/0`, so the gRPC server takes a client's IP from forwarding headers
+    sent by anyone. A client can then report a different IP, which affects the peer location and geolocation posture
+    checks. If peers connect directly, set it to an empty list; behind a proxy, set it to the proxy's addresses.
 </Warning>
 
-### Activity Events Store Settings
+## dex.config.yaml
 
-Configures the database backend for storing activity events (audit trail). By default, activity events are stored in a separate SQLite database in the data directory.
+Mounted at `/etc/dex/config.yaml` in the `dex` container.
 
-<Properties>
-  <Property name="server.activityStore.engine" type="string">
-    Database engine for activity events. Options: `sqlite`, `postgres`. Default: `sqlite`.
-  </Property>
-  <Property name="server.activityStore.dsn" type="string">
-    Connection string for postgres engine. Example: `host=localhost port=5432 user=postgres password=postgres dbname=openzro_activity sslmode=disable`.
-  </Property>
-  <Property name="server.activityStore.file" type="string">
-    Custom SQLite file path. Optional, defaults to `{dataDir}/events.db`.
-  </Property>
-</Properties>
+| Section | Description |
+|---|---|
+| `issuer` | `https://<your-domain>/dex`. Dex serves its routes under this path. |
+| `storage` | Dex's own database, SQLite in `/var/lib/dex/dex.db` (the `openzro-dex` volume). |
+| `grpc` | The gRPC API management uses to manage connectors, on port 5557 with mTLS (`grpc-certs/`). |
+| `staticClients` | The `openzro-dashboard` client used by the dashboard and the CLI, with redirect URIs `/auth`, `/silent-auth`, `/peers` and `/`. |
+| `staticPasswords` | The bootstrap admin account, from `OPENZRO_DEX_ADMIN_EMAIL` and `OPENZRO_DEX_ADMIN_PASSWORD_BCRYPT`. |
+| `connectors` | Upstream identity providers. Usually managed from **Settings → Auth Providers** in the dashboard instead. |
 
-### Auth Store Settings
+## turnserver.conf
 
-Configures the database backend for the embedded identity provider (Dex). By default, auth data is stored in a separate SQLite database in the data directory.
+Coturn's configuration. The values you are most likely to change come from `setup.env`:
 
-<Properties>
-  <Property name="server.authStore.engine" type="string">
-    Database engine for the embedded IdP. Options: `sqlite3`, `postgres`. Default: `sqlite3`.
-  </Property>
-  <Property name="server.authStore.dsn" type="string">
-    Connection string for postgres engine. Example: `host=localhost port=5432 user=postgres password=postgres dbname=openzro_idp sslmode=disable`.
-  </Property>
-  <Property name="server.authStore.file" type="string">
-    Custom SQLite file path. Optional, defaults to `{dataDir}/idp.db`.
-  </Property>
-</Properties>
-
----
-
-## dashboard.env
-
-Environment configuration for the dashboard service.
-
-### Dashboard Architecture
-
-The openZro dashboard container includes an **embedded nginx server** that serves the dashboard web pages. This nginx instance is built into the container image and handles serving the static web UI files.
-
-```bash
-# Endpoints
-OPENZRO_MGMT_API_ENDPOINT=https://openzro.example.com
-OPENZRO_MGMT_GRPC_API_ENDPOINT=https://openzro.example.com
-
-# OIDC - using embedded IdP
-AUTH_AUDIENCE=openzro-dashboard
-AUTH_CLIENT_ID=openzro-dashboard
-AUTH_CLIENT_SECRET=
-AUTH_AUTHORITY=https://openzro.example.com/oauth2
-USE_AUTH0=false
-AUTH_SUPPORTED_SCOPES=openid profile email groups
-AUTH_REDIRECT_URI=/nb-auth
-AUTH_SILENT_REDIRECT_URI=/nb-silent-auth
-
-# SSL - disabled when behind reverse proxy (Traefik handles TLS)
-NGINX_SSL_PORT=443
-LETSENCRYPT_DOMAIN=none
-```
-
-<Note>
-When using the built-in Traefik or an external reverse proxy, set `LETSENCRYPT_DOMAIN=none` because the reverse proxy handles TLS termination. Only set a domain here if running the dashboard standalone without a reverse proxy.
-</Note>
-
-### Endpoint Configuration
-
-| Variable | Description |
-|----------|-------------|
-| `OPENZRO_MGMT_API_ENDPOINT` | The URL where the dashboard makes REST API calls to the management server (e.g., `https://openzro.example.com`). Must be accessible from users' browsers since API calls are made client-side. |
-| `OPENZRO_MGMT_GRPC_API_ENDPOINT` | The URL for gRPC communication with the management server. Usually the same as the REST endpoint. Used for in-browser SSH and RDP clients, as well as surfacing management links for client config instructions. |
-
-### Authentication Configuration
-
-| Variable | Description |
-|----------|-------------|
-| `AUTH_AUDIENCE` | The expected audience claim in OAuth2 tokens. Must match the audience configured in your IdP. For embedded IdP, use `openzro-dashboard`. |
-| `AUTH_CLIENT_ID` | The OAuth2 client identifier for the dashboard application. For embedded IdP deployments, this is `openzro-dashboard`. Must match the client ID registered with your identity provider. |
-| `AUTH_CLIENT_SECRET` | OAuth2 client secret for confidential clients. Leave empty for public clients (the default for browser-based apps like the dashboard). |
-| `AUTH_AUTHORITY` | The OAuth2/OIDC issuer URL (e.g., `https://openzro.example.com/oauth2` for embedded IdP). The dashboard fetches OIDC discovery metadata from `{AUTH_AUTHORITY}/.well-known/openid-configuration`. |
-| `USE_AUTH0` | Set to `true` only when using Auth0 as your identity provider. Leave as `false` for embedded IdP or other OIDC providers. |
-| `AUTH_SUPPORTED_SCOPES` | Space-separated list of OAuth2 scopes to request during login. Standard value is `openid profile email groups`. |
-| `AUTH_REDIRECT_URI` | The path where the IdP redirects after authentication (e.g., `/nb-auth`). Must match a redirect URI registered with your identity provider. |
-| `AUTH_SILENT_REDIRECT_URI` | The path for silent token refresh (e.g., `/nb-silent-auth`). Used by the dashboard to refresh tokens in the background without user interaction. |
-
-### Embedded Nginx Configuration
-
-The dashboard container's embedded nginx server can be configured using these environment variables. These settings control how the dashboard serves its web UI.
-
-| Variable | Default | Description |
-|----------|---------|-------------|
-| `NGINX_SSL_PORT` | `443` | The HTTPS port for the dashboard's embedded nginx server. Only relevant in standalone mode without an external reverse proxy. |
-| `LETSENCRYPT_DOMAIN` | - | The domain name for automatic Let's Encrypt certificate provisioning. Set to `none` when using an external reverse proxy that handles TLS. |
-| `LETSENCRYPT_EMAIL` | - | Email address for Let's Encrypt account registration and certificate expiry notifications. Required when `LETSENCRYPT_DOMAIN` is set to an actual domain. |
-
-<Note>
-The `NGINX_SSL_PORT` and Let's Encrypt variables are **only necessary when running the dashboard standalone** without an external reverse proxy. For most installations using the built-in Traefik or an external reverse proxy, set `LETSENCRYPT_DOMAIN=none` and the embedded nginx will serve on HTTP (port 80) internally while your reverse proxy handles HTTPS.
-</Note>
-
----
-
-## Common Configuration Scenarios
-
-### Using an External Database
-
-To use PostgreSQL instead of SQLite:
-
-1. Update `config.yaml`:
-```yaml
-server:
-  store:
-    engine: "postgres"
-    dsn: "host=db-server user=openzro password=secret dbname=openzro port=5432"
-```
-
-Alternatively, you can use an environment variable instead of putting the DSN in the config file:
-```yaml
-openzro-server:
-  environment:
-    - OPENZRO_STORE_ENGINE_POSTGRES_DSN=host=db-server user=openzro password=secret dbname=openzro port=5432
-    # Or for MySQL:
-    # - OPENZRO_STORE_ENGINE_MYSQL_DSN=user:password@tcp(host:3306)/openzro
-```
-
-See [Management Postgres Store](/selfhosted/postgres-store) for detailed setup.
-
-### Changing Log Level
-
-Update `server.logLevel` in `config.yaml`:
-
-```yaml
-server:
-  logLevel: "debug"
-```
-
-Options: `debug`, `info`, `warn`, `error`. Use `debug` for troubleshooting connection issues.
-
-### Custom STUN Ports
-
-To use multiple STUN ports, update `config.yaml`:
-
-```yaml
-server:
-  stunPorts:
-    - 3478
-    - 3479
-```
-
-Make sure to expose all ports in `docker-compose.yml`:
-```yaml
-openzro-server:
-  ports:
-    - '3478:3478/udp'
-    - '3479:3479/udp'
-```
-
-### Behind a Reverse Proxy
-
-When running behind your own reverse proxy (Nginx, Caddy, Nginx Proxy Manager, etc.) instead of the built-in Traefik:
-
-1. Set `LETSENCRYPT_DOMAIN=none` in `dashboard.env`
-2. Use the exposed-ports variant of `docker-compose.yml` (the setup script generates this automatically for options 1-4)
-3. Configure your reverse proxy to route traffic to the correct containers and ports:
-   - Dashboard: `127.0.0.1:8080` (HTTP)
-   - openZro Server: `127.0.0.1:8081` (HTTP), with gRPC paths using h2c (HTTP/2 cleartext)
-
-See [External Reverse Proxy Configuration](/selfhosted/external-reverse-proxy) for detailed templates for Nginx, Caddy, and other proxies.
-
-### Using External Services (Advanced)
-
-<Note>
-The default openZro deployment includes embedded relay, signal, and STUN services. External services are only needed for advanced use cases.
-</Note>
-
-To use external STUN, relay, or signal servers, add overrides to `config.yaml`:
-
-```yaml
-server:
-  # ... basic settings ...
-
-  # Optional: Use external STUN servers
-  stuns:
-    - uri: "stun:stun.example.com:3478"
-      proto: "udp"
-
-  # Optional: Use external relay servers
-  relays:
-    addresses:
-      - "rels://relay.example.com:443"
-    secret: "relay-auth-secret"
-    credentialsTTL: "24h"
-
-  # Optional: Use external signal server
-  signalUri: "https://signal.example.com:443"
-```
-See the [Scaling Your Self-Hosted Deployment](/selfhosted/maintenance/scaling/scaling-your-self-hosted-deployment) guide for more details on configuring external services.
-
----
-
-## See Also
-
-- [Self-hosting Quickstart Guide](/selfhosted/selfhosted-quickstart) - Get started quickly with default settings
-- [External Reverse Proxy Configuration](/selfhosted/external-reverse-proxy) - Nginx, Caddy, NPM, HAProxy setup
-- [Management SQLite Store](/selfhosted/sqlite-store) - SQLite database details
-- [Management Postgres Store](/selfhosted/postgres-store) - PostgreSQL setup
+| Setting | Source |
+|---|---|
+| `listening-port` 3478, `tls-listening-port` 5349 | fixed in the template |
+| `min-port`, `max-port` (relay range, default 49152-65535) | `TURN_MIN_PORT`, `TURN_MAX_PORT` |
+| `external-ip` | `OPENZRO_TURN_EXTERNAL_IP`, or discovered by `configure.sh` |
+| `user` | `TURN_USER` and the generated `TURN_PASSWORD` |
