@@ -151,7 +151,13 @@ roles:
 ```
 
 That covers the **write path only**, which is all the sink itself
-does.
+does. Two later stages need more, on the bucket and nothing wider:
+
+| Stage | Needs | Role that covers it |
+|---|---|---|
+| Sink writing events | `storage.objects.create` | `roles/storage.objectCreator` |
+| Dashboard reading the archive | `storage.objects.get`, `storage.objects.list` | `roles/storage.objectViewer` |
+| [Compaction](/selfhosted/flow-archive-compaction) | the above plus `storage.objects.delete` | `roles/storage.objectAdmin` |
 
 <Note>
   Reading the archive back (the dashboard's Flow Traffic page for time ranges past the hot store, and
@@ -159,13 +165,7 @@ does.
   HMAC key pair. Create one under **Cloud Storage → Settings → Interoperability** and set
   `OPENZRO_FLOW_ARCHIVE_GCS_HMAC_KEY_ID` and `OPENZRO_FLOW_ARCHIVE_GCS_HMAC_SECRET` on the management service. The
   service account or ADC is still used for writing.
-</Note> Two later stages need more, on the bucket and nothing wider:
-
-| Stage | Needs | Role that covers it |
-|---|---|---|
-| Sink writing events | `storage.objects.create` | `roles/storage.objectCreator` |
-| Dashboard reading the archive | `storage.objects.get`, `storage.objects.list` | `roles/storage.objectViewer` |
-| [Compaction](/selfhosted/flow-archive-compaction) | the above plus `storage.objects.delete` | `roles/storage.objectAdmin` |
+</Note>
 
 Grant the compaction principal `roles/storage.objectAdmin` on the
 bucket only when you actually run compaction with
