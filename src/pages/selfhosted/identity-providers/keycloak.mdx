@@ -6,11 +6,13 @@ import {Note} from "@/components/mdx";
 
 ## Management Setup (Recommended)
 
-Add Keycloak as an external IdP directly in the openZro Management Dashboard. This is the simplest approach and recommended for most deployments.
+Add Keycloak as an authentication provider of openZro's embedded Dex from the dashboard. This is the simplest approach and recommended for most deployments.
 
 ### Prerequisites
 
-- openZro self-hosted with embedded IdP enabled
+- An openZro self-hosted deployment with the embedded Dex (the default), and the dashboard's
+  **Settings → Auth Providers** page working (management needs `OPENZRO_DEX_GRPC_ADDR`; the Docker Compose stack sets
+  it)
 - Keycloak instance running with SSL
 
 ### Step 1: Create Realm in Keycloak
@@ -56,7 +58,7 @@ Add Keycloak as an external IdP directly in the openZro Management Dashboard. Th
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/04_user-password-keycloak.png" alt="User password" className="imagewrapper-big"/>
 </p>
 
-### Step 3: Start Creating Client in Keycloak
+### Step 3: Create a Client in Keycloak
 
 1. Click **Clients** → **Create client**
 
@@ -80,67 +82,42 @@ Add Keycloak as an external IdP directly in the openZro Management Dashboard. Th
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/07_client-auth-on-keycloak.png" alt="Client authentication enabled" className="imagewrapper-big"/>
 </p>
 
-5. Click **Next**
-6. On Login settings page, **don't click Save yet** — you'll add the redirect URI in Step 4
-
-### Step 4: Get Redirect URL from openZro
-
-1. Open a new tab or window and log in to your openZro Dashboard
-2. Navigate to **Settings** → **Identity Providers**
-3. Click **Add Identity Provider**
-4. Select **Keycloak** (or choose **Generic OIDC** if Keycloak is not listed)
-5. Fill in the fields (you can leave **Client Secret** empty for now):
-
-| Field | Value |
-|-------|-------|
-| Type | Generic OIDC (if not already selected) |
-| Name | Keycloak (or your preferred display name) |
-| Client ID | `openzro` (from Step 3) |
-| Client Secret | Leave empty for now |
-| Issuer | `https://keycloak.example.com/realms/openzro` |
-
-6. openZro will display a **Redirect URL** — **copy this URL** (but don't click **Add Provider** yet)
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/08_copy-redirect-url-keycloak.png" alt="Copy redirect URL from openZro" className="imagewrapper-big"/>
-</p>
-
-### Step 5: Complete Client Configuration in Keycloak
-
-1. Return to the Keycloak Admin Console tab
-2. On the Login settings page:
-   - Under **Valid redirect URIs**, paste the redirect URL you copied from openZro
-3. Click **Save**
-4. Go to the **Credentials** tab and copy the **Client secret** — you'll need this for Step 6
+5. Click **Next**.
+6. On **Login settings**, under **Valid redirect URIs**, enter `https://<your-domain>/dex/callback`, then click **Save**.
+7. Go to the **Credentials** tab and copy the **Client secret**.
 
 <p>
     <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/09_copy-client-secret-keycloak.png" alt="Copy client secret" className="imagewrapper-big"/>
 </p>
 
-### Step 6: Complete openZro Setup
+### Step 4: Add Keycloak in openZro
 
-1. Return to the openZro tab
-2. In the identity provider form, paste the **Client secret** you copied from Step 5
-3. Click **Add Provider**
+1. In the openZro dashboard, go to **Settings → Auth Providers** and click **Add provider**.
+2. Fill in the form:
+
+| Field | Value |
+|-------|-------|
+| ID | `keycloak` |
+| Type | Keycloak |
+| Display name | `Keycloak` |
+| Issuer URL | `https://keycloak.example.com/realms/openzro` |
+| Client ID | `openzro` (from Step 3) |
+| Client Secret | From Step 3 |
+| Redirect URI | Prefilled: `https://<your-domain>/dex/callback` |
+
+3. Click **Add provider**.
 
 <p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/10_openzro-config-keycloak.png" alt="openZro Keycloak configuration" className="imagewrapper-big"/>
+    <img src="/docs-static/img/selfhosted/identity-providers/openzro-add-provider-keycloak.png" alt="Add authentication provider dialog" className="imagewrapper-big"/>
 </p>
 
-### Step 7: Test the Connection
+### Step 5: Test the Connection
 
-1. Log out of openZro Dashboard
-2. On the login page, you should see a "Keycloak" button
-3. Click it and authenticate with the user credentials you created in Step 2
-4. You should be redirected back to openZro and logged in
-
-<p>
-    <img src="/docs-static/img/selfhosted/identity-providers/self-hosted/keycloak/11_openzro-keycloak-login.png" alt="openZro Keycloak login" className="imagewrapper-big"/>
-</p>
-
-<Note>
-Users who authenticate via Keycloak will appear in your openZro Users list with a Keycloak badge next to their name.
-</Note>
+1. Log out of the openZro dashboard.
+2. The sign-in page now shows **Log in with Keycloak**.
+3. Click it and authenticate with the user you created in Step 2.
+4. You are redirected back to openZro and logged in. A user who logs in for the first time is added to the account
+   with the default role.
 
 ### Configuring JWT 'groups' Claim
 
@@ -197,12 +174,20 @@ To sync Keycloak groups with openZro, you need to create a client scope with a g
 3. Go to **Users** → select a user → **Groups** tab
 4. Click **Join Group** and assign users to groups
 
+<Note>
+Dex passes upstream groups on only when its connector sets `insecureEnableGroups: true` and requests the `groups`
+scope. Connectors added from **Settings → Auth Providers** do not set these, so the claim does not reach openZro.
+To use JWT group sync, declare the connector in `dex.config.yaml` instead (Docker Compose: `artifacts/dex.config.yaml`;
+Helm: `dex.config.connectors`), as in the
+[Helm quickstart](/selfhosted/kubernetes/helm-quickstart#jwt-group-sync-when-using-an-upstream-id-p).
+</Note>
+
 #### Step 5: Enable JWT Group Sync in openZro
 
 1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to `groups`
-4. Optionally configure **JWT allow groups** to restrict access
+4. Optionally set **JWT allow group** to restrict access
 
 <Note>
 If **Full group path** is enabled, group names will include the path (e.g., `/admins` or `/parent/child`). Disable it for cleaner names like `admins`.
@@ -215,10 +200,10 @@ Kubernetes deployments, the chart's `dashboard.env.AUTH_SUPPORTED_SCOPES`
 must include `groups` and `dashboard.env.OPENZRO_TOKEN_SOURCE` must
 be `idToken` — Dex puts `groups` in the id_token only, never in
 the access_token. The
-[Helm Quickstart](/selfhosted/kubernetes/helm-quickstart#jwt-group-sync-when-using-an-upstream-idp)
+[Helm Quickstart](/selfhosted/kubernetes/helm-quickstart#jwt-group-sync-when-using-an-upstream-id-p)
 spells out the four moving parts.
 
-For Docker Compose deploys, set in `setup.env`:
+For Docker Compose deploys, `configure.sh` already requests `groups` with the embedded Dex; set the token source in `setup.env`:
 
 ```shell
 OPENZRO_AUTH_SUPPORTED_SCOPES="openid profile email offline_access groups"
@@ -245,9 +230,10 @@ connector likely has `getUserInfo: true`. With that enabled, Dex
 calls Keycloak's `/userinfo` endpoint after the token exchange and
 overwrites the claims — and the userinfo response does not carry
 `groups` by default. Set `getUserInfo: false` and `insecureEnableGroups: true`
-on the connector and restart the Dex pods.
+on the connector in `dex.config.yaml` (the dashboard form cannot set them) and
+restart Dex.
 
-If `groups` appears in the Dex log but not in **Team → Groups**, the
+If `groups` appears in the Dex log but not in **Identity → Users & Groups → Groups**, the
 likely missing piece is the dashboard requesting the `groups` scope
 (Step 6 above) — without it, Dex omits the claim from the id_token
 even though the upstream returned them.
@@ -257,7 +243,7 @@ even though the upstream returned them.
 ## Standalone Setup (Advanced)
 
 The standalone setup wires Keycloak as openZro's *only* identity
-provider — Dex is disabled and the management daemon talks
+provider — Dex is bypassed (it keeps running but is not used) and the management daemon talks
 directly to Keycloak for both token validation and user
 lifecycle. Choose this path **only** if all three apply:
 

@@ -75,11 +75,13 @@ The claim name is configurable (default: `groups`). Some providers use `roles`, 
 
 ## Management Setup (Recommended)
 
-Add your OIDC provider directly in the openZro Management Dashboard. This is the simplest approach and works with any OIDC-compliant provider.
+Add your OIDC provider as an authentication provider of openZro's embedded Dex from the dashboard. This is the simplest approach and works with any OIDC-compliant provider.
 
 ### Prerequisites
 
-- openZro self-hosted with embedded IdP enabled
+- An openZro self-hosted deployment with the embedded Dex (the default), and the dashboard's
+  **Settings → Auth Providers** page working (management needs `OPENZRO_DEX_GRPC_ADDR`; the Docker Compose stack sets
+  it)
 - An OIDC-compliant identity provider with admin access
 
 ### Step 1: Create OIDC Client in Your Identity Provider
@@ -93,12 +95,13 @@ Add your OIDC provider directly in the openZro Management Dashboard. This is the
 | Application Type | Web Application (Confidential Client) |
 | Grant Type | Authorization Code |
 | Token Endpoint Auth | Client Secret (Basic or Post) |
+| Redirect / callback URL | `https://<your-domain>/dex/callback` |
 
 4. Note the **Client ID** and **Client Secret** - you'll need these for openZro
 5. Note the **Issuer URL** (typically the base URL of your IdP)
 
 <Note>
-**Important:** Create a confidential client (not a public client). openZro requires a client secret for secure token exchange. The secret is stored securely and never exposed to end users.
+**Important:** Create a confidential client (not a public client). Dex needs a client secret for the token exchange; it is stored in Dex and never exposed to end users.
 </Note>
 
 ### Step 2: Configure Scopes
@@ -116,38 +119,33 @@ Ensure your OIDC client requests the following scopes:
 Some providers include profile and email claims by default. Others require explicit scope requests. Check your provider's documentation.
 </Note>
 
-### Step 3: Add Identity Provider in openZro
+### Step 3: Add the provider in openZro
 
-1. Log in to your openZro Dashboard
-2. Navigate to **Settings** → **Identity Providers**
-3. Click **Add Identity Provider**
-4. Select **Generic OIDC** from the type dropdown
-5. Fill in the fields:
+1. In the openZro dashboard, go to **Settings → Auth Providers** and click **Add provider**.
+2. Fill in the form:
 
 | Field | Value |
 |-------|-------|
+| ID | A short lowercase identifier, e.g. `corp-idp`; it appears in `/dex/auth/<id>` and cannot be changed later |
 | Type | Generic OIDC |
-| Name | Your provider name (shown on login button) |
+| Display name | Your provider name, shown on the sign-in button |
+| Issuer URL | Your provider's issuer URL (e.g. `https://idp.example.com`) |
 | Client ID | From your identity provider |
 | Client Secret | From your identity provider |
-| Issuer | Your provider's issuer URL (e.g., `https://idp.example.com`) |
+| Redirect URI | Prefilled: `https://<your-domain>/dex/callback` |
 
-6. Click **Save** (don't close the modal yet)
+3. Click **Add provider**.
 
-### Step 4: Configure Redirect URI
-
-After saving, openZro displays the **Redirect URL**. Copy this URL and add it to your identity provider's allowed redirect URIs / callback URLs.
-
-The redirect URL format is typically:
-```
-https://your-openzro-domain.com/oauth2/callback/{connector-id}
-```
+<p>
+    <img src="/docs-static/img/selfhosted/identity-providers/openzro-add-provider-oidc.png" alt="Add authentication provider dialog" className="imagewrapper-big"/>
+</p>
 
 <Note>
-**Common issues:** Ensure the redirect URI matches exactly - no trailing slashes, correct protocol (https), and proper case sensitivity depending on your provider.
+**Common issues:** The redirect URI registered at your provider must match exactly — no trailing slash, `https`, and
+the right case for providers that compare case-sensitively.
 </Note>
 
-### Step 5: Test the Connection
+### Step 4: Test the Connection
 
 1. Log out of openZro Dashboard
 2. On the login page, you should see a button with your provider's name
@@ -170,12 +168,20 @@ Most identity providers require explicit configuration to include groups in toke
 
 Refer to your identity provider's documentation for specific instructions.
 
+<Note>
+Dex passes upstream groups on only when its connector sets `insecureEnableGroups: true` and requests the `groups`
+scope. Connectors added from **Settings → Auth Providers** do not set these, so the claim does not reach openZro.
+To use JWT group sync, declare the connector in `dex.config.yaml` instead (Docker Compose: `artifacts/dex.config.yaml`;
+Helm: `dex.config.connectors`), as in the
+[Helm quickstart](/selfhosted/kubernetes/helm-quickstart#jwt-group-sync-when-using-an-upstream-id-p).
+</Note>
+
 ### Step 2: Enable JWT Group Sync in openZro
 
 1. In openZro Dashboard, go to **Settings** → **Groups**
 2. Enable **JWT group sync**
 3. Set **JWT claim** to the claim name your IdP uses (commonly `groups`, `roles`, or `memberOf`)
-4. Optionally configure **JWT allow groups** to restrict access to specific groups
+4. Optionally configure **JWT allow group** to restrict access to specific groups
 
 ### Example: Groups Claim Configuration
 
@@ -190,7 +196,7 @@ If your IdP returns groups like this:
 
 Configure openZro with:
 - **JWT claim**: `groups`
-- **JWT allow groups**: `openzro-users` (optional - restricts access to this group)
+- **JWT allow group**: `openzro-users` (optional - restricts access to this group)
 
 <Note>
 Groups created via JWT sync are managed by your IdP. Users are added/removed from these groups automatically on each login based on their IdP group membership.
@@ -202,7 +208,7 @@ Groups created via JWT sync are managed by your IdP. Users are added/removed fro
 
 ### Claims in ID Token vs UserInfo
 
-Some providers only include basic claims in the ID token and require a UserInfo request for `email` and `name`. openZro's embedded DEX connector automatically fetches UserInfo when configured with `getUserInfo: true` (the default for generic OIDC connectors).
+Some providers only include basic claims in the ID token and require a UserInfo request for `email` and `name`. Dex's OIDC connector only calls the UserInfo endpoint when it is configured with `getUserInfo: true`. Connectors added from the dashboard leave it off (Dex's default); set it in the connector's configuration if your provider needs it.
 
 If users appear without email or name:
 1. Check if your IdP includes these claims in the ID token
@@ -266,18 +272,27 @@ openZro validates tokens using public keys from your IdP's JWKS endpoint. Ensure
 
 ## API Configuration
 
-You can also configure generic OIDC providers via the API:
+You can also manage providers through the management API at `/api/admin/auth-providers` (`GET`, `POST`, and
+`PUT`/`DELETE` on `/api/admin/auth-providers/{id}`). The `config` object is passed to Dex as the connector's
+configuration, so it can also carry options the dashboard form does not expose, such as `insecureEnableGroups`,
+`scopes` and `getUserInfo`:
 
 ```bash
-curl -X POST "https://openzro.example.com/api/identity-providers" \
-  -H "Authorization: Bearer ${TOKEN}" \
+curl -X POST "https://openzro.example.com/api/admin/auth-providers" \
+  -H "Authorization: Token ${OPENZRO_TOKEN}" \
   -H "Content-Type: application/json" \
   -d '{
+    "id": "corp-idp",
     "type": "oidc",
-    "name": "My Custom IdP",
-    "client_id": "your-client-id",
-    "client_secret": "your-client-secret",
-    "issuer": "https://idp.example.com"
+    "name": "Corp IdP",
+    "config": {
+      "issuer": "https://idp.example.com",
+      "clientID": "your-client-id",
+      "clientSecret": "your-client-secret",
+      "redirectURI": "https://openzro.example.com/dex/callback",
+      "scopes": ["openid", "profile", "email", "groups"],
+      "insecureEnableGroups": true
+    }
   }'
 ```
 
@@ -286,5 +301,5 @@ curl -X POST "https://openzro.example.com/api/identity-providers" \
 ## Related Resources
 
 - [Identity Providers Overview](/selfhosted/identity-providers)
-- [Local User Management](/selfhosted/identity-providers)
+- [Local users (SCIM)](/manage/team/idp-sync/scim-local-users)
 - [OpenID Connect Specification](https://openid.net/specs/openid-connect-core-1_0.html)
