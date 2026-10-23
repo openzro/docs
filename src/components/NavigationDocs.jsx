@@ -305,37 +305,11 @@ export const docsNavigation = [
             title: 'Add Users to Your Network',
             href: '/manage/team/add-users-to-your-network',
           },
-          { title: 'Approve Users', href: '/manage/team/approve-users' },
-          {
-            title: 'Enable openZro for Entra ID',
-            href: '/manage/team/entra-id-app-enablement',
-          },
           {
             title: 'Provision Users & Groups',
             href: '/manage/team/idp-sync',
             isOpen: false,
             links: [
-              {
-                title: 'Microsoft Entra ID (API)',
-                href: '/manage/team/idp-sync/microsoft-entra-id-sync',
-              },
-              {
-                title: 'Microsoft Entra ID (SCIM)',
-                href: '/manage/team/idp-sync/microsoft-entra-id-scim-sync',
-              },
-              { title: 'Okta', href: '/manage/team/idp-sync/okta-sync' },
-              {
-                title: 'Google Workspace',
-                href: '/manage/team/idp-sync/google-workspace-sync',
-              },
-              {
-                title: 'JumpCloud',
-                href: '/manage/team/idp-sync/jumpcloud-sync',
-              },
-              {
-                title: 'Keycloak',
-                href: '/manage/team/idp-sync/keycloak-sync',
-              },
               {
                 title: 'Local users (SCIM)',
                 href: '/manage/team/idp-sync/scim-local-users',
@@ -343,20 +317,14 @@ export const docsNavigation = [
             ],
           },
           {
-            title: 'Auto-Offboard Users',
+            title: 'Offboard Users',
             href: '/manage/team/auto-offboard-users',
             isOpen: false,
           },
           {
             title: 'Single Sign-On',
-            href: '/manage/team/single-sign-on',
+            href: '/selfhosted/identity-providers',
             isOpen: false,
-            //                        links: [
-            //                            { title: 'Authentik', href: '/manage/team/single-sign-on/authentik' },
-            //                            { title: 'Keycloak', href: '/manage/team/single-sign-on/keycloak' },
-            //                            { title: 'Auth0', href: '/manage/team/single-sign-on/auth0' },
-            //                            { title: 'JumpCloud', href: '/manage/team/single-sign-on/jumpcloud' },
-            //                        ]
           },
         ],
       },
